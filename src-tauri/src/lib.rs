@@ -14,6 +14,21 @@ use commands::AppState;
 use std::sync::Mutex;
 use tauri::{Manager, WindowEvent, DragDropEvent};
 
+/// The window background for a theme setting ("light", "dark" or "system",
+/// which follows the OS), matching `--bg` in the app's CSS.
+fn window_background(theme: Option<&str>, os_dark: bool) -> tauri::window::Color {
+    let dark = match theme {
+        Some("dark") => true,
+        Some("light") => false,
+        _ => os_dark,
+    };
+    if dark {
+        tauri::window::Color(0x1b, 0x1e, 0x24, 0xff)
+    } else {
+        tauri::window::Color(0xff, 0xff, 0xff, 0xff)
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -55,6 +70,20 @@ pub fn run() {
                 pending_open: Mutex::new(open_paths::OpenPaths::default()),
             };
             state.load_recents();
+            // The main window is created here rather than in tauri.conf.json so
+            // its background matches the theme from the first frame: while the
+            // web view starts (slow on a first run, when WebView2 creates its
+            // profile), a dark-theme user sees a dark window, not a white one.
+            let theme = storage::read_json(&state.config_dir.join("settings.json"));
+            let window = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::default())
+                .title("Markpion")
+                .inner_size(1280.0, 800.0)
+                .min_inner_size(720.0, 480.0)
+                .center()
+                .build()?;
+            // Set before the event loop runs, so the first paint already has it.
+            let os_dark = matches!(window.theme(), Ok(tauri::Theme::Dark));
+            let _ = window.set_background_color(Some(window_background(theme.get("theme").and_then(|t| t.as_str()), os_dark)));
             // Files passed on the command line (file association, "Open with").
             let cwd = std::env::current_dir().unwrap_or_default();
             let launch = open_paths::paths_from_args(std::env::args().skip(1), &cwd);

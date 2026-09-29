@@ -13,6 +13,8 @@ description: What to do when Markpion doesn't start, shows a blank window, or qu
 
 **Possible cause:** Markpion draws its window with Microsoft Edge WebView2. It's part of Windows 11 and up-to-date Windows 10, but it can be missing or broken on older or locked-down PCs.
 
+**If it happens only once, right after installing or updating:** the first start of a new version can take several seconds while Windows (and antivirus software) check the new program and WebView2 sets up Markpion's browser profile. The window stays empty and may say "Not responding" until then; later starts are quick. From 0.16.0 the empty window uses your theme's background colour instead of white.
+
 **Solution:**
 
 1. Install the [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) (the Evergreen Standalone Installer), then start Markpion again.
