@@ -88,6 +88,8 @@ The installer supports unattended installation. Add `/AllUsers` (run elevated) o
 
 To uninstall silently, run `uninstall.exe /S` from the installation folder.
 
+To preset or lock settings for everyone on the computer (for example, to turn off the AI assistant or the update check), put a `policy.json` in `%ProgramData%\Markpion\`. See [Managed settings](https://nasimuddin-dev.github.io/markpion/reference/managed-settings).
+
 ## macOS
 
 ### Requirements

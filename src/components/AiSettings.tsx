@@ -15,6 +15,7 @@ const MODEL_NAMES: Record<string, string> = {
 export function AiSettings() {
   const settings = useSettings((s) => s.settings);
   const update = useSettings((s) => s.update);
+  const locked = useSettings((s) => s.locked);
   const [status, setStatus] = useState<AiStatus | null>(null);
   const [key, setKey] = useState("");
   const [busy, setBusy] = useState(false);
@@ -41,7 +42,7 @@ export function AiSettings() {
     <section>
       <h3>AI Assistant</h3>
       <label className="check">
-        <input type="checkbox" checked={settings.aiEnabled} onChange={(e) => update({ aiEnabled: e.target.checked })} /> Turn on AI commands (Claude, by
+        <input type="checkbox" checked={settings.aiEnabled} disabled={locked.includes("aiEnabled")} onChange={(e) => update({ aiEnabled: e.target.checked })} /> Turn on AI commands (Claude, by
         Anthropic)
       </label>
       <p className="muted small">
@@ -84,7 +85,7 @@ export function AiSettings() {
             </>
           )}
           <label htmlFor="setting-aiModel">Model</label>
-          <select id="setting-aiModel" value={settings.aiModel} onChange={(e) => update({ aiModel: e.target.value })}>
+          <select id="setting-aiModel" value={settings.aiModel} disabled={locked.includes("aiModel")} onChange={(e) => update({ aiModel: e.target.value })}>
             {(status?.models ?? Object.keys(MODEL_NAMES)).map((m) => (
               <option key={m} value={m}>
                 {MODEL_NAMES[m] ?? m}

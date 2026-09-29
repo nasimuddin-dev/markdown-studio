@@ -243,6 +243,7 @@ export default defineConfig({
           items: [
             { text: "Keyboard Shortcuts", link: "/reference/keyboard-shortcuts" },
             { text: "Configuration", link: "/reference/configuration" },
+            { text: "Managed Settings (IT)", link: "/reference/managed-settings" },
             { text: "Privacy", link: "/privacy" },
             { text: "FAQ", link: "/faq" },
           ],

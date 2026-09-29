@@ -129,6 +129,7 @@ pub fn run() {
             commands::workspace::unwatch_workspace,
             commands::app_data::read_history,
             commands::app_data::load_settings,
+            commands::app_data::load_policy,
             commands::app_data::save_settings,
             commands::app_data::load_recovery,
             commands::app_data::save_recovery,

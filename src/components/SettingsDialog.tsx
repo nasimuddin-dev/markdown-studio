@@ -14,13 +14,21 @@ export function SettingsDialog() {
   const update = useSettings((s) => s.update);
   if (!open) return null;
 
+  const locked = useSettings.getState().locked;
+  const isLocked = (key: keyof Settings) => locked.includes(key);
   const field = <K extends keyof Settings>(key: K) => ({
     id: `setting-${key}`,
     value: settings[key] as unknown as string,
+    disabled: isLocked(key),
   });
 
   return (
     <Modal title="Settings" onClose={() => setOpen(false)} className="settings-modal">
+      {locked.length > 0 && (
+        <p className="settings-managed" role="note">
+          Some settings are managed by your organization and can't be changed here.
+        </p>
+      )}
       <div className="settings-grid">
         <section>
           <h3>Appearance</h3>
@@ -49,11 +57,11 @@ export function SettingsDialog() {
 
         <section>
           <h3>Editor</h3>
-          <label className="check"><input type="checkbox" checked={settings.lineNumbers} onChange={(e) => update({ lineNumbers: e.target.checked })} /> Show line numbers</label>
-          <label className="check"><input type="checkbox" checked={settings.lineWrapping} onChange={(e) => update({ lineWrapping: e.target.checked })} /> Wrap long lines</label>
-          <label className="check"><input type="checkbox" checked={settings.pasteRichTextAsMarkdown} onChange={(e) => update({ pasteRichTextAsMarkdown: e.target.checked })} /> Convert pasted web/Word content to Markdown (Ctrl+Shift+V pastes plain text)</label>
-          <label className="check"><input type="checkbox" checked={settings.spellCheck} onChange={(e) => update({ spellCheck: e.target.checked })} /> Check spelling (uses the system dictionary)</label>
-          <label className="check"><input type="checkbox" checked={settings.lintMarkdown} onChange={(e) => update({ lintMarkdown: e.target.checked })} /> Check Markdown for problems (broken links, headings, alt text)</label>
+          <label className="check"><input type="checkbox" checked={settings.lineNumbers} disabled={isLocked("lineNumbers")} onChange={(e) => update({ lineNumbers: e.target.checked })} /> Show line numbers</label>
+          <label className="check"><input type="checkbox" checked={settings.lineWrapping} disabled={isLocked("lineWrapping")} onChange={(e) => update({ lineWrapping: e.target.checked })} /> Wrap long lines</label>
+          <label className="check"><input type="checkbox" checked={settings.pasteRichTextAsMarkdown} disabled={isLocked("pasteRichTextAsMarkdown")} onChange={(e) => update({ pasteRichTextAsMarkdown: e.target.checked })} /> Convert pasted web/Word content to Markdown (Ctrl+Shift+V pastes plain text)</label>
+          <label className="check"><input type="checkbox" checked={settings.spellCheck} disabled={isLocked("spellCheck")} onChange={(e) => update({ spellCheck: e.target.checked })} /> Check spelling (uses the system dictionary)</label>
+          <label className="check"><input type="checkbox" checked={settings.lintMarkdown} disabled={isLocked("lintMarkdown")} onChange={(e) => update({ lintMarkdown: e.target.checked })} /> Check Markdown for problems (broken links, headings, alt text)</label>
           <label htmlFor="setting-tabSize">Tab size</label>
           <select {...field("tabSize")} onChange={(e) => update({ tabSize: Number(e.target.value) })}>
             {[2, 4, 8].map((n) => <option key={n} value={n}>{n} spaces</option>)}
@@ -81,9 +89,9 @@ export function SettingsDialog() {
             </>
           )}
           <p className="muted small">Untitled documents are never auto-saved. Recovery snapshots are kept either way.</p>
-          <label className="check"><input type="checkbox" checked={settings.trimTrailingWhitespace} onChange={(e) => update({ trimTrailingWhitespace: e.target.checked })} /> Trim trailing whitespace on save (keeps Markdown line breaks)</label>
-          <label className="check"><input type="checkbox" checked={settings.updateTocOnSave} onChange={(e) => update({ updateTocOnSave: e.target.checked })} /> Keep the table of contents up to date on save</label>
-          <label className="check"><input type="checkbox" checked={settings.insertFinalNewline} onChange={(e) => update({ insertFinalNewline: e.target.checked })} /> Insert a final newline on save</label>
+          <label className="check"><input type="checkbox" checked={settings.trimTrailingWhitespace} disabled={isLocked("trimTrailingWhitespace")} onChange={(e) => update({ trimTrailingWhitespace: e.target.checked })} /> Trim trailing whitespace on save (keeps Markdown line breaks)</label>
+          <label className="check"><input type="checkbox" checked={settings.updateTocOnSave} disabled={isLocked("updateTocOnSave")} onChange={(e) => update({ updateTocOnSave: e.target.checked })} /> Keep the table of contents up to date on save</label>
+          <label className="check"><input type="checkbox" checked={settings.insertFinalNewline} disabled={isLocked("insertFinalNewline")} onChange={(e) => update({ insertFinalNewline: e.target.checked })} /> Insert a final newline on save</label>
           <label htmlFor="setting-newFileLineEnding">Line endings for new files</label>
           <select {...field("newFileLineEnding")} onChange={(e) => update({ newFileLineEnding: e.target.value as Settings["newFileLineEnding"] })}>
             <option value="lf">LF (Unix, macOS)</option>
@@ -103,9 +111,9 @@ export function SettingsDialog() {
             <option value={600}>600 ms</option>
             <option value={1000}>1 second</option>
           </select>
-          <label className="check"><input type="checkbox" checked={settings.renderMath} onChange={(e) => update({ renderMath: e.target.checked })} /> Render LaTeX math ($…$ and $$…$$)</label>
-          <label className="check"><input type="checkbox" checked={settings.renderDiagrams} onChange={(e) => update({ renderDiagrams: e.target.checked })} /> Render Mermaid diagrams</label>
-          <label className="check"><input type="checkbox" checked={settings.syncScroll} onChange={(e) => update({ syncScroll: e.target.checked })} /> Sync editor and preview scrolling</label>
+          <label className="check"><input type="checkbox" checked={settings.renderMath} disabled={isLocked("renderMath")} onChange={(e) => update({ renderMath: e.target.checked })} /> Render LaTeX math ($…$ and $$…$$)</label>
+          <label className="check"><input type="checkbox" checked={settings.renderDiagrams} disabled={isLocked("renderDiagrams")} onChange={(e) => update({ renderDiagrams: e.target.checked })} /> Render Mermaid diagrams</label>
+          <label className="check"><input type="checkbox" checked={settings.syncScroll} disabled={isLocked("syncScroll")} onChange={(e) => update({ syncScroll: e.target.checked })} /> Sync editor and preview scrolling</label>
         </section>
 
         <section>
@@ -122,14 +130,14 @@ export function SettingsDialog() {
 
         <section>
           <h3>Startup</h3>
-          <label className="check"><input type="checkbox" checked={settings.restoreSession} onChange={(e) => update({ restoreSession: e.target.checked })} /> Reopen last folder and files</label>
-          <label className="check"><input type="checkbox" checked={settings.checkForUpdates} onChange={(e) => update({ checkForUpdates: e.target.checked })} /> Check for updates when Markpion starts (asks GitHub for the latest version; nothing else is sent)</label>
+          <label className="check"><input type="checkbox" checked={settings.restoreSession} disabled={isLocked("restoreSession")} onChange={(e) => update({ restoreSession: e.target.checked })} /> Reopen last folder and files</label>
+          <label className="check"><input type="checkbox" checked={settings.checkForUpdates} disabled={isLocked("checkForUpdates")} onChange={(e) => update({ checkForUpdates: e.target.checked })} /> Check for updates when Markpion starts (asks GitHub for the latest version; nothing else is sent)</label>
         </section>
       </div>
       <div className="modal-buttons">
         <button
           className="button"
-          onClick={() => update({ ...DEFAULT_SETTINGS, session: settings.session })}
+          onClick={() => update({ ...DEFAULT_SETTINGS, ...useSettings.getState().managedDefaults, session: settings.session })}
         >
           Reset to Defaults
         </button>

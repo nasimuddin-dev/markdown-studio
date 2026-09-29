@@ -150,3 +150,21 @@ describe("AI: Write", () => {
     expect(AI_ACTIONS.write.placement).toBe("cursor");
   });
 });
+
+describe("AI assistant under an IT policy", () => {
+  it("says the organization turned it off, without offering Settings", async () => {
+    const claude = vi.fn(async () => "x");
+    setBackend(new MemoryBackend({ ai: claude, prompt: () => null, policy: { settings: { aiEnabled: false }, locked: ["aiEnabled"] } }));
+    await act(() => useSettings.getState().load());
+    useUi.setState({ dialogs: [], toasts: [] });
+    render(<App />);
+    act(() => {
+      newDocument("Some text.");
+    });
+    await waitFor(() => expect(getEditorView()).toBeTruthy());
+    await act(() => runAiAction("improve"));
+    expect(useUi.getState().toasts.at(-1)?.message).toMatch(/turned off by your organization/);
+    expect(useUi.getState().dialogs).toHaveLength(0);
+    expect(claude).not.toHaveBeenCalled();
+  });
+});

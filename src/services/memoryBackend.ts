@@ -24,6 +24,8 @@ export interface MemoryBackendOptions {
    * assistant: the API key belongs in the desktop app's credential store.
    */
   ai?: (request: { model: string; system: string; prompt: string }) => Promise<string>;
+  /** A managed-settings policy, as an IT administrator would set it (tests). */
+  policy?: unknown;
 }
 
 const AI_MODELS = ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-4-5"];
@@ -58,12 +60,14 @@ export class MemoryBackend implements Backend {
   private readonly promptFn: (message: string, defaultValue: string) => string | null;
   private readonly aiFn: MemoryBackendOptions["ai"];
   private aiKey: string | null = null;
+  private readonly policy: unknown;
   readonly logs: string[] = [];
 
   constructor(opts: MemoryBackendOptions = {}) {
     this.storageKey = opts.storageKey ?? null;
     this.promptFn = opts.prompt ?? ((m, d) => window.prompt(m, d));
     this.aiFn = opts.ai;
+    this.policy = opts.policy ?? null;
     this.capabilities = { desktop: false, trash: false, revealInFolder: false, selfUpdate: false, nativeImport: false, ai: !!opts.ai };
     if (!this.restore()) {
       for (const [path, content] of Object.entries(opts.files ?? {})) this.put(path, content);
@@ -181,6 +185,10 @@ export class MemoryBackend implements Backend {
     this.roots.add(p);
     this.remember(p, "folder");
     return p;
+  }
+
+  async loadPolicy() {
+    return this.policy;
   }
 
   async aiStatus() {

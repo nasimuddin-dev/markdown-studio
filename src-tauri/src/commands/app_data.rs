@@ -3,6 +3,23 @@
 #[allow(unused_imports)]
 use super::*;
 
+/// The managed-settings policy set by an IT administrator, if any. A policy
+/// that can't be read is logged and ignored, so it can never stop the app.
+#[tauri::command]
+pub fn load_policy(state: State<'_, AppState>) -> Value {
+    match storage::read_policy(&storage::policy_path()) {
+        Ok(Some(policy)) => {
+            state.logger.log("info", "policy.load", "managed settings applied");
+            policy
+        }
+        Ok(None) => Value::Null,
+        Err(e) => {
+            state.logger.log("warn", "policy.load", &e);
+            Value::Null
+        }
+    }
+}
+
 #[tauri::command]
 pub fn list_recent(state: State<'_, AppState>) -> Vec<RecentEntry> {
     state.recents.lock().unwrap().clone()

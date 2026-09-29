@@ -164,6 +164,10 @@ async function ensureReady(): Promise<boolean> {
     return false;
   }
   const settings = useSettings.getState();
+  if (!settings.settings.aiEnabled && settings.locked.includes("aiEnabled")) {
+    notify("info", "The AI assistant has been turned off by your organization.");
+    return false;
+  }
   if (!settings.settings.aiEnabled) {
     const choice = await ask({
       title: "AI assistant is off",

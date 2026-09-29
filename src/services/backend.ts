@@ -115,6 +115,8 @@ export interface WorkspaceApi {
 export interface StorageApi {
   loadSettings(): Promise<unknown>;
   saveSettings(settings: unknown): Promise<void>;
+  /** Managed settings set by an IT administrator (read-only), or `null`. */
+  loadPolicy(): Promise<unknown>;
   listRecent(): Promise<RecentEntry[]>;
   openRecent(path: string): Promise<RecentEntry>;
   removeRecent(path: string): Promise<void>;

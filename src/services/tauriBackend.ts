@@ -52,6 +52,7 @@ export const tauriBackend: Backend = {
   listHistory: (path) => call("list_history", { path }),
   readHistory: (path, id) => call("read_history", { path, id }),
   loadSettings: () => call("load_settings"),
+  loadPolicy: () => call("load_policy"),
   saveSettings: (settings) => call("save_settings", { settings }),
   loadRecovery: async () => (await call<RecoverySnapshot | null>("load_recovery")) ?? null,
   saveRecovery: (snapshot) => call("save_recovery", { snapshot }),

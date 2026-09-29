@@ -61,6 +61,8 @@ The installer supports unattended installation. Add `/AllUsers` (run elevated) o
 
 To uninstall silently, run `uninstall.exe /S` from the installation folder.
 
+To preset or lock settings for everyone on the computer (for example, to turn off the AI assistant or the update check), deploy a `policy.json`; see [Managed settings](/reference/managed-settings).
+
 ## Uninstall
 
 Open **Settings → Apps → Installed apps** (or **Control Panel → Programs and Features**), find **Markpion**, and choose **Uninstall**. The uninstaller also removes the right-click menu entry and file-type registrations. Your documents are never removed. Settings and history are kept in `%APPDATA%\com.markpion.app` and `%LOCALAPPDATA%\com.markpion.app`; delete those folders to remove them too.

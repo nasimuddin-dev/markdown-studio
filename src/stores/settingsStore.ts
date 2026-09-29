@@ -1,3 +1,4 @@
+import { applyPolicy, NO_POLICY, parsePolicy, withoutLocked } from "./policy";
 import { create } from "zustand";
 import type { Settings } from "../types";
 import { backend } from "../services";
@@ -88,6 +89,10 @@ export function sanitizeSettings(raw: unknown): Settings {
 interface SettingsState {
   settings: Settings;
   loaded: boolean;
+  /** Settings an IT policy has locked; the app can't change them. */
+  locked: Array<keyof Settings>;
+  /** Defaults set by an IT policy (what "Reset to defaults" returns to). */
+  managedDefaults: Partial<Settings>;
   load(): Promise<void>;
   update(patch: Partial<Settings>): void;
 }
@@ -97,17 +102,25 @@ let saveTimer: ReturnType<typeof setTimeout> | undefined;
 export const useSettings = create<SettingsState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   loaded: false,
+  locked: [],
+  managedDefaults: {},
   async load() {
     let raw: unknown = null;
+    let policy = NO_POLICY;
     try {
       raw = await backend().loadSettings();
     } catch (e) {
       backend().log("warn", "settings.load", String(e));
     }
-    set({ settings: sanitizeSettings(raw), loaded: true });
+    try {
+      policy = parsePolicy(await backend().loadPolicy(), sanitizeSettings, DEFAULT_SETTINGS);
+    } catch (e) {
+      backend().log("warn", "policy.load", String(e));
+    }
+    set({ settings: applyPolicy(raw, policy, sanitizeSettings, DEFAULT_SETTINGS), locked: policy.locked, managedDefaults: policy.settings, loaded: true });
   },
   update(patch) {
-    const settings = sanitizeSettings({ ...get().settings, ...patch });
+    const settings = sanitizeSettings({ ...get().settings, ...withoutLocked(patch, get().locked) });
     set({ settings });
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {

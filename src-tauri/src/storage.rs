@@ -49,6 +49,37 @@ fn copy_dir(from: &Path, to: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Where IT administrators put the managed-settings policy (read-only for the app).
+pub fn policy_path() -> PathBuf {
+    if cfg!(windows) {
+        let base = std::env::var_os("ProgramData").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(r"C:\ProgramData"));
+        base.join("Markpion").join("policy.json")
+    } else if cfg!(target_os = "macos") {
+        PathBuf::from("/Library/Application Support/Markpion/policy.json")
+    } else {
+        PathBuf::from("/etc/markpion/policy.json")
+    }
+}
+
+/// Reads a managed-settings policy: `Ok(None)` if there's none; an error
+/// message if it exists but can't be used (too large, not a JSON object).
+pub fn read_policy(path: &Path) -> Result<Option<Value>, String> {
+    const MAX_POLICY_BYTES: u64 = 64 * 1024;
+    let meta = match fs::metadata(path) {
+        Ok(m) => m,
+        Err(_) => return Ok(None),
+    };
+    if meta.len() > MAX_POLICY_BYTES {
+        return Err(format!("policy file is larger than {MAX_POLICY_BYTES} bytes"));
+    }
+    let text = fs::read_to_string(path).map_err(|e| e.to_string())?;
+    match serde_json::from_str::<Value>(text.trim_start_matches('\u{feff}')) {
+        Ok(v) if v.is_object() => Ok(Some(v)),
+        Ok(_) => Err("policy file must contain a JSON object".into()),
+        Err(e) => Err(format!("policy file isn't valid JSON: {e}")),
+    }
+}
+
 /// Writes JSON through a temporary file so a crash mid-write cannot corrupt it.
 pub fn write_json(path: &Path, value: &Value) -> AppResult<()> {
     if let Some(dir) = path.parent() {
@@ -130,6 +161,21 @@ impl Logger {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn reads_policies_and_rejects_bad_ones() {
+        let tmp = tempfile::tempdir().unwrap();
+        let p = tmp.path().join("policy.json");
+        assert_eq!(read_policy(&p), Ok(None));
+        fs::write(&p, "\u{feff}{\"settings\":{\"aiEnabled\":false},\"locked\":[\"aiEnabled\"]}").unwrap();
+        assert_eq!(read_policy(&p).unwrap().unwrap()["locked"][0], "aiEnabled");
+        fs::write(&p, "[1,2]").unwrap();
+        assert!(read_policy(&p).is_err());
+        fs::write(&p, "{ nope").unwrap();
+        assert!(read_policy(&p).is_err());
+        fs::write(&p, "x".repeat(70 * 1024)).unwrap();
+        assert!(read_policy(&p).unwrap_err().contains("larger"));
+    }
 
     #[test]
     fn legacy_dir_is_copied_once_without_webview_cache() {
