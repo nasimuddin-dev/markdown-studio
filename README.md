@@ -53,7 +53,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Create, open, edit, save and Save As Markdown files (`.md`, `.markdown`) with native dialogs
 - Windows shell integration: "Open with Markpion" in the right-click menu, listed under Open with and Default apps, Installed apps / Programs and Features entry, install for "Only me" or "Everyone"
 - Opens files from the OS: double-click / "Open with" (file association), drag and drop onto the window, and single-instance hand-off
-- Paste or drop images into a document: they are saved to an `assets/` folder next to it and linked automatically
+- Paste or drop images into a document: they are saved to an `assets/` folder next to it and linked automatically; Format → Insert Image… picks an image file (linked in place when it is already in the document's folder, otherwise copied into `assets/`)
 - Workspace folders with a file explorer: new file/folder, duplicate, rename (F2), move (drag and drop onto a folder, or Move To…), delete to the Trash/Recycle Bin, Reveal in File Explorer, Copy (Relative) Path; renaming or moving offers to update the relative links that pointed to (or from) the file
 - Tab context menu: Close Others, Close to the Right, Close Saved, Copy Path, Reveal
 - Tabs with dirty indicators, and Save / Don't Save / Cancel prompts on close and on quit; Save All; Reopen Closed Tab (Ctrl/Cmd+Shift+T); recent files and folders (File menu and welcome screen)

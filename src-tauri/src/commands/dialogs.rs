@@ -78,6 +78,7 @@ fn import_filter(kind: &str) -> AppResult<(&'static str, &'static [&'static str]
         "pdf" => Ok(("PDF document", &["pdf"])),
         "csv" => Ok(("Spreadsheet data (CSV/TSV)", &["csv", "tsv"])),
         "json" => Ok(("Markpion settings", &["json"])),
+        "image" => Ok(("Image", &["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "avif"])),
         _ => Err(AppError::InvalidPath("Unsupported import type".into())),
     }
 }
@@ -97,4 +98,19 @@ pub async fn pick_import_file(app: AppHandle, state: State<'_, AppState>, kind: 
     };
     let resolved = state.track("dialog.import", state.scope.allow_file(&path))?;
     Ok(Some(fs_ops::path_string(&resolved)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::import_filter;
+
+    #[test]
+    fn import_filters_cover_each_kind_and_reject_others() {
+        for kind in ["docx", "html", "pdf", "csv", "json", "image"] {
+            let (_, exts) = import_filter(kind).unwrap();
+            assert!(!exts.is_empty());
+        }
+        assert!(import_filter("image").unwrap().1.contains(&"png"));
+        assert!(import_filter("exe").is_err());
+    }
 }

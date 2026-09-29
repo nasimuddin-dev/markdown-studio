@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import type { Element, ElementContent, Root } from "hast";
 
 /**
@@ -73,13 +74,14 @@ export function rehypeChunks() {
 const mountAllListeners = new Set<() => void>();
 
 /**
- * Builds every chunk of the preview (for jumping to a heading or an anchor
- * that may not be rendered yet); resolves once they are in the page.
+ * Builds every chunk of the preview right away (for jumping to a heading or
+ * an anchor that may not be rendered yet), so the caller can scroll to it.
  */
-export function mountAllChunks(): Promise<void> {
-  if (!mountAllListeners.size) return Promise.resolve();
-  for (const mount of [...mountAllListeners]) mount();
-  return new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+export function mountAllChunks() {
+  if (!mountAllListeners.size) return;
+  flushSync(() => {
+    for (const mount of [...mountAllListeners]) mount();
+  });
 }
 
 /** One chunk: a sized placeholder until it nears the visible area. */

@@ -1,6 +1,6 @@
 import { backend } from "../services";
 import { describeError } from "../services/errors";
-import { basename } from "../services/paths";
+import { basename, dirname, isInside, relativePath } from "../services/paths";
 import { activeDoc } from "../stores/documentsStore";
 import { notify } from "../stores/uiStore";
 import { getEditorView } from "./editorBridge";
@@ -74,6 +74,12 @@ export async function insertImageFiles(files: File[]): Promise<boolean> {
       notify("error", /outOfScope|access/i.test(msg) ? msg + " Open the document's folder to allow adding images." : msg);
     }
   }
+  insertImageLinks(links);
+  return true;
+}
+
+/** Inserts image links at the cursor, each on its own line. */
+function insertImageLinks(links: string[]) {
   const view = getEditorView();
   if (links.length && view) {
     const { from, to } = view.state.selection.main;
@@ -86,5 +92,50 @@ export async function insertImageFiles(files: File[]): Promise<boolean> {
     view.dispatch({ changes: { from, to, insert }, selection: { anchor: from + insert.length }, userEvent: "input.paste" });
     view.focus();
   }
-  return true;
+}
+
+/** Markdown for an image file the document can reach by a relative path. */
+export function relativeImageMarkdown(docPath: string, imagePath: string): string | null {
+  const rel = relativePath(dirname(docPath), imagePath);
+  if (rel === null) return null;
+  const alt = basename(imagePath).replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
+  return `![${alt}](${encodeURI(rel).replace(/\(/g, "%28").replace(/\)/g, "%29")})`;
+}
+
+/**
+ * Format → Insert Image…: asks for an image file and links it at the cursor.
+ * An image inside the document's folder is linked where it is; any other is
+ * copied into the "assets" folder next to the document first.
+ */
+export async function insertImageFromFile() {
+  const doc = activeDoc();
+  if (!doc) return;
+  if (!doc.path) {
+    notify("info", "Save the document first. Inserted images are linked relative to it.");
+    return;
+  }
+  const b = backend();
+  if (!b.capabilities.nativeImport) {
+    const file = await new Promise<File | null>((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.addEventListener("change", () => resolve(input.files?.[0] ?? null), { once: true });
+      input.addEventListener("cancel", () => resolve(null), { once: true });
+      input.click();
+    });
+    if (file) await insertImageFiles([file]);
+    return;
+  }
+  try {
+    const path = await b.pickImportFile("image");
+    if (!path) return;
+    const local = isInside(path, dirname(doc.path)) ? relativeImageMarkdown(doc.path, path) : null;
+    if (local) return insertImageLinks([local]);
+    const name = assetFileName(new File([], basename(path)));
+    const saved = await b.saveImageAsset(doc.path, name, await b.readBinaryFile(path));
+    insertImageLinks([imageMarkdown(saved)]);
+  } catch (e) {
+    notify("error", describeError(e, "insert the image"));
+  }
 }

@@ -29,7 +29,7 @@ const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
   {
     label: "Format",
     items: () => [
-      c("bold"), c("italic"), c("strikethrough"), c("inlineCode"), c("link"), sep,
+      c("bold"), c("italic"), c("strikethrough"), c("inlineCode"), c("link"), c("insertImage"), sep,
       c("heading1"), c("heading2"), c("heading3"), c("paragraph"), c("promoteHeading"), c("demoteHeading"), c("moveSectionUp"), c("moveSectionDown"), sep,
       c("bulletList"), c("orderedList"), c("taskList"), c("toggleTaskCheck"), c("quote"), sep,
       c("codeBlock"), c("table"), c("formatTable"), c("tableRowAbove"), c("tableRowBelow"), c("tableColumnLeft"), c("tableColumnRight"), c("tableDeleteRow"), c("tableDeleteColumn"), c("sortTableAsc"), c("sortTableDesc"), c("copyTableCsv"), c("horizontalRule"), c("footnote"), sep, c("toc"),

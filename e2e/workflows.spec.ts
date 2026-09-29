@@ -458,12 +458,16 @@ test("long documents render in chunks; the outline, anchors and tasks still work
   // Chunks far below the visible area are placeholders until needed.
   await expect(preview.locator(".preview-chunk.pending").first()).toBeAttached();
 
-  await preview.getByRole("link", { name: "Jump" }).click();
-  await expect(preview.getByRole("heading", { name: "Section 110" })).toBeInViewport();
-
-  await page.keyboard.press(`${mod}+Home`);
+  // The outline builds the rest of the preview before scrolling to the heading.
   await page.getByRole("region", { name: "Outline" }).getByRole("button", { name: "Section 115" }).click();
   await expect(preview.getByRole("heading", { name: "Section 115" })).toBeInViewport();
+  await expect(preview.locator(".preview-chunk.pending")).toHaveCount(0);
+
+  // Back to the top of the preview, then follow an anchor link.
+  await preview.evaluate((el) => el.scrollTo({ top: 0 }));
+  await expect(preview.getByRole("link", { name: "Jump" })).toBeInViewport();
+  await preview.getByRole("link", { name: "Jump" }).click();
+  await expect(preview.getByRole("heading", { name: "Section 110" })).toBeInViewport();
 
   await preview.getByRole("checkbox", { name: "Open task" }).click();
   await expect(page.locator(".cm-line").filter({ hasText: "- [x] last task" })).toHaveCount(1);

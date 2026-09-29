@@ -23,6 +23,15 @@ The easiest way to add an image is to **paste** it (for example a screenshot) or
 
 The document must be saved first, so Markpion knows where to put the `assets` folder. Supported formats are PNG, JPEG, GIF, WebP, SVG, BMP and AVIF, up to 20 MB per image.
 
+## Insert Image…
+
+**Format → Insert Image…** (also in the command palette) asks for an image file and inserts a link at the cursor:
+
+- An image that is already in the document's folder, or a folder inside it, is linked where it is, for example `![logo](images/logo.png)`.
+- An image from anywhere else is copied into the `assets` folder next to the document first, like a dropped file.
+
+In the browser demo, the image is always copied into `assets`.
+
 ## Local images and paths
 
 | Path | Example | Supported |

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
-import { assetFileName, imageMarkdown, insertImageFiles, isImageFile, toBase64 } from "../src/features/images";
+import { assetFileName, imageMarkdown, insertImageFiles, insertImageFromFile, isImageFile, relativeImageMarkdown, toBase64 } from "../src/features/images";
 import { registerEditorView } from "../src/features/editorBridge";
 import { newDocument, openPath } from "../src/features/documents";
 import { useUi } from "../src/stores/uiStore";
@@ -69,5 +69,50 @@ describe("inserting images", () => {
     setupBackend();
     newDocument();
     expect(await insertImageFiles([new File(["x"], "a.txt", { type: "text/plain" })])).toBe(false);
+  });
+});
+
+describe("Insert Image…", () => {
+  /** A backend that behaves like the desktop app's native picker, returning `picked`. */
+  function nativeBackend(files: Record<string, string>, picked: string | null) {
+    const backend = setupBackend(files);
+    Object.assign(backend, { capabilities: { ...backend.capabilities, nativeImport: true }, pickImportFile: async () => picked });
+    return backend;
+  }
+
+  it("links an image inside the document's folder where it is", async () => {
+    nativeBackend({ "/ws/docs/a.md": "", "/ws/docs/pics/my cat (1).png": "png" }, "/ws/docs/pics/my cat (1).png");
+    await openPath("/ws/docs/a.md");
+    const view = mountEditor("");
+    await insertImageFromFile();
+    expect(view.state.doc.toString()).toBe("![my cat (1)](pics/my%20cat%20%281%29.png)");
+    view.destroy();
+  });
+
+  it("copies an image from elsewhere into assets/ next to the document", async () => {
+    const backend = nativeBackend({ "/ws/docs/a.md": "", "/ws/other/dog.png": "png" }, "/ws/other/dog.png");
+    await openPath("/ws/docs/a.md");
+    const view = mountEditor("");
+    await insertImageFromFile();
+    expect(view.state.doc.toString()).toBe("![dog](assets/dog.png)");
+    expect(await backend.fileMtime("/ws/docs/assets/dog.png")).not.toBeNull();
+    view.destroy();
+  });
+
+  it("does nothing when the picker is cancelled, and asks to save untitled documents first", async () => {
+    nativeBackend({ "/ws/a.md": "x" }, null);
+    await openPath("/ws/a.md");
+    const view = mountEditor("x");
+    await insertImageFromFile();
+    expect(view.state.doc.toString()).toBe("x");
+    view.destroy();
+    newDocument("draft");
+    await insertImageFromFile();
+    expect(useUi.getState().toasts.at(-1)?.message).toMatch(/Save the document first/);
+  });
+
+  it("builds relative links for images the document can reach", () => {
+    expect(relativeImageMarkdown("/ws/docs/a.md", "/ws/img/b_c.png")).toBe("![b c](../img/b_c.png)");
+    expect(relativeImageMarkdown("C:\\ws\\a.md", "D:\\img\\b.png")).toBeNull();
   });
 });

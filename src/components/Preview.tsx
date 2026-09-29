@@ -249,7 +249,7 @@ export function Preview() {
     const target = classifyLink(anchor.getAttribute("data-href") ?? anchor.getAttribute("href"));
     switch (target.type) {
       case "anchor": {
-        await mountAllChunks();
+        mountAllChunks();
         const el = ref.current?.querySelector(`[id="${CSS.escape(target.id)}"], [id="user-content-${CSS.escape(target.id)}"]`);
         el?.scrollIntoView({ behavior: "smooth", block: "start" });
         break;
