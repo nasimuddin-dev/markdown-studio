@@ -7,6 +7,10 @@ description: The complete list of Markpion keyboard shortcuts for Windows, Linux
 
 The tables below are generated from Markpion's source code when this site is built, so they match the current version. Inside the app, **Help → Keyboard Shortcuts** shows the same list with a search box, and the command palette (**Ctrl+Shift+P** / **Cmd+Shift+P**, or **F1**) lists every command, including those without a shortcut.
 
+## Change a shortcut
+
+In **Help → Keyboard Shortcuts**, choose **Change** next to a command and press the new key combination (**Esc** cancels). Shortcuts need **Ctrl**, **Alt** or **Cmd**, or a function key. If another command already uses it, Markpion asks whether to move it. **Remove** leaves a command without a shortcut, **Reset** restores the original, and **Reset All** restores every shortcut. Any command can get a shortcut, including those without one here. Your shortcuts are saved in `keybindings` in [settings.json](/reference/configuration#settings-json); the tables below show the defaults.
+
 ## App commands
 
 Files, tabs, editing, search and views.

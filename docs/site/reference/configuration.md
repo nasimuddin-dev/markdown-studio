@@ -50,6 +50,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `aiEnabled` | `false` | Turns on the [AI assistant](/guide/ai-assistant) |
 | `aiModel` | `"claude-opus-5-5"` | `"claude-opus-5-5"`, `"claude-sonnet-5-5"`, `"claude-haiku-4-5"` |
 | `aiConsent` | `false` | `true` once the user has agreed to send text for AI commands |
+| `keybindings` | `{}` | Changed shortcuts: command id → shortcut such as `"Mod+Shift+K"` (`Mod` is Ctrl, or Cmd on macOS), or `null` for none. See [Keyboard shortcuts](/reference/keyboard-shortcuts#change-a-shortcut) |
 
 The file also records the last session (open folder and files) so it can be restored.
 

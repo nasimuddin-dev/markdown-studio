@@ -32,8 +32,22 @@ export const DEFAULT_SETTINGS: Settings = {
   aiEnabled: false,
   aiModel: "claude-opus-5-5",
   aiConsent: false,
+  keybindings: {},
   session: { workspace: null, files: [] },
 };
+
+/** A shortcut such as "Mod+Shift+K", "Alt+ArrowUp" or "F2". */
+export const SHORTCUT = /^((Mod|Ctrl|Shift|Alt)\+){0,4}([A-Z0-9]|F([1-9]|1[0-9]|2[0-4])|Arrow(Up|Down|Left|Right)|Tab|Enter|Escape|Space|Home|End|PageUp|PageDown|Delete|Backspace|Insert|[-=[\]\\;',./`])$/;
+
+function sanitizeKeybindings(raw: unknown): Record<string, string | null> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  const out: Record<string, string | null> = {};
+  for (const [id, value] of Object.entries(raw as Record<string, unknown>).slice(0, 300)) {
+    if (!/^[A-Za-z][A-Za-z0-9]{0,40}$/.test(id)) continue;
+    if (value === null || (typeof value === "string" && SHORTCUT.test(value))) out[id] = value as string | null;
+  }
+  return out;
+}
 
 const clamp = (n: unknown, min: number, max: number, fallback: number) =>
   typeof n === "number" && Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback;
@@ -79,6 +93,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     aiEnabled: bool(s.aiEnabled, d.aiEnabled),
     aiModel: typeof s.aiModel === "string" && /^claude-[a-z0-9-]{3,60}$/.test(s.aiModel) ? s.aiModel : d.aiModel,
     aiConsent: bool(s.aiConsent, d.aiConsent),
+    keybindings: sanitizeKeybindings(s.keybindings),
     session: {
       workspace: typeof session.workspace === "string" ? session.workspace : null,
       files: Array.isArray(session.files) ? session.files.filter((f): f is string => typeof f === "string").slice(0, 50) : [],

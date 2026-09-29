@@ -93,6 +93,8 @@ export interface Settings {
   aiModel: string;
   /** Set once the user has accepted that AI commands send text to Anthropic. */
   aiConsent: boolean;
+  /** Changed keyboard shortcuts: command id → shortcut ("Mod+Shift+K"), or null for none. */
+  keybindings: Record<string, string | null>;
   /** Last session's workspace and open files, restored on launch (FR-003). */
   session: { workspace: string | null; files: string[] };
 }

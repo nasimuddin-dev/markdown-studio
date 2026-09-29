@@ -53,6 +53,23 @@ const markdownHighlight = HighlightStyle.define([
 ]);
 
 const appearance = new Compartment();
+/** The editor's key bindings; reconfigured when the user changes shortcuts. */
+const keys = new Compartment();
+
+function editorKeys(): Extension {
+  return keymap.of([
+    { key: "Mod-g", run: gotoLine, preventDefault: true },
+    { key: "Mod-h", run: openReplacePanel, preventDefault: true },
+    ...editorKeymap(),
+    ...defaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
+    // In a table, Tab and Shift+Tab move between cells; elsewhere they indent.
+    { key: "Tab", run: moveTableCell(true), shift: moveTableCell(false) },
+    indentWithTab,
+  ]);
+}
 const gutters = new Compartment();
 const wrapping = new Compartment();
 const tabs = new Compartment();
@@ -77,6 +94,7 @@ function reconfigure(s: Settings) {
     tabs.reconfigure([EditorState.tabSize.of(s.tabSize), indentUnit.of(" ".repeat(s.tabSize))]),
     linting.reconfigure(s.lintMarkdown ? markdownLinter() : []),
     spelling.reconfigure(spellAttr(s.spellCheck)),
+    keys.reconfigure(editorKeys()),
   ];
 }
 
@@ -156,18 +174,7 @@ export function Editor() {
             return true;
           },
         }),
-        keymap.of([
-          { key: "Mod-g", run: gotoLine, preventDefault: true },
-          { key: "Mod-h", run: openReplacePanel, preventDefault: true },
-          ...editorKeymap(),
-          ...defaultKeymap,
-          ...searchKeymap,
-          ...historyKeymap,
-          ...foldKeymap,
-          // In a table, Tab and Shift+Tab move between cells; elsewhere they indent.
-          { key: "Tab", run: moveTableCell(true), shift: moveTableCell(false) },
-          indentWithTab,
-        ]),
+        keys.of(editorKeys()),
         appearance.of(appearanceExt(s)),
         gutters.of(s.lineNumbers ? [lineNumbers(), foldGutter(), highlightActiveLineGutter()] : []),
         wrapping.of(s.lineWrapping ? EditorView.lineWrapping : []),

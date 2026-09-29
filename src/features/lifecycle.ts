@@ -4,7 +4,7 @@ import { useSettings } from "../stores/settingsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { ask } from "../stores/uiStore";
 import type { RecoverySnapshot } from "../types";
-import { handleGlobalKeydown } from "./commands";
+import { applyKeybindings, handleGlobalKeydown } from "./commands";
 import { checkExternalChanges, closeAllDocuments, openPath } from "./documents";
 import { refreshWorkspace, setWorkspace } from "./workspace";
 import { installOsOpenHandlers } from "./osOpen";
@@ -204,6 +204,11 @@ export async function startApp() {
   );
 
   await useSettings.getState().load();
+  // The user's own keyboard shortcuts, now and whenever they change.
+  applyKeybindings(useSettings.getState().settings.keybindings);
+  useSettings.subscribe((s, prev) => {
+    if (s.settings.keybindings !== prev.settings.keybindings) applyKeybindings(s.settings.keybindings);
+  });
   applyTheme(useSettings.getState().settings.theme);
   useSettings.subscribe((s, prev) => {
     if (s.settings.theme !== prev.settings.theme) applyTheme(s.settings.theme);

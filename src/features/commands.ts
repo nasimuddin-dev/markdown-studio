@@ -400,16 +400,41 @@ export function eventToShortcut(e: KeyboardEvent): string {
 /** Shortcuts handled by the editor itself when it has focus. */
 const EDITOR_OWNED = new Set(["undo", "redo", "selectAll", "find", "replace", "gotoLine"]);
 
-const byShortcut = (() => {
+/** "Ctrl+Tab" on Windows/Linux is "Mod+Tab" after normalization. */
+const normalizeShortcut = (shortcut: string) => (!isMac ? shortcut.replace(/^Ctrl\+/, "Mod+") : shortcut);
+
+function buildShortcutMap() {
   const map = new Map<string, Command>();
-  for (const c of Object.values(commands)) {
-    if (!c.shortcut) continue;
-    // "Ctrl+Tab" on Windows/Linux is "Mod+Tab" after normalization.
-    const normalized = !isMac ? c.shortcut.replace(/^Ctrl\+/, "Mod+") : c.shortcut;
-    map.set(normalized, c);
-  }
+  for (const c of Object.values(commands)) if (c.shortcut) map.set(normalizeShortcut(c.shortcut), c);
   return map;
-})();
+}
+let byShortcut = buildShortcutMap();
+
+/** Each command's built-in shortcut, before the user's changes. */
+const DEFAULT_SHORTCUTS = new Map(Object.values(commands).map((c) => [c.id, c.shortcut] as const));
+
+export function defaultShortcut(id: string): string | undefined {
+  return DEFAULT_SHORTCUTS.get(id);
+}
+
+/**
+ * Applies the user's shortcuts (Settings `keybindings`: command id → shortcut,
+ * or `null` for none) over the built-in ones. Menus, the command palette and
+ * the global and editor key handling all read `command.shortcut`.
+ */
+export function applyKeybindings(overrides: Record<string, string | null>) {
+  for (const c of Object.values(commands)) {
+    const id = c.id;
+    c.shortcut = Object.hasOwn(overrides, id) ? (overrides[id] ?? undefined) : DEFAULT_SHORTCUTS.get(id);
+  }
+  byShortcut = buildShortcutMap();
+}
+
+/** The command that already uses a shortcut, if any (besides `exceptId`). */
+export function commandWithShortcut(shortcut: string, exceptId?: string): Command | undefined {
+  const c = byShortcut.get(normalizeShortcut(shortcut));
+  return c && c.id !== exceptId ? c : undefined;
+}
 
 export function handleGlobalKeydown(e: KeyboardEvent) {
   if (e.defaultPrevented || e.isComposing) return;

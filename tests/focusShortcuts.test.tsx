@@ -17,7 +17,7 @@ describe("keyboard shortcuts reference", () => {
     expect(screen.getByRole("heading", { name: "Format" })).toBeInTheDocument();
     expect(screen.getByRole("row", { name: /Bold Ctrl\+B/ })).toBeInTheDocument();
     await userEvent.type(screen.getByRole("textbox", { name: "Filter commands" }), "find in files");
-    expect(screen.getAllByRole("row").map((r) => r.textContent)).toEqual(["Find in FilesCtrl+Shift+F"]);
+    expect(screen.getAllByRole("row").map((r) => [...r.querySelectorAll("td")].slice(0, 2).map((td) => td.textContent).join(""))).toEqual(["Find in FilesCtrl+Shift+F"]);
     await userEvent.clear(screen.getByRole("textbox", { name: "Filter commands" }));
     await userEvent.type(screen.getByRole("textbox", { name: "Filter commands" }), "zzqqxx");
     expect(screen.getByText("No matching commands.")).toBeInTheDocument();

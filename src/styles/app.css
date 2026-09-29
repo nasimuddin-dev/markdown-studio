@@ -1848,3 +1848,19 @@ body.dragging-entry * {
     border-top-color: Highlight;
   }
 }
+
+/* Keyboard Shortcuts dialog: changing shortcuts */
+.shortcuts-table .shortcut-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+.shortcuts-table .shortcut-actions .button + .button {
+  margin-left: 4px;
+}
+.shortcuts-table tr.custom kbd {
+  border-color: var(--accent);
+}
+.shortcuts-table .recording {
+  color: var(--accent);
+  font-style: italic;
+}
