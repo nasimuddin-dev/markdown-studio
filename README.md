@@ -49,7 +49,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 
 ## Features
 
-- Optional AI assistant (Claude, by Anthropic; off by default): the AI menu improves, fixes, shortens, summarizes, translates or continues the selected text or follows your own instruction (Ctrl/Cmd+J), with a review (editable, undoable) before anything changes. Uses your own API key, stored in Windows Credential Manager / macOS Keychain and only read by the native process, which calls api.anthropic.com directly; asks for consent before the first request
+- Optional AI assistant (Claude, by Anthropic; off by default): the AI menu improves, fixes, shortens, summarizes, translates or continues the selected text follows your own instruction (Ctrl/Cmd+J), or writes new text at the cursor from an instruction alone (Ctrl/Cmd+Shift+J), with a review (editable, undoable) before anything changes. Uses your own API key, stored in Windows Credential Manager / macOS Keychain and only read by the native process, which calls api.anthropic.com directly; asks for consent before the first request
 - Create, open, edit, save and Save As Markdown files (`.md`, `.markdown`) with native dialogs
 - Windows shell integration: "Open with Markpion" in the right-click menu, listed under Open with and Default apps, Installed apps / Programs and Features entry, install for "Only me" or "Everyone"
 - Opens files from the OS: double-click / "Open with" (file association), drag and drop onto the window, and single-instance hand-off

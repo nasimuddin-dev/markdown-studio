@@ -72,7 +72,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 
 ## AI assistant (optional)
 
-- Off by default. With your own Anthropic API key, the **AI** menu asks Claude to improve, fix, shorten, summarize, translate or continue the selected text, or to follow your own instruction (**Ctrl+J**). You review and can edit every answer before it changes the document, and the key stays in the system's credential store. [AI Assistant](/guide/ai-assistant)
+- Off by default. With your own Anthropic API key, the **AI** menu asks Claude to improve, fix, shorten, summarize, translate or continue the selected text, to follow your own instruction (**Ctrl+J**), or to write new text at the cursor from an instruction alone (**Ctrl+Shift+J**). You review and can edit every answer before it changes the document, and the key stays in the system's credential store. [AI Assistant](/guide/ai-assistant)
 
 ## Not included
 
