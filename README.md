@@ -158,7 +158,7 @@ tests/          Vitest unit and component tests
 e2e/            Playwright workflows and axe-core accessibility audits
 scripts/        Versioning and release scripts
 downloads/      The latest standard Windows installer and its checksum
-docs/           All documentation: SRS, requirement traceability, installation guide, development log,
+docs/           All documentation: design, SRS, requirement traceability, installation guide, development log,
                 website spec, and site/ (the pages of the documentation website)
 website/        Website tooling: VitePress config, theme and checks (deployed to GitHub Pages)
 .github/        CI, the macOS/Linux release workflow and the website deployment
@@ -169,6 +169,7 @@ website/        Website tooling: VitePress config, theme and checks (deployed to
 | Document | Contents |
 | --- | --- |
 | [Website](https://nasimuddin-dev.github.io/markpion/) ([source](docs/site/)) | The public user documentation: download, installation, user guide, Markdown reference, FAQ, troubleshooting, changelog, roadmap, blog |
+| [docs/DESIGN.md](docs/DESIGN.md) | Core design with diagrams: architecture layers, security boundary, document lifecycle, safe save, recovery, preview and export pipelines, updates, release |
 | [docs/INSTALL.md](docs/INSTALL.md) | Installing, updating and uninstalling on Windows, macOS and Linux; troubleshooting |
 | [docs/SRS.md](docs/SRS.md) | Software requirements specification (the baseline requirements) |
 | [docs/TRACEABILITY.md](docs/TRACEABILITY.md) | Status of every requirement, where it is implemented, and known gaps |
