@@ -12,11 +12,13 @@ export interface AiReview {
   from: number;
   to: number;
   placement: AiPlacement;
+  /** Claude is still writing the suggestion. */
+  streaming?: boolean;
 }
 
 interface AiState {
   /** The request being waited for; `seq` tells a cancelled or older request apart. */
-  busy: { label: string; seq: number } | null;
+  busy: { label: string; seq: number; abort?: () => void } | null;
   /** An answer waiting for the user to apply, copy or discard it. */
   review: AiReview | null;
   setBusy(busy: AiState["busy"]): void;

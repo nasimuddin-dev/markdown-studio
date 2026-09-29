@@ -69,6 +69,7 @@ pub fn run() {
                 data_dir,
                 recents: Mutex::new(Vec::new()),
                 pending_open: Mutex::new(open_paths::OpenPaths::default()),
+                ai_cancelled: Mutex::new(Default::default()),
             };
             state.load_recents();
             // The main window is created here rather than in tauri.conf.json so
@@ -139,6 +140,7 @@ pub fn run() {
             commands::ai::ai_status,
             commands::ai::ai_set_key,
             commands::ai::ai_complete,
+            commands::ai::ai_cancel,
             updater::check_app_update,
             updater::install_app_update,
         ])

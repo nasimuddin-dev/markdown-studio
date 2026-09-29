@@ -1,4 +1,4 @@
-import type { Backend, WriteRequest } from "./backend";
+import type { AiRequest, Backend, WriteRequest } from "./backend";
 import { AppError } from "./errors";
 import { basename, dirname, isMarkdownPath, join } from "./paths";
 import type { AppUpdate, DirEntry, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
@@ -23,7 +23,7 @@ export interface MemoryBackendOptions {
    * Stands in for Claude in tests. Without it the browser demo has no AI
    * assistant: the API key belongs in the desktop app's credential store.
    */
-  ai?: (request: { model: string; system: string; prompt: string }) => Promise<string>;
+  ai?: (request: AiRequest) => Promise<string>;
   /** A managed-settings policy, as an IT administrator would set it (tests). */
   policy?: unknown;
 }
@@ -202,10 +202,14 @@ export class MemoryBackend implements Backend {
     return this.aiStatus();
   }
 
-  async aiComplete(request: { model: string; system: string; prompt: string }) {
+  async aiComplete(request: AiRequest, onText?: (text: string) => void, signal?: AbortSignal) {
     if (!this.aiFn) throw new AppError("ai", AI_DESKTOP_ONLY);
     if (!this.aiKey) throw new AppError("ai", "Add your Anthropic API key in Settings → AI Assistant first.");
-    return this.aiFn(request);
+    const answer = await this.aiFn(request);
+    if (signal?.aborted) return null;
+    // Streams the stand-in answer word by word, like the real one.
+    for (const piece of answer.match(/\S+\s*|\s+/g) ?? []) onText?.(piece);
+    return answer;
   }
 
   async pickExportFolder() {

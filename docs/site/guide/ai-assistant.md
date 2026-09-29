@@ -33,11 +33,11 @@ The **AI** menu, and the command palette (search for "AI"), have these commands.
 | Ask Claude… (**Ctrl+J** / **Cmd+J**) | Follows your own instruction, such as "turn this into a table" | Over the original |
 | Write… (**Ctrl+Shift+J** / **Cmd+Shift+J**) | Writes new text from your instruction alone, such as "an introduction about our release process". **No document text is sent** | At the cursor |
 
-While Claude works, a message at the bottom of the window shows its progress; **Cancel** stops waiting.
+The review window opens straight away and shows the answer as Claude writes it. **Stop** (or closing the window) ends the request, so Claude stops writing and nothing is applied.
 
 ## Review before anything changes
 
-The answer opens in a review window next to the original text. You can **edit the suggestion** first, then:
+When Claude has finished, you can **edit the suggestion**, then:
 
 - **Replace** (or **Insert** / **Insert Below**, depending on the command) puts it into the document as one edit, so **Ctrl+Z** undoes it;
 - **Copy** copies it to the clipboard;

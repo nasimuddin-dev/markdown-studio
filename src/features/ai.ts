@@ -238,34 +238,49 @@ export async function runAiAction(id: AiActionId): Promise<void> {
     input = answer;
   }
   const seq = ++requestSeq;
-  useAi.getState().setBusy({ label: action.label, seq });
+  const controller = new AbortController();
+  const ai = useAi.getState();
+  ai.setBusy({ label: action.label, seq, abort: () => controller.abort() });
+  // The review opens at once and fills in as Claude writes.
+  ai.setReview({
+    docId,
+    label: action.label,
+    original: action.scope === "selection" ? target.text : "",
+    suggestion: "",
+    from: target.from,
+    to: target.to,
+    placement: action.placement,
+    streaming: true,
+  });
+  const current = () => useAi.getState().busy?.seq === seq;
   try {
-    const answer = await backend().aiComplete({
-      model: useSettings.getState().settings.aiModel,
-      system: AI_SYSTEM_PROMPT,
-      prompt: buildAiPrompt(action, target.text, input),
-    });
+    const answer = await backend().aiComplete(
+      { model: useSettings.getState().settings.aiModel, system: AI_SYSTEM_PROMPT, prompt: buildAiPrompt(action, target.text, input) },
+      (text) => {
+        const review = useAi.getState().review;
+        if (current() && review) useAi.getState().setReview({ ...review, suggestion: review.suggestion + text });
+      },
+      controller.signal,
+    );
     // Cancelled, or replaced by a newer request.
-    if (useAi.getState().busy?.seq !== seq) return;
-    useAi.getState().setReview({
-      docId,
-      label: action.label,
-      original: action.scope === "selection" ? target.text : "",
-      suggestion: cleanAiAnswer(answer, target.text),
-      from: target.from,
-      to: target.to,
-      placement: action.placement,
-    });
+    if (!current() || answer === null) return;
+    const review = useAi.getState().review;
+    if (review) useAi.getState().setReview({ ...review, suggestion: cleanAiAnswer(answer, target.text), streaming: false });
   } catch (e) {
-    if (useAi.getState().busy?.seq === seq) notify("error", describeError(e, action.label.toLowerCase()));
+    if (current()) {
+      useAi.getState().setReview(null);
+      notify("error", describeError(e, action.label.toLowerCase()));
+    }
   } finally {
-    if (useAi.getState().busy?.seq === seq) useAi.getState().setBusy(null);
+    if (current()) useAi.getState().setBusy(null);
   }
 }
 
-/** Stops waiting for the current request (its answer is ignored when it arrives). */
+/** Stops the current request: Claude stops writing and nothing is applied. */
 export function cancelAiRequest() {
+  useAi.getState().busy?.abort?.();
   useAi.getState().setBusy(null);
+  useAi.getState().setReview(null);
 }
 
 /**

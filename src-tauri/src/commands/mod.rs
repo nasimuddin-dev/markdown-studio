@@ -40,6 +40,8 @@ pub struct AppState {
     pub recents: Mutex<Vec<RecentEntry>>,
     /// Files/folders passed on the command line, waiting for the UI to start.
     pub pending_open: Mutex<crate::open_paths::OpenPaths>,
+    /// AI requests the user cancelled; their streams stop at the next chunk.
+    pub ai_cancelled: Mutex<std::collections::HashSet<u64>>,
 }
 
 impl AppState {

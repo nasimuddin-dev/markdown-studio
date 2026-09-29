@@ -217,8 +217,76 @@ fn network_error(e: reqwest::Error) -> AppError {
     }
 }
 
-/// Sends one request, retrying twice on rate limits, overload and server errors.
-pub async fn complete(key: &str, model: &str, system: &str, prompt: &str) -> AppResult<String> {
+/// One server-sent event of a streamed answer, reduced to what the app needs.
+#[derive(Debug, PartialEq)]
+pub enum StreamEvent {
+    /// More answer text. Text is never taken back: after a mid-answer refusal
+    /// fallback, the next model continues from it (a `fallback` block marks the
+    /// switch and is ignored here).
+    Text(String),
+    /// Why generation stopped (from `message_delta`).
+    Stop(String),
+    /// The API reported an error inside the stream (e.g. overloaded).
+    Error { error_type: String, message: String },
+    Other,
+}
+
+/// Parses the `data:` JSON of one server-sent event.
+pub fn parse_stream_event(data: &str) -> StreamEvent {
+    let v: Value = match serde_json::from_str(data) {
+        Ok(v) => v,
+        Err(_) => return StreamEvent::Other,
+    };
+    match v["type"].as_str().unwrap_or("") {
+        "content_block_delta" if v["delta"]["type"] == "text_delta" => {
+            StreamEvent::Text(v["delta"]["text"].as_str().unwrap_or("").to_string())
+        }
+        "message_delta" => match v["delta"]["stop_reason"].as_str() {
+            Some(reason) => StreamEvent::Stop(reason.to_string()),
+            None => StreamEvent::Other,
+        },
+        "error" => StreamEvent::Error {
+            error_type: v["error"]["type"].as_str().unwrap_or("").to_string(),
+            message: v["error"]["message"].as_str().unwrap_or("").to_string(),
+        },
+        _ => StreamEvent::Other,
+    }
+}
+
+/// Splits complete server-sent events off the front of `buffer`, returning their `data:` payloads.
+pub fn drain_sse_events(buffer: &mut String) -> Vec<String> {
+    let mut out = Vec::new();
+    loop {
+        let normalized = buffer.replace("\r\n", "\n");
+        let Some(end) = normalized.find("\n\n") else {
+            *buffer = normalized;
+            return out;
+        };
+        let event = &normalized[..end];
+        let data: Vec<&str> = event
+            .lines()
+            .filter_map(|l| l.strip_prefix("data:"))
+            .map(|d| d.strip_prefix(' ').unwrap_or(d))
+            .collect();
+        if !data.is_empty() {
+            out.push(data.join("\n"));
+        }
+        *buffer = normalized[end + 2..].to_string();
+    }
+}
+
+/// Like [`complete`], but streams the answer: `on_text` receives each piece as
+/// it arrives, and `cancelled` is checked between pieces (stopping the
+/// download ends the request, so the rest isn't generated or billed).
+pub async fn complete_stream(
+    key: &str,
+    model: &str,
+    system: &str,
+    prompt: &str,
+    cancelled: impl Fn() -> bool,
+    mut on_text: impl FnMut(&str),
+) -> AppResult<Option<String>> {
+    use futures_util::StreamExt;
     if !MODELS.contains(&model) {
         return Err(AppError::Ai(format!("Unknown model “{model}”.")));
     }
@@ -229,9 +297,10 @@ pub async fn complete(key: &str, model: &str, system: &str, prompt: &str) -> App
         )));
     }
     let http = client()?;
-    let body = request_body(model, system, prompt);
+    let mut body = request_body(model, system, prompt);
+    body["stream"] = json!(true);
     let mut attempt = 0;
-    loop {
+    let res = loop {
         let mut req = http
             .post(format!("{API_BASE}/messages"))
             .header("x-api-key", key)
@@ -242,6 +311,9 @@ pub async fn complete(key: &str, model: &str, system: &str, prompt: &str) -> App
         }
         let res = req.send().await.map_err(network_error)?;
         let status = res.status().as_u16();
+        if status == 200 {
+            break res;
+        }
         let wait = res
             .headers()
             .get("retry-after")
@@ -250,13 +322,48 @@ pub async fn complete(key: &str, model: &str, system: &str, prompt: &str) -> App
             .unwrap_or(2 << attempt)
             .min(20);
         let text = res.text().await.map_err(network_error)?;
-        if retryable(status) && attempt < 2 {
+        if retryable(status) && attempt < 2 && !cancelled() {
             attempt += 1;
             tokio::time::sleep(Duration::from_secs(wait)).await;
             continue;
         }
-        return parse_response(status, &text);
+        return parse_response(status, &text).map(Some);
+    };
+
+    let mut stream = res.bytes_stream();
+    let mut buffer = String::new();
+    let mut answer = String::new();
+    let mut stop = String::new();
+    while let Some(chunk) = stream.next().await {
+        if cancelled() {
+            return Ok(None);
+        }
+        let chunk = chunk.map_err(network_error)?;
+        buffer.push_str(&String::from_utf8_lossy(&chunk));
+        for data in drain_sse_events(&mut buffer) {
+            match parse_stream_event(&data) {
+                StreamEvent::Text(t) => {
+                    answer.push_str(&t);
+                    on_text(&t);
+                }
+                StreamEvent::Stop(reason) => stop = reason,
+                StreamEvent::Error { error_type, message } => {
+                    let status = match error_type.as_str() {
+                        "overloaded_error" => 529,
+                        "rate_limit_error" => 429,
+                        "api_error" => 500,
+                        _ => 400,
+                    };
+                    let body = json!({ "error": { "type": error_type, "message": message } }).to_string();
+                    return parse_response(status, &body).map(Some);
+                }
+                StreamEvent::Other => {}
+            }
+        }
     }
+    // Reuse the non-streaming checks (refusal, truncation, empty answer).
+    let final_message = json!({ "content": [{ "type": "text", "text": answer }], "stop_reason": stop }).to_string();
+    parse_response(200, &final_message).map(Some)
 }
 
 /// Checks a key with a free request (lists one model).
@@ -326,8 +433,31 @@ mod tests {
     async fn live_api_rejects_an_invalid_key() {
         let err = test_key("sk-ant-invalid-key-for-markpion-tests").await.unwrap_err();
         assert!(matches!(&err, AppError::Ai(m) if m.contains("API key was rejected")), "{err:?}");
-        let err = complete("sk-ant-invalid-key-for-markpion-tests", "claude-opus-5-5", "s", "hi").await.unwrap_err();
+        let err = complete_stream("sk-ant-invalid-key-for-markpion-tests", "claude-opus-5-5", "s", "hi", || false, |_| {}).await.unwrap_err();
         assert!(matches!(&err, AppError::Ai(m) if m.contains("API key was rejected")), "{err:?}");
+    }
+
+    #[test]
+    fn parses_streamed_events() {
+        let mut buf = String::from(
+            "event: message_start\ndata: {\"type\":\"message_start\"}\n\nevent: content_block_delta\r\ndata: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"text_delta\",\"text\":\"Hel\"}}\r\n\r\nevent: content_block_delta\ndata: {\"type\":\"content_block_del",
+        );
+        let events = drain_sse_events(&mut buf);
+        assert_eq!(events.len(), 2);
+        assert_eq!(parse_stream_event(&events[0]), StreamEvent::Other);
+        assert_eq!(parse_stream_event(&events[1]), StreamEvent::Text("Hel".into()));
+        // The incomplete event stays buffered until the rest arrives.
+        assert!(buf.starts_with("event: content_block_delta"));
+        buf.push_str("ta\",\"index\":0,\"delta\":{\"type\":\"text_delta\",\"text\":\"lo\"}}\n\n");
+        assert_eq!(parse_stream_event(&drain_sse_events(&mut buf)[0]), StreamEvent::Text("lo".into()));
+        // Thinking deltas, fallback markers and pings are ignored.
+        assert_eq!(parse_stream_event(r#"{"type":"content_block_delta","delta":{"type":"thinking_delta","thinking":"x"}}"#), StreamEvent::Other);
+        assert_eq!(parse_stream_event(r#"{"type":"content_block_start","content_block":{"type":"fallback"}}"#), StreamEvent::Other);
+        assert_eq!(parse_stream_event(r#"{"type":"message_delta","delta":{"stop_reason":"end_turn"}}"#), StreamEvent::Stop("end_turn".into()));
+        assert_eq!(
+            parse_stream_event(r#"{"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}"#),
+            StreamEvent::Error { error_type: "overloaded_error".into(), message: "Overloaded".into() }
+        );
     }
 
     #[test]

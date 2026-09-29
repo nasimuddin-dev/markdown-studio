@@ -147,13 +147,23 @@ export interface PlatformApi {
   exportLogs(): Promise<string | null>;
 }
 
+export interface AiRequest {
+  model: string;
+  system: string;
+  prompt: string;
+}
+
 /** The optional AI assistant. The API key never passes through the UI after it's saved. */
 export interface AiApi {
   aiStatus(): Promise<AiStatus>;
   /** Checks and stores the Anthropic API key, or removes it (`null`). */
   aiSetKey(key: string | null): Promise<AiStatus>;
-  /** Sends one request to Claude and returns the answer's text. */
-  aiComplete(request: { model: string; system: string; prompt: string }): Promise<string>;
+  /**
+   * Sends one request to Claude. `onText` receives the answer as it's
+   * written; the whole answer is returned at the end, or `null` if `signal`
+   * aborted the request (which stops it, so the rest isn't generated).
+   */
+  aiComplete(request: AiRequest, onText?: (text: string) => void, signal?: AbortSignal): Promise<string | null>;
 }
 
 export interface Backend extends DialogsApi, FilesApi, WorkspaceApi, StorageApi, PlatformApi, AiApi {

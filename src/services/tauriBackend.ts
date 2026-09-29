@@ -11,6 +11,8 @@ async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> 
   }
 }
 
+let nextAiRequestId = 1;
+
 export const tauriBackend: Backend = {
   capabilities: { desktop: true, trash: true, revealInFolder: true, selfUpdate: true, nativeImport: true, ai: true },
   appInfo: () => call("app_info"),
@@ -20,7 +22,21 @@ export const tauriBackend: Backend = {
   pickExportFolder: () => call("pick_export_folder"),
   aiStatus: () => call("ai_status"),
   aiSetKey: (key) => call("ai_set_key", { key }),
-  aiComplete: ({ model, system, prompt }) => call("ai_complete", { model, system, prompt }),
+  aiComplete: async ({ model, system, prompt }, onText, signal) => {
+    const requestId = nextAiRequestId++;
+    const { listen } = await import("@tauri-apps/api/event");
+    const unlisten = await listen<{ requestId: number; text: string }>("ai-stream", (e) => {
+      if (e.payload.requestId === requestId) onText?.(e.payload.text);
+    });
+    const cancel = () => void call("ai_cancel", { requestId });
+    signal?.addEventListener("abort", cancel);
+    try {
+      return await call<string | null>("ai_complete", { requestId, model, system, prompt });
+    } finally {
+      unlisten();
+      signal?.removeEventListener("abort", cancel);
+    }
+  },
   pickSavePath: (suggestedName, directory) => call("pick_save_path", { suggestedName, directory }),
 
   pickImportFile: (kind) => call("pick_import_file", { kind }),

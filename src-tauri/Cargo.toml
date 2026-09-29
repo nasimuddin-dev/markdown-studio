@@ -28,7 +28,8 @@ base64 = "0.22"
 regex = "1"
 notify-debouncer-mini = "0.7"
 # AI assistant: HTTPS to the Claude API (same reqwest/rustls build as the updater).
-reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider", "system-proxy"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "rustls-no-provider", "system-proxy"] }
+futures-util = "0.3"
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
 tokio = { version = "1", features = ["time"] }
 

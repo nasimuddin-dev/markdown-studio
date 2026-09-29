@@ -7,7 +7,9 @@ import { Modal } from "./Dialogs";
 /** "Claude is working…" while an AI request runs, with Cancel. */
 function AiBusy() {
   const busy = useAi((s) => s.busy);
-  if (!busy) return null;
+  const reviewing = useAi((s) => !!s.review);
+  // Once the review opens, it shows the progress itself.
+  if (!busy || reviewing) return null;
   return (
     <div className="ai-busy" role="status" aria-live="polite">
       <span className="ai-spinner" aria-hidden="true" />
@@ -27,7 +29,9 @@ function AiReviewDialog() {
   const [text, setText] = useState("");
   useEffect(() => setText(review?.suggestion ?? ""), [review]);
   if (!review) return null;
-  const close = () => useAi.getState().setReview(null);
+  const streaming = !!review.streaming;
+  // Closing while Claude is still writing stops the request.
+  const close = () => (streaming ? cancelAiRequest() : useAi.getState().setReview(null));
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text);
@@ -52,25 +56,34 @@ function AiReviewDialog() {
         )}
         <section>
           <h3>
-            <label htmlFor="ai-suggestion">Suggestion (you can edit it before applying)</label>
+            <label htmlFor="ai-suggestion">{streaming ? "Claude is writing…" : "Suggestion (you can edit it before applying)"}</label>
           </h3>
-          <textarea id="ai-suggestion" className="ai-suggestion" value={text} onChange={(e) => setText(e.target.value)} spellCheck data-autofocus />
+          <textarea
+            id="ai-suggestion"
+            className="ai-suggestion"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            readOnly={streaming}
+            aria-busy={streaming}
+            spellCheck
+            data-autofocus
+          />
         </section>
         <p className="muted small">Written by Claude. Check it before you use it.</p>
       </div>
       <div className="modal-buttons">
         <button className="button" onClick={close}>
-          Discard
+          {streaming ? "Stop" : "Discard"}
         </button>
-        <button className="button" onClick={() => void copy()}>
+        <button className="button" onClick={() => void copy()} disabled={streaming}>
           Copy
         </button>
         {alternative && (
-          <button className="button" onClick={() => applyAiReview(alternative, text)}>
+          <button className="button" onClick={() => applyAiReview(alternative, text)} disabled={streaming}>
             {PRIMARY_LABEL[alternative]}
           </button>
         )}
-        <button className="button primary" onClick={() => applyAiReview(review.placement, text)} disabled={!text.trim()}>
+        <button className="button primary" onClick={() => applyAiReview(review.placement, text)} disabled={streaming || !text.trim()}>
           {PRIMARY_LABEL[review.placement]}
         </button>
       </div>

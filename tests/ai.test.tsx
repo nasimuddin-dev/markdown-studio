@@ -54,8 +54,9 @@ describe("AI assistant: in the editor", () => {
     setBackend(backend);
     useDocuments.setState({ docs: [], activeId: null });
     useWorkspace.getState().setRoot(null);
-    useUi.setState({ dialogs: [], toasts: [] });
+    useUi.setState({ dialogs: [], toasts: [], settingsOpen: false });
     useAi.setState({ busy: null, review: null });
+    useSettings.setState({ locked: [], managedDefaults: {} });
     useSettings.getState().update({ aiEnabled: true, aiConsent: true, aiModel: "claude-opus-5-5" });
     return { backend, claude };
   }
@@ -156,7 +157,7 @@ describe("AI assistant under an IT policy", () => {
     const claude = vi.fn(async () => "x");
     setBackend(new MemoryBackend({ ai: claude, prompt: () => null, policy: { settings: { aiEnabled: false }, locked: ["aiEnabled"] } }));
     await act(() => useSettings.getState().load());
-    useUi.setState({ dialogs: [], toasts: [] });
+    useUi.setState({ dialogs: [], toasts: [], settingsOpen: false });
     render(<App />);
     act(() => {
       newDocument("Some text.");
@@ -166,5 +167,40 @@ describe("AI assistant under an IT policy", () => {
     expect(useUi.getState().toasts.at(-1)?.message).toMatch(/turned off by your organization/);
     expect(useUi.getState().dialogs).toHaveLength(0);
     expect(claude).not.toHaveBeenCalled();
+  });
+});
+
+describe("AI streaming", () => {
+  it("opens the review at once, fills it as Claude writes, and Stop cancels without changes", async () => {
+    let release: (v: string) => void = () => {};
+    const claude = vi.fn(() => new Promise<string>((r) => (release = r)));
+    const backend = new MemoryBackend({ ai: claude, prompt: () => null });
+    setBackend(backend);
+    await backend.aiSetKey("sk-ant-test-key-1234567890");
+    useDocuments.setState({ docs: [], activeId: null });
+    useUi.setState({ dialogs: [], toasts: [], settingsOpen: false });
+    useAi.setState({ busy: null, review: null });
+    useSettings.setState({ locked: [], managedDefaults: {} });
+    useSettings.getState().update({ aiEnabled: true, aiConsent: true });
+    render(<App />);
+    act(() => {
+      newDocument("Some text.");
+    });
+    await waitFor(() => expect(getEditorView()).toBeTruthy());
+    let done: Promise<void> = Promise.resolve();
+    act(() => {
+      done = runAiAction("improve");
+    });
+    const dialog = await screen.findByRole("dialog", { name: /AI: Improve Writing/ });
+    expect(dialog).toHaveTextContent("Claude is writing…");
+    expect(screen.getByRole("button", { name: "Replace" })).toBeDisabled();
+    await userEvent.click(screen.getByRole("button", { name: "Stop" }));
+    await act(async () => {
+      release("Better text.");
+      await done;
+    });
+    expect(screen.queryByRole("dialog", { name: /AI:/ })).toBeNull();
+    expect(useAi.getState().busy).toBeNull();
+    expect(getEditorView()!.state.doc.toString()).toBe("Some text.");
   });
 });
