@@ -408,3 +408,34 @@ The user reported that a tab with a long file name showed its icon above the nam
 - **Fix:** `.tab-main` is laid out for every tab, and only unsaved tabs are italic. The tab strip's scrollbar is hidden; the mouse wheel scrolls the tabs sideways, and the active tab is scrolled into view.
 - **Test:** a Playwright regression test checks that the icon, name and close button share one row, the long name is truncated, a saved name isn't italic and an unsaved one is, and the tabs fill the bar. It fails on the old CSS (icon 18.5 px above the name) and passes now. Playwright 26.
 - **Docs:** website Tabs page (truncation, wheel scrolling, italic unsaved names). Ships in the next release.
+
+## 2026-09-28 (4:00 PM, scheduled session): features without a log entry
+
+The scheduled session ended before it wrote its entry. Its commits, from `git log`: d69c7d4 LaTeX formulas exported to Word as native equations, 3f072bb display formulas drawn as pictures in PDF export, 1e3f608 Replace in Files, 409d443 Go to File (Ctrl/Cmd+Alt+O), 6953bd6 Explorer: Duplicate a file. "Copy as Formatted Text" was left uncommitted; it was tested and committed on 2026-09-29 (5d1bdf6). All shipped in 0.14.0.
+
+## 2026-09-29: Renamed to Markpion (0.14.0), inline math in PDF, shortcut fix, docs merge (0.15.0)
+
+At the user's request the app was renamed from **Markdown Studio** to **Markpion**.
+
+- **Rename** (7a2df02): product name, window title, bundle identifier `com.markpion.app`, Rust crate/binary `markpion`, npm package, installer names `Markpion-<version>-…`, registry integration, update/release URLs, website and docs (90 files). New logo (an "M" with a pen nib) with regenerated icons and website screenshots. The GitHub repository was renamed to `nasimuddin-dev/markpion` (`gh repo rename`); the git remote was updated. GitHub redirects the old repository, releases and API, so 0.13 installs find the update (verified: the old `latest.json` URL returns 0.14.0). **GitHub Pages doesn't redirect:** the old site URL returns 404.
+- **Upgrade path:** on first start Markpion copies settings, recent files, recovery and history from the old `com.markdownstudio.app` folder (`storage::migrate_legacy_dir`, Rust test). The Windows installer silently runs the Markdown Studio uninstaller first. The release script also accepts the updater key under its old file name (`~/.tauri/markdown-studio.key`).
+- **Release 0.14.0** (7f28ab9): Windows standard and offline installers, macOS and Linux builds from CI. Both Windows download links returned 200.
+- **PDF export: inline formulas as text** (46763a0): italic variables, real superscripts/subscripts, fractions, roots, Greek; formulas needing glyphs the bundled Roboto lacks keep their LaTeX. A test checks the allowed characters against the font file. Verified visually by rendering an exported PDF with pdf.js.
+- **Bug reported by the user: no desktop shortcut after updating** (dbb7cf2). Cause, confirmed in Tauri's generated `installer.nsi`: the old uninstaller deletes Markdown Studio's desktop and Start menu shortcuts, and an update (`/UPDATE`) never creates shortcuts. The user's PC had Markpion 0.14.0 for all users and no shortcut at all. The installer hook now creates both once (when it removes Markdown Studio, or when Markdown Studio's data folder shows the PC was already upgraded to 0.14.0), with a registry marker so they don't come back after the user deletes them; `/NS` is respected. It compiles (makensis); **the upgrade itself is unverified** until the user's app updates to 0.15.0.
+- **Docs merged into `docs/`** (1b6cdcd, user's choice of layout): website pages moved to `docs/site/`; `website/` keeps the tooling. The VitePress config resolves the pages' imports from `website/node_modules` and keeps Vue external in the server build; the shortcut loader loads the website's TypeScript 5 (the app has TypeScript 7). docs:check and the 23 site browser checks pass.
+- **Performance investigation, nothing shipped:** section-by-section preview rendering looked like a 4× win in dev mode, but production builds showed no difference (per keystroke ~110 ms at 800 KB either way), so it was reverted. Measured: pasting 100/400/800 KB takes 3/10/21 s until the preview shows it. Recorded in TRACEABILITY known gaps and the roadmap.
+
+**Tests:** Vitest 260 (41 files), Playwright 31, Rust 28, website check (48 pages) and 23 site browser checks. All passing.
+
+**Next up:**
+
+1. Large documents: find where the 3–21 s first display goes (paste handling, CodeMirror, first preview render) and move it off the main thread or render progressively.
+2. Verify the shortcut fix on the user's PC after the 0.15.0 update.
+3. Tauri-driver e2e against the native build.
+
+**Questions for the user:**
+
+- The old website address (nasimuddin-dev.github.io/markdown-studio) now returns 404. A small `markdown-studio` repository with a redirect page would keep old links working. Should I create it?
+- The local folder is still `D:\Development\markdown-studio`. Rename it to `markpion`? (The scheduled task and the memory folder refer to the old path.)
+- The bundle identifier is `com.markpion.app`; Tauri warns that identifiers ending in `.app` aren't recommended on macOS. Changing it later would need another data migration, so it's best decided now.
+- `AGENTS.md` (untracked) is a copy of the project rules. Commit it, or delete it?

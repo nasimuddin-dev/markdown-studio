@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-Status of each [SRS](SRS.md) requirement as of version 0.14.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
+Status of each [SRS](SRS.md) requirement as of version 0.15.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
 
 ## Functional requirements
 
@@ -94,9 +94,9 @@ Status of each [SRS](SRS.md) requirement as of version 0.14.0. **Done** means im
 
 ## Test coverage
 
-| Level | Where | Count (0.14.0) |
+| Level | Where | Count (0.15.0) |
 | --- | --- | --- |
-| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 254 tests in 40 files |
+| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 260 tests in 41 files |
 | End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 31 tests |
 | Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 28 tests |
 
@@ -110,6 +110,6 @@ Status of each [SRS](SRS.md) requirement as of version 0.14.0. **Done** means im
 - ARM64 builds for Windows and Linux (SRS §13.1, §21).
 - The startup bundle is 691 KB (232 KB gzipped); the preview pipeline, export and Mermaid are lazy-loaded. It could be trimmed further (a highlight.js language subset).
 - A native OS menu bar on macOS (the in-app menu is used on all platforms today).
-- Large-file benchmark (10 MB+) and incremental preview rendering.
+- Large documents: measured on 2026-09-29 (production build, Edge), a keystroke costs at most 0–120 ms up to 800 KB, but pasting a whole document into a new tab takes about 3 s at 100 KB, 10 s at 400 KB and 21 s at 800 KB until the preview shows it (live preview pauses only above 1 MB). Splitting the preview into sections didn't help (tried and reverted); opening a file wasn't measured separately yet, and the cost is in the first full render, so the next step is rendering it off the main thread or progressively.
 - Playwright runs against the browser demo; a Tauri-driver e2e run against the native build is still to do.
 - Localization (i18n): waiting on the choice of languages.

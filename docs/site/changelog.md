@@ -7,6 +7,18 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.15.0
+
+Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.15.0)
+
+### Added
+
+- **Inline formulas in PDF export** are set as text, with italic variables, real superscripts and subscripts, fractions and roots. A formula that needs a symbol the PDF font doesn't have (arrows, set symbols), a script inside a script, or a matrix still shows its LaTeX.
+
+### Fixed
+
+- **Windows: missing shortcuts after updating from Markdown Studio.** Updating to 0.14.0 removed the Markdown Studio shortcuts without creating Markpion ones. This update creates the Start menu and desktop shortcuts once. Pin Markpion to the taskbar again from the Start menu if you had pinned Markdown Studio.
+
 ## v0.14.0
 
 Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.14.0)
