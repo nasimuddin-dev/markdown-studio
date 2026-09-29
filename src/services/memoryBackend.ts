@@ -212,6 +212,23 @@ export class MemoryBackend implements Backend {
     return answer;
   }
 
+  // Browser host: the same behaviour a web version would have.
+  async setWindowTitle() {
+    /* The page title is the window title in a browser. */
+  }
+
+  async toggleFullScreen() {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen?.().catch(() => {});
+  }
+
+  async guardClose(_canClose: () => Promise<boolean>, hasUnsaved: () => boolean) {
+    // A browser can't show the app's own dialog when a tab closes; it can only warn.
+    window.addEventListener("beforeunload", (e) => {
+      if (hasUnsaved()) e.preventDefault();
+    });
+  }
+
   async pickExportFolder() {
     const answer = this.promptFn("Export to folder:", "/export");
     if (!answer) return null;

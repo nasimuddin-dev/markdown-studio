@@ -39,7 +39,7 @@ function sectionEnd(list: Heading[], i: number, lastLine: number): number {
  * above the previous section or below the next one at the same level, within
  * the same parent. The cursor stays at the same place in the moved section.
  */
-export function moveSection(direction: -1 | 1): StateCommand {
+function moveSection(direction: -1 | 1): StateCommand {
   return ({ state, dispatch }) => {
     const doc = state.doc;
     const list = headings(doc);

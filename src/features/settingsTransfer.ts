@@ -10,7 +10,7 @@ import type { Settings } from "../types";
  * and the AI consent are personal and never exported or imported.
  */
 
-export const SETTINGS_FILE_NAME = "markpion-settings.json";
+const SETTINGS_FILE_NAME = "markpion-settings.json";
 
 /** The file's content: a marker, a format version and the settings. */
 export function settingsExport(settings: Settings, now = new Date()): string {

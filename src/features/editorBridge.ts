@@ -47,7 +47,7 @@ export function editorShowing(docId: string | null) {
 }
 
 /** Selects `length` characters at line/column (UTF-16) and scrolls them into view. */
-export function selectRange(line: number, column: number, length: number) {
+function selectRange(line: number, column: number, length: number) {
   if (!view) return;
   const doc = view.state.doc;
   const l = doc.line(Math.max(1, Math.min(line, doc.lines)));

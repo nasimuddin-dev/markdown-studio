@@ -8,7 +8,7 @@ import { EditorSelection, type EditorState, type Transaction, type StateCommand 
 type Dispatch = (tr: Transaction) => void;
 
 /** Toggles an inline marker (e.g. `**`) around each selection range. */
-export function toggleInline(marker: string): StateCommand {
+function toggleInline(marker: string): StateCommand {
   return ({ state, dispatch }) => {
     const len = marker.length;
     const tr = state.changeByRange((range) => {
@@ -113,7 +113,7 @@ export function setHeading(level: number): StateCommand {
  * Moves each selected heading up (`delta` < 0, fewer `#`) or down a level,
  * staying within H1–H6. Lines that aren't headings are left alone.
  */
-export function shiftHeadingLevel(delta: -1 | 1): StateCommand {
+function shiftHeadingLevel(delta: -1 | 1): StateCommand {
   return ({ state, dispatch }) => {
     const changes = selectedLines(state).flatMap((line) => {
       const m = HEADING.exec(line.text);
@@ -216,7 +216,7 @@ function hasKind(text: string, kind: LineKind) {
  * non-empty line already has that kind, it is removed; otherwise any existing
  * list/quote prefix is replaced.
  */
-export function toggleLinePrefix(kind: LineKind): StateCommand {
+function toggleLinePrefix(kind: LineKind): StateCommand {
   return ({ state, dispatch }) => {
     const lines = selectedLines(state);
     const content = lines.filter((l) => l.text.trim() !== "" || lines.length === 1);

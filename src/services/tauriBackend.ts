@@ -13,6 +13,8 @@ async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> 
 
 let nextAiRequestId = 1;
 
+const currentWindow = async () => (await import("@tauri-apps/api/window")).getCurrentWindow();
+
 export const tauriBackend: Backend = {
   capabilities: { desktop: true, trash: true, revealInFolder: true, selfUpdate: true, nativeImport: true, ai: true },
   appInfo: () => call("app_info"),
@@ -96,4 +98,16 @@ export const tauriBackend: Backend = {
     invoke("log_event", { level, category, message }).catch(() => {});
   },
   exportLogs: () => call("export_logs"),
+  setWindowTitle: async (title) => {
+    await (await currentWindow()).setTitle(title);
+  },
+  toggleFullScreen: async () => {
+    const win = await currentWindow();
+    await win.setFullscreen(!(await win.isFullscreen()));
+  },
+  guardClose: async (canClose) => {
+    await (await currentWindow()).onCloseRequested(async (event) => {
+      if (!(await canClose())) event.preventDefault();
+    });
+  },
 };

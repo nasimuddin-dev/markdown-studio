@@ -15,6 +15,25 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 // The preview pulls in the Markdown/math/highlighting pipeline; load it in
 // parallel with first paint instead of blocking startup on it.
 const Preview = lazy(() => import("./components/Preview").then((m) => ({ default: m.Preview })));
+// Rarely used dialogs load on first use, keeping them out of the startup bundle.
+const HistoryDialog = lazy(() => import("./components/HistoryDialog").then((m) => ({ default: m.HistoryDialog })));
+const ShortcutsDialog = lazy(() => import("./components/ShortcutsDialog").then((m) => ({ default: m.ShortcutsDialog })));
+const AiPanel = lazy(() => import("./components/AiPanel").then((m) => ({ default: m.AiPanel })));
+
+/** Mounts the lazily loaded dialogs only once they are first needed. */
+function OnDemandDialogs() {
+  const history = useUi((s) => s.historyDocId !== null);
+  const shortcuts = useUi((s) => s.shortcutsOpen);
+  const ai = useAi((s) => !!s.busy || !!s.review);
+  return (
+    <Suspense fallback={null}>
+      {history && <HistoryDialog />}
+      {shortcuts && <ShortcutsDialog />}
+      {ai && <AiPanel />}
+    </Suspense>
+  );
+}
+
 function PreviewPane() {
   // A document that broke the preview is retried as soon as it changes.
   const content = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.content);
@@ -41,9 +60,7 @@ import { DialogHost, Toasts } from "./components/Dialogs";
 import { AboutDialog, SettingsDialog } from "./components/SettingsDialog";
 import { Welcome } from "./components/Welcome";
 import { CommandPalette } from "./components/CommandPalette";
-import { HistoryDialog } from "./components/HistoryDialog";
-import { ShortcutsDialog } from "./components/ShortcutsDialog";
-import { AiPanel } from "./components/AiPanel";
+import { useAi } from "./stores/aiStore";
 import { useSettings } from "./stores/settingsStore";
 import { useDocuments } from "./stores/documentsStore";
 
@@ -187,9 +204,7 @@ export default function App() {
       <SettingsDialog />
       <AboutDialog />
       <CommandPalette />
-      <HistoryDialog />
-      <ShortcutsDialog />
-      <AiPanel />
+      <OnDemandDialogs />
       <DialogHost />
       <Toasts />
     </div>

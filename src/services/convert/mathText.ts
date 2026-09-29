@@ -22,7 +22,7 @@ export const EXTRA_GLYPHS = "ϑϖ−′″∑∫∏√∞∂≤≥≠≈…ℓ";
 
 const SPACED = new Set(["=", "<", ">", "≤", "≥", "≠", "≈", "+", "−", "×", "÷", "±", "~"]);
 
-export function hasGlyph(ch: string): boolean {
+function hasGlyph(ch: string): boolean {
   const cp = ch.codePointAt(0)!;
   return (cp >= 0x20 && cp <= 0x7e) || (cp >= 0xa0 && cp <= 0xff) || (cp >= 0x391 && cp <= 0x3c9) || EXTRA_GLYPHS.includes(ch);
 }

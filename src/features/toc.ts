@@ -30,7 +30,7 @@ export function buildToc(markdown: string, maxDepth = 2): string {
   return `${TOC_START}\n${lines.join("\n")}\n${TOC_END}`;
 }
 
-export const hasToc = (markdown: string) => TOC_BLOCK.test(markdown);
+const hasToc = (markdown: string) => TOC_BLOCK.test(markdown);
 
 /** Regenerates an existing TOC block (used on save). Returns the text unchanged if there is none. */
 export function updateToc(markdown: string): string {

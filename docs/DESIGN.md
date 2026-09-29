@@ -360,15 +360,15 @@ flowchart LR
 | `FilesApi` | Scope-checked disk I/O; saves carry the last-seen modification time | REST calls; the same `expectedMtime` field carries a revision/ETag, so conflict detection works unchanged |
 | `WorkspaceApi` | Folder listing, search (Rust), file watcher | Server-side listing and search; change notifications over a WebSocket |
 | `StorageApi` | Settings, recents, recovery and history in app-data folders | Per-account settings and server-side version history |
-| `PlatformApi` | Reveal in folder, OS "Open with", signed self-update | Mostly absent (`capabilities` switches the UI features off) |
+| `PlatformApi` | Window title, full screen, the close guard (Save / Don't Save when the window closes), reveal in folder, OS "Open with", signed self-update | The page title, the browser's Fullscreen API and a "leave page?" warning; the rest is absent (`capabilities` switches those UI features off) |
 | `AiApi` | The Rust core calls Anthropic with the user's key from the OS credential store | A server endpoint calls Anthropic with an organisation key, applying quotas and policies |
 
 Design rules that keep this path open:
 
 - **Paths are opaque to the UI.** Features pass the strings the backend returns; path helpers only format them for display and resolve relative Markdown links.
-- **No feature talks to the OS or network directly**; it goes through `Backend`, and asks `capabilities` before offering host-specific actions.
+- **No feature talks to the OS or network directly**; it goes through `Backend`, and asks `capabilities` before offering host-specific actions. Only `services/` imports Tauri; `services/index.ts` is the one place that picks the host.
 - **Stores hold state, features hold workflows, services hold pure logic** (Markdown pipeline, converters, parsers). Pure logic is shared by every backend and runs in tests without a host.
-- **Heavy features load on demand** (converters, Mermaid, KaTeX, the AI module), so a web build keeps a small first download.
+- **Heavy features load on demand** (converters, Mermaid, KaTeX, the AI module, and the History, Keyboard Shortcuts and AI review dialogs), so a web build keeps a small first download.
 - **Per-feature state stays separate** (for example `aiStore`), so new features don't grow one global store.
 
 ## 14. Design principles

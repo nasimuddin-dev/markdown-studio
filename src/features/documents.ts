@@ -21,7 +21,7 @@ function untitledName(): string {
   }
 }
 
-export function docFromFile(file: FileContent): Doc {
+function docFromFile(file: FileContent): Doc {
   return {
     id: newDocId(),
     path: file.path,
@@ -311,12 +311,6 @@ export async function closeAllDocuments(): Promise<boolean> {
   }
   for (const doc of [...docs().docs]) docs().remove(doc.id);
   return true;
-}
-
-export async function closeOtherDocuments(keepId: string) {
-  for (const d of [...docs().docs]) {
-    if (d.id !== keepId && !(await closeDocument(d.id))) return;
-  }
 }
 
 export async function reloadDocument(id: string) {

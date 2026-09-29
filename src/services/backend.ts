@@ -145,6 +145,15 @@ export interface PlatformApi {
   onUpdateProgress(handler: (downloaded: number, total: number | null) => void): Promise<() => void>;
   log(level: "error" | "warn" | "info" | "debug", category: string, message: string): void;
   exportLogs(): Promise<string | null>;
+  /** Shows `title` in the window's title bar (the page title is set separately). */
+  setWindowTitle(title: string): Promise<void>;
+  toggleFullScreen(): Promise<void>;
+  /**
+   * Protects unsaved work when the window closes. The desktop app asks
+   * `canClose` (which may show Save / Don't Save) and stays open if it
+   * returns false; a browser can only warn, when `hasUnsaved` is true.
+   */
+  guardClose(canClose: () => Promise<boolean>, hasUnsaved: () => boolean): Promise<void>;
 }
 
 export interface AiRequest {

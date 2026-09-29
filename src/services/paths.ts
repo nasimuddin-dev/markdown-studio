@@ -10,7 +10,7 @@ const BACKSLASHES = /\\/g;
 const DRIVE_ROOT = /^[a-zA-Z]:[\\/]/;
 const URL_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
 
-export function separatorOf(path: string): "/" | "\\" {
+function separatorOf(path: string): "/" | "\\" {
   return path.includes("\\") && !path.includes("/") ? "\\" : "/";
 }
 
@@ -33,7 +33,7 @@ export function join(dir: string, name: string): string {
   return dir.endsWith("/") || dir.endsWith("\\") ? dir + name : dir + sep + name;
 }
 
-export function isAbsolute(path: string): boolean {
+function isAbsolute(path: string): boolean {
   return path.startsWith("/") || path.startsWith("\\\\") || DRIVE_ROOT.test(path);
 }
 

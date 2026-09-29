@@ -69,7 +69,7 @@ const MB = 1024 * 1024;
  * restarts Markpion. Returns false if it was cancelled or failed, in
  * which case the current version keeps running unchanged (UPD-005).
  */
-export async function installUpdate(version: string): Promise<boolean> {
+async function installUpdate(version: string): Promise<boolean> {
   const b = backend();
   const dirty = useDocuments.getState().docs.some((d) => d.content !== d.savedContent);
   if (dirty && !(await saveAll())) {

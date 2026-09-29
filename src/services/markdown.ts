@@ -16,7 +16,7 @@ import type { Options } from "react-markdown";
  * styles and `javascript:` URLs are removed. Syntax highlighting and heading
  * ids are added *after* sanitizing so they are not stripped.
  */
-export const sanitizeSchema = {
+const sanitizeSchema = {
   ...defaultSchema,
   attributes: {
     ...defaultSchema.attributes,

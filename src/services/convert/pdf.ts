@@ -129,7 +129,7 @@ function bodySize(lines: Line[]): number {
 const escapeStart = (t: string) => t.replace(/^([#>|+=])/, "\\$1");
 
 /** Turns positioned lines into Markdown blocks. */
-export function linesToMarkdown(pages: Line[][]): string {
+function linesToMarkdown(pages: Line[][]): string {
   const lines = pages.flat();
   if (!lines.length) return "";
   const body = bodySize(lines);

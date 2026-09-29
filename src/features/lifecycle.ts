@@ -1,4 +1,4 @@
-import { backend, isTauri } from "../services";
+import { backend } from "../services";
 import { useDocuments, isDirty, newDocId } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
 import { useWorkspace } from "../stores/workspaceStore";
@@ -15,7 +15,7 @@ const RECOVERY_INTERVAL_MS = 5000;
 const EXTERNAL_CHECK_INTERVAL_MS = 3000;
 
 /** Applies the theme preference to the document root (FR-060). */
-export function applyTheme(pref: "system" | "light" | "dark") {
+function applyTheme(pref: "system" | "light" | "dark") {
   const dark = pref === "dark" || (pref === "system" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
   document.documentElement.dataset.theme = dark ? "dark" : "light";
 }
@@ -167,33 +167,19 @@ function updateWindowTitle() {
   const title = active ? `${isDirty(active) ? "● " : ""}${active.name} — Markpion` : "Markpion";
   if (document.title === title) return;
   document.title = title;
-  if (isTauri) {
-    import("@tauri-apps/api/window")
-      .then(({ getCurrentWindow }) => getCurrentWindow().setTitle(title))
-      .catch(() => {});
-  }
+  backend().setWindowTitle(title).catch(() => {});
 }
 
 /** Guards window close with the unsaved-changes prompt (Appendix A.3). */
 async function installCloseGuard() {
-  if (isTauri) {
-    const { getCurrentWindow } = await import("@tauri-apps/api/window");
-    const win = getCurrentWindow();
-    await win.onCloseRequested(async (event) => {
-      const ok = await closeAllDocuments();
-      if (!ok) {
-        event.preventDefault();
-        return;
-      }
+  await backend().guardClose(
+    async () => {
+      if (!(await closeAllDocuments())) return false;
       await backend().clearRecovery().catch(() => {});
-    });
-  } else {
-    window.addEventListener("beforeunload", (e) => {
-      if (useDocuments.getState().docs.some(isDirty)) {
-        e.preventDefault();
-      }
-    });
-  }
+      return true;
+    },
+    () => useDocuments.getState().docs.some(isDirty),
+  );
 }
 
 export async function startApp() {

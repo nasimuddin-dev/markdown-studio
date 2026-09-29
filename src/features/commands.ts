@@ -344,17 +344,7 @@ export function editorKeymap(): KeyBinding[] {
   return [app, ...format];
 }
 
-async function toggleFullScreen() {
-  if ("__TAURI_INTERNALS__" in window) {
-    const { getCurrentWindow } = await import("@tauri-apps/api/window");
-    const win = getCurrentWindow();
-    await win.setFullscreen(!(await win.isFullscreen()));
-  } else if (document.fullscreenElement) {
-    await document.exitFullscreen();
-  } else {
-    await document.documentElement.requestFullscreen?.().catch(() => {});
-  }
-}
+const toggleFullScreen = () => backend().toggleFullScreen();
 
 function bumpFont(delta: number) {
   const { settings, update } = useSettings.getState();

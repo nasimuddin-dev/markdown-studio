@@ -12,7 +12,7 @@ const CACHE_MS = 10_000;
 let cache: { root: string; at: number; files: Promise<string[]> } | null = null;
 
 /** Workspace file list for completion, cached briefly. */
-export function workspaceFiles(root: string): Promise<string[]> {
+function workspaceFiles(root: string): Promise<string[]> {
   if (!cache || cache.root !== root || Date.now() - cache.at > CACHE_MS) {
     cache = { root, at: Date.now(), files: backend().listWorkspaceFiles(root).catch(() => []) };
   }

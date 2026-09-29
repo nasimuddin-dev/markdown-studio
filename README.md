@@ -129,6 +129,8 @@ That runs the desktop app with hot reload. Other scripts:
 | `npm run typecheck` | TypeScript type check |
 | `cargo test --manifest-path src-tauri/Cargo.toml` | Rust tests (scope, safe save, encoding, settings, history, search, watcher) |
 | `npm run build` | Type check and production build of the frontend (`dist/`) |
+| `npm run check:unused` | Finds unused files, exports and dependencies ([knip](https://knip.dev), configured in `knip.json`) |
+| `npm run test:fixtures` | Regenerates the sample files the import tests use |
 | `npm run tauri:build` | Builds installers for the current OS |
 | `npm run version:set <x.y.z>` / `release:installer` / `release:github` | Release pipeline (see [Releasing a new version](#releasing-a-new-version)) |
 | `npm run docs:install`, then `docs:dev` / `docs:check` / `docs:test` | The documentation website (see [website/README.md](website/README.md)) |
@@ -186,7 +188,7 @@ website/        Website tooling: VitePress config, theme and checks (deployed to
 | [docs/DOCUMENTATION_SITE_SPEC.md](docs/DOCUMENTATION_SITE_SPEC.md) | Requirements for the documentation website |
 | [website/README.md](website/README.md) | Maintaining the website: commands, deployment, Google Search Console |
 
-Every feature change updates the README feature list, TRACEABILITY and the matching website guide page (the checklist is in [CLAUDE.md](CLAUDE.md)). Every release updates the download section, INSTALL.md, the website changelog and the DEV_LOG; the website's version, download links and keyboard shortcuts update themselves from the app.
+Every feature change updates the README feature list, TRACEABILITY and the matching website guide page (the checklist is in [AGENTS.md](AGENTS.md), which `CLAUDE.md` imports). Every release updates the download section, INSTALL.md, the website changelog and the DEV_LOG; the website's version, download links and keyboard shortcuts update themselves from the app.
 
 ## Releasing a new version
 
