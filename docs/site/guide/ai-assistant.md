@@ -31,6 +31,7 @@ The **AI** menu, and the command palette (search for "AI"), have these commands.
 | Continue Writing | Writes one or two more paragraphs from the cursor, using up to 6,000 characters before it | At the cursor |
 | Translate… | Translates into the language you type | Over the original |
 | Ask Claude… (**Ctrl+J** / **Cmd+J**) | Follows your own instruction, such as "turn this into a table" | Over the original |
+| Write… (**Ctrl+Shift+J** / **Cmd+Shift+J**) | Writes new text from your instruction alone, such as "an introduction about our release process". **No document text is sent** | At the cursor |
 
 While Claude works, a message at the bottom of the window shows its progress; **Cancel** stops waiting.
 
@@ -49,7 +50,7 @@ AI can make mistakes: always check the suggestion before you use it.
 ## Privacy
 
 - **Nothing is sent until you run an AI command.** The first time, Markpion asks you to confirm. After that, running a command is your consent to send that text.
-- **What's sent:** the selected text or paragraph (or, for Continue Writing, the text before the cursor) and the command's instruction, directly from your computer to Anthropic's API (`api.anthropic.com`), under your key. Nothing else from your documents or your computer is sent.
+- **What's sent:** the selected text or paragraph (or, for Continue Writing, the text before the cursor; for Write, nothing but your instruction) and the command's instruction, directly from your computer to Anthropic's API (`api.anthropic.com`), under your key. Nothing else from your documents or your computer is sent.
 - **How Anthropic handles it** is set by your agreement with Anthropic and its [privacy policy](https://www.anthropic.com/legal/privacy).
 - Markpion's diagnostic log records only that a request was made, its size and whether it worked, never the text or the key.
 - The key is only read by Markpion's native part; the editor interface never sees it.

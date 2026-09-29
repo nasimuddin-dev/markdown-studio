@@ -11,7 +11,7 @@ import { editorDocId, getEditorView } from "./editorBridge";
  * review before anything in the document changes.
  */
 
-export type AiActionId = "improve" | "fixGrammar" | "shorter" | "summarize" | "continue" | "translate" | "ask";
+export type AiActionId = "improve" | "fixGrammar" | "shorter" | "summarize" | "continue" | "translate" | "ask" | "write";
 
 export interface AiAction {
   id: AiActionId;
@@ -20,8 +20,8 @@ export interface AiAction {
   instruction: string;
   /** Where the answer goes by default. */
   placement: AiPlacement;
-  /** The text sent: the selection (or paragraph), or the text before the cursor. */
-  scope: "selection" | "before";
+  /** The text sent: the selection (or paragraph), the text before the cursor, or none. */
+  scope: "selection" | "before" | "none";
   /** Asks the user for a language or an instruction first. */
   input?: { title: string; message: string; value: string };
 }
@@ -78,6 +78,14 @@ export const AI_ACTIONS: Record<AiActionId, AiAction> = {
     scope: "selection",
     input: { title: "Ask Claude", message: "What should Claude do with the selected text (or the paragraph at the cursor)?", value: "" },
   },
+  write: {
+    id: "write",
+    label: "Write",
+    instruction: "{input}",
+    placement: "cursor",
+    scope: "none",
+    input: { title: "Write with AI", message: "What should Claude write at the cursor? Only this instruction is sent, no text from your document.", value: "" },
+  },
 };
 
 export const AI_SYSTEM_PROMPT = [
@@ -104,6 +112,7 @@ export interface AiTarget {
  * at the cursor; for Continue Writing, the text before the cursor.
  */
 export function aiTarget(doc: string, from: number, to: number, scope: AiAction["scope"]): AiTarget | null {
+  if (scope === "none") return { from: to, to, text: "" };
   if (scope === "before") {
     const text = doc.slice(Math.max(0, to - CONTINUE_CONTEXT_CHARS), to);
     return text.trim() ? { from: to, to, text } : null;
@@ -133,6 +142,7 @@ export function aiTarget(doc: string, from: number, to: number, scope: AiAction[
 /** The user message for an action. */
 export function buildAiPrompt(action: AiAction, text: string, input = ""): string {
   const instruction = action.instruction.replace("{input}", input.trim());
+  if (action.scope === "none") return `<instruction>${instruction}</instruction>\n\nWrite the requested text in Markdown. There is no document text to work on.`;
   return `<instruction>${instruction}</instruction>\n\n<document>\n${text}\n</document>`;
 }
 
@@ -219,7 +229,7 @@ export async function runAiAction(id: AiActionId): Promise<void> {
   }
   let input = "";
   if (action.input) {
-    const answer = await promptText({ ...action.input, okLabel: action.id === "ask" ? "Ask" : "Translate" });
+    const answer = await promptText({ ...action.input, okLabel: action.id === "ask" ? "Ask" : action.id === "write" ? "Write" : "Translate" });
     if (!answer) return;
     input = answer;
   }
@@ -236,7 +246,7 @@ export async function runAiAction(id: AiActionId): Promise<void> {
     useAi.getState().setReview({
       docId,
       label: action.label,
-      original: action.scope === "before" ? "" : target.text,
+      original: action.scope === "selection" ? target.text : "",
       suggestion: cleanAiAnswer(answer, target.text),
       from: target.from,
       to: target.to,

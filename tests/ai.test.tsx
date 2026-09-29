@@ -140,3 +140,13 @@ describe("AI assistant: in the editor", () => {
     expect(getEditorView()!.state.doc.toString()).toBe("Some text.");
   });
 });
+
+describe("AI: Write", () => {
+  it("sends only the instruction, and inserts at the cursor", () => {
+    expect(aiTarget("Existing text.", 5, 5, "none")).toEqual({ from: 5, to: 5, text: "" });
+    const prompt = buildAiPrompt(AI_ACTIONS.write, "", "A short intro about Markdown");
+    expect(prompt).toContain("<instruction>A short intro about Markdown</instruction>");
+    expect(prompt).not.toContain("<document>");
+    expect(AI_ACTIONS.write.placement).toBe("cursor");
+  });
+});

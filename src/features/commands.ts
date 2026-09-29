@@ -306,6 +306,7 @@ export const commands: Record<string, Command> = {
   aiSummarize: { id: "aiSummarize", label: "AI: Summarize", run: async () => (await ai()).runAiAction("summarize"), enabled: hasActive },
   aiContinue: { id: "aiContinue", label: "AI: Continue Writing", run: async () => (await ai()).runAiAction("continue"), enabled: hasActive },
   aiTranslate: { id: "aiTranslate", label: "AI: Translate…", run: async () => (await ai()).runAiAction("translate"), enabled: hasActive },
+  aiWrite: { id: "aiWrite", label: "AI: Write…", shortcut: "Mod+Shift+J", run: async () => (await ai()).runAiAction("write"), enabled: hasActive },
   aiAsk: { id: "aiAsk", label: "AI: Ask Claude…", shortcut: "Mod+J", run: async () => (await ai()).runAiAction("ask"), enabled: hasActive },
   about: { id: "about", label: "About Markpion", run: () => useUi.getState().setAboutOpen(true) },
   exportLogs: {
