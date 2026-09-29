@@ -63,11 +63,11 @@ The document's front matter isn't exported; its `title`, if any, becomes the exp
 | | HTML export | Print / Save as PDF | PDF export | Word export |
 | --- | --- | --- | --- | --- |
 | Mermaid diagrams | Rendered | Rendered | Drawn as a picture | Drawn as a picture |
-| LaTeX math | Rendered | Rendered | Display formulas as pictures on Windows; inline as LaTeX text | Word equations (see [Math](/markdown/math#export)) |
+| LaTeX math | Rendered | Rendered | Display formulas as pictures on Windows; inline formulas as text | Word equations (see [Math](/markdown/math#export)) |
 | Footnotes | Linked section at the end | Linked section at the end | Section at the end | Word footnotes |
 | Chinese, Japanese, Korean, Arabic, emoji | Yes | Yes | Not in the built-in font | Yes |
 
-**Export as PDF** uses a built-in font. If the document contains characters it can't display, Markpion warns you and offers **Print → Save as PDF**, which uses your system fonts, instead. For documents with formulas, use **Print / Save as PDF** or **Export as HTML**. A diagram with a syntax error is exported as its code.
+**Export as PDF** uses a built-in font. If the document contains characters it can't display, Markpion warns you and offers **Print → Save as PDF**, which uses your system fonts, instead. Inline formulas are set as text, and display formulas are drawn as pictures on Windows (see [Math](/markdown/math)). For documents where every formula must be typeset, use **Print / Save as PDF** or **Export as HTML**. A diagram with a syntax error is exported as its code.
 
 ### A whole folder as one document
 

@@ -190,14 +190,17 @@ describe("SVG size", () => {
 });
 
 describe("math in PDF export", () => {
-  const md = "Inline $e^{i\\pi}$ stays text.\n\n$$\n\\int_0^1 x^2 \\, dx\n$$";
+  const md = "Inline $e^{i\\pi}$ and $A \\subset B$ here.\n\n$$\n\\int_0^1 x^2 \\, dx\n$$";
 
-  it("draws display formulas as images and keeps inline ones as LaTeX", async () => {
+  it("draws display formulas as images and sets inline ones as text", async () => {
     const png = Uint8Array.from(atob(PNG_B64), (c) => c.charCodeAt(0));
     const bytes = await markdownToPdf(md, { renderMath: async () => ({ data: png, width: 90, height: 40 }) });
     expect(new TextDecoder("latin1").decode(bytes)).toMatch(/\/Subtype\s*\/Image/);
     const text = (await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown;
-    expect(text).toContain("$e^{i\\pi}$");
+    expect(text).toContain("π");
+    expect(text).not.toContain("$e^{i\\pi}$");
+    // The font has no ⊂, so that formula keeps its source.
+    expect(text).toContain("$A \\subset B$");
     expect(text).not.toContain("\\int_0^1");
   }, 30_000);
 

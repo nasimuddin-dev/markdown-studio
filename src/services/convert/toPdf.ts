@@ -1,4 +1,5 @@
 import { collectFootnotes, type Footnotes } from "./footnotes";
+import { mathTextRuns } from "./mathText";
 import { ALERT_KINDS, takeMdastAlert } from "../alerts";
 import { stripFrontMatter } from "../frontMatter";
 import { unified } from "unified";
@@ -88,10 +89,14 @@ class PdfBuilder {
         case "html":
           out.push(n.value.replace(/<[^>]+>/g, ""));
           break;
-        case "inlineMath":
-          // Inline formulas stay as LaTeX: PDF text can't flow around pictures.
-          out.push({ text: `$${n.value}$`, ...style, style: "inlineCode" });
+        case "inlineMath": {
+          // PDF text can't flow around pictures, so inline formulas are set as
+          // text; ones the font can't draw keep their LaTeX source.
+          const runs = mathTextRuns(n.value);
+          if (runs) out.push(...runs.map((r) => ({ ...style, ...r, ...(style.italics ? { italics: true } : {}) })));
+          else out.push({ text: `$${n.value}$`, ...style, style: "inlineCode" });
           break;
+        }
         case "footnoteReference": {
           const number = this.footnotes?.number(n.identifier);
           out.push(number ? { text: String(number), sup: true, linkToDestination: `fn-${number}`, color: "#2F5BEA" } : `[^${n.label ?? n.identifier}]`);

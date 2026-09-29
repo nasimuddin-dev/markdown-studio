@@ -24,7 +24,7 @@ Nothing is actively under development right now. The next items are chosen from 
 
 ## Planned
 
-- **All math in PDF export:** inline formulas, and display formulas on macOS and Linux. Today PDF export draws display formulas on Windows; HTML export, Print → Save as PDF and Word export render all formulas.
+- **All math in PDF export:** every inline formula, and display formulas on macOS and Linux. Today PDF export draws display formulas on Windows and sets common inline formulas as text; HTML export, Print → Save as PDF and Word export render all formulas.
 - **Performance:** a smaller startup bundle and benchmarks with very large documents.
 - **End-to-end tests of the native app** on Windows, macOS and Linux, and testing the macOS and Linux builds on real hardware.
 
