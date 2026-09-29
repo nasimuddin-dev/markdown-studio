@@ -141,6 +141,12 @@ export function SettingsDialog() {
         >
           Reset to Defaults
         </button>
+        <button className="button" onClick={() => void import("../features/settingsTransfer").then((m) => m.exportSettings())}>
+          Export…
+        </button>
+        <button className="button" onClick={() => void import("../features/settingsTransfer").then((m) => m.importSettings())}>
+          Import…
+        </button>
         <button className="button primary" onClick={() => setOpen(false)}>Done</button>
       </div>
     </Modal>

@@ -87,6 +87,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Safe saves: atomic temp-file writes, conflict detection when a file changed on disk, and actionable errors (permission denied → Save As, disk full, and so on)
 - Live folder watching: the explorer and open files update immediately when other programs change files on disk
 - External change detection: clean tabs reload automatically; dirty tabs get Reload / Compare / Keep Mine
+- Export and import settings and keyboard shortcuts (Settings → Export… / Import…) as `markpion-settings.json`
 - Managed settings for IT: a machine-wide `policy.json` (`%ProgramData%\Markpion` on Windows) presets defaults and locks settings such as the AI assistant or the update check
 - Crash recovery for unsaved documents, and session restore for the last folder and open files
 - Rendering errors are contained: if the preview or another area fails, it shows the error with Try Again while the rest of the window, including saving, keeps working

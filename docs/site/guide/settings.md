@@ -71,6 +71,10 @@ The update check asks GitHub for the latest version number; nothing else is sent
 
 **Reset to Defaults** at the bottom of the Settings dialog restores every setting above to its default. Your open folder and files are kept.
 
+## Export and import
+
+**Export…** saves your settings and keyboard shortcuts to `markpion-settings.json`; **Import…** loads such a file, after asking, on this or another computer. Use it to move to a new PC or to share a setup with your team. Your open folder and files, and your answer to the AI assistant's consent question, aren't included. Settings your organization manages keep their managed values.
+
 ## Remembered automatically
 
 Markpion also remembers the window size and position, the view (editor, split or preview), whether the explorer and outline are shown, and panel sizes.

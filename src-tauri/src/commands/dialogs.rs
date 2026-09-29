@@ -77,6 +77,7 @@ fn import_filter(kind: &str) -> AppResult<(&'static str, &'static [&'static str]
         "html" => Ok(("Web page", &["html", "htm"])),
         "pdf" => Ok(("PDF document", &["pdf"])),
         "csv" => Ok(("Spreadsheet data (CSV/TSV)", &["csv", "tsv"])),
+        "json" => Ok(("Markpion settings", &["json"])),
         _ => Err(AppError::InvalidPath("Unsupported import type".into())),
     }
 }

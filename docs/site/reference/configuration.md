@@ -24,7 +24,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | Key | Default | Values |
 | --- | --- | --- |
 | `theme` | `"system"` | `"system"`, `"light"`, `"dark"` |
-| `fontSize` | `15` | 10–28 |
+| `fontSize` | `15` | 8–40 (the Settings slider offers 10–28) |
 | `fontFamily` | `""` | A font name; empty for the default monospace font |
 | `lineNumbers` | `true` | |
 | `lineWrapping` | `true` | |

@@ -172,6 +172,7 @@ pub async fn export_file(
 ) -> AppResult<Option<String>> {
     let (filter, exts): (&str, &[&str]) = match kind.as_str() {
         "html" => ("HTML document", &["html", "htm"]),
+        "json" => ("Markpion settings", &["json"]),
         _ => return Err(AppError::InvalidPath("Unsupported export type".into())),
     };
     scope::validate_file_name(&suggested_name)?;

@@ -19,7 +19,7 @@ import type {
  * POSIX paths in the demo, and could be document IDs or URLs in a cloud backend.
  */
 
-export type ExportKind = "html";
+export type ExportKind = "html" | "json";
 
 export interface WriteRequest {
   path: string;
@@ -60,7 +60,7 @@ export interface DialogsApi {
   /** Asks for a folder to export into; approves it for writing without opening it. */
   pickExportFolder(): Promise<string | null>;
   /** Native Open dialog for a document to import (desktop only). */
-  pickImportFile(kind: "docx" | "html" | "pdf" | "csv"): Promise<string | null>;
+  pickImportFile(kind: "docx" | "html" | "pdf" | "csv" | "json"): Promise<string | null>;
 }
 
 /** Reading and writing documents, folders and assets in approved locations. */
