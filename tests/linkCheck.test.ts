@@ -34,6 +34,13 @@ describe("workspace link check", () => {
     expect(first.column).toBe("[Guide](docs/guide.md#install) ".length);
   });
 
+  it("checks reference-style link definitions", async () => {
+    setupBackend({ "/ws/a.md": "# A\n\nSee [b][1] and [c][2].\n\n[1]: b.md#b\n[2]: c.md\n", "/ws/b.md": "# B\n" });
+    const report = await checkWorkspaceLinks("/ws");
+    expect(report.linksChecked).toBe(2);
+    expect(report.files[0].problems.map((p) => `${p.line}:${p.message}`)).toEqual(["6:Linked file not found: c.md"]);
+  });
+
   it("reports a clean workspace", async () => {
     setupBackend({ "/ws/a.md": "# A\n\n[b](b.md)\n", "/ws/b.md": "# B\n" });
     const report = await checkWorkspaceLinks("/ws");

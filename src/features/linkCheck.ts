@@ -2,7 +2,7 @@ import GithubSlugger from "github-slugger";
 import { backend } from "../services";
 import { isInside, isMarkdownPath } from "../services/paths";
 import { extractHeadings } from "./outline";
-import { findLinks, lintMarkdown, localTargets, type Severity } from "./lint";
+import { findAllLinks, lintMarkdown, localTargets, type Severity } from "./lint";
 
 export interface LinkProblem {
   line: number;
@@ -89,7 +89,7 @@ export async function checkWorkspaceLinks(root: string, onProgress?: (done: numb
     for (const p of lintMarkdown(text)) {
       if (p.rule === "broken-anchor" || p.rule === "empty-link") problems.push({ ...at(p.from, p.to), severity: p.severity, rule: p.rule, message: p.message });
     }
-    const links = findLinks(text);
+    const links = findAllLinks(text);
     report.linksChecked += links.length;
     for (const { link, path } of localTargets(links, doc)) {
       const where = at(link.from, link.to);

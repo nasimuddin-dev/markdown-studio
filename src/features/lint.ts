@@ -19,10 +19,15 @@ export interface LinkRef {
   image: boolean;
   text: string;
   target: string;
+  /** Where the destination starts in the text (after `<` when it is bracketed). */
+  targetFrom: number;
+  /** True for a reference-style definition (`[id]: path`). */
+  definition?: boolean;
 }
 
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
 const LINK = /(!?)\[([^\]\n]*)\]\(\s*(<[^>\n]*>|[^)\s]*)(?:\s+(?:"[^"\n]*"|'[^'\n]*'))?\s*\)/g;
+const DEFINITION = /^( {0,3}\[([^\]\n]+)\]:[ \t]*)(<[^>\n]*>|\S+)/gm;
 
 /**
  * Returns the text with fenced code blocks and inline code spans blanked out
@@ -48,10 +53,30 @@ export function findLinks(text: string): LinkRef[] {
   const masked = maskCode(text);
   const links: LinkRef[] = [];
   for (const m of masked.matchAll(LINK)) {
-    const raw = m[3].startsWith("<") ? m[3].slice(1, -1) : m[3];
-    links.push({ from: m.index!, to: m.index! + m[0].length, image: m[1] === "!", text: m[2], target: raw });
+    const bracketed = m[3].startsWith("<");
+    const raw = bracketed ? m[3].slice(1, -1) : m[3];
+    // The destination follows "](" and optional spaces.
+    const open = m.index! + m[1].length + 1 + m[2].length + 2;
+    const targetFrom = masked.indexOf(m[3], open) + (bracketed ? 1 : 0);
+    links.push({ from: m.index!, to: m.index! + m[0].length, image: m[1] === "!", text: m[2], target: raw, targetFrom });
   }
   return links;
+}
+
+/** Reference-style link definitions (`[id]: path "title"`), outside code. */
+export function findLinkDefinitions(text: string): LinkRef[] {
+  const out: LinkRef[] = [];
+  for (const m of maskCode(text).matchAll(DEFINITION)) {
+    const bracketed = m[3].startsWith("<");
+    const targetFrom = m.index! + m[1].length + (bracketed ? 1 : 0);
+    out.push({ from: m.index!, to: m.index! + m[0].length, image: false, text: m[2], target: bracketed ? m[3].slice(1, -1) : m[3], targetFrom, definition: true });
+  }
+  return out;
+}
+
+/** Every link destination in the text: inline links and images, and reference definitions. */
+export function findAllLinks(text: string): LinkRef[] {
+  return [...findLinks(text), ...findLinkDefinitions(text)].sort((a, b) => a.from - b.from);
 }
 
 function lineStarts(text: string) {
@@ -95,8 +120,8 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
   // Explicit HTML anchors: <a id="x"> / <a name="x">
   for (const m of text.matchAll(/<a\s+[^>]*(?:id|name)\s*=\s*["']([^"']+)["']/gi)) anchors.add(m[1]);
 
-  // Links and images
-  for (const link of findLinks(text)) {
+  // Links, images and reference definitions
+  for (const link of findAllLinks(text)) {
     const at = { from: link.from, to: link.to };
     if (!link.target) {
       problems.push({ ...at, severity: "warning", rule: "empty-link", message: link.image ? "Image has no source." : "Link has no destination." });
@@ -140,7 +165,7 @@ export async function lintLinks(
   if (!docPath) return [];
   const problems: MarkdownProblem[] = [];
   const cache = new Map<string, Promise<boolean | null>>();
-  for (const { link, path } of localTargets(findLinks(text), docPath)) {
+  for (const { link, path } of localTargets(findAllLinks(text), docPath)) {
     if (!path) {
       problems.push({ from: link.from, to: link.to, severity: "warning", rule: "broken-link", message: "Link points outside the file system root." });
       continue;

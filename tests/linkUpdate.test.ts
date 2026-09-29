@@ -40,6 +40,13 @@ describe("rewriteLinks", () => {
     expect(out).toBe("[home](../../a/index.md) [sibling](../../other/x.md) [web](https://example.com) [top](#top)");
   });
 
+  it("updates reference-style definitions, but not indented code", () => {
+    const text = 'See [the guide][g].\n\n[g]: guide.md#setup "Guide"\n[logo]: <img/logo.png>\n\n    [g]: guide.md';
+    const { text: out, count } = rewriteLinks(text, "/ws/index.md", "/ws/index.md", moved("/ws/guide.md", "/ws/docs/guide.md"));
+    expect(count).toBe(1);
+    expect(out).toBe('See [the guide][g].\n\n[g]: docs/guide.md#setup "Guide"\n[logo]: <img/logo.png>\n\n    [g]: guide.md');
+  });
+
   it("leaves links between files that moved together unchanged, and escapes spaces", () => {
     const inside = rewriteLinks("[n](n2.md)", "/ws/notes/n1.md", "/ws/archive/notes/n1.md", moved("/ws/notes", "/ws/archive/notes"));
     expect(inside.count).toBe(0);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
+import { findAllLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
 
 const rules = (text: string) => lintMarkdown(text).map((p) => p.rule);
 
@@ -30,6 +30,19 @@ describe("markdown lint: document rules", () => {
   it("parses link titles and angle-bracket destinations", () => {
     const links = findLinks('[a](<my file.md> "title") ![i](img.png \'t\')');
     expect(links.map((l) => [l.target, l.image])).toEqual([["my file.md", false], ["img.png", true]]);
+  });
+
+  it("finds reference definitions outside code, with where each destination starts", () => {
+    const text = 'See [the guide][g] and [a](  b.md).\n\n[g]: docs/guide.md "Guide"\n  [logo]: <img/my logo.png>\n\n```\n[x]: not-a-def.md\n```';
+    const links = findAllLinks(text);
+    expect(links.map((l) => [l.target, !!l.definition])).toEqual([["b.md", false], ["docs/guide.md", true], ["img/my logo.png", true]]);
+    for (const l of links) expect(text.slice(l.targetFrom, l.targetFrom + l.target.length)).toBe(l.target);
+  });
+
+  it("flags reference definitions to missing files and anchors", async () => {
+    expect(rules("# A\n\n[x]: #nope")).toEqual(["broken-anchor"]);
+    const problems = await lintLinks("[ok]: a.md\n[bad]: missing.md", "/ws/p.md", async (p) => p === "/ws/a.md");
+    expect(problems.map((p) => p.message)).toEqual(["Linked file not found: missing.md"]);
   });
 });
 

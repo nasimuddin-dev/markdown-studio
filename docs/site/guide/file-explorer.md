@@ -40,7 +40,7 @@ When you rename or move a file or folder, Markpion looks through the Markdown fi
 - Anchors (`#section`), a leading `./` and `<…>` brackets are kept; spaces and brackets in new names are written as `%20`, `%28` and `%29`.
 - Files open with unsaved changes are skipped (the dialog names them). Open tabs without changes reload with the new links.
 - The previous version of each rewritten file is kept in [File History](/guide/saving-and-recovery#file-history).
-- Only inline links and images (`[text](path)`, `![alt](path)`) are updated. Reference-style link definitions (`[id]: path`), HTML `<a>`/`<img>` tags and absolute paths aren't; [Check Links in Folder](/guide/checking-documents) finds any that broke.
+- Inline links and images (`[text](path)`, `![alt](path)`) and reference-style link definitions (`[id]: path`) are updated. HTML `<a>`/`<img>` tags and absolute paths aren't; [Check Links in Folder](/guide/checking-documents) finds any that broke.
 - Renaming or moving files outside Markpion (in your file manager or with Git) doesn't update links.
 
 ## Changes made by other programs

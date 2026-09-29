@@ -27,4 +27,4 @@ The **Links** tab in the sidebar (or **Edit → Check Links in Folder**) checks 
 - `#anchors` that don't exist, both within a file and across files (`guide.md#setup`);
 - empty links.
 
-Results are grouped by file. Click a problem to open the file at that line. Web links (`https://…`) are not checked, because that would need the internet, and neither are files outside the open folder.
+Inline links and images (`[text](path)`) and reference-style link definitions (`[id]: path`) are both checked; links inside code are not. Results are grouped by file. Click a problem to open the file at that line. Web links (`https://…`) are not checked, because that would need the internet, and neither are files outside the open folder.

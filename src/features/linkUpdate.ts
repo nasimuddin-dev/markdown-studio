@@ -5,7 +5,7 @@ import { isDirty, useDocuments } from "../stores/documentsStore";
 import { ask, notify } from "../stores/uiStore";
 import type { FileContent } from "../types";
 import { reloadDocument } from "./documents";
-import { findLinks, localTargets } from "./lint";
+import { findAllLinks, localTargets } from "./lint";
 
 /**
  * Keeps relative links working when a file or folder is renamed or moved in
@@ -24,14 +24,14 @@ function mover(from: string, to: string) {
 const escapeTarget = (path: string) => path.replace(/[%\s()<>]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"));
 
 /**
- * Rewrites the relative links and images of a document that was at `oldDocPath`
+ * Rewrites the relative links, images and reference definitions of a document that was at `oldDocPath`
  * and is now at `newDocPath`, given where every path moved (`moved`). Only
  * links that would otherwise point somewhere else change; `#anchors`, `?query`
  * parts, a leading `./` and `<…>` brackets are kept.
  */
 export function rewriteLinks(text: string, oldDocPath: string, newDocPath: string, moved: (path: string) => string): { text: string; count: number } {
   const edits: Array<{ from: number; to: number; insert: string }> = [];
-  for (const { link, path } of localTargets(findLinks(text), oldDocPath)) {
+  for (const { link, path } of localTargets(findAllLinks(text), oldDocPath)) {
     if (!path || /^([a-zA-Z]:)?[\\/]/.test(link.target)) continue; // absolute paths are left alone
     const target = moved(path);
     const now = resolveRelative(newDocPath, link.target);
@@ -41,11 +41,8 @@ export function rewriteLinks(text: string, oldDocPath: string, newDocPath: strin
     const cut = link.target.search(/[?#]/);
     const suffix = cut < 0 ? "" : link.target.slice(cut);
     const prefix = link.target.startsWith("./") && !rel.startsWith("..") ? "./" : "";
-    // The destination starts after "](", optional spaces and an optional "<".
-    let start = link.from + (link.image ? 1 : 0) + 1 + link.text.length + 2;
-    while (/\s/.test(text[start])) start++;
-    const bracketed = text[start] === "<";
-    if (bracketed) start++;
+    const start = link.targetFrom;
+    const bracketed = text[start - 1] === "<";
     const insert = prefix + (bracketed ? rel : escapeTarget(rel)) + suffix;
     edits.push({ from: start, to: start + link.target.length, insert });
   }
