@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { EditorState } from "@codemirror/state";
 import { CompletionContext } from "@codemirror/autocomplete";
-import { fileCompletions, headingCompletions, invalidateWorkspaceFiles, linkCompletionSource } from "../src/features/completion";
+import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
+import { ensureSyntaxTree } from "@codemirror/language";
+import { emojiCompletionSource, fileCompletions, headingCompletions, invalidateWorkspaceFiles, linkCompletionSource } from "../src/features/completion";
 import { relativePath } from "../src/services/paths";
 import { openPath } from "../src/features/documents";
 import { setWorkspace } from "../src/features/workspace";
@@ -45,5 +47,28 @@ describe("link completion source", () => {
     expect(await complete("![p](")).toEqual({ from: 5, labels: ["pics/p.png"] });
     expect(await complete("# Top\n[t](#")).toEqual({ from: 10, labels: ["#top"] });
     expect(await complete("plain text")).toBeNull();
+  });
+});
+
+describe("emoji shortcode completion", () => {
+  const complete = async (doc: string) => {
+    const state = EditorState.create({ doc, extensions: [markdown({ base: markdownLanguage })] });
+    ensureSyntaxTree(state, state.doc.length, 5000);
+    return emojiCompletionSource(new CompletionContext(state, doc.length, false));
+  };
+
+  it("offers shortcodes after a colon and two characters", async () => {
+    const result = await complete("Launch :roc");
+    expect(result?.from).toBe(7);
+    const rocket = result?.options.find((o) => o.label === ":rocket:");
+    expect(rocket?.displayLabel).toBe("🚀  :rocket:");
+  });
+
+  it("stays quiet for one character, times, URLs and code", async () => {
+    expect(await complete("Launch :r")).toBeNull();
+    expect(await complete("at 10:30")).toBeNull();
+    expect(await complete("see http://example")).toBeNull();
+    expect(await complete("`:roc")).toBeNull();
+    expect(await complete("```\n:roc")).toBeNull();
   });
 });

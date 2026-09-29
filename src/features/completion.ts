@@ -1,5 +1,6 @@
 import { autocompletion, type Completion, type CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
-import type { Extension } from "@codemirror/state";
+import { syntaxTree } from "@codemirror/language";
+import type { EditorState, Extension } from "@codemirror/state";
 import GithubSlugger from "github-slugger";
 import { backend } from "../services";
 import { basename, dirname, isMarkdownPath, relativePath } from "../services/paths";
@@ -74,6 +75,41 @@ export async function linkCompletionSource(ctx: CompletionContext): Promise<Comp
   return options.length ? { from, options, validFor: /^[^)\s#]*$/ } : null;
 }
 
+let emojiOptions: Promise<Completion[]> | null = null;
+
+/** Every GitHub emoji shortcode, loaded on first use. */
+function loadEmojiOptions(): Promise<Completion[]> {
+  emojiOptions ??= import("gemoji").then(({ gemoji }) =>
+    gemoji.flatMap((g) =>
+      g.names.map((name): Completion => ({ label: `:${name}:`, displayLabel: `${g.emoji}  :${name}:`, detail: g.description, type: "text" })),
+    ),
+  );
+  return emojiOptions;
+}
+
+/** True inside inline code or a code block, where shortcodes aren't converted. */
+function inCode(state: EditorState, pos: number): boolean {
+  for (let node: ReturnType<ReturnType<typeof syntaxTree>["resolveInner"]> | null = syntaxTree(state).resolveInner(pos, -1); node; node = node.parent) {
+    if (/Code/.test(node.name)) return true;
+  }
+  return false;
+}
+
+/**
+ * Completes GitHub emoji shortcodes after a colon and two characters
+ * (`:roc` → `:rocket:`), except right after a letter, digit or backtick
+ * (times, URLs, code being typed) and inside code.
+ */
+export async function emojiCompletionSource(ctx: CompletionContext): Promise<CompletionResult | null> {
+  const m = ctx.matchBefore(/:[a-z0-9_+-]{2,}$/i);
+  if (!m) return null;
+  if (/[\w:`]/.test(ctx.state.sliceDoc(m.from - 1, m.from))) return null;
+  if (inCode(ctx.state, ctx.pos)) return null;
+  const options = await loadEmojiOptions();
+  if (ctx.aborted) return null;
+  return { from: m.from, options, validFor: /^:[a-z0-9_+-]*$/i };
+}
+
 export function linkCompletion(): Extension {
-  return autocompletion({ override: [linkCompletionSource], icons: false, activateOnTyping: true });
+  return autocompletion({ override: [linkCompletionSource, emojiCompletionSource], icons: false, activateOnTyping: true });
 }

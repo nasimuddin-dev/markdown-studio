@@ -386,3 +386,13 @@ test("copy as formatted text puts HTML and Markdown on the clipboard", async ({ 
   // The Windows clipboard stores line breaks as CRLF.
   expect(clip.text.replace(/\r\n/g, "\n")).toBe("# Report\n\nSome **bold** text.");
 });
+
+test("emoji shortcode completion inserts a shortcode the preview shows as emoji", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.type("Launch :rock");
+  await page.getByRole("option", { name: /🚀\s+:rocket:/ }).click();
+  await expect(page.locator(".cm-content")).toContainText("Launch :rocket:");
+  await expect(page.locator(".markdown-body p")).toHaveText("Launch 🚀");
+});
