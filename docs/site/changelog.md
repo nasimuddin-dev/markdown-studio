@@ -7,6 +7,34 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.16.0
+
+Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.16.0)
+
+### Added
+
+- **AI assistant (optional, off by default):** with your own Anthropic API key, Claude can improve, shorten, fix grammar, translate, summarize or continue the selected text, answer a question about the document (Ctrl/Cmd+J), or write new text from an instruction (Ctrl/Cmd+Shift+J). Answers stream in as Claude writes them, can be stopped, and change nothing until you apply them. The key is kept in your system's credential store.
+- **Links follow renamed and moved files:** after you rename or move a file or folder in the Explorer, Markpion offers to update the relative links and images that would otherwise break.
+- **Move files and folders** in the Explorer by drag and drop, or with **Move To…** from the keyboard.
+- **Customizable keyboard shortcuts** in Help → Keyboard Shortcuts: change, remove or reset any command's shortcut.
+- **Export and import settings** (including shortcuts) as `markpion-settings.json`.
+- **Managed settings for IT administrators:** a `policy.json` file can set defaults and lock settings.
+- **Export Folder as HTML Site:** every document becomes an HTML page, links between documents keep working, and an index page lists them all.
+- **Tables:** insert and delete rows and columns, and move between cells with Tab and Shift+Tab.
+- **GitHub emoji shortcodes** (`:tada:`) in the preview and exports, with completion in the editor.
+- **Exports:** page size (A4 or Letter) for PDF and Word, document properties from front matter, and page numbers in Word footers.
+
+### Changed
+
+- Large documents appear in the preview about twice as fast.
+- Windows High Contrast (forced colours) is supported throughout the app.
+- The History, Keyboard Shortcuts and AI dialogs load after startup, making the first download of the web code smaller.
+
+### Fixed
+
+- Windows: the window no longer flashes white while the app starts in dark mode.
+- A rendering error in one part of the window is contained and reported instead of blanking the whole window.
+
 ## v0.15.0
 
 Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.15.0)

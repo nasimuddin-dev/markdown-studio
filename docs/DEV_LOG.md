@@ -439,3 +439,28 @@ At the user's request the app was renamed from **Markdown Studio** to **Markpion
 - The local folder is still `D:\Development\markdown-studio`. Rename it to `markpion`? (The scheduled task and the memory folder refer to the old path.)
 - The bundle identifier is `com.markpion.app`; Tauri warns that identifiers ending in `.app` aren't recommended on macOS. Changing it later would need another data migration, so it's best decided now.
 - `AGENTS.md` (untracked) is a copy of the project rules. Commit it, or delete it?
+
+## 2026-09-29 (afternoon): 0.16.0, AI assistant, architecture for a future cloud version, link updates
+
+Built in the development loop (the user asked for a release every 5 hours, then for one release now).
+
+- **Features:** large-document preview about 2× faster (0d54dea); export page size (808a2f5); document properties from front matter (002e871); emoji shortcodes (1edff64) and completion (6135e12); Word page numbers (e63d352); Export Folder as HTML Site (4779582); contained rendering errors (9741b79); table rows/columns (0f76228) and Tab navigation (c6af89f); move in the Explorer (e5d8ebc); no white window at startup (5b3d9e1, reported by the user); optional AI assistant with Claude (1f897bc, 6243ebd, 2c9bfeb streaming); managed settings policy (1f04308); Windows High Contrast (7dd09f1); customizable shortcuts (c302882); settings export/import (17e9dd0); link updates after rename/move (730d72b).
+- **Architecture (user request: scalable, cloud-friendly):** `Backend` split by domain with `capabilities`, Rust commands per domain (8f999c7); window title, full screen and the close guard moved behind `PlatformApi`, so only `services/` knows about Tauri; unused dependencies and dead exports removed, `knip` check added; History/Shortcuts/AI dialogs lazy-loaded and preloaded after startup (8564ea9, ee0dacf). `AGENTS.md` is now the single contributor/agent guide and `CLAUDE.md` imports it. `docs/DESIGN.md` added (b9ef55b) with the path to a cloud backend (§13).
+- **Tried and not kept:** preview parsing in a Web Worker, and progressive preview rendering (both measured slower; recorded in TRACEABILITY).
+- **Test flakiness found:** three UI tests timed out when the whole suite ran cold in parallel (lazy dialog imports and a slow role query); fixed with preloading and longer timeouts.
+
+**Version:** 0.16.0. **Tests:** Vitest 328 (51 files), Playwright 35, Rust 35 (+1 ignored live API test), website check (50 pages). All passing.
+
+**Unverified:** the AI assistant against the live API with a real key (only an invalid-key live test runs); the white-window fix on a first start of a fresh install; the macOS and Linux builds on real hardware.
+
+**Next up:**
+
+1. Virtualized preview for very large documents, keeping react-markdown.
+2. Reference-style link definitions in link updates and Check Links.
+3. Tauri-driver e2e against the native build.
+
+**Questions for the user:**
+
+- A redirect repository for the old website address (nasimuddin-dev.github.io/markdown-studio)?
+- Rename the local folder `D:\Development\markdown-studio` to `markpion`?
+- Keep the bundle identifier `com.markpion.app` (Tauri warns about `.app` on macOS)?
