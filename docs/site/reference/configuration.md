@@ -38,6 +38,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `syncScroll` | `true` | |
 | `viewMode` | `"split"` | `"editor"`, `"split"`, `"preview"` |
 | `showExplorer`, `showOutline` | `true` | |
+| `showGitStatus` | `true` | Git branch and changed files in the Explorer (runs `git status`) |
 | `autoSave` | `"off"` | `"off"`, `"afterDelay"`, `"onFocusChange"` |
 | `autoSaveDelayMs` | `1000` | Milliseconds |
 | `trimTrailingWhitespace` | `false` | |

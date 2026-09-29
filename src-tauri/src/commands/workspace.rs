@@ -58,3 +58,12 @@ pub fn watch_workspace(
 pub fn unwatch_workspace(watcher: State<'_, crate::watcher::WorkspaceWatcher>) {
     watcher.stop();
 }
+
+/// Git branch and changed files for an approved folder; `None` without Git or outside a repository.
+#[tauri::command]
+pub async fn git_status(state: State<'_, AppState>, root: String) -> AppResult<Option<crate::git::GitStatus>> {
+    let dir = state.scope.check(Path::new(&root))?;
+    tauri::async_runtime::spawn_blocking(move || crate::git::status(&dir))
+        .await
+        .map_err(|e| AppError::Io(e.to_string()))
+}

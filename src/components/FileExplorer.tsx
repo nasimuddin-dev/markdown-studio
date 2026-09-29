@@ -5,10 +5,11 @@ import { basename, dirname, isInside } from "../services/paths";
 import type { DirEntry } from "../types";
 import { openPath } from "../features/documents";
 import {
-  createFileIn, createFolderIn, deleteEntry, duplicateFile, moveEntry, moveEntryTo, openFolderDialog, refreshWorkspace, renameEntry,
+  closeWorkspace, createFileIn, createFolderIn, deleteEntry, duplicateFile, moveEntry, moveEntryTo, openFolderDialog, refreshWorkspace, renameEntry,
   toggleDir,
 } from "../features/workspace";
 import { Icon } from "./Icon";
+import { pathKey, useGit } from "../stores/gitStore";
 import { ContextMenu, type MenuEntry } from "./ContextMenu";
 import { copyPath, copyRelativePath, revealInFolder, revealLabel } from "../features/pathActions";
 import { backend } from "../services";
@@ -18,6 +19,8 @@ interface ContextMenu {
   y: number;
   entry: DirEntry;
 }
+
+const GIT_LABELS: Record<string, string> = { M: "modified", A: "added", D: "deleted", R: "renamed", U: "untracked", C: "conflict" };
 
 type DragStart = (e: React.PointerEvent<HTMLElement>, entry: DirEntry) => void;
 
@@ -36,6 +39,7 @@ function TreeNode({ entry, depth, onContext, onDragStart, dropTarget }: {
   const selected = useWorkspace((s) => s.selected === entry.path);
   const openDoc = useDocuments((s) => s.docs.find((d) => d.path === entry.path));
   const active = useDocuments((s) => !!openDoc && s.activeId === openDoc.id);
+  const git = useGit((s) => (entry.isDir ? (s.changedDirs.has(pathKey(entry.path)) ? "dir" : null) : s.files.get(pathKey(entry.path)) ?? null));
 
   const activate = () => {
     if (Date.now() - lastDragEnd < 300) return;
@@ -85,8 +89,15 @@ function TreeNode({ entry, depth, onContext, onDragStart, dropTarget }: {
           <span className="tree-chevron-spacer" />
         )}
         <Icon name={entry.isDir ? (expanded ? "folderOpen" : "folder") : "file"} size={15} className={entry.isDir ? "tree-folder-icon" : "tree-file-icon"} />
-        <span className="tree-label">{entry.name}</span>
+        <span className={`tree-label${git && git !== "dir" ? ` git-${git}` : ""}`}>{entry.name}</span>
         {openDoc && isDirty(openDoc) && <span className="dirty-dot" title="Unsaved changes" aria-label="unsaved changes" />}
+        {git === "dir" ? (
+          <span className="git-dir-dot" title="Contains changes (Git)" aria-label="contains Git changes" />
+        ) : git ? (
+          <span className={`git-badge git-${git}`} title={`Git: ${GIT_LABELS[git] ?? "changed"}`} aria-label={`Git: ${GIT_LABELS[git] ?? "changed"}`}>
+            {git}
+          </span>
+        ) : null}
       </div>
       {entry.isDir && expanded && (
         <ul role="group">
@@ -214,6 +225,14 @@ export function FileExplorer() {
           </button>
           <button className="icon-button small" title="Refresh" aria-label="Refresh file explorer" onClick={() => void refreshWorkspace()}>
             <Icon name="refresh" size={15} />
+          </button>
+          <button
+            className="icon-button small"
+            title="Close Folder (removes it from the Explorer; nothing is deleted)"
+            aria-label="Close folder"
+            onClick={closeWorkspace}
+          >
+            <Icon name="close" size={15} />
           </button>
         </div>
       </div>

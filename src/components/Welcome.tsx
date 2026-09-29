@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { clearRecent, forgetRecent, useRecentVersion } from "../features/recent";
 import { backend } from "../services";
 import { basename, displayPath } from "../services/paths";
 import type { RecentEntry } from "../types";
@@ -10,9 +11,10 @@ import { Icon } from "./Icon";
 /** Shown when no document is open (Appendix A.1, step 4). */
 export function Welcome() {
   const [recent, setRecent] = useState<RecentEntry[]>([]);
+  const version = useRecentVersion((s) => s.version);
   useEffect(() => {
     backend().listRecent().then(setRecent).catch(() => {});
-  }, []);
+  }, [version]);
 
   return (
     <div className="welcome">
@@ -33,7 +35,12 @@ export function Welcome() {
         </div>
         {recent.length > 0 && (
           <div className="welcome-recent">
-            <h2>Recent</h2>
+            <div className="welcome-recent-header">
+              <h2>Recent</h2>
+              <button className="link-button small" onClick={() => void clearRecent()}>
+                Clear
+              </button>
+            </div>
             <ul>
               {recent.slice(0, 8).map((r) => (
                 <li key={r.path}>
@@ -45,6 +52,14 @@ export function Welcome() {
                     <Icon name={r.kind === "file" ? "file" : "folder"} size={14} />
                     <span>{basename(r.path)}</span>
                     <span className="muted small">{displayPath(r.path, 48)}</span>
+                  </button>
+                  <button
+                    className="icon-button small welcome-recent-remove"
+                    title="Remove from Recent (the file isn't deleted)"
+                    aria-label={`Remove ${basename(r.path)} from Recent`}
+                    onClick={() => void forgetRecent(r.path)}
+                  >
+                    <Icon name="close" size={12} />
                   </button>
                 </li>
               ))}

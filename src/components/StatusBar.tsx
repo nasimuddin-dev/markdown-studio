@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useGit } from "../stores/gitStore";
 import { useDocuments, isDirty } from "../stores/documentsStore";
 import { useUi } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
@@ -31,6 +32,7 @@ export function StatusBar() {
     <footer className="statusbar" aria-label="Status bar">
       <div className="status-left">
         {!backend().capabilities.desktop && <span className="status-item status-demo" title="Running in a browser. Files are stored in this browser only.">Browser demo</span>}
+        <GitBranch />
         {doc && (
           <span className={`status-item status-state${doc && isDirty(doc) ? " dirty" : ""}`} role="status" aria-live="polite">
             {state}
@@ -63,6 +65,24 @@ export function StatusBar() {
         </div>
       )}
     </footer>
+  );
+}
+
+/** The Git branch of the open folder, with commits ahead of and behind its upstream. */
+function GitBranch() {
+  const status = useGit((s) => s.status);
+  if (!status) return null;
+  const name = status.branch ?? "detached HEAD";
+  const sync = `${status.ahead ? ` ↑${status.ahead}` : ""}${status.behind ? ` ↓${status.behind}` : ""}`;
+  const changed = status.files.length;
+  return (
+    <span
+      className="status-item"
+      title={`Git branch ${name}${status.ahead ? `, ${status.ahead} to push` : ""}${status.behind ? `, ${status.behind} to pull` : ""}; ${changed} changed ${changed === 1 ? "file" : "files"}`}
+    >
+      ⎇ {name}
+      {sync}
+    </span>
   );
 }
 

@@ -89,6 +89,31 @@ const layoutStorage: LayoutStorage = {
   },
 };
 
+/** The Explorer above the Outline, with a draggable divider while the Outline is open. */
+function ExplorerAndOutline() {
+  const outlineOpen = useSettings((s) => s.settings.showOutline);
+  const layout = useDefaultLayout({ id: "explorer-outline", storage: layoutStorage, panelIds: ["files", "outline"] });
+  if (!outlineOpen) {
+    return (
+      <>
+        <FileExplorer />
+        <Outline />
+      </>
+    );
+  }
+  return (
+    <Group id="explorer-outline" orientation="vertical" className="sidebar-split" defaultLayout={layout.defaultLayout} onLayoutChanged={layout.onLayoutChanged}>
+      <Panel id="files" defaultSize="60" minSize={80} className="sidebar-pane">
+        <FileExplorer />
+      </Panel>
+      <Separator className="resize-handle horizontal" aria-label="Resize file explorer and outline" />
+      <Panel id="outline" defaultSize="40" minSize={60} className="sidebar-pane">
+        <Outline />
+      </Panel>
+    </Group>
+  );
+}
+
 function Sidebar() {
   const view = useUi((s) => s.sidebarView);
   const setView = useUi((s) => s.setSidebarView);
@@ -124,10 +149,7 @@ function Sidebar() {
         </button>
       </div>
       {view === "explorer" ? (
-        <>
-          <FileExplorer />
-          <Outline />
-        </>
+        <ExplorerAndOutline />
       ) : view === "search" ? (
         <SearchPanel />
       ) : (

@@ -497,3 +497,23 @@ test("present a document as slides", async ({ page }) => {
   await expect(show).toBeHidden();
   await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
 });
+
+test("resize the outline against the explorer, and close the folder from the explorer", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const outline = page.getByRole("region", { name: "Outline" });
+  const before = (await outline.boundingBox())!.height;
+  const handle = page.getByRole("separator", { name: "Resize file explorer and outline" });
+  const box = (await handle.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2, box.y - 120, { steps: 6 });
+  await page.mouse.up();
+  await expect.poll(async () => (await outline.boundingBox())!.height).toBeGreaterThan(before + 60);
+
+  await page.getByRole("button", { name: "Close folder" }).click();
+  await expect(page.getByRole("tree")).toHaveCount(0);
+  // The open document stays open; only the folder left the Explorer.
+  await expect(page.getByRole("tab", { name: /README\.md/ })).toBeVisible();
+});

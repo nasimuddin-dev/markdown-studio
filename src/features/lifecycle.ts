@@ -1,4 +1,5 @@
 import { backend } from "../services";
+import { installGitStatus } from "./git";
 import { useDocuments, isDirty, newDocId } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
 import { useWorkspace } from "../stores/workspaceStore";
@@ -211,6 +212,7 @@ export async function startApp() {
   await installOsOpenHandlers();
   installAutoSave();
   await installWorkspaceWatcher();
+  installGitStatus();
   void import("./updates").then((m) => m.scheduleUpdateCheck());
 
   useDocuments.subscribe((s, prev) => {

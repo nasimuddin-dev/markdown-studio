@@ -1,5 +1,15 @@
 export type LineEnding = "lf" | "crlf";
 
+/** Git state of the open folder's repository (read-only). */
+export interface GitStatus {
+  /** The branch, or null on a detached HEAD. */
+  branch: string | null;
+  ahead: number;
+  behind: number;
+  /** Changed files: M modified, A added, D deleted, R renamed, U untracked, C conflict. */
+  files: Array<{ path: string; status: string }>;
+}
+
 export interface DirEntry {
   name: string;
   path: string;
@@ -72,6 +82,8 @@ export interface Settings {
   viewMode: ViewMode;
   showExplorer: boolean;
   showOutline: boolean;
+  /** Show Git branch and file status (runs `git status` in the open folder). */
+  showGitStatus: boolean;
   syncScroll: boolean;
   renderMath: boolean;
   renderDiagrams: boolean;

@@ -18,6 +18,8 @@
   --accent-soft: rgba(47, 91, 234, 0.12);
   --focus: #2f5bea;
   --danger: #c62f3a;
+  --git-modified: #9a6700;
+  --git-added: #1a7f37;
   --warning-bg: #fff6dc;
   --warning-border: #e9c46a;
   --success: #1f8a4c;
@@ -57,6 +59,8 @@
   --accent-soft: rgba(107, 140, 255, 0.16);
   --focus: #8aa4ff;
   --danger: #ff6b76;
+  --git-modified: #d29922;
+  --git-added: #3fb950;
   --warning-bg: #3a3017;
   --warning-border: #8a6d1f;
   --success: #4cc17d;
@@ -189,6 +193,47 @@ kbd {
   position: absolute;
   inset: 0 -3px;
   z-index: 2;
+}
+/* Git status in the Explorer */
+.git-badge {
+  margin-left: auto;
+  padding-left: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.git-dir-dot {
+  margin-left: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--git-modified);
+}
+.git-M, .git-R { color: var(--git-modified); }
+.git-A, .git-U { color: var(--git-added); }
+.git-D, .git-C { color: var(--danger); }
+.resize-handle.horizontal {
+  width: auto;
+  height: 1px;
+}
+.resize-handle.horizontal::after {
+  inset: -3px 0;
+}
+.sidebar-split {
+  flex: 1;
+  min-height: 0;
+}
+.sidebar-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sidebar-pane > .explorer,
+.sidebar-pane > .outline {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.sidebar-pane > .outline {
+  border-top: none;
 }
 .resize-handle:hover,
 .resize-handle[data-separator="active"],
@@ -860,6 +905,29 @@ select {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+.welcome-recent-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.welcome-recent-header .link-button {
+  font-size: 12px;
+}
+.welcome-recent li {
+  display: flex;
+  align-items: center;
+}
+.welcome-recent li > .link-button {
+  flex: 1;
+  min-width: 0;
+}
+.welcome-recent-remove {
+  opacity: 0;
+}
+.welcome-recent li:hover .welcome-recent-remove,
+.welcome-recent-remove:focus-visible {
+  opacity: 1;
 }
 
 /* ------------------------------------------------------------ modals */

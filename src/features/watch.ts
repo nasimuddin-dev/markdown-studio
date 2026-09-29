@@ -1,4 +1,5 @@
 import { backend } from "../services";
+import { scheduleGitRefresh } from "./git";
 import { dirname, isInside } from "../services/paths";
 import { useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
@@ -23,6 +24,7 @@ export async function applyFsChanges(paths: string[]) {
     if (children[p]) dirs.add(p); // a listed folder changed itself
   }
   await Promise.all([...dirs].map(refreshDir));
+  scheduleGitRefresh();
   const open = useDocuments.getState().docs;
   if (open.some((d) => d.path && paths.some((p) => p === d.path || isInside(d.path!, p)))) {
     await checkExternalChanges();

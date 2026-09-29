@@ -100,6 +100,11 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().openFilePicker(),
     enabled: () => !!useWorkspace.getState().root,
   },
+  clearRecent: {
+    id: "clearRecent",
+    label: "Clear Recent",
+    run: async () => (await import("./recent")).clearRecent(),
+  },
   closeFolder: {
     id: "closeFolder",
     label: "Close Folder",

@@ -30,6 +30,7 @@ The file explorer shows the folder you're working in, your **workspace**. Open i
 | Move | Drag a file or folder onto another folder, or onto the empty space below the tree for the top level; **Esc** cancels. From the keyboard: right-click (or **Shift+F10**) → **Move To…** and type the folder, relative to the open folder (`/` for the top level). Nothing is replaced: moving onto a name that already exists is refused. Open tabs follow the move, and links to it can be updated (see below) |
 | Delete | Right-click → **Delete…**. After you confirm, the item goes to the Trash or Recycle Bin, so it can be restored |
 | Refresh | The **Refresh** button |
+| Close the folder | The **×** button at the top of the Explorer, or **File → Close Folder**. The folder leaves the Explorer; nothing is deleted, and open tabs stay open |
 
 Other right-click actions: **Open**, **Reveal in File Explorer** (**Reveal in Finder** on macOS, **Open Containing Folder** on Linux), **Copy Path** and **Copy Relative Path**.
 
@@ -62,7 +63,19 @@ Markpion can read and write only inside folders and files you've opened yourself
 
 ## Recent files and folders
 
-The **File** menu and the welcome screen list recently opened files and folders. By default, the next start reopens your last folder and files; turn this off with **Settings → Startup → Reopen last folder and files**. **File → Close Folder** closes the workspace.
+The **File** menu and the welcome screen list recently opened files and folders. By default, the next start reopens your last folder and files; turn this off with **Settings → Startup → Reopen last folder and files**.
+
+To tidy the list, point at an entry on the welcome screen and click its **×**, or clear the whole list with **Clear** (on the welcome screen) or **File → Clear Recent**. Only the list changes; the files and folders stay where they are.
+
+## Explorer and Outline size
+
+The Outline sits below the Explorer. Drag the line between them to give either more room; the size is remembered. Click the **Outline** heading to collapse it to a single line, and again to expand it.
+
+## Git status
+
+When the open folder is in a Git repository, the Explorer marks changed files with a letter: **M** modified, **A** added, **D** deleted, **R** renamed, **U** untracked, **C** conflict. Folders that contain changes get a dot. The status bar shows the branch, with **↑** commits to push and **↓** commits to pull.
+
+This needs Git installed. Markpion runs `git status` in the open folder, read-only, when the folder opens, when files change, and when you come back to the window; it never commits, pulls or pushes. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
 
 ## Search and links across the folder
 

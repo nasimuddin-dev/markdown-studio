@@ -1,7 +1,7 @@
 import type { AiRequest, Backend, WriteRequest } from "./backend";
 import { AppError } from "./errors";
 import { basename, dirname, isMarkdownPath, join } from "./paths";
-import type { AppUpdate, DirEntry, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
+import type { AppUpdate, DirEntry, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
 import { buildSearchRegex, searchText } from "./search";
 import { DEMO_FILES } from "./demoContent";
 
@@ -17,6 +17,8 @@ export interface MemoryBackendOptions {
   storageKey?: string | null;
   /** Answers native-dialog requests (defaults to `window.prompt`). */
   prompt?: (message: string, defaultValue: string) => string | null;
+  /** What Git status reports (tests); the demo has no Git. */
+  git?: GitStatus;
   /** Folders that are pre-approved (as if opened via a dialog). */
   approved?: string[];
   /**
@@ -61,6 +63,7 @@ export class MemoryBackend implements Backend {
   private readonly aiFn: MemoryBackendOptions["ai"];
   private aiKey: string | null = null;
   private readonly policy: unknown;
+  private readonly git: GitStatus | null;
   readonly logs: string[] = [];
 
   constructor(opts: MemoryBackendOptions = {}) {
@@ -68,6 +71,7 @@ export class MemoryBackend implements Backend {
     this.promptFn = opts.prompt ?? ((m, d) => window.prompt(m, d));
     this.aiFn = opts.ai;
     this.policy = opts.policy ?? null;
+    this.git = opts.git ?? null;
     this.capabilities = { desktop: false, trash: false, revealInFolder: false, selfUpdate: false, nativeImport: false, ai: !!opts.ai };
     if (!this.restore()) {
       for (const [path, content] of Object.entries(opts.files ?? {})) this.put(path, content);
@@ -433,6 +437,11 @@ export class MemoryBackend implements Backend {
     this.dirs = new Set([...this.dirs].filter((d) => d !== p && !d.startsWith(p + "/")));
     this.files = new Map([...this.files].filter(([k]) => !k.startsWith(p + "/")));
     this.persist();
+  }
+
+  async gitStatus(root: string): Promise<GitStatus | null> {
+    this.check(root);
+    return this.git;
   }
 
   async listWorkspaceFiles(root: string) {

@@ -2,6 +2,7 @@ mod ai;
 mod commands;
 mod error;
 mod fs_ops;
+mod git;
 mod history;
 mod open_paths;
 mod scope;
@@ -124,6 +125,7 @@ pub fn run() {
             commands::platform::take_pending_opens,
             commands::workspace::search_workspace,
             commands::workspace::list_workspace_files,
+            commands::workspace::git_status,
             commands::workspace::list_convertible_files,
             commands::app_data::list_history,
             commands::workspace::watch_workspace,

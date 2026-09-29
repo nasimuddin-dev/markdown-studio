@@ -91,6 +91,7 @@ export function SettingsDialog() {
           <p className="muted small">Untitled documents are never auto-saved. Recovery snapshots are kept either way.</p>
           <label className="check"><input type="checkbox" checked={settings.trimTrailingWhitespace} disabled={isLocked("trimTrailingWhitespace")} onChange={(e) => update({ trimTrailingWhitespace: e.target.checked })} /> Trim trailing whitespace on save (keeps Markdown line breaks)</label>
           <label className="check"><input type="checkbox" checked={settings.updateTocOnSave} disabled={isLocked("updateTocOnSave")} onChange={(e) => update({ updateTocOnSave: e.target.checked })} /> Keep the table of contents up to date on save</label>
+          <label className="check"><input type="checkbox" checked={settings.showGitStatus} disabled={isLocked("showGitStatus")} onChange={(e) => update({ showGitStatus: e.target.checked })} /> Show Git branch and changed files (runs git status in the open folder)</label>
           <label className="check"><input type="checkbox" checked={settings.insertFinalNewline} disabled={isLocked("insertFinalNewline")} onChange={(e) => update({ insertFinalNewline: e.target.checked })} /> Insert a final newline on save</label>
           <label htmlFor="setting-newFileLineEnding">Line endings for new files</label>
           <select {...field("newFileLineEnding")} onChange={(e) => update({ newFileLineEnding: e.target.value as Settings["newFileLineEnding"] })}>
