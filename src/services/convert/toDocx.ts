@@ -1,8 +1,8 @@
 import { ALERT_KINDS, takeMdastAlert } from "../alerts";
 import { stripFrontMatter } from "../frontMatter";
 import {
-  AlignmentType, BorderStyle, Document, ExternalHyperlink, FootnoteReferenceRun, HeadingLevel, ImageRun, LevelFormat, Packer,
-  Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType,
+  AlignmentType, BorderStyle, Document, ExternalHyperlink, Footer, FootnoteReferenceRun, HeadingLevel, ImageRun, LevelFormat, Packer,
+  PageNumber, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType,
   type IParagraphOptions, type ParagraphChild,
 } from "docx";
 import { unified } from "unified";
@@ -368,6 +368,17 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
       {
         // Twips (1/20 pt); Word's default margins fit both sizes.
         properties: { page: { size: { width: Math.round(page.width * 20), height: Math.round(page.height * 20) } } },
+        // "page / pages", like the PDF export.
+        footers: {
+          default: new Footer({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [new TextRun({ children: [PageNumber.CURRENT, " / ", PageNumber.TOTAL_PAGES], size: 16, color: "8A93A3" })],
+              }),
+            ],
+          }),
+        },
         children,
       },
     ],

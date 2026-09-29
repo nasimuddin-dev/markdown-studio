@@ -43,3 +43,15 @@ describe("export page size", () => {
     expect(sanitizeSettings({ exportPageSize: "tabloid" }).exportPageSize).toBe("auto");
   });
 });
+
+describe("Word page numbers", () => {
+  it("adds a page / pages footer, like the PDF export", async () => {
+    const zip = await JSZip.loadAsync(await markdownToDocx("# Hi"));
+    const footerName = Object.keys(zip.files).find((f) => /^word\/footer\d*\.xml$/.test(f));
+    expect(footerName).toBeDefined();
+    const footer = await zip.file(footerName!)!.async("string");
+    expect(footer).toMatch(/PAGE/);
+    expect(footer).toMatch(/NUMPAGES/);
+    expect(footer).toContain(" / ");
+  });
+});
