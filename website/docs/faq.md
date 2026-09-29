@@ -11,7 +11,7 @@ A desktop Markdown editor for Windows, macOS and Linux. You edit `.md` files on 
 
 ## Is Markpion the same app as Markdown Studio?
 
-Yes. Markdown Studio was renamed to Markpion in version 0.14.0. Updating keeps your settings, recent files and version history: Markpion copies them from Markdown Studio the first time it starts. On Windows, the Markpion installer also removes the old Markdown Studio installation. If Markdown Studio was installed for all users and Markpion is installed only for you, Windows may keep both; uninstall Markdown Studio from **Settings → Apps**.
+Yes. Markdown Studio was renamed to Markpion in version 0.14.0. Updating keeps your settings, recent files and version history: Markpion copies them from Markdown Studio the first time it starts. On Windows, the Markpion installer also removes the old Markdown Studio installation and, from 0.15.0, creates Markpion's Start menu and desktop shortcuts in place of the old ones (pin it to the taskbar again yourself). If Markdown Studio was installed for all users and Markpion is installed only for you, Windows may keep both; uninstall Markdown Studio from **Settings → Apps**.
 
 ## Which operating systems are supported?
 

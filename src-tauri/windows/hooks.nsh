@@ -34,6 +34,10 @@
 ; Markpion was called Markdown Studio up to version 0.13. Its uninstaller is run
 ; silently before installing, so the old app doesn't stay installed next to the
 ; new one. It keeps the user's settings (Markpion copies them on first start).
+!define MS_LEGACY_DATA "%APPDATA%\com.markdownstudio.app"
+!define MS_SETUP_KEY "Software\Markpion Setup"
+Var MsLegacyRemoved
+
 !macro MS_REMOVE_LEGACY ROOT
   Push $R0
   Push $R1
@@ -48,12 +52,42 @@
     ExecWait '"$R0\uninstall.exe" /S _?=$R0'
     Delete "$R0\uninstall.exe"
     RMDir "$R0"
+    StrCpy $MsLegacyRemoved 1
   ${EndIf}
   Pop $R1
   Pop $R0
 !macroend
 
+; The old uninstaller deletes Markdown Studio's Start menu and desktop
+; shortcuts, and an update (/UPDATE, as the in-app updater runs it) never
+; creates new ones. So the first time Markpion is installed over Markdown
+; Studio, create them here. Installs that updated to 0.14.0 before this fix
+; are recognised by Markdown Studio's data folder and repaired once. A
+; marker keeps shortcuts the user deletes later from coming back.
+!macro MS_RESTORE_SHORTCUTS
+  Push $R0
+  ReadRegStr $R0 SHCTX "${MS_SETUP_KEY}" "ShortcutsRestored"
+  ${If} $R0 == ""
+  ${AndIf} $NoShortcutMode <> 1
+    ExpandEnvStrings $R0 "${MS_LEGACY_DATA}"
+    ${If} $MsLegacyRemoved = 1
+    ${OrIf} ${FileExists} "$R0\*.*"
+      ${IfNot} ${FileExists} "$SMPROGRAMS\${PRODUCTNAME}.lnk"
+        CreateShortcut "$SMPROGRAMS\${PRODUCTNAME}.lnk" "${MS_EXE}"
+        !insertmacro SetLnkAppUserModelId "$SMPROGRAMS\${PRODUCTNAME}.lnk"
+      ${EndIf}
+      ${IfNot} ${FileExists} "$DESKTOP\${PRODUCTNAME}.lnk"
+        CreateShortcut "$DESKTOP\${PRODUCTNAME}.lnk" "${MS_EXE}"
+        !insertmacro SetLnkAppUserModelId "$DESKTOP\${PRODUCTNAME}.lnk"
+      ${EndIf}
+      WriteRegStr SHCTX "${MS_SETUP_KEY}" "ShortcutsRestored" "1"
+    ${EndIf}
+  ${EndIf}
+  Pop $R0
+!macroend
+
 !macro NSIS_HOOK_PREINSTALL
+  StrCpy $MsLegacyRemoved 0
   !insertmacro MS_REMOVE_LEGACY HKCU
   !insertmacro MS_REMOVE_LEGACY HKLM
 !macroend
@@ -95,6 +129,8 @@
   WriteRegStr SHCTX "${MS_UNINST}" "URLUpdateInfo" "${MS_HOMEPAGE}#download"
   WriteRegStr SHCTX "${MS_UNINST}" "Comments" "Local-first Markdown editor"
 
+  !insertmacro MS_RESTORE_SHORTCUTS
+
   ; Tell Explorer that file associations changed.
   System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, p 0, p 0)'
 !macroend
@@ -106,6 +142,9 @@
   DeleteRegKey SHCTX "Software\Classes\Applications\${MAINBINARYNAME}.exe"
   DeleteRegValue SHCTX "Software\RegisteredApplications" "Markpion"
   DeleteRegKey SHCTX "Software\Markpion"
+  ${If} $UpdateMode <> 1
+    DeleteRegKey SHCTX "${MS_SETUP_KEY}"
+  ${EndIf}
   DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\App Paths\${MAINBINARYNAME}.exe"
   System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, p 0, p 0)'
 !macroend

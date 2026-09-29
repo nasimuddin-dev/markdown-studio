@@ -33,6 +33,12 @@ description: Fix Markpion installation problems on Windows, including SmartScree
 
 **Solution:** sign in to that account, or reinstall and choose **Anyone who uses this computer**.
 
+## No desktop or Start menu shortcut after updating from Markdown Studio
+
+**Cause:** updating Markdown Studio 0.13 to Markpion 0.14.0 removed the old shortcuts and didn't create new ones. A taskbar pin of Markdown Studio is removed too.
+
+**Solution:** update to Markpion 0.15.0 or later (**Help → Check for Updates…**). It creates the Start menu and desktop shortcuts once. To pin Markpion to the taskbar, right-click it in the Start menu and choose **Pin to taskbar**.
+
 ## No "Open with Markpion" in the right-click menu
 
 **Solution:** on Windows 11, choose **Show more options** first. If it's still missing, reinstall the latest version.
