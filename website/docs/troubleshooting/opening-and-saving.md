@@ -1,11 +1,11 @@
 ---
 title: Opening & Saving Files
-description: Fix problems opening or saving Markdown files in Markdown Studio, including permission denied, disk full, files changed by another program, invalid UTF-8, very large files and missing files.
+description: Fix problems opening or saving Markdown files in Markpion, including permission denied, disk full, files changed by another program, invalid UTF-8, very large files and missing files.
 ---
 
 # Opening & saving files
 
-Markdown Studio's error messages say what happened and what you can do next. They're explained here.
+Markpion's error messages say what happened and what you can do next. They're explained here.
 
 ## "You don't have permission to write here"
 
@@ -19,7 +19,7 @@ Markdown Studio's error messages say what happened and what you can do next. The
 
 1. Use **File → Save As…** (**Ctrl+Shift+S**) to save a copy in a folder you own, such as Documents.
 2. Or remove the file's read-only flag, or ask its owner for write access.
-3. If it happened once and then works, a program was briefly holding the file; Markdown Studio already retries a few times on Windows.
+3. If it happened once and then works, a program was briefly holding the file; Markpion already retries a few times on Windows.
 
 ## "The disk is full"
 
@@ -41,7 +41,7 @@ Markdown Studio's error messages say what happened and what you can do next. The
 
 **Possible cause:** the file uses another encoding, such as Windows-1252 or UTF-16, or isn't a text file.
 
-**Solution:** convert it to UTF-8 in another editor (for example, in Notepad choose **Save As → Encoding: UTF-8**), then open it again. Markdown Studio doesn't open it to avoid damaging it on save.
+**Solution:** convert it to UTF-8 in another editor (for example, in Notepad choose **Save As → Encoding: UTF-8**), then open it again. Markpion doesn't open it to avoid damaging it on save.
 
 ## "The maximum supported size is 50 MB"
 
@@ -55,11 +55,11 @@ Markdown Studio's error messages say what happened and what you can do next. The
 
 **Solution:** open it from its new location with **File → Open File…**, or use **Save As** to save your text somewhere else.
 
-## "Markdown Studio hasn't been given access to this location"
+## "Markpion hasn't been given access to this location"
 
 **Problem:** a file can't be opened or saved: *"Open the file or its folder first."*
 
-**Possible cause:** for privacy, Markdown Studio only accesses files and folders you've opened yourself.
+**Possible cause:** for privacy, Markpion only accesses files and folders you've opened yourself.
 
 **Solution:** open the file with **File → Open File…**, or its folder with **File → Open Folder…**.
 
@@ -69,4 +69,4 @@ Markdown Studio's error messages say what happened and what you can do next. The
 
 ## Report an issue
 
-If a file won't open or save and none of this applies, [report it on GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new) with the exact message and the diagnostic log.
+If a file won't open or save and none of this applies, [report it on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) with the exact message and the diagnostic log.

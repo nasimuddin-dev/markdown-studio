@@ -304,7 +304,7 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
   content.push(...(await builder.footnoteSection()));
 
   const doc: TDocumentDefinitions = {
-    info: { title: opts.title, creator: "Markdown Studio", producer: "Markdown Studio" },
+    info: { title: opts.title, creator: "Markpion", producer: "Markpion" },
     pageSize: "A4",
     pageMargins: [40, 48, 40, 56],
     content,

@@ -36,6 +36,9 @@ pub fn run() {
             let paths = app.path();
             let config_dir = paths.app_config_dir()?;
             let data_dir = paths.app_data_dir()?;
+            // Keep settings, recent files and history from Markdown Studio (the old name).
+            storage::migrate_legacy_dir(&config_dir);
+            storage::migrate_legacy_dir(&data_dir);
             let log_dir = paths.app_log_dir()?;
             let logger = storage::Logger::new(log_dir, paths.home_dir().ok());
             logger.log(
@@ -109,7 +112,7 @@ pub fn run() {
             }
         })
         .build(tauri::generate_context!())
-        .expect("error while building Markdown Studio")
+        .expect("error while building Markpion")
         .run(|_app, _event| {
             // macOS delivers "Open With" / double-clicked documents as an event.
             #[cfg(target_os = "macos")]

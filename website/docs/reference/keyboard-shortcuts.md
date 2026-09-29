@@ -1,11 +1,11 @@
 ---
 title: Keyboard Shortcuts
-description: The complete list of Markdown Studio keyboard shortcuts for Windows, Linux and macOS, covering files, tabs, editing, formatting, views and the built-in editor keys.
+description: The complete list of Markpion keyboard shortcuts for Windows, Linux and macOS, covering files, tabs, editing, formatting, views and the built-in editor keys.
 ---
 
 # Keyboard shortcuts
 
-The tables below are generated from Markdown Studio's source code when this site is built, so they match the current version. Inside the app, **Help → Keyboard Shortcuts** shows the same list with a search box, and the command palette (**Ctrl+Shift+P** / **Cmd+Shift+P**, or **F1**) lists every command, including those without a shortcut.
+The tables below are generated from Markpion's source code when this site is built, so they match the current version. Inside the app, **Help → Keyboard Shortcuts** shows the same list with a search box, and the command palette (**Ctrl+Shift+P** / **Cmd+Shift+P**, or **F1**) lists every command, including those without a shortcut.
 
 ## App commands
 

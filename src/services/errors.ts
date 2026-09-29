@@ -38,7 +38,7 @@ export function describeError(e: unknown, action: string): string {
     case "permissionDenied":
       return `Couldn't ${action}: you don't have permission to write here. Use Save As to save a copy somewhere else.`;
     case "outOfScope":
-      return `Couldn't ${action}: Markdown Studio hasn't been given access to this location. Open the file or its folder first.`;
+      return `Couldn't ${action}: Markpion hasn't been given access to this location. Open the file or its folder first.`;
     case "invalidPath":
       return `Couldn't ${action}: ${err.message}`;
     case "encoding":

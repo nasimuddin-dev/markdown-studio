@@ -1,6 +1,6 @@
 ---
 title: Front Matter, Alerts & Footnotes
-description: Use YAML front matter, GitHub-style alerts (NOTE, TIP, IMPORTANT, WARNING, CAUTION) and footnotes in Markdown Studio, and how each looks in the preview and in exports.
+description: Use YAML front matter, GitHub-style alerts (NOTE, TIP, IMPORTANT, WARNING, CAUTION) and footnotes in Markpion, and how each looks in the preview and in exports.
 ---
 
 # Front matter, alerts & footnotes
@@ -52,7 +52,7 @@ The **preview** and **HTML export** show them as coloured callouts with an icon 
 Footnotes put a reference number in the text and the note at the end of the document:
 
 ```markdown
-Markdown Studio stores files locally.[^1]
+Markpion stores files locally.[^1]
 
 [^1]: Nothing is uploaded unless you share the file yourself.
 ```

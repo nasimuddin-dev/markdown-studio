@@ -10,7 +10,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
 const DIST = new URL("../.vitepress/dist/", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
-const BASE = "/markdown-studio/";
+const BASE = "/markpion/";
 const external = process.argv.includes("--external");
 
 const pages = [];
@@ -22,7 +22,7 @@ const pages = [];
   }
 })(DIST);
 
-/** The output file for a site URL such as /markdown-studio/guide/editor#tabs. */
+/** The output file for a site URL such as /markpion/guide/editor#tabs. */
 function target(url) {
   let path = decodeURIComponent(url.replace(/[?#].*$/, "")).slice(BASE.length);
   if (path === "" || path.endsWith("/")) path += "index.html";
@@ -40,7 +40,7 @@ for (const page of pages) {
   for (const m of html.matchAll(/\s(?:href|src)="([^"]+)"/g)) {
     const url = m[1].replace(/&amp;/g, "&");
     if (/^https?:\/\//.test(url)) {
-      if (/github\.com\/nasimuddin-dev\/markdown-studio/.test(url)) externalUrls.add(url);
+      if (/github\.com\/nasimuddin-dev\/markpion/.test(url)) externalUrls.add(url);
       continue;
     }
     if (/^(mailto:|data:|#|javascript:)/.test(url)) continue;

@@ -1,7 +1,7 @@
 name: Documentation website
 
 # Builds the VitePress site in website/ and deploys it to GitHub Pages
-# (https://nasimuddin-dev.github.io/markdown-studio/). Pull requests are built
+# (https://nasimuddin-dev.github.io/markpion/). Pull requests are built
 # and checked but not deployed. A release's version bump on main redeploys the
 # site, so the download page and changelog pick up the new version. (Releases
 # themselves don't trigger it: the github-pages environment only accepts main.)

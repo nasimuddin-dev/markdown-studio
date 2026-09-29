@@ -6,7 +6,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const SITE = process.env.SITE_URL ?? "http://localhost:4173/markdown-studio/";
+const SITE = process.env.SITE_URL ?? "http://localhost:4173/markpion/";
 const PAGES = ["", "download", "features", "getting-started/first-document", "guide/editor", "markdown/tables", "reference/keyboard-shortcuts", "troubleshooting/opening-and-saving", "faq", "changelog", "blog/what-is-markdown"];
 const SHOTS = process.env.SHOTS_DIR;
 

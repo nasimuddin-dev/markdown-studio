@@ -1,6 +1,6 @@
 ---
 title: Mermaid Diagrams
-description: Draw flowcharts, sequence diagrams, Gantt charts and more with Mermaid code blocks in Markdown Studio. Syntax, supported diagram types, preview, export and troubleshooting.
+description: Draw flowcharts, sequence diagrams, Gantt charts and more with Mermaid code blocks in Markpion. Syntax, supported diagram types, preview, export and troubleshooting.
 ---
 
 # Mermaid diagrams
@@ -8,7 +8,7 @@ description: Draw flowcharts, sequence diagrams, Gantt charts and more with Merm
 [Mermaid](https://mermaid.js.org) turns text into diagrams. Write the diagram in a code block with the language `mermaid`, and the preview draws it.
 
 <figure>
-  <img class="screenshot" src="../images/markdown-studio-mermaid.webp" alt="A Mermaid flowchart written in the editor and drawn as a diagram with boxes and arrows in the preview" width="1440" height="900" loading="lazy">
+  <img class="screenshot" src="../images/markpion-mermaid.webp" alt="A Mermaid flowchart written in the editor and drawn as a diagram with boxes and arrows in the preview" width="1440" height="900" loading="lazy">
   <figcaption>A Mermaid flowchart in the editor (left) and preview (right).</figcaption>
 </figure>
 
@@ -17,7 +17,7 @@ description: Draw flowcharts, sequence diagrams, Gantt charts and more with Merm
 ````markdown
 ```mermaid
 graph TD
-    A[Markdown] --> B[Markdown Studio]
+    A[Markdown] --> B[Markpion]
     B --> C[Preview]
 ```
 ````
@@ -45,7 +45,7 @@ pie title Time spent
 
 ## Supported diagram types
 
-Markdown Studio includes Mermaid 12, so it draws the diagram types that version supports, including flowcharts (`graph` / `flowchart`), sequence, class, state, entity-relationship, Gantt, pie, user journey, Git graph, mindmap, timeline, quadrant and XY charts. See the [Mermaid documentation](https://mermaid.js.org/intro/) for the syntax of each.
+Markpion includes Mermaid 12, so it draws the diagram types that version supports, including flowcharts (`graph` / `flowchart`), sequence, class, state, entity-relationship, Gantt, pie, user journey, Git graph, mindmap, timeline, quadrant and XY charts. See the [Mermaid documentation](https://mermaid.js.org/intro/) for the syntax of each.
 
 ## Preview
 

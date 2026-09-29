@@ -333,7 +333,7 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
   const doc = new Document({
     footnotes,
     title: opts.title,
-    creator: "Markdown Studio",
+    creator: "Markpion",
     styles: {
       default: { document: { run: { font: "Calibri", size: 22 } } },
       characterStyles: [{ id: "Hyperlink", name: "Hyperlink", run: { color: "2F5BEA", underline: {} } }],

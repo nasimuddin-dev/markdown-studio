@@ -11,7 +11,7 @@ export function ChangeBanner() {
     return (
       <div className="banner warning" role="alert">
         <Icon name="warning" />
-        <span className="banner-text">“{doc.name}” was deleted or moved outside Markdown Studio. Your text is still here.</span>
+        <span className="banner-text">“{doc.name}” was deleted or moved outside Markpion. Your text is still here.</span>
         <button className="button" onClick={() => void saveDocument(doc.id)}>Save to Recreate</button>
         <button className="button" onClick={() => void saveDocument(doc.id, { saveAs: true })}>Save As…</button>
         <button className="button" onClick={() => void closeDocument(doc.id)}>Close</button>

@@ -1,13 +1,13 @@
 [package]
-name = "markdown-studio"
+name = "markpion"
 version = "0.13.0"
 description = "Cross-platform, local-first desktop Markdown editor"
-authors = ["Markdown Studio contributors"]
+authors = ["Markpion contributors"]
 edition = "2021"
 rust-version = "1.83"
 
 [lib]
-name = "markdown_studio_lib"
+name = "markpion_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

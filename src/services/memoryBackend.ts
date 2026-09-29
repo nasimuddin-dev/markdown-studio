@@ -21,7 +21,7 @@ export interface MemoryBackendOptions {
   approved?: string[];
 }
 
-const STORAGE_PREFIX = "markdown-studio:";
+const STORAGE_PREFIX = "markpion:";
 
 function safeStorage(): Storage | null {
   try {
@@ -127,7 +127,7 @@ export class MemoryBackend implements Backend {
     const p = this.validate(path);
     const inRoot = [...this.roots].some((r) => p === r || p.startsWith(r + "/"));
     if (!inRoot && !this.allowedFiles.has(p)) {
-      throw new AppError("outOfScope", "This location has not been opened in Markdown Studio.");
+      throw new AppError("outOfScope", "This location has not been opened in Markpion.");
     }
     return p;
   }
@@ -511,10 +511,10 @@ export class MemoryBackend implements Backend {
     const blob = new Blob([this.logs.join("\n")], { type: "text/plain" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "markdown-studio-diagnostics.log";
+    a.download = "markpion-diagnostics.log";
     a.click();
     URL.revokeObjectURL(a.href);
-    return "markdown-studio-diagnostics.log";
+    return "markpion-diagnostics.log";
   }
 
   /** Test helper: simulates another program editing a file. */

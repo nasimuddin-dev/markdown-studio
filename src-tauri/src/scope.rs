@@ -101,7 +101,7 @@ impl Scope {
             Ok(resolved)
         } else {
             Err(AppError::OutOfScope(
-                "This location has not been opened in Markdown Studio. Use Open File or Open Folder to grant access.".into(),
+                "This location has not been opened in Markpion. Use Open File or Open Folder to grant access.".into(),
             ))
         }
     }

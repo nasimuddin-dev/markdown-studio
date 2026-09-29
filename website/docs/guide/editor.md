@@ -1,6 +1,6 @@
 ---
 title: Editor
-description: How to use the Markdown Studio editor, including layout, syntax highlighting, line numbers, selection and multiple cursors, folding, undo and redo, paste, views, focus mode and go to line.
+description: How to use the Markpion editor, including layout, syntax highlighting, line numbers, selection and multiple cursors, folding, undo and redo, paste, views, focus mode and go to line.
 ---
 
 # Editor
@@ -68,7 +68,7 @@ When you press **Enter** inside a list or quote, the next line continues it.
 
 ## Copy, cut and paste
 
-Copy, cut and paste use the system clipboard. Markdown Studio adds some smart behaviour:
+Copy, cut and paste use the system clipboard. Markpion adds some smart behaviour:
 
 - **Rich text:** content copied from a web page or Word is converted to Markdown (headings, lists, links, tables). On Windows, **Ctrl+Shift+V** pastes plain text instead; on any system you can turn the conversion off in Settings.
 - **Spreadsheet cells:** cells copied from Excel or Google Sheets are pasted as a Markdown table.

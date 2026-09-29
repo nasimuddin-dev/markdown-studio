@@ -1,8 +1,8 @@
 /** Sample workspace used when the UI runs in a browser without the native shell. */
 export const DEMO_FILES: Record<string, string> = {
-  "/demo/README.md": `# Welcome to Markdown Studio
+  "/demo/README.md": `# Welcome to Markpion
 
-Markdown Studio is a **local-first** Markdown editor with live preview.
+Markpion is a **local-first** Markdown editor with live preview.
 
 > You're running the browser demo. Files here live in your browser only.
 > Install the desktop app to edit files on your computer.
@@ -106,5 +106,5 @@ $$
 - [ ] Write release notes
 - [ ] Test on Windows, macOS and Linux
 `,
-  "/demo/assets/logo.svg": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="96" height="96"><rect width="64" height="64" rx="14" fill="#2f5bea"/><path d="M12 44V20h6l7 9 7-9h6v24h-6V30l-7 9-7-9v14z" fill="#fff"/><path d="M44 20h6v14h5l-8 10-8-10h5z" fill="#fff"/></svg>`,
+  "/demo/assets/logo.svg": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="96" height="96"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f46e5"/><stop offset="1" stop-color="#9333ea"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#g)"/><path d="M14 44V18l18 18 18-18v26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 42l5.5 6.5L32 57l-5.5-8.5z" fill="#fff"/><circle cx="32" cy="48.6" r="1.6" fill="#6d3be8"/></svg>`,
 };

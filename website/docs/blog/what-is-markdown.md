@@ -56,7 +56,7 @@ If you write GFM, your documents will look right on GitHub and in most editors.
 
 You can write Markdown in any text editor, but a dedicated editor helps: it highlights the syntax, shows a live preview, and handles the fiddly parts such as aligning tables or inserting links.
 
-[Markdown Studio](/) is one such editor, a free desktop app for Windows, macOS and Linux. It shows your file and its preview side by side and works with the files in your folders. The [first document walkthrough](/getting-started/first-document) takes five minutes.
+[Markpion](/) is one such editor, a free desktop app for Windows, macOS and Linux. It shows your file and its preview side by side and works with the files in your folders. The [first document walkthrough](/getting-started/first-document) takes five minutes.
 
 ## Where to go next
 

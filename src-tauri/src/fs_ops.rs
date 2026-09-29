@@ -143,7 +143,7 @@ pub fn write_text_atomic(
         .file_name()
         .ok_or_else(|| AppError::InvalidPath("Path has no file name".into()))?
         .to_string_lossy();
-    let tmp_path = dir.join(format!(".{}.{}.mdstudio-tmp", file_name, std::process::id()));
+    let tmp_path = dir.join(format!(".{}.{}.markpion-tmp", file_name, std::process::id()));
 
     let bytes = text::encode(content, line_ending, bom);
     let result = (|| -> AppResult<()> {
@@ -203,7 +203,7 @@ pub fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> AppResult<()> {
         .file_name()
         .ok_or_else(|| AppError::InvalidPath("Path has no file name".into()))?
         .to_string_lossy();
-    let tmp = dir.join(format!(".{}.{}.mdstudio-tmp", name, std::process::id()));
+    let tmp = dir.join(format!(".{}.{}.markpion-tmp", name, std::process::id()));
     let result = (|| -> AppResult<()> {
         let mut f = File::create(&tmp)?;
         f.write_all(bytes)?;

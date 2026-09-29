@@ -1,6 +1,6 @@
 ---
 title: Import & Export
-description: Import Word, PDF, HTML and CSV/TSV files as Markdown, and export Markdown to PDF, Word (.docx) and standalone HTML in Markdown Studio, one document or a whole folder at a time.
+description: Import Word, PDF, HTML and CSV/TSV files as Markdown, and export Markdown to PDF, Word (.docx) and standalone HTML in Markpion, one document or a whole folder at a time.
 ---
 
 # Import & export
@@ -22,10 +22,10 @@ Import commands are in the **File** menu. Each one converts a file into a new Ma
 
 **File → Import PDF (.pdf)…**
 
-PDFs store positioned text rather than structure, so Markdown Studio reconstructs the document:
+PDFs store positioned text rather than structure, so Markpion reconstructs the document:
 
 - **Supported:** paragraphs (lines are joined, and hyphenated line breaks are mended), headings (text larger than the body text), and bulleted or numbered items. Repeated headers, footers and page numbers are dropped.
-- **Limitations:** tables and multi-column layouts may come out as plain paragraphs, and images aren't extracted. **Scanned PDFs** contain only images of text; they can't be imported, because text recognition (OCR) isn't supported, and Markdown Studio tells you so.
+- **Limitations:** tables and multi-column layouts may come out as plain paragraphs, and images aren't extracted. **Scanned PDFs** contain only images of text; they can't be imported, because text recognition (OCR) isn't supported, and Markpion tells you so.
 
 ### Web page (.html)
 
@@ -67,7 +67,7 @@ The document's front matter isn't exported; its `title`, if any, becomes the exp
 | Footnotes | Linked section at the end | Linked section at the end | Section at the end | Word footnotes |
 | Chinese, Japanese, Korean, Arabic, emoji | Yes | Yes | Not in the built-in font | Yes |
 
-**Export as PDF** uses a built-in font. If the document contains characters it can't display, Markdown Studio warns you and offers **Print → Save as PDF**, which uses your system fonts, instead. For documents with formulas, use **Print / Save as PDF** or **Export as HTML**. A diagram with a syntax error is exported as its code.
+**Export as PDF** uses a built-in font. If the document contains characters it can't display, Markpion warns you and offers **Print → Save as PDF**, which uses your system fonts, instead. For documents with formulas, use **Print / Save as PDF** or **Export as HTML**. A diagram with a syntax error is exported as its code.
 
 ### A whole folder as one document
 

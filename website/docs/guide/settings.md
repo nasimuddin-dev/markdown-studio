@@ -1,6 +1,6 @@
 ---
 title: Settings
-description: Every Markdown Studio setting explained, covering theme, editor font and size, line numbers, wrapping, tab size, spell check, paste, lint, auto save, line endings, preview, math, diagrams and startup.
+description: Every Markpion setting explained, covering theme, editor font and size, line numbers, wrapping, tab size, spell check, paste, lint, auto save, line endings, preview, math, diagrams and startup.
 ---
 
 # Settings
@@ -55,7 +55,7 @@ Existing files always keep their own line endings. Untitled documents are never 
 | Setting | Default |
 | --- | --- |
 | Reopen last folder and files | On |
-| Check for updates when Markdown Studio starts | On |
+| Check for updates when Markpion starts | On |
 
 The update check asks GitHub for the latest version number; nothing else is sent. See [Privacy](/privacy).
 
@@ -65,4 +65,4 @@ The update check asks GitHub for the latest version number; nothing else is sent
 
 ## Remembered automatically
 
-Markdown Studio also remembers the window size and position, the view (editor, split or preview), whether the explorer and outline are shown, and panel sizes.
+Markpion also remembers the window size and position, the view (editor, split or preview), whether the explorer and outline are shown, and panel sizes.

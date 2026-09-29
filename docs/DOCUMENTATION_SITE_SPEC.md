@@ -1,11 +1,11 @@
-# Markdown Studio Documentation Website — AI Implementation Specification
+# Markpion Documentation Website — AI Implementation Specification
 
 ## 1. Mission
 
-Build a professional public documentation and product website for **Markdown Studio**, the cross-platform desktop Markdown editor in this repository.
+Build a professional public documentation and product website for **Markpion**, the cross-platform desktop Markdown editor in this repository.
 
 Repository:
-`https://github.com/nasimuddinbd02/markdown-studio`
+`https://github.com/nasimuddinbd02/markpion`
 
 The website must support GitHub Pages hosting, Google search indexing, product discovery, downloads, user documentation, troubleshooting, releases, and future pricing/monetization pages.
 
@@ -26,7 +26,7 @@ The source code and current release artifacts are the source of truth.
 
 The website must allow visitors to:
 
-- Understand Markdown Studio.
+- Understand Markpion.
 - Discover supported features.
 - Download the application.
 - Install it on supported platforms.
@@ -42,7 +42,7 @@ Desired flow:
 
 ```text
 Google Search
-  -> Markdown Studio Website
+  -> Markpion Website
   -> Product Overview
   -> Features
   -> Download
@@ -77,7 +77,7 @@ Requirements:
 Prefer keeping the site inside the existing repository:
 
 ```text
-markdown-studio/
+markpion/
 ├── src/
 ├── src-tauri/
 ├── tests/
@@ -165,13 +165,13 @@ Create a professional landing page.
 
 Hero should communicate:
 
-**Markdown Studio**
+**Markpion**
 
 A modern desktop Markdown editor for Windows, macOS, and Linux.
 
 Write, edit, preview, and organize Markdown documents from one fast local-first workspace.
 
-Primary CTA: `Download Markdown Studio`
+Primary CTA: `Download Markpion`
 
 Secondary CTA: `View on GitHub`
 
@@ -375,7 +375,7 @@ Example:
 
 ```mermaid
 graph TD
-    A[Markdown] --> B[Markdown Studio]
+    A[Markdown] --> B[Markpion]
     B --> C[Preview]
 ```
 
@@ -499,18 +499,18 @@ Create `/faq`.
 
 Initial questions:
 
-- What is Markdown Studio?
+- What is Markpion?
 - Which operating systems are supported?
-- Is Markdown Studio free?
+- Is Markpion free?
 - Does it work offline?
 - Where are documents stored?
-- Does Markdown Studio upload documents?
+- Does Markpion upload documents?
 - Does it support GitHub Flavored Markdown?
 - Does it support Mermaid?
 - Does it support LaTeX?
 - How do I report a bug?
 - How do I request a feature?
-- How do I uninstall Markdown Studio?
+- How do I uninstall Markpion?
 
 Answers must reflect actual behavior.
 
@@ -594,10 +594,10 @@ Example homepage metadata:
 
 ```text
 Title:
-Markdown Studio — Cross-Platform Markdown Editor
+Markpion — Cross-Platform Markdown Editor
 
 Description:
-Markdown Studio is a desktop Markdown editor for Windows, macOS, and Linux with editing, live preview, file management, and more.
+Markpion is a desktop Markdown editor for Windows, macOS, and Linux with editing, live preview, file management, and more.
 ```
 
 Adjust based on actual features.
@@ -788,11 +788,11 @@ Recommended:
 
 ```text
 website/public/images/
-├── markdown-studio-home.webp
-├── markdown-studio-editor.webp
-├── markdown-studio-preview.webp
-├── markdown-studio-file-explorer.webp
-└── markdown-studio-mermaid.webp
+├── markpion-home.webp
+├── markpion-editor.webp
+├── markpion-preview.webp
+├── markpion-file-explorer.webp
+└── markpion-mermaid.webp
 ```
 
 Use optimized image formats and descriptive alt text.
@@ -830,7 +830,7 @@ The website must:
 
 Use the actual repository:
 
-`https://github.com/nasimuddinbd02/markdown-studio`
+`https://github.com/nasimuddinbd02/markpion`
 
 Provide links to:
 

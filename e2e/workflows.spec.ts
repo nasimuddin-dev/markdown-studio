@@ -14,7 +14,7 @@ async function start(page: Page) {
     window.prompt = (_message?: string, defaultValue?: string) => defaultValue ?? null;
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Markdown Studio" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
 }
 
 async function openDemoFolder(page: Page) {
@@ -166,7 +166,7 @@ test("combine the folder into one document", async ({ page }) => {
   await expect(page.getByRole("treeitem", { name: /demo \(combined\)\.md/ })).toBeVisible();
   const preview = page.locator(".markdown-body");
   await expect(preview.locator("h1")).toHaveText("demo");
-  await expect(preview.locator("h2", { hasText: "Welcome to Markdown Studio" })).toBeVisible();
+  await expect(preview.locator("h2", { hasText: "Welcome to Markpion" })).toBeVisible();
   await expect(preview.locator("h2", { hasText: "Guide" })).toBeVisible();
 });
 
@@ -363,7 +363,7 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await page.getByRole("menuitem", { name: "Duplicate" }).click();
   await expect(page.getByRole("tab", { name: /README copy\.md/ })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("treeitem", { name: /README copy\.md/ })).toBeVisible();
-  await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markdown Studio");
+  await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
 test("copy as formatted text puts HTML and Markdown on the clipboard", async ({ page }) => {

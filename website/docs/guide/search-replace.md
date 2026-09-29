@@ -42,7 +42,7 @@ To replace text in every Markdown file of the folder:
 
 1. Search for the text in **Find in Files**, with the options you need.
 2. Type the new text in **Replace with**. With **Use regular expression** on, `$1`, `$2`… insert the matching groups, `$<name>` a named group, `$&` the whole match and `$$` a dollar sign.
-3. Click **Replace All** (or press **Ctrl+Enter** in the field). Markdown Studio counts the matches in every file and asks you to confirm, for example "Replace 12 matches in 4 files".
+3. Click **Replace All** (or press **Ctrl+Enter** in the field). Markpion counts the matches in every file and asks you to confirm, for example "Replace 12 matches in 4 files".
 
 What happens:
 

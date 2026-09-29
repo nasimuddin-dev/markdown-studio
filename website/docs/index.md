@@ -1,23 +1,23 @@
 ---
 layout: home
-title: Markdown Studio
+title: Markpion
 titleTemplate: Cross-Platform Markdown Editor
-description: Markdown Studio is a free, local-first desktop Markdown editor for Windows, macOS and Linux with live preview, tabs, a file explorer, Mermaid diagrams, math, and PDF and Word export.
+description: Markpion is a free, local-first desktop Markdown editor for Windows, macOS and Linux with live preview, tabs, a file explorer, Mermaid diagrams, math, and PDF and Word export.
 
 hero:
-  name: Markdown Studio
+  name: Markpion
   text: A desktop Markdown editor for Windows, macOS and Linux
   tagline: Write, edit, preview and organize Markdown documents in one fast, local-first workspace. Your files stay on your computer.
   image:
     src: /logo.svg
-    alt: Markdown Studio logo
+    alt: Markpion logo
   actions:
     - theme: brand
-      text: Download Markdown Studio
+      text: Download Markpion
       link: /download
     - theme: alt
       text: View on GitHub
-      link: https://github.com/nasimuddin-dev/markdown-studio
+      link: https://github.com/nasimuddin-dev/markpion
     - theme: alt
       text: Read the docs
       link: /getting-started/
@@ -56,13 +56,13 @@ import { data as release } from "./data/release.data";
 ## See it in action
 
 <figure class="ms-screenshot">
-  <img src="./images/markdown-studio-editor.webp" alt="Markdown Studio with the file explorer and outline on the left, a Markdown file in the editor in the middle, and its rendered preview with a table and task list on the right" width="1440" height="900">
+  <img src="./images/markpion-editor.webp" alt="Markpion with the file explorer and outline on the left, a Markdown file in the editor in the middle, and its rendered preview with a table and task list on the right" width="1440" height="900">
   <figcaption>The editor, file explorer, outline and live preview in split view.</figcaption>
 </figure>
 
 ## Runs on your operating system
 
-Markdown Studio is a native desktop app built with [Tauri](https://tauri.app). Every release has a separate installer for each system, and nothing else needs to be installed:
+Markpion is a native desktop app built with [Tauri](https://tauri.app). Every release has a separate installer for each system, and nothing else needs to be installed:
 
 | System | Installers |
 | --- | --- |
@@ -70,11 +70,11 @@ Markdown Studio is a native desktop app built with [Tauri](https://tauri.app). E
 | **macOS** 10.15+ | `.dmg` for Apple Silicon and for Intel |
 | **Linux** x86_64 | AppImage, `.deb` and `.rpm` |
 
-[Download Markdown Studio](/download) · [Installation guides](/getting-started/installation)
+[Download Markpion](/download) · [Installation guides](/getting-started/installation)
 
 ## Local-first by design
 
-- **Your documents stay on your computer.** Markdown Studio edits files in place on your disk. There's no account, no cloud sync and no telemetry.
+- **Your documents stay on your computer.** Markpion edits files in place on your disk. There's no account, no cloud sync and no telemetry.
 - **No internet needed to write.** Everything works offline. The app's only own network request is the update check to GitHub at startup, which you can turn off in Settings. Images with web (`https://`) addresses in your documents are loaded from the web when you preview them, as in a browser.
 - **Safe rendering.** HTML inside Markdown is sanitized with GitHub's allow-list: scripts, event handlers, iframes and forms are removed, and links open in your browser.
 - **Limited access.** The app can only reach files and folders you open yourself.
@@ -83,8 +83,8 @@ Read the full [privacy notes](/privacy).
 
 ## Latest release
 
-**Markdown Studio {{ release.version }}**<span v-if="release.date">, released {{ release.date }}</span>. See [what's new](/changelog) or <a :href="release.releaseUrl">all release files on GitHub</a>.
+**Markpion {{ release.version }}**<span v-if="release.date">, released {{ release.date }}</span>. See [what's new](/changelog) or <a :href="release.releaseUrl">all release files on GitHub</a>.
 
 ## Developed in public on GitHub
 
-Markdown Studio's source code, issues and releases are public at [github.com/nasimuddin-dev/markdown-studio](https://github.com/nasimuddin-dev/markdown-studio). [Report a bug or request a feature](https://github.com/nasimuddin-dev/markdown-studio/issues), browse [releases](https://github.com/nasimuddin-dev/markdown-studio/releases), or read the source.
+Markpion's source code, issues and releases are public at [github.com/nasimuddin-dev/markpion](https://github.com/nasimuddin-dev/markpion). [Report a bug or request a feature](https://github.com/nasimuddin-dev/markpion/issues), browse [releases](https://github.com/nasimuddin-dev/markpion/releases), or read the source.

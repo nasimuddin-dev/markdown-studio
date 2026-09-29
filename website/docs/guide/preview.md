@@ -1,6 +1,6 @@
 ---
 title: Preview
-description: How Markdown Studio's live preview works, including views, update delay, synced scrolling, links, images, clickable task checkboxes, safe HTML, and large-document mode.
+description: How Markpion's live preview works, including views, update delay, synced scrolling, links, images, clickable task checkboxes, safe HTML, and large-document mode.
 ---
 
 # Preview
@@ -8,7 +8,7 @@ description: How Markdown Studio's live preview works, including views, update d
 The preview renders your Markdown as you type, in a style close to GitHub's. It supports [GitHub Flavored Markdown](/markdown/gfm), [Mermaid diagrams](/markdown/mermaid), [math](/markdown/math), and [front matter, alerts and footnotes](/markdown/extras).
 
 <figure>
-  <img class="screenshot" src="../images/markdown-studio-editor.webp" alt="Split view with Markdown source on the left and the rendered preview with a table, task list and code block on the right" width="1440" height="900" loading="lazy">
+  <img class="screenshot" src="../images/markpion-editor.webp" alt="Split view with Markdown source on the left and the rendered preview with a table, task list and code block on the right" width="1440" height="900" loading="lazy">
   <figcaption>Split view: the editor on the left, the preview on the right.</figcaption>
 </figure>
 
@@ -29,7 +29,7 @@ Choose **Editor Only** (**Ctrl+1**), **Split View** (**Ctrl+2**) or **Preview On
 
 ## Safe HTML
 
-Raw HTML in Markdown is rendered, then **sanitized with GitHub's allow-list**. Scripts, event handlers, iframes, forms, styles and `javascript:` links are removed, and a strict Content Security Policy blocks inline scripts. So a document you download can't run code in Markdown Studio.
+Raw HTML in Markdown is rendered, then **sanitized with GitHub's allow-list**. Scripts, event handlers, iframes, forms, styles and `javascript:` links are removed, and a strict Content Security Policy blocks inline scripts. So a document you download can't run code in Markpion.
 
 ## Large documents
 

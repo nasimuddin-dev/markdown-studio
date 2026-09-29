@@ -1,11 +1,11 @@
 ---
 title: Roadmap
-description: What's done, what's planned and what's being considered for Markdown Studio, based on the project's requirements specification and development log. No delivery dates are promised.
+description: What's done, what's planned and what's being considered for Markpion, based on the project's requirements specification and development log. No delivery dates are promised.
 ---
 
 # Roadmap
 
-This roadmap comes from the project's [requirements specification](https://github.com/nasimuddin-dev/markdown-studio/blob/main/docs/SRS.md) and [development log](https://github.com/nasimuddin-dev/markdown-studio/blob/main/docs/DEV_LOG.md). It shows direction, not commitments: there are no dates, and plans can change. Suggestions are welcome in [GitHub issues](https://github.com/nasimuddin-dev/markdown-studio/issues).
+This roadmap comes from the project's [requirements specification](https://github.com/nasimuddin-dev/markpion/blob/main/docs/SRS.md) and [development log](https://github.com/nasimuddin-dev/markpion/blob/main/docs/DEV_LOG.md). It shows direction, not commitments: there are no dates, and plans can change. Suggestions are welcome in [GitHub issues](https://github.com/nasimuddin-dev/markpion/issues).
 
 ## Completed
 

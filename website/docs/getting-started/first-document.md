@@ -1,13 +1,13 @@
 ---
 title: Your First Document
-description: A step-by-step walkthrough of Markdown Studio. Launch the app, open a folder, create a Markdown file, write with live preview, and save.
+description: A step-by-step walkthrough of Markpion. Launch the app, open a folder, create a Markdown file, write with live preview, and save.
 ---
 
 # Your first document
 
 This walkthrough takes about five minutes. The shortcuts are shown for Windows and Linux; on macOS use **Cmd** instead of **Ctrl**.
 
-## 1. Launch Markdown Studio
+## 1. Launch Markpion
 
 Start it from the Start menu (Windows), Applications (macOS) or your applications menu (Linux). The first time, you see the welcome screen with **New File**, **Open File** and **Open Folder**, plus your recent files once you have some.
 
@@ -16,7 +16,7 @@ Start it from the Start menu (Windows), Applications (macOS) or your application
 Choose **Open Folder** (**Ctrl+Shift+O**) and pick the folder where you keep your notes or documentation. It becomes your workspace:
 
 - The **Explorer** in the sidebar shows its folders and Markdown files (`.md`, `.markdown`). Hidden folders and folders such as `node_modules` are skipped.
-- Markdown Studio can only access folders and files that you open this way. See [Privacy](/privacy).
+- Markpion can only access folders and files that you open this way. See [Privacy](/privacy).
 
 You can also open a single file with **Open File** (**Ctrl+O**), double-click a `.md` file in your file manager, or drag one onto the window.
 
@@ -31,11 +31,11 @@ Type some Markdown:
 ```markdown
 # Project notes
 
-Markdown Studio shows the **preview** as you type.
+Markpion shows the **preview** as you type.
 
 ## To do
 
-- [x] Install Markdown Studio
+- [x] Install Markpion
 - [ ] Write the first page
 
 | Step | Status |
@@ -51,13 +51,13 @@ Use the **Format** menu or shortcuts such as **Ctrl+B** (bold), **Ctrl+I** (ital
 The preview on the right updates as you type, and scrolling stays in sync. Switch views with **Ctrl+1** (editor only), **Ctrl+2** (split) and **Ctrl+3** (preview only), or cycle through them with **Ctrl+\\**. You can tick task checkboxes directly in the preview.
 
 <figure>
-  <img class="screenshot" src="../images/markdown-studio-preview.webp" alt="Preview-only view of a Markdown document showing headings, a table with check marks, a task list and a code block" width="1440" height="900" loading="lazy">
+  <img class="screenshot" src="../images/markpion-preview.webp" alt="Preview-only view of a Markdown document showing headings, a table with check marks, a task list and a code block" width="1440" height="900" loading="lazy">
   <figcaption>Preview-only view (Ctrl+3).</figcaption>
 </figure>
 
 ## 6. Save
 
-Press **Ctrl+S**. For a new document you choose a name and location; after that, **Ctrl+S** saves in place. The tab's dot and the status bar show unsaved changes, and Markdown Studio asks before closing a document with unsaved changes. See [Saving, history & recovery](/guide/saving-and-recovery) for auto save and file history.
+Press **Ctrl+S**. For a new document you choose a name and location; after that, **Ctrl+S** saves in place. The tab's dot and the status bar show unsaved changes, and Markpion asks before closing a document with unsaved changes. See [Saving, history & recovery](/guide/saving-and-recovery) for auto save and file history.
 
 ## Next steps
 

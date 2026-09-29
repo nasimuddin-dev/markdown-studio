@@ -1,5 +1,5 @@
 /**
- * Captures real screenshots of the Markdown Studio UI for the website
+ * Captures real screenshots of the Markpion UI for the website
  * (run: npm run docs:screenshots from the repository root). It drives the
  * browser build of the app (the same React UI as the desktop app, with the
  * in-memory demo workspace) and saves optimized WebP images to
@@ -23,7 +23,7 @@ async function start(page: Page, theme: "light" | "dark" = "light") {
     window.prompt = (_m?: string, d?: string) => d ?? null;
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Markdown Studio" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
 }
 
 /** Saves a WebP screenshot, encoded by the browser's canvas (no extra tools needed). */
@@ -43,7 +43,7 @@ async function shot(page: Page, name: string) {
   const bytes = Buffer.from(dataUrl.split(",")[1], "base64");
   writeFileSync(join(OUT, `${name}.webp`), bytes);
   // The social-sharing preview needs a stable URL, so it lives in public/.
-  if (name === "markdown-studio-editor") writeFileSync(join(PUBLIC, "social-preview.webp"), bytes);
+  if (name === "markpion-editor") writeFileSync(join(PUBLIC, "social-preview.webp"), bytes);
 }
 
 async function openFolder(page: Page) {
@@ -60,7 +60,7 @@ test.use({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 
 test("welcome screen", async ({ page }) => {
   await start(page);
-  await shot(page, "markdown-studio-home");
+  await shot(page, "markpion-home");
 });
 
 test("editor, explorer, outline and preview", async ({ page }) => {
@@ -68,7 +68,7 @@ test("editor, explorer, outline and preview", async ({ page }) => {
   await openFolder(page);
   await openFile(page, /^README\.md/);
   await expect(page.locator(".markdown-body h1")).toBeVisible();
-  await shot(page, "markdown-studio-editor");
+  await shot(page, "markpion-editor");
 });
 
 test("preview only", async ({ page }) => {
@@ -77,7 +77,7 @@ test("preview only", async ({ page }) => {
   await openFile(page, /^README\.md/);
   await page.keyboard.press(`${mod}+3`);
   await expect(page.locator(".markdown-body h1")).toBeVisible();
-  await shot(page, "markdown-studio-preview");
+  await shot(page, "markpion-preview");
 });
 
 test("mermaid diagrams and math", async ({ page }) => {
@@ -88,7 +88,7 @@ test("mermaid diagrams and math", async ({ page }) => {
   await openFile(page, /^diagrams-and-math\.md/);
   await expect(page.locator(".markdown-body svg").first()).toBeVisible({ timeout: 20_000 });
   await expect(page.locator(".markdown-body math, .markdown-body .katex").first()).toBeVisible();
-  await shot(page, "markdown-studio-mermaid");
+  await shot(page, "markpion-mermaid");
 });
 
 test("dark theme", async ({ page }) => {
@@ -98,5 +98,5 @@ test("dark theme", async ({ page }) => {
   if (await folder.count()) await folder.first().click();
   await openFile(page, /^guide\.md/);
   await expect(page.locator(".markdown-body h1")).toBeVisible();
-  await shot(page, "markdown-studio-dark");
+  await shot(page, "markpion-dark");
 });

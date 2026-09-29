@@ -13,7 +13,7 @@ async function start(page: Page, theme: "light" | "dark") {
     window.prompt = (_m?: string, d?: string) => d ?? null;
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Markdown Studio" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
 }
 
 /** WCAG 2.1 A/AA checks (SRS §15). CodeMirror's editable surface is excluded: its internals are managed by the library. */

@@ -8,7 +8,7 @@ export default defineConfig({
   testMatch: "site.spec.ts",
   webServer: {
     command: "npm --prefix website run preview -- --port 4173",
-    url: "http://localhost:4173/markdown-studio/",
+    url: "http://localhost:4173/markpion/",
     reuseExistingServer: true,
     timeout: 60_000,
   },

@@ -1,11 +1,11 @@
 ---
 title: GitHub Flavored Markdown
-description: Which GitHub Flavored Markdown (GFM) features Markdown Studio supports, including tables, task lists, strikethrough, autolinks, fenced code, footnotes and alerts, and the extensions it adds.
+description: Which GitHub Flavored Markdown (GFM) features Markpion supports, including tables, task lists, strikethrough, autolinks, fenced code, footnotes and alerts, and the extensions it adds.
 ---
 
 # GitHub Flavored Markdown
 
-Markdown Studio renders **GitHub Flavored Markdown (GFM)**, the Markdown dialect used on GitHub, through the [remark-gfm](https://github.com/remarkjs/remark-gfm) parser plugin. Documents you write in Markdown Studio display the same way in GitHub READMEs, issues and wikis, apart from the extensions noted below.
+Markpion renders **GitHub Flavored Markdown (GFM)**, the Markdown dialect used on GitHub, through the [remark-gfm](https://github.com/remarkjs/remark-gfm) parser plugin. Documents you write in Markpion display the same way in GitHub READMEs, issues and wikis, apart from the extensions noted below.
 
 ## Supported GFM features
 
@@ -23,7 +23,7 @@ Markdown Studio renders **GitHub Flavored Markdown (GFM)**, the Markdown dialect
 
 ## Extensions beyond GFM
 
-Markdown Studio also supports, and GitHub renders too:
+Markpion also supports, and GitHub renders too:
 
 - [Mermaid diagrams](/markdown/mermaid) in ` ```mermaid ` blocks.
 - [LaTeX math](/markdown/math) with `$…$` and `$$…$$`.

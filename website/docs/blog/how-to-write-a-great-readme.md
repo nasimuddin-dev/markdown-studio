@@ -82,6 +82,6 @@ Bug reports and pull requests are welcome. See CONTRIBUTING.md.
 MIT (or your license)
 ````
 
-## Writing READMEs in Markdown Studio
+## Writing READMEs in Markpion
 
-Markdown Studio has a **Project README** template (**File → New from Template…**), a live GitHub-style preview, and a **link check** that finds broken links and missing images before you publish. **Insert / Update Table of Contents** adds a linked contents list for longer READMEs. See [Writing tools](/guide/writing-tools).
+Markpion has a **Project README** template (**File → New from Template…**), a live GitHub-style preview, and a **link check** that finds broken links and missing images before you publish. **Insert / Update Table of Contents** adds a linked contents list for longer READMEs. See [Writing tools](/guide/writing-tools).

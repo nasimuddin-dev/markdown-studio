@@ -11,7 +11,8 @@
 // In-app updates: the standard installer is signed with the updater key
 // (minisign) and release-assets/latest.json is written for the updater. The
 // private key is read from TAURI_SIGNING_PRIVATE_KEY or, by default, from
-// ~/.tauri/markdown-studio.key. It must never be committed; keep a backup,
+// ~/.tauri/markpion.key (or markdown-studio.key, its name before the app was
+// renamed). It must never be committed; keep a backup,
 // because updates can only be published with the same key.
 //
 //   npm run release:installer                   standard installer
@@ -44,7 +45,9 @@ const sha256Of = (file) => createHash("sha256").update(readFileSync(file)).diges
 const mb = (file) => (statSync(file).size / 1024 / 1024).toFixed(1);
 
 // ---------------------------------------------------------------- updater signing key
-const keyFile = join(homedir(), ".tauri", "markdown-studio.key");
+const keyFile = ["markpion.key", "markdown-studio.key"]
+  .map((name) => join(homedir(), ".tauri", name))
+  .find((file) => existsSync(file)) ?? join(homedir(), ".tauri", "markpion.key");
 if (!skipBuild && !process.env.TAURI_SIGNING_PRIVATE_KEY) {
   if (!existsSync(keyFile)) {
     console.error(`Updater signing key not found: ${keyFile}`);
@@ -57,10 +60,10 @@ if (!skipBuild && !process.env.TAURI_SIGNING_PRIVATE_KEY) {
 
 // ---------------------------------------------------------------- standard installer
 const outDir = "downloads";
-const fileName = `MarkdownStudio-${version}-windows-x64-setup.exe`;
+const fileName = `Markpion-${version}-windows-x64-setup.exe`;
 const target = join(outDir, fileName);
 if (!skipBuild) {
-  console.log(`Building Markdown Studio ${version} installer…`);
+  console.log(`Building Markpion ${version} installer…`);
   execSync("npx tauri build --bundles nsis", { stdio: "inherit" });
 }
 if (!skipBuild || !existsSync(target)) {
@@ -91,7 +94,7 @@ if (!skipBuild || !existsSync(manifestPath)) {
   mkdirSync(assetsDir, { recursive: true });
   const manifest = {
     version,
-    notes: `Markdown Studio ${version}. See https://github.com/${repo}/releases/tag/v${version} for what's new.`,
+    notes: `Markpion ${version}. See https://github.com/${repo}/releases/tag/v${version} for what's new.`,
     pub_date: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
     platforms: { "windows-x86_64-nsis": platform, "windows-x86_64": platform },
   };
@@ -99,11 +102,11 @@ if (!skipBuild || !existsSync(manifestPath)) {
 }
 
 // ---------------------------------------------------------------- offline installer
-const offlineName = `MarkdownStudio-${version}-windows-x64-offline-setup.exe`;
+const offlineName = `Markpion-${version}-windows-x64-offline-setup.exe`;
 const offlineTarget = join(assetsDir, offlineName);
 if (withOffline) {
   if (!skipBuild) {
-    console.log(`Building Markdown Studio ${version} offline installer (bundles WebView2)…`);
+    console.log(`Building Markpion ${version} offline installer (bundles WebView2)…`);
     execSync("npx tauri build --bundles nsis --config src-tauri/tauri.offline.conf.json", { stdio: "inherit" });
   }
   if (!skipBuild || !existsSync(offlineTarget)) {
@@ -136,16 +139,16 @@ const offlineRow = hasOffline
   ? `\n| **Offline**: [${offlineName}](${offlineUrl}) | Includes WebView2; no internet needed | ${mb(offlineTarget)} MB | \`${offlineSha}\` |`
   : "";
 const asset = (name) => `https://github.com/${repo}/releases/download/v${version}/${name}`;
-const mac = (arch) => `MarkdownStudio-${version}-macos-${arch}.dmg`;
+const mac = (arch) => `Markpion-${version}-macos-${arch}.dmg`;
 const linux = {
-  appImage: `MarkdownStudio-${version}-linux-x86_64.AppImage`,
-  deb: `MarkdownStudio-${version}-linux-amd64.deb`,
-  rpm: `MarkdownStudio-${version}-linux-x86_64.rpm`,
+  appImage: `Markpion-${version}-linux-x86_64.AppImage`,
+  deb: `Markpion-${version}-linux-amd64.deb`,
+  rpm: `Markpion-${version}-linux-x86_64.rpm`,
 };
 // The macOS and Linux installers are built by .github/workflows/release.yml
 // when the tag is pushed, and attached to the same release.
 const section = `<!-- download:start -->
-Markdown Studio ${version} was released on ${date} and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [${version} release page](${releaseUrl}).
+Markpion ${version} was released on ${date} and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [${version} release page](${releaseUrl}).
 
 | Operating system | Download |
 | --- | --- |
@@ -161,19 +164,19 @@ Markdown Studio ${version} was released on ${date} and has a separate installer 
 
 1. **Download** an installer above.
 2. **Run** it and choose **Anyone who uses this computer**, which needs administrator approval, or **Only for me**, which doesn't. The installer isn't code-signed yet, so if Windows SmartScreen says *"Windows protected your PC"*, choose **More info → Run anyway**.
-3. **Start** Markdown Studio from the Start menu, or right-click any \`.md\` file and choose **Open with Markdown Studio**.
+3. **Start** Markpion from the Start menu, or right-click any \`.md\` file and choose **Open with Markpion**.
 
 The app appears in **Settings → Apps → Installed apps** and in **Control Panel → Programs and Features**, where it can be uninstalled. Newer versions install over older ones, keep your settings, and are offered automatically when the app starts.
 
 ### macOS
 
 1. **Download** the \`.dmg\` for your Mac: **Apple Silicon** for M1 and later, **Intel** for older Macs (Apple menu → About This Mac shows which one you have).
-2. **Open** the \`.dmg\` and drag **Markdown Studio** to **Applications**.
-3. **Start** it from Applications. The app isn't notarized by Apple yet, so the first time, macOS blocks it: open **System Settings → Privacy & Security** and choose **Open Anyway**. If macOS says the app *"is damaged"*, run \`xattr -dr com.apple.quarantine "/Applications/Markdown Studio.app"\` in Terminal once.
+2. **Open** the \`.dmg\` and drag **Markpion** to **Applications**.
+3. **Start** it from Applications. The app isn't notarized by Apple yet, so the first time, macOS blocks it: open **System Settings → Privacy & Security** and choose **Open Anyway**. If macOS says the app *"is damaged"*, run \`xattr -dr com.apple.quarantine "/Applications/Markpion.app"\` in Terminal once.
 
 ### Linux
 
-- **AppImage** (any distribution, no installation needed): download it, run \`chmod +x MarkdownStudio-*.AppImage\`, then start it.
+- **AppImage** (any distribution, no installation needed): download it, run \`chmod +x Markpion-*.AppImage\`, then start it.
 - **Debian, Ubuntu, Mint**: \`sudo apt install ./${linux.deb}\` (apt installs the required system libraries automatically).
 - **Fedora, RHEL, openSUSE**: \`sudo dnf install ./${linux.rpm}\` (or \`sudo zypper install\` on openSUSE).
 
@@ -199,7 +202,7 @@ if (existsSync(installGuide)) {
     /<!-- offline-link -->[\s\S]*?<!-- \/offline-link -->/,
     `<!-- offline-link -->${hasOffline ? `[**${offlineName}**](${offlineUrl})` : "the offline installer from the latest GitHub release"}<!-- /offline-link -->`,
   );
-  guide = guide.replace(/MarkdownStudio-[\d.]+(?:-[0-9A-Za-z.-]+)?-windows-x64-setup\.exe \/S/g, `${fileName} /S`);
+  guide = guide.replace(/Markpion-[\d.]+(?:-[0-9A-Za-z.-]+)?-windows-x64-setup\.exe \/S/g, `${fileName} /S`);
   writeFileSync(installGuide, guide);
 }
 

@@ -1,6 +1,6 @@
 ---
 title: Update Problems
-description: Fix Markdown Studio update problems, including a failed update check, a failed installation, update prompts, and turning off the startup check.
+description: Fix Markpion update problems, including a failed update check, a failed installation, update prompts, and turning off the startup check.
 ---
 
 # Updates
@@ -17,12 +17,12 @@ description: Fix Markdown Studio update problems, including a failed update chec
 
 **Problem:** after **Update Now**, a message says the new version couldn't be installed.
 
-**Symptoms:** *"Markdown Studio x.y.z couldn't be installed; your current version is unchanged."* followed by the reason.
+**Symptoms:** *"Markpion x.y.z couldn't be installed; your current version is unchanged."* followed by the reason.
 
 **Possible causes:**
 
 - The download was interrupted.
-- The downloaded file's signature didn't match the key built into the app. Markdown Studio refuses such files, to protect you from tampered updates.
+- The downloaded file's signature didn't match the key built into the app. Markpion refuses such files, to protect you from tampered updates.
 - For an all-users installation, administrator approval was declined.
 
 **Solution:** try again later with **Help → Check for Updates…**, or download the installer from the [download page](/download) and run it. It upgrades in place and keeps your settings.
@@ -31,19 +31,19 @@ description: Fix Markdown Studio update problems, including a failed update chec
 
 **Problem:** **Update Now** says *"Update postponed. Save or close your unsaved documents, then try again."*
 
-**Possible cause:** Markdown Studio saves open documents before updating; one couldn't be saved (for example, an untitled document whose Save As you cancelled).
+**Possible cause:** Markpion saves open documents before updating; one couldn't be saved (for example, an untitled document whose Save As you cancelled).
 
 **Solution:** save or close your documents, then choose **Help → Check for Updates…** again.
 
 ## Updates on macOS and Linux
 
-On macOS and Linux, Markdown Studio tells you about new versions and opens the download page, but doesn't install them itself. Install the new version as you did the first time; see the [macOS](/installation/macos#updates) and [Linux](/installation/linux#updates) guides.
+On macOS and Linux, Markpion tells you about new versions and opens the download page, but doesn't install them itself. Install the new version as you did the first time; see the [macOS](/installation/macos#updates) and [Linux](/installation/linux#updates) guides.
 
 ## Stop the update prompt
 
 - **Skip This Version** stops the startup prompt for that version.
-- **Settings → Startup → Check for updates when Markdown Studio starts** turns off the automatic check entirely.
+- **Settings → Startup → Check for updates when Markpion starts** turns off the automatic check entirely.
 
 ## Report an issue
 
-If updates keep failing, [report it on GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new) with the message and the diagnostic log (**Help → Export Diagnostic Logs…**).
+If updates keep failing, [report it on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) with the message and the diagnostic log (**Help → Export Diagnostic Logs…**).

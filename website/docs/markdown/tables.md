@@ -1,6 +1,6 @@
 ---
 title: Tables
-description: Create and edit Markdown tables in Markdown Studio. Syntax, column alignment, Insert Table, Format Table, Sort Table by Column, pasting from spreadsheets, and CSV import and export.
+description: Create and edit Markdown tables in Markpion. Syntax, column alignment, Insert Table, Format Table, Sort Table by Column, pasting from spreadsheets, and CSV import and export.
 ---
 
 # Tables

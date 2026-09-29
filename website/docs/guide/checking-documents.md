@@ -1,13 +1,13 @@
 ---
 title: Checking Documents
-description: Find problems in Markdown documents with Markdown Studio, using the Markdown lint and Problems panel for one file and the link check for a whole folder.
+description: Find problems in Markdown documents with Markpion, using the Markdown lint and Problems panel for one file and the link check for a whole folder.
 ---
 
 # Checking documents
 
 ## Markdown lint
 
-While you type, Markdown Studio checks the document for common problems and underlines them in the editor:
+While you type, Markpion checks the document for common problems and underlines them in the editor:
 
 - Broken links to files that don't exist
 - Missing images

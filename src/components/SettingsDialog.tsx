@@ -110,7 +110,7 @@ export function SettingsDialog() {
         <section>
           <h3>Startup</h3>
           <label className="check"><input type="checkbox" checked={settings.restoreSession} onChange={(e) => update({ restoreSession: e.target.checked })} /> Reopen last folder and files</label>
-          <label className="check"><input type="checkbox" checked={settings.checkForUpdates} onChange={(e) => update({ checkForUpdates: e.target.checked })} /> Check for updates when Markdown Studio starts (asks GitHub for the latest version; nothing else is sent)</label>
+          <label className="check"><input type="checkbox" checked={settings.checkForUpdates} onChange={(e) => update({ checkForUpdates: e.target.checked })} /> Check for updates when Markpion starts (asks GitHub for the latest version; nothing else is sent)</label>
         </section>
       </div>
       <div className="modal-buttons">
@@ -135,11 +135,11 @@ export function AboutDialog() {
   }, [open]);
   if (!open) return null;
   return (
-    <Modal title="About Markdown Studio" onClose={() => setOpen(false)}>
+    <Modal title="About Markpion" onClose={() => setOpen(false)}>
       <div className="about">
         <img src="/icon.svg" alt="" width={56} height={56} />
         <div>
-          <p><strong>Markdown Studio</strong> {info ? `version ${info.version}` : ""}</p>
+          <p><strong>Markpion</strong> {info ? `version ${info.version}` : ""}</p>
           <p className="muted">A fast, local-first Markdown editor. Your documents stay on your computer.</p>
           {info && <p className="muted">Platform: {info.os} ({info.arch})</p>}
           {info && <p className="muted">Logs: {info.logPath}</p>}

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Markdown Studio",
+  "productName": "Markpion",
   "version": "0.13.0",
-  "identifier": "com.markdownstudio.app",
+  "identifier": "com.markpion.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -14,7 +14,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Markdown Studio",
+        "title": "Markpion",
         "width": 1280,
         "height": 800,
         "minWidth": 720,
@@ -53,8 +53,8 @@
     ],
     "category": "Productivity",
     "shortDescription": "Local-first Markdown editor",
-    "longDescription": "Markdown Studio is a fast, privacy-conscious, local-first Markdown editor with live preview, tabs and workspace navigation.",
-    "copyright": "Copyright © Markdown Studio contributors",
+    "longDescription": "Markpion is a fast, privacy-conscious, local-first Markdown editor with live preview, tabs and workspace navigation.",
+    "copyright": "Copyright © Markpion contributors",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -89,15 +89,15 @@
         "depends": []
       }
     },
-    "publisher": "Markdown Studio",
-    "homepage": "https://github.com/nasimuddin-dev/markdown-studio",
+    "publisher": "Markpion",
+    "homepage": "https://github.com/nasimuddin-dev/markpion",
     "createUpdaterArtifacts": true
   },
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY2Q0NDNkE4QTA1MDc4ODcKUldTSGVGQ2dxTWJNWnJzNlFmUksxTk16blBHREloUXhmWFgySThyM2Q1eGhpMWxhYzN2NldsbTMK",
       "endpoints": [
-        "https://github.com/nasimuddin-dev/markdown-studio/releases/latest/download/latest.json"
+        "https://github.com/nasimuddin-dev/markpion/releases/latest/download/latest.json"
       ],
       "windows": {
         "installMode": "passive"

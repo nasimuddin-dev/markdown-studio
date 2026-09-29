@@ -1,46 +1,46 @@
-# Markdown Studio
+# Markpion
 
-A fast, local-first, privacy-conscious Markdown editor for Windows, macOS and Linux, built with **Tauri 2**, **React + TypeScript**, **CodeMirror 6** and the **remark/rehype** ecosystem.
+Formerly **Markdown Studio**. A fast, local-first, privacy-conscious Markdown editor for Windows, macOS and Linux, built with **Tauri 2**, **React + TypeScript**, **CodeMirror 6** and the **remark/rehype** ecosystem.
 
-**Website and user documentation: [nasimuddin-dev.github.io/markdown-studio](https://nasimuddin-dev.github.io/markdown-studio/)** (download, installation guides, user guide, Markdown reference, FAQ, troubleshooting, changelog).
+**Website and user documentation: [nasimuddin-dev.github.io/markpion](https://nasimuddin-dev.github.io/markpion/)** (download, installation guides, user guide, Markdown reference, FAQ, troubleshooting, changelog).
 
 The requirements are in [docs/SRS.md](docs/SRS.md), and implementation status per requirement is in [docs/TRACEABILITY.md](docs/TRACEABILITY.md).
 
 ## Download
 
 <!-- download:start -->
-Markdown Studio 0.13.0 was released on 2026-09-25 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.13.0 release page](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.13.0).
+Markpion 0.13.0 was released on 2026-09-25 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.13.0 release page](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.13.0).
 
 | Operating system | Download |
 | --- | --- |
-| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/MarkdownStudio-0.13.0-windows-x64-setup.exe?raw=true) (6.9 MB) · [Offline installer](https://github.com/nasimuddin-dev/markdown-studio/releases/download/v0.13.0/MarkdownStudio-0.13.0-windows-x64-offline-setup.exe) (211.9 MB) |
-| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markdown-studio/releases/download/v0.13.0/MarkdownStudio-0.13.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markdown-studio/releases/download/v0.13.0/MarkdownStudio-0.13.0-macos-x64.dmg) |
-| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markdown-studio/releases/download/v0.13.0/MarkdownStudio-0.13.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markdown-studio/releases/download/v0.13.0/MarkdownStudio-0.13.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markdown-studio/releases/download/v0.13.0/MarkdownStudio-0.13.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
+| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/Markpion-0.13.0-windows-x64-setup.exe?raw=true) (6.9 MB) · [Offline installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-windows-x64-offline-setup.exe) (211.9 MB) |
+| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-macos-x64.dmg) |
+| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
 
 ### Windows
 
 | Installer | When to use it | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **Standard**: [MarkdownStudio-0.13.0-windows-x64-setup.exe](downloads/MarkdownStudio-0.13.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 6.9 MB | `d83a901c8d3b446eb716be9c1e9ac706d51a7b2080d1c3cb2660ebe60ad56a8a` |
-| **Offline**: [MarkdownStudio-0.13.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markdown-studio/releases/download/v0.13.0/MarkdownStudio-0.13.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 211.9 MB | `2d877ec1a05e1c7e8556b1fd2de7f5bba2810a9a2f385da05e0166bae48c8c6d` |
+| **Standard**: [Markpion-0.13.0-windows-x64-setup.exe](downloads/Markpion-0.13.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 6.9 MB | `d83a901c8d3b446eb716be9c1e9ac706d51a7b2080d1c3cb2660ebe60ad56a8a` |
+| **Offline**: [Markpion-0.13.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 211.9 MB | `2d877ec1a05e1c7e8556b1fd2de7f5bba2810a9a2f385da05e0166bae48c8c6d` |
 
 1. **Download** an installer above.
 2. **Run** it and choose **Anyone who uses this computer**, which needs administrator approval, or **Only for me**, which doesn't. The installer isn't code-signed yet, so if Windows SmartScreen says *"Windows protected your PC"*, choose **More info → Run anyway**.
-3. **Start** Markdown Studio from the Start menu, or right-click any `.md` file and choose **Open with Markdown Studio**.
+3. **Start** Markpion from the Start menu, or right-click any `.md` file and choose **Open with Markpion**.
 
 The app appears in **Settings → Apps → Installed apps** and in **Control Panel → Programs and Features**, where it can be uninstalled. Newer versions install over older ones, keep your settings, and are offered automatically when the app starts.
 
 ### macOS
 
 1. **Download** the `.dmg` for your Mac: **Apple Silicon** for M1 and later, **Intel** for older Macs (Apple menu → About This Mac shows which one you have).
-2. **Open** the `.dmg` and drag **Markdown Studio** to **Applications**.
-3. **Start** it from Applications. The app isn't notarized by Apple yet, so the first time, macOS blocks it: open **System Settings → Privacy & Security** and choose **Open Anyway**. If macOS says the app *"is damaged"*, run `xattr -dr com.apple.quarantine "/Applications/Markdown Studio.app"` in Terminal once.
+2. **Open** the `.dmg` and drag **Markpion** to **Applications**.
+3. **Start** it from Applications. The app isn't notarized by Apple yet, so the first time, macOS blocks it: open **System Settings → Privacy & Security** and choose **Open Anyway**. If macOS says the app *"is damaged"*, run `xattr -dr com.apple.quarantine "/Applications/Markpion.app"` in Terminal once.
 
 ### Linux
 
-- **AppImage** (any distribution, no installation needed): download it, run `chmod +x MarkdownStudio-*.AppImage`, then start it.
-- **Debian, Ubuntu, Mint**: `sudo apt install ./MarkdownStudio-0.13.0-linux-amd64.deb` (apt installs the required system libraries automatically).
-- **Fedora, RHEL, openSUSE**: `sudo dnf install ./MarkdownStudio-0.13.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
+- **AppImage** (any distribution, no installation needed): download it, run `chmod +x Markpion-*.AppImage`, then start it.
+- **Debian, Ubuntu, Mint**: `sudo apt install ./Markpion-0.13.0-linux-amd64.deb` (apt installs the required system libraries automatically).
+- **Fedora, RHEL, openSUSE**: `sudo dnf install ./Markpion-0.13.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
 
 On macOS and Linux, the app tells you when a new version is available and opens its download page.
 
@@ -50,7 +50,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 ## Features
 
 - Create, open, edit, save and Save As Markdown files (`.md`, `.markdown`) with native dialogs
-- Windows shell integration: "Open with Markdown Studio" in the right-click menu, listed under Open with and Default apps, Installed apps / Programs and Features entry, install for "Only me" or "Everyone"
+- Windows shell integration: "Open with Markpion" in the right-click menu, listed under Open with and Default apps, Installed apps / Programs and Features entry, install for "Only me" or "Everyone"
 - Opens files from the OS: double-click / "Open with" (file association), drag and drop onto the window, and single-instance hand-off
 - Paste or drop images into a document: they are saved to an `assets/` folder next to it and linked automatically
 - Workspace folders with a file explorer: new file/folder, duplicate, rename (F2), delete to the Trash/Recycle Bin, Reveal in File Explorer, Copy (Relative) Path
@@ -153,7 +153,7 @@ src-tauri/
   src/          Rust: commands, scope (path checks), fs_ops (safe save, trash), text (encoding),
                 storage (settings, recovery, logs), history, search, watcher, open_paths, updater
   capabilities/ Least-privilege permission set
-  windows/      NSIS installer hooks (Explorer "Open with Markdown Studio")
+  windows/      NSIS installer hooks (Explorer "Open with Markpion")
 tests/          Vitest unit and component tests
 e2e/            Playwright workflows and axe-core accessibility audits
 scripts/        Versioning and release scripts
@@ -167,7 +167,7 @@ website/        Documentation and product website (VitePress, deployed to GitHub
 
 | Document | Contents |
 | --- | --- |
-| [Website](https://nasimuddin-dev.github.io/markdown-studio/) ([source](website/docs/)) | The public user documentation: download, installation, user guide, Markdown reference, FAQ, troubleshooting, changelog, roadmap, blog |
+| [Website](https://nasimuddin-dev.github.io/markpion/) ([source](website/docs/)) | The public user documentation: download, installation, user guide, Markdown reference, FAQ, troubleshooting, changelog, roadmap, blog |
 | [docs/INSTALL.md](docs/INSTALL.md) | Installing, updating and uninstalling on Windows, macOS and Linux; troubleshooting |
 | [docs/SRS.md](docs/SRS.md) | Software requirements specification (the baseline requirements) |
 | [docs/TRACEABILITY.md](docs/TRACEABILITY.md) | Status of every requirement, where it is implemented, and known gaps |
@@ -200,7 +200,7 @@ npm run release:github
 3. Commit and push, then run `release:github`. It creates or updates the GitHub Release `v<version>` with both installers, the checksums and `latest.json`, using the GitHub CLI (`gh auth login` once). Installed Windows apps pick up the new version automatically on their next start.
 4. Creating the release pushes the tag `v<version>`, which starts [.github/workflows/release.yml](.github/workflows/release.yml) on GitHub Actions. It builds the **macOS** (Apple Silicon and Intel `.dmg`) and **Linux** (`.AppImage`, `.deb`, `.rpm`) installers and attaches them to the same release, with `SHA256SUMS-macos-linux.txt`. Follow it with `gh run watch`. To rebuild them for an existing release, run the workflow by hand: `gh workflow run release.yml -f tag=v<version>`.
 
-**Update signing key.** Updates are signed with a minisign key. `release:installer` reads the private key from `~/.tauri/markdown-studio.key`, or from the `TAURI_SIGNING_PRIVATE_KEY` environment variable. The matching public key is in `src-tauri/tauri.conf.json`. **Never commit the private key, and keep a backup somewhere safe.** Installed apps only accept updates signed with this exact key; if it's lost, users would have to reinstall manually once to switch to a new key.
+**Update signing key.** Updates are signed with a minisign key. `release:installer` reads the private key from `~/.tauri/markpion.key`, or from the `TAURI_SIGNING_PRIVATE_KEY` environment variable. The matching public key is in `src-tauri/tauri.conf.json`. **Never commit the private key, and keep a backup somewhere safe.** Installed apps only accept updates signed with this exact key; if it's lost, users would have to reinstall manually once to switch to a new key.
 
 ## Packaging and releases
 
@@ -212,4 +212,4 @@ npm run release:github
 
 Each platform has its own installers: Windows ones are built locally by `npm run release:installer` (see above), and macOS and Linux ones are built by [.github/workflows/release.yml](.github/workflows/release.yml) when the version tag is pushed. Without Apple signing secrets, the macOS app is ad-hoc signed; add the `APPLE_*` repository secrets listed in the workflow to sign and notarize it.
 
-Settings, recovery data and logs live in the platform's application-data folders, under the identifier `com.markdownstudio.app`.
+Settings, recovery data and logs live in the platform's application-data folders, under the identifier `com.markpion.app`.

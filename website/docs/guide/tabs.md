@@ -1,6 +1,6 @@
 ---
 title: Tabs
-description: Work with several documents at once in Markdown Studio tabs. Switch, reorder and close tabs, see unsaved changes, reopen closed tabs, and use tab context actions.
+description: Work with several documents at once in Markpion tabs. Switch, reorder and close tabs, see unsaved changes, reopen closed tabs, and use tab context actions.
 ---
 
 # Tabs
@@ -9,7 +9,7 @@ Every open document gets a tab above the editor. The active tab is marked with a
 
 ## Unsaved changes
 
-A dot on a tab marks unsaved changes, its name is shown in italics, and the tab's accessible name says "(unsaved)". The status bar and the window title show it too. If you close a tab or quit with unsaved changes, Markdown Studio asks whether to **Save**, **Don't Save** or **Cancel**.
+A dot on a tab marks unsaved changes, its name is shown in italics, and the tab's accessible name says "(unsaved)". The status bar and the window title show it too. If you close a tab or quit with unsaved changes, Markpion asks whether to **Save**, **Don't Save** or **Cancel**.
 
 ## Switching and arranging
 

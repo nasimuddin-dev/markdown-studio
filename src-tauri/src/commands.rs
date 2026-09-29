@@ -598,13 +598,13 @@ pub async fn export_logs(app: AppHandle, state: State<'_, AppState>) -> AppResul
         .file()
         .set_title("Export Diagnostic Logs")
         .add_filter("Log file", &["log", "txt"])
-        .set_file_name("markdown-studio-diagnostics.log")
+        .set_file_name("markpion-diagnostics.log")
         .blocking_save_file();
     let Some(dest) = picked.and_then(|p| p.into_path().ok()) else {
         return Ok(None);
     };
     let mut out = format!(
-        "Markdown Studio {} ({} {})\n\n",
+        "Markpion {} ({} {})\n\n",
         env!("CARGO_PKG_VERSION"),
         std::env::consts::OS,
         std::env::consts::ARCH

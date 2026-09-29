@@ -1,6 +1,6 @@
 ---
 title: File Explorer
-description: Work with a folder in Markdown Studio. Open a workspace, browse, create, rename and delete files and folders, see changes made by other programs, and use recent files.
+description: Work with a folder in Markpion. Open a workspace, browse, create, rename and delete files and folders, see changes made by other programs, and use recent files.
 ---
 
 # File explorer
@@ -8,7 +8,7 @@ description: Work with a folder in Markdown Studio. Open a workspace, browse, cr
 The file explorer shows the folder you're working in, your **workspace**. Open it with **File → Open Folder…** (**Ctrl+Shift+O**, or **Cmd+Shift+O** on macOS). Show or hide the sidebar with **Ctrl+Shift+E**.
 
 <figure>
-  <img class="screenshot" src="../images/markdown-studio-dark.webp" alt="Markdown Studio in the dark theme, with the Explorer listing folders and Markdown files, a document open in the editor, and its preview" width="1440" height="900" loading="lazy">
+  <img class="screenshot" src="../images/markpion-dark.webp" alt="Markpion in the dark theme, with the Explorer listing folders and Markdown files, a document open in the editor, and its preview" width="1440" height="900" loading="lazy">
   <figcaption>The Explorer (top left) and Outline (bottom left), in the dark theme.</figcaption>
 </figure>
 
@@ -34,7 +34,7 @@ Other right-click actions: **Open**, **Reveal in File Explorer** (**Reveal in Fi
 
 ## Changes made by other programs
 
-Markdown Studio watches the workspace folder. When another program (Git, a script, another editor) adds, removes or changes files, the Explorer updates straight away.
+Markpion watches the workspace folder. When another program (Git, a script, another editor) adds, removes or changes files, the Explorer updates straight away.
 
 If a file that's open in a tab changes on disk:
 
@@ -43,7 +43,7 @@ If a file that's open in a tab changes on disk:
 
 ## Workspace access
 
-Markdown Studio can read and write only inside folders and files you've opened yourself (or reopened from the recent list). That keeps the app from reaching anything else on your computer. See [Privacy](/privacy).
+Markpion can read and write only inside folders and files you've opened yourself (or reopened from the recent list). That keeps the app from reaching anything else on your computer. See [Privacy](/privacy).
 
 ## Go to File
 

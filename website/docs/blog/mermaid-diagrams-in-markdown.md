@@ -10,7 +10,7 @@ date: 2026-09-25
 
 A diagram drawn in a graphics tool is a picture: to change one label, you open the tool again, edit, export and replace the image. [Mermaid](https://mermaid.js.org) takes a different approach. You describe the diagram in text inside your Markdown, and the viewer draws it. Changing a label means editing a word, and version control shows exactly what changed.
 
-GitHub, GitLab and many editors, including [Markdown Studio](/markdown/mermaid), render Mermaid in Markdown files.
+GitHub, GitLab and many editors, including [Markpion](/markdown/mermaid), render Mermaid in Markdown files.
 
 ## The basic idea
 
@@ -82,10 +82,10 @@ gantt
 - **Keep them small.** If a diagram needs scrolling, split it into two.
 - **Quote labels with special characters:** `A["Save (Ctrl+S)"]`.
 - **Use `subgraph`** to group related nodes in a flowchart.
-- **Check errors early.** A syntax error stops the whole diagram from drawing, so preview as you type. Markdown Studio shows Mermaid's error message in place of the diagram.
+- **Check errors early.** A syntax error stops the whole diagram from drawing, so preview as you type. Markpion shows Mermaid's error message in place of the diagram.
 
 ## Where Mermaid works
 
-Mermaid in Markdown renders on GitHub, GitLab, in many documentation site generators, and in editors with Mermaid support. For documents you share as files, check that the output format keeps the diagram: in Markdown Studio, **Export as HTML** and **Print → Save as PDF** include drawn diagrams (see [Mermaid](/markdown/mermaid#export)).
+Mermaid in Markdown renders on GitHub, GitLab, in many documentation site generators, and in editors with Mermaid support. For documents you share as files, check that the output format keeps the diagram: in Markpion, **Export as HTML** and **Print → Save as PDF** include drawn diagrams (see [Mermaid](/markdown/mermaid#export)).
 
 The [Mermaid documentation](https://mermaid.js.org/intro/) covers every diagram type, including class, state, entity-relationship, mindmap and timeline diagrams.

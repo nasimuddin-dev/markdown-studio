@@ -5,9 +5,9 @@ import { fileURLToPath } from "node:url";
 // The application version is read from the app's package.json, never typed here.
 const app = JSON.parse(readFileSync(fileURLToPath(new URL("../../package.json", import.meta.url)), "utf8"));
 
-export const REPO = "https://github.com/nasimuddin-dev/markdown-studio";
-const SITE = "https://nasimuddin-dev.github.io/markdown-studio/";
-const BASE = "/markdown-studio/";
+export const REPO = "https://github.com/nasimuddin-dev/markpion";
+const SITE = "https://nasimuddin-dev.github.io/markpion/";
+const BASE = "/markpion/";
 const SOCIAL_IMAGE = `${SITE}images/social-preview.webp`;
 
 /** Page URL (clean URLs) for a source file such as `guide/editor.md`. */
@@ -26,7 +26,7 @@ function structuredData(relativePath: string, title: string, description: string
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "Markdown Studio",
+        name: "Markpion",
         applicationCategory: "DeveloperApplication",
         operatingSystem: "Windows 10, Windows 11, macOS 10.15 or later, Linux",
         softwareVersion: app.version,
@@ -35,8 +35,8 @@ function structuredData(relativePath: string, title: string, description: string
         downloadUrl: `${REPO}/releases/latest`,
         screenshot: SOCIAL_IMAGE,
       },
-      { "@context": "https://schema.org", "@type": "WebSite", name: "Markdown Studio", url: SITE },
-      { "@context": "https://schema.org", "@type": "Organization", name: "Markdown Studio", url: SITE, logo: `${SITE}logo.svg`, sameAs: [REPO] },
+      { "@context": "https://schema.org", "@type": "WebSite", name: "Markpion", url: SITE },
+      { "@context": "https://schema.org", "@type": "Organization", name: "Markpion", url: SITE, logo: `${SITE}logo.svg`, sameAs: [REPO] },
     ];
   }
   const parts = relativePath.replace(/(^|\/)index\.md$/, "").replace(/\.md$/, "").split("/").filter(Boolean);
@@ -61,8 +61,8 @@ function structuredData(relativePath: string, title: string, description: string
       url,
       image: SOCIAL_IMAGE,
       ...(date ? { datePublished: date } : {}),
-      author: { "@type": "Organization", name: "Markdown Studio" },
-      publisher: { "@type": "Organization", name: "Markdown Studio", logo: { "@type": "ImageObject", url: `${SITE}logo.svg` } },
+      author: { "@type": "Organization", name: "Markpion" },
+      publisher: { "@type": "Organization", name: "Markpion", logo: { "@type": "ImageObject", url: `${SITE}logo.svg` } },
     });
   }
   return data;
@@ -70,9 +70,9 @@ function structuredData(relativePath: string, title: string, description: string
 
 export default defineConfig({
   lang: "en-US",
-  title: "Markdown Studio",
-  titleTemplate: ":title | Markdown Studio",
-  description: "Markdown Studio is a local-first desktop Markdown editor for Windows, macOS and Linux with live preview, tabs, a file explorer, and import and export.",
+  title: "Markpion",
+  titleTemplate: ":title | Markpion",
+  description: "Markpion is a local-first desktop Markdown editor for Windows, macOS and Linux with live preview, tabs, a file explorer, and import and export.",
   base: BASE,
   srcDir: "docs",
   cleanUrls: true,
@@ -102,10 +102,10 @@ export default defineConfig({
   head: [
     ["link", { rel: "icon", type: "image/svg+xml", href: `${BASE}logo.svg` }],
     ["meta", { name: "theme-color", content: "#2563eb" }],
-    ["meta", { property: "og:site_name", content: "Markdown Studio" }],
+    ["meta", { property: "og:site_name", content: "Markpion" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:image", content: SOCIAL_IMAGE }],
-    ["meta", { property: "og:image:alt", content: "Markdown Studio with a Markdown file in the editor and its live preview" }],
+    ["meta", { property: "og:image:alt", content: "Markpion with a Markdown file in the editor and its live preview" }],
     ["meta", { name: "twitter:card", content: "summary_large_image" }],
     ["meta", { name: "twitter:image", content: SOCIAL_IMAGE }],
   ],
@@ -130,7 +130,7 @@ export default defineConfig({
   },
   themeConfig: {
     logo: { src: "/logo.svg", alt: "" },
-    siteTitle: "Markdown Studio",
+    siteTitle: "Markpion",
     nav: [
       { text: "Download", link: "/download" },
       { text: "Features", link: "/features" },
@@ -228,12 +228,12 @@ export default defineConfig({
         },
       ],
     },
-    socialLinks: [{ icon: "github", link: REPO, ariaLabel: "Markdown Studio on GitHub" }],
+    socialLinks: [{ icon: "github", link: REPO, ariaLabel: "Markpion on GitHub" }],
     editLink: { pattern: `${REPO}/edit/main/website/docs/:path`, text: "Edit this page on GitHub" },
     search: { provider: "local" },
     outline: { level: [2, 3] },
     footer: {
-      message: `Markdown Studio ${app.version} · <a href="${REPO}">GitHub</a> · <a href="${REPO}/issues">Issues</a> · <a href="${REPO}/releases">Releases</a>`,
+      message: `Markpion ${app.version} · <a href="${REPO}">GitHub</a> · <a href="${REPO}/issues">Issues</a> · <a href="${REPO}/releases">Releases</a>`,
     },
   },
 });

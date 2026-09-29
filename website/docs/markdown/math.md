@@ -1,11 +1,11 @@
 ---
 title: Math and LaTeX
-description: Write mathematical formulas in Markdown Studio with LaTeX syntax, inline with $…$ and as display blocks with $$…$$. Rendering, supported syntax, examples and limitations.
+description: Write mathematical formulas in Markpion with LaTeX syntax, inline with $…$ and as display blocks with $$…$$. Rendering, supported syntax, examples and limitations.
 ---
 
 # Math / LaTeX
 
-Markdown Studio renders mathematical formulas written in LaTeX syntax, using [KaTeX](https://katex.org). Formulas are converted to MathML, which the system's web engine displays.
+Markpion renders mathematical formulas written in LaTeX syntax, using [KaTeX](https://katex.org). Formulas are converted to MathML, which the system's web engine displays.
 
 ## Inline math
 

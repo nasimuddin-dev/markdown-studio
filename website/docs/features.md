@@ -1,14 +1,14 @@
 ---
 title: Features
-description: Everything Markdown Studio can do today, including editing, live preview, GitHub Flavored Markdown, Mermaid, math, workspaces, search, import and export, file history, and safe saving.
+description: Everything Markpion can do today, including editing, live preview, GitHub Flavored Markdown, Mermaid, math, workspaces, search, import and export, file history, and safe saving.
 ---
 
 # Features
 
-This page lists what Markdown Studio does today. Each feature links to its guide. Planned work is on the [roadmap](/roadmap).
+This page lists what Markpion does today. Each feature links to its guide. Planned work is on the [roadmap](/roadmap).
 
 <figure>
-  <img class="screenshot" src="./images/markdown-studio-mermaid.webp" alt="A Markdown file with a Mermaid flowchart and LaTeX formulas, rendered as a diagram and typeset math in the preview" width="1440" height="900" loading="lazy">
+  <img class="screenshot" src="./images/markpion-mermaid.webp" alt="A Markdown file with a Mermaid flowchart and LaTeX formulas, rendered as a diagram and typeset math in the preview" width="1440" height="900" loading="lazy">
   <figcaption>Mermaid diagrams and LaTeX math render in the live preview.</figcaption>
 </figure>
 
@@ -40,7 +40,7 @@ This page lists what Markdown Studio does today. Each feature links to its guide
 - Find and replace in the document (case, whole word, regex), and Find in Files and Replace in Files across the folder (unsaved files are skipped; previous versions go to File History). [Search & replace](/guide/search-replace)
 - A document outline (drag to reorder sections, copy a link to a heading), a command palette, Go to File (open any file in the folder by typing part of its name), and recent files and folders.
 - Live folder watching: the explorer and open files update when other programs change files on disk.
-- Opens files from your operating system: double-click, "Open with", or drag and drop onto the window. On Windows, the right-click menu has **Open with Markdown Studio**.
+- Opens files from your operating system: double-click, "Open with", or drag and drop onto the window. On Windows, the right-click menu has **Open with Markpion**.
 
 ## Saving and safety
 
@@ -72,7 +72,7 @@ This page lists what Markdown Studio does today. Each feature links to its guide
 
 ## Not included
 
-These aren't part of Markdown Studio today. Some are [on the roadmap](/roadmap):
+These aren't part of Markpion today. Some are [on the roadmap](/roadmap):
 
 - AI writing features, cloud sync, collaboration, Git integration and plugins.
 - MDX, and Markdown flavours beyond GitHub Flavored Markdown with the extensions listed above.

@@ -1,6 +1,6 @@
 ---
 title: Import & Export Problems
-description: Fix Markdown Studio import and export problems, including scanned PDFs, lost layout, PDF characters the built-in font can't show, and formulas or diagrams shown as code in PDF and Word.
+description: Fix Markpion import and export problems, including scanned PDFs, lost layout, PDF characters the built-in font can't show, and formulas or diagrams shown as code in PDF and Word.
 ---
 
 # Import & export
@@ -17,7 +17,7 @@ description: Fix Markdown Studio import and export problems, including scanned P
 
 **Problem:** headings, lists or tables from a PDF come out as plain paragraphs.
 
-**Possible cause:** PDFs store positioned text, not structure. Markdown Studio infers headings from font size and lists from bullets or numbers, which doesn't always match the original.
+**Possible cause:** PDFs store positioned text, not structure. Markpion infers headings from font size and lists from bullets or numbers, which doesn't always match the original.
 
 **Solution:** fix the structure in the editor, for example with **Ctrl+Alt+1**–**3** for headings and **Ctrl+Shift+8** for lists. If you have the original Word file, import that instead: `.docx` keeps headings, lists and tables reliably.
 
@@ -47,7 +47,7 @@ description: Fix Markdown Studio import and export problems, including scanned P
 
 - The diagram has a syntax error. The preview shows **Diagram error:** too; fix the diagram (see [Mermaid](/markdown/mermaid#troubleshooting)).
 - **Settings → Preview → Render Mermaid diagrams** is off, so all exports keep the code.
-- The version is older than 0.12.0, which exported diagrams as code. Update Markdown Studio.
+- The version is older than 0.12.0, which exported diagrams as code. Update Markpion.
 
 ## "Files larger than 100 MB can't be imported"
 
@@ -61,4 +61,4 @@ description: Fix Markdown Studio import and export problems, including scanned P
 
 ## Report an issue
 
-If a document converts badly and you can share it (or a similar one), [report it on GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new). Samples help us improve the converters.
+If a document converts badly and you can share it (or a similar one), [report it on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new). Samples help us improve the converters.

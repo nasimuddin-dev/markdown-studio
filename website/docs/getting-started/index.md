@@ -1,14 +1,14 @@
 ---
 title: Introduction
-description: What Markdown Studio is, who it's for, and how the documentation is organized. Start here if you're new to Markdown Studio.
+description: What Markpion is, who it's for, and how the documentation is organized. Start here if you're new to Markpion.
 ---
 
 # Introduction
 
-Markdown Studio is a desktop Markdown editor for Windows, macOS and Linux. You write in an editor on one side and see the rendered document on the other. It works directly with the `.md` files on your computer: there's no account, no cloud and no import step.
+Markpion is a desktop Markdown editor for Windows, macOS and Linux. You write in an editor on one side and see the rendered document on the other. It works directly with the `.md` files on your computer: there's no account, no cloud and no import step.
 
 <figure>
-  <img class="screenshot" src="../images/markdown-studio-home.webp" alt="The Markdown Studio welcome screen with buttons for New File, Open File and Open Folder" width="1440" height="900" loading="lazy">
+  <img class="screenshot" src="../images/markpion-home.webp" alt="The Markpion welcome screen with buttons for New File, Open File and Open Folder" width="1440" height="900" loading="lazy">
   <figcaption>The welcome screen when no document is open.</figcaption>
 </figure>
 
@@ -31,7 +31,7 @@ Markdown Studio is a desktop Markdown editor for Windows, macOS and Linux. You w
 
 ## Where to go next
 
-1. [Install Markdown Studio](/getting-started/installation) on your system.
+1. [Install Markpion](/getting-started/installation) on your system.
 2. [Create your first document](/getting-started/first-document).
 3. Learn the [editor](/guide/editor), the [Markdown syntax](/markdown/) it supports, and its [keyboard shortcuts](/reference/keyboard-shortcuts).
 

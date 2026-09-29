@@ -17,6 +17,38 @@ fn now_secs() -> u64 {
         .unwrap_or(0)
 }
 
+/// Bundle identifier used before the app was renamed from Markdown Studio to Markpion.
+pub const LEGACY_IDENTIFIER: &str = "com.markdownstudio.app";
+
+/// Copies settings, recent files, recovery and history from the directory used
+/// under the old identifier (a sibling of `dir`) the first time `dir` is used,
+/// so upgrading from Markdown Studio keeps them. The old directory is left in
+/// place; the browser engine's cache (`EBWebView`) is not copied.
+pub fn migrate_legacy_dir(dir: &Path) {
+    let Some(legacy) = dir.parent().map(|p| p.join(LEGACY_IDENTIFIER)) else { return };
+    if dir.exists() || !legacy.is_dir() || legacy == dir {
+        return;
+    }
+    let _ = copy_dir(&legacy, dir);
+}
+
+fn copy_dir(from: &Path, to: &Path) -> std::io::Result<()> {
+    fs::create_dir_all(to)?;
+    for entry in fs::read_dir(from)? {
+        let entry = entry?;
+        let target = to.join(entry.file_name());
+        let kind = entry.file_type()?;
+        if kind.is_dir() {
+            if entry.file_name() != "EBWebView" {
+                copy_dir(&entry.path(), &target)?;
+            }
+        } else if kind.is_file() {
+            fs::copy(entry.path(), target)?;
+        }
+    }
+    Ok(())
+}
+
 /// Writes JSON through a temporary file so a crash mid-write cannot corrupt it.
 pub fn write_json(path: &Path, value: &Value) -> AppResult<()> {
     if let Some(dir) = path.parent() {
@@ -54,7 +86,7 @@ impl Logger {
     pub fn new(dir: PathBuf, home: Option<PathBuf>) -> Self {
         let _ = fs::create_dir_all(&dir);
         Logger {
-            path: dir.join("markdown-studio.log"),
+            path: dir.join("markpion.log"),
             home: home.map(|h| h.to_string_lossy().into_owned()),
         }
     }
@@ -98,6 +130,26 @@ impl Logger {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn legacy_dir_is_copied_once_without_webview_cache() {
+        let tmp = tempfile::tempdir().unwrap();
+        let legacy = tmp.path().join(LEGACY_IDENTIFIER);
+        fs::create_dir_all(legacy.join("history").join("a")).unwrap();
+        fs::create_dir_all(legacy.join("EBWebView")).unwrap();
+        fs::write(legacy.join("settings.json"), "{}").unwrap();
+        fs::write(legacy.join("history").join("a").join("1.md"), "x").unwrap();
+        let dir = tmp.path().join("com.markpion.app");
+        migrate_legacy_dir(&dir);
+        assert_eq!(fs::read_to_string(dir.join("settings.json")).unwrap(), "{}");
+        assert!(dir.join("history").join("a").join("1.md").is_file());
+        assert!(!dir.join("EBWebView").exists());
+        assert!(legacy.join("settings.json").is_file());
+        // Once the new directory exists, it is never overwritten.
+        fs::write(dir.join("settings.json"), "{\"new\":1}").unwrap();
+        migrate_legacy_dir(&dir);
+        assert_eq!(fs::read_to_string(dir.join("settings.json")).unwrap(), "{\"new\":1}");
+    }
 
     #[test]
     fn corrupt_json_falls_back_to_null_and_is_preserved() {

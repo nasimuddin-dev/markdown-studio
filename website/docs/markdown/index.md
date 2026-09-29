@@ -1,13 +1,13 @@
 ---
 title: Markdown Basics
-description: The Markdown syntax supported by Markdown Studio, with examples of headings, emphasis, lists, quotes, links, images, code, tables and horizontal rules.
+description: The Markdown syntax supported by Markpion, with examples of headings, emphasis, lists, quotes, links, images, code, tables and horizontal rules.
 ---
 
 # Markdown basics
 
-Markdown is plain text with a few symbols that mark up structure: `#` for headings, `*` for emphasis, `-` for lists. Markdown Studio follows [CommonMark](https://commonmark.org) and [GitHub Flavored Markdown](/markdown/gfm), the dialect used on GitHub, so your files look the same there.
+Markdown is plain text with a few symbols that mark up structure: `#` for headings, `*` for emphasis, `-` for lists. Markpion follows [CommonMark](https://commonmark.org) and [GitHub Flavored Markdown](/markdown/gfm), the dialect used on GitHub, so your files look the same there.
 
-Every example below renders in the Markdown Studio preview as described.
+Every example below renders in the Markpion preview as described.
 
 ## Headings
 
@@ -57,14 +57,14 @@ For highlighted notes and warnings, see [alerts](/markdown/extras#alerts).
 ## Links
 
 ```markdown
-[Markdown Studio on GitHub](https://github.com/nasimuddin-dev/markdown-studio)
+[Markpion on GitHub](https://github.com/nasimuddin-dev/markpion)
 [Another document](docs/guide.md)
 [A heading in this document](#links)
 [A heading in another document](docs/guide.md#install)
 <https://example.com>
 ```
 
-Relative links to other Markdown files open them in Markdown Studio when clicked in the preview. Web links open in your browser.
+Relative links to other Markdown files open them in Markpion when clicked in the preview. Web links open in your browser.
 
 ## Images
 

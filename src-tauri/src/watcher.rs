@@ -34,7 +34,7 @@ pub fn is_ignored(root: &Path, path: &Path) -> bool {
     rel.components().any(|c| match c {
         Component::Normal(name) => {
             let n = name.to_string_lossy();
-            n.starts_with('.') || IGNORED_DIRS.contains(&n.as_ref()) || n.ends_with(".mdstudio-tmp")
+            n.starts_with('.') || IGNORED_DIRS.contains(&n.as_ref()) || n.ends_with(".markpion-tmp")
         }
         _ => false,
     })
@@ -83,7 +83,7 @@ mod tests {
         assert!(!is_ignored(root, &root.join("docs").join("a.md")));
         assert!(is_ignored(root, &root.join(".git").join("index")));
         assert!(is_ignored(root, &root.join("node_modules").join("x.md")));
-        assert!(is_ignored(root, &root.join(".a.md.123.mdstudio-tmp")));
+        assert!(is_ignored(root, &root.join(".a.md.123.markpion-tmp")));
         assert!(is_ignored(root, Path::new("/elsewhere/a.md")));
     }
 }

@@ -1,13 +1,17 @@
 ---
 title: FAQ
-description: Answers to common questions about Markdown Studio, covering supported systems, price, offline use, privacy, where documents are stored, Markdown features, bug reports and uninstalling.
+description: Answers to common questions about Markpion, covering supported systems, price, offline use, privacy, where documents are stored, Markdown features, bug reports and uninstalling.
 ---
 
 # Frequently asked questions
 
-## What is Markdown Studio?
+## What is Markpion?
 
 A desktop Markdown editor for Windows, macOS and Linux. You edit `.md` files on your computer with a live preview, organize them in folders and tabs, and export them to PDF, Word or HTML. See [Features](/features).
+
+## Is Markpion the same app as Markdown Studio?
+
+Yes. Markdown Studio was renamed to Markpion in version 0.14.0. Updating keeps your settings, recent files and version history: Markpion copies them from Markdown Studio the first time it starts. On Windows, the Markpion installer also removes the old Markdown Studio installation. If Markdown Studio was installed for all users and Markpion is installed only for you, Windows may keep both; uninstall Markdown Studio from **Settings → Apps**.
 
 ## Which operating systems are supported?
 
@@ -17,9 +21,9 @@ A desktop Markdown editor for Windows, macOS and Linux. You edit `.md` files on 
 
 ARM64 builds for Windows and Linux aren't available yet. See [Installation](/getting-started/installation).
 
-## Is Markdown Studio free?
+## Is Markpion free?
 
-Yes. Markdown Studio is free to download and use, and there's no paid edition. The source code is public on [GitHub](https://github.com/nasimuddin-dev/markdown-studio); a license for reusing the code hasn't been published yet.
+Yes. Markpion is free to download and use, and there's no paid edition. The source code is public on [GitHub](https://github.com/nasimuddin-dev/markpion); a license for reusing the code hasn't been published yet.
 
 ## Does it work offline?
 
@@ -27,9 +31,9 @@ Yes. Everything works without an internet connection. The only connections are t
 
 ## Where are my documents stored?
 
-Wherever you save them. Markdown Studio edits files in place in your folders; there's no internal library or database. Its own settings, file history and recovery data are kept in your user profile (see [Configuration](/reference/configuration)).
+Wherever you save them. Markpion edits files in place in your folders; there's no internal library or database. Its own settings, file history and recovery data are kept in your user profile (see [Configuration](/reference/configuration)).
 
-## Does Markdown Studio upload my documents?
+## Does Markpion upload my documents?
 
 No. There's no cloud service, account or telemetry. Import and export run on your computer. See [Privacy](/privacy).
 
@@ -59,16 +63,16 @@ The installers aren't code-signed with a commercial certificate yet (Windows) or
 
 ## How do I report a bug?
 
-Open an issue on [GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new). Include your version (**Help → About Markdown Studio**), your operating system, the steps to reproduce, and if relevant the log from **Help → Export Diagnostic Logs…** (it never contains your text). See [Troubleshooting](/troubleshooting/#report-an-issue).
+Open an issue on [GitHub](https://github.com/nasimuddin-dev/markpion/issues/new). Include your version (**Help → About Markpion**), your operating system, the steps to reproduce, and if relevant the log from **Help → Export Diagnostic Logs…** (it never contains your text). See [Troubleshooting](/troubleshooting/#report-an-issue).
 
 ## How do I request a feature?
 
-Open an issue on [GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new) describing what you'd like to do and why. Check the [roadmap](/roadmap) first; it may already be planned.
+Open an issue on [GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) describing what you'd like to do and why. Check the [roadmap](/roadmap) first; it may already be planned.
 
-## How do I uninstall Markdown Studio?
+## How do I uninstall Markpion?
 
-- **Windows:** Settings → Apps → Installed apps → Markdown Studio → Uninstall.
-- **macOS:** drag Markdown Studio from Applications to the Trash.
-- **Linux:** `sudo apt remove markdown-studio` or `sudo dnf remove markdown-studio`, or delete the AppImage.
+- **Windows:** Settings → Apps → Installed apps → Markpion → Uninstall.
+- **macOS:** drag Markpion from Applications to the Trash.
+- **Linux:** `sudo apt remove markpion` or `sudo dnf remove markpion`, or delete the AppImage.
 
-Your documents are never removed. To remove settings and history too, see [Configuration](/reference/configuration#reset-markdown-studio).
+Your documents are never removed. To remove settings and history too, see [Configuration](/reference/configuration#reset-markpion).

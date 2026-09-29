@@ -33,7 +33,7 @@ async function offerRecovery() {
   const when = snapshot?.savedAt ? new Date(snapshot.savedAt).toLocaleString() : "the last session";
   const choice = await ask({
     title: "Recover unsaved changes?",
-    message: `Markdown Studio didn't close normally. ${docs.length} document${docs.length > 1 ? "s have" : " has"} unsaved changes from ${when}.`,
+    message: `Markpion didn't close normally. ${docs.length} document${docs.length > 1 ? "s have" : " has"} unsaved changes from ${when}.`,
     detail: docs.map((d) => d.name).join(", "),
     buttons: [
       { id: "discard", label: "Discard", variant: "danger" },
@@ -151,7 +151,7 @@ function persistSession() {
 function updateWindowTitle() {
   const { docs, activeId } = useDocuments.getState();
   const active = docs.find((d) => d.id === activeId);
-  const title = active ? `${isDirty(active) ? "● " : ""}${active.name} — Markdown Studio` : "Markdown Studio";
+  const title = active ? `${isDirty(active) ? "● " : ""}${active.name} — Markpion` : "Markpion";
   if (document.title === title) return;
   document.title = title;
   if (isTauri) {

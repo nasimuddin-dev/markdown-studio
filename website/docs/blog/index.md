@@ -1,11 +1,11 @@
 ---
 title: Blog
-description: Guides and articles about writing in Markdown, covering Markdown basics, tables, Mermaid diagrams and writing a great README, from the Markdown Studio project.
+description: Guides and articles about writing in Markdown, covering Markdown basics, tables, Mermaid diagrams and writing a great README, from the Markpion project.
 ---
 
 # Blog
 
-Practical guides to writing in Markdown. The techniques work in any Markdown editor and on GitHub; where Markdown Studio has a shortcut for something, the article mentions it.
+Practical guides to writing in Markdown. The techniques work in any Markdown editor and on GitHub; where Markpion has a shortcut for something, the article mentions it.
 
 ## [What Is Markdown? A Practical Introduction](/blog/what-is-markdown)
 

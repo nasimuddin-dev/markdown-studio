@@ -1,8 +1,8 @@
 {
-  "name": "markdown-studio-website",
+  "name": "markpion-website",
   "private": true,
   "type": "module",
-  "description": "Documentation and product website for Markdown Studio (VitePress, deployed to GitHub Pages).",
+  "description": "Documentation and product website for Markpion (VitePress, deployed to GitHub Pages).",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",

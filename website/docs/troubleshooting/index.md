@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-description: Solutions for common Markdown Studio problems with installation, starting the app, opening and saving files, preview, Mermaid, math, import, export and updates, plus how to collect diagnostic logs.
+description: Solutions for common Markpion problems with installation, starting the app, opening and saving files, preview, Mermaid, math, import, export and updates, plus how to collect diagnostic logs.
 ---
 
 # Troubleshooting
@@ -20,15 +20,15 @@ Find your problem below. Each article describes the symptoms, the likely cause a
 
 ## Diagnostic logs
 
-Markdown Studio keeps a log of operations and errors. **Logs never contain your document text**, and your home folder is replaced by `~` in paths.
+Markpion keeps a log of operations and errors. **Logs never contain your document text**, and your home folder is replaced by `~` in paths.
 
 To attach the log to a bug report, choose **Help → Export Diagnostic Logs…** and save the file.
 
 ## Report an issue
 
-If the articles don't help, [open an issue on GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new) with:
+If the articles don't help, [open an issue on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) with:
 
-1. Your Markdown Studio version (**Help → About Markdown Studio**) and operating system.
+1. Your Markpion version (**Help → About Markpion**) and operating system.
 2. What you did, what you expected, and what happened, including the exact error message.
 3. The diagnostic log, if the problem involves an error.
 4. If you can, a small Markdown file that shows the problem. Remove anything private first.

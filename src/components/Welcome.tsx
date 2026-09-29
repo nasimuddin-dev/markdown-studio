@@ -18,7 +18,7 @@ export function Welcome() {
     <div className="welcome">
       <div className="welcome-inner">
         <img src="/icon.svg" alt="" width={64} height={64} />
-        <h1>Markdown Studio</h1>
+        <h1>Markpion</h1>
         <p className="muted">Write, preview and organize Markdown — locally and privately.</p>
         <div className="welcome-actions">
           <button className="button primary" onClick={() => newDocument()}>

@@ -1,19 +1,19 @@
 ---
 title: Configuration
-description: Where Markdown Studio stores its settings, recent files, file history, crash recovery data and logs on Windows, macOS and Linux, the settings.json keys and defaults, and how to reset everything.
+description: Where Markpion stores its settings, recent files, file history, crash recovery data and logs on Windows, macOS and Linux, the settings.json keys and defaults, and how to reset everything.
 ---
 
 # Configuration
 
-Markdown Studio has no configuration files in your projects. Everything it stores lives in your user profile, under the app identifier `com.markdownstudio.app`. Change settings through the [Settings dialog](/guide/settings); this page is for backups, troubleshooting and IT administrators.
+Markpion has no configuration files in your projects. Everything it stores lives in your user profile, under the app identifier `com.markpion.app`. Change settings through the [Settings dialog](/guide/settings); this page is for backups, troubleshooting and IT administrators.
 
 ## Where data is stored
 
 | What | Windows | macOS | Linux |
 | --- | --- | --- | --- |
-| Settings (`settings.json`), recent files (`recent.json`) | `%APPDATA%\com.markdownstudio.app` | `~/Library/Application Support/com.markdownstudio.app` | `~/.config/com.markdownstudio.app` |
-| File history (`history/`), crash recovery (`recovery/`) | `%APPDATA%\com.markdownstudio.app` | `~/Library/Application Support/com.markdownstudio.app` | `~/.local/share/com.markdownstudio.app` |
-| Logs | `%LOCALAPPDATA%\com.markdownstudio.app\logs` | `~/Library/Logs/com.markdownstudio.app` | `~/.local/share/com.markdownstudio.app/logs` |
+| Settings (`settings.json`), recent files (`recent.json`) | `%APPDATA%\com.markpion.app` | `~/Library/Application Support/com.markpion.app` | `~/.config/com.markpion.app` |
+| File history (`history/`), crash recovery (`recovery/`) | `%APPDATA%\com.markpion.app` | `~/Library/Application Support/com.markpion.app` | `~/.local/share/com.markpion.app` |
+| Logs | `%LOCALAPPDATA%\com.markpion.app\logs` | `~/Library/Logs/com.markpion.app` | `~/.local/share/com.markpion.app/logs` |
 
 Your documents are never stored here, except for the previous versions kept by [file history](/guide/saving-and-recovery#file-history) and unsaved text kept for [crash recovery](/guide/saving-and-recovery#crash-recovery).
 
@@ -61,6 +61,6 @@ The file also records the last session (open folder and files) so it can be rest
 | Recent files and folders | 15 |
 | Reopen Closed Tab | 20 files |
 
-## Reset Markdown Studio
+## Reset Markpion
 
-To start fresh, quit Markdown Studio and delete the folders above. Settings return to their defaults; your documents aren't affected.
+To start fresh, quit Markpion and delete the folders above. Settings return to their defaults; your documents aren't affected.

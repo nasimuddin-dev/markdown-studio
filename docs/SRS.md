@@ -1,4 +1,4 @@
-# Markdown Studio — Software Requirements Specification
+# Markpion — Software Requirements Specification
 
 *Cross-Platform Desktop Markdown Editor*
 
@@ -7,7 +7,7 @@
 | Document Information | Value |
 |---|---|
 | Document Type | Software Requirements Specification (SRS) |
-| Product | Markdown Studio |
+| Product | Markpion |
 | Version | 1.1 |
 | Status | Baseline, with implementation status |
 | Target Platforms | Windows, macOS, Linux |
@@ -22,6 +22,7 @@
 |---|---|---|
 | 1.0 | — | Baseline, converted from `Markdown_Studio_SRS_v1.0.docx`. |
 | 1.1 | 2026-09-25 | Added the revision history and implementation-status notes (§13, §18, §21). Requirement text is unchanged. |
+| 1.2 | 2026-09-29 | The product was renamed from Markdown Studio to Markpion; the name is updated throughout. Requirements are otherwise unchanged. |
 
 > **Implementation status.** Requirement-by-requirement status is tracked in [TRACEABILITY.md](TRACEABILITY.md). As of 0.13.0, every MVP functional requirement (FR-001 to FR-063) is implemented, as are the auto-update requirements. Many §19 future enhancements have been delivered early: outline, linting, Mermaid and math, export to HTML, PDF and Word, and version history. The notes marked *Status* below record decisions made during development.
 
@@ -56,11 +57,11 @@
 
 ### 1.1 Purpose
 
-This SRS defines the functional, non-functional, technical, security, distribution, and quality requirements for Markdown Studio, a standalone cross-platform desktop application for creating, opening, editing, previewing, organizing, and saving Markdown documents.
+This SRS defines the functional, non-functional, technical, security, distribution, and quality requirements for Markpion, a standalone cross-platform desktop application for creating, opening, editing, previewing, organizing, and saving Markdown documents.
 
 ### 1.2 Product Vision
 
-Markdown Studio will provide a fast, professional, privacy-conscious Markdown editing experience for Windows, macOS, and Linux. Core editing will work locally without requiring an internet connection.
+Markpion will provide a fast, professional, privacy-conscious Markdown editing experience for Windows, macOS, and Linux. Core editing will work locally without requiring an internet connection.
 
 ### 1.3 Definitions
 
@@ -75,7 +76,7 @@ Markdown Studio will provide a fast, professional, privacy-conscious Markdown ed
 
 ## 2. Product Overview
 
-Markdown Studio is a local-first desktop application packaged with Tauri. Users will not need Node.js, Python, or a separate server runtime to use the released application.
+Markpion is a local-first desktop application packaged with Tauri. Users will not need Node.js, Python, or a separate server runtime to use the released application.
 
 - Native desktop experience on Windows, macOS, and Linux.
 - Local Markdown editing and file management.
@@ -422,7 +423,7 @@ The product website shall provide OS-specific download options. The site may det
 | Should AI features support local models, cloud providers, or both? | Open. |
 | Should Markdown HTML be fully supported, partially supported, or sanitized to a strict subset? | **Answered:** raw HTML is parsed, then sanitized to GitHub's allow-list (FR-034, SEC-004). |
 | Should the application include Git integration in the first major release? | Open. |
-| What product name, domain, logo, and application identifier will be used for signing and releases? | **Partly answered:** "Markdown Studio", identifier `com.markdownstudio.app`, releases on GitHub. Domain and signing identity are open. |
+| What product name, domain, logo, and application identifier will be used for signing and releases? | **Partly answered:** "Markpion", identifier `com.markpion.app`, releases on GitHub. Domain and signing identity are open. |
 | Will telemetry be collected? If yes, what is collected and what consent mechanism is required? | **Answered:** no telemetry. The app's only own network request is the optional update check to GitHub, which can be turned off in Settings (web images referenced in a document load when previewed). |
 
 ## Appendix A — Suggested MVP User Flows
@@ -431,7 +432,7 @@ The product website shall provide OS-specific download options. The site may det
 
 1. Download the installer for your operating system from the official website (today: the README download section or GitHub Releases).
 2. Run the platform installer/package.
-3. Launch Markdown Studio.
+3. Launch Markpion.
 4. Select Open Folder or Create New Document.
 5. Begin editing locally.
 
@@ -455,7 +456,7 @@ The product website shall provide OS-specific download options. The site may det
 ## Appendix B — Recommended Initial Repository Structure
 
 ```text
-markdown-studio/
+markpion/
 ├── src/
 │   ├── components/
 │   ├── features/

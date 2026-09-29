@@ -1,6 +1,6 @@
 ---
 title: Preview, Mermaid & Math Problems
-description: Fix Markdown Studio preview problems, including a paused preview, images that don't show, Mermaid diagram errors, math that doesn't render, and dollar signs read as math.
+description: Fix Markpion preview problems, including a paused preview, images that don't show, Mermaid diagram errors, math that doesn't render, and dollar signs read as math.
 ---
 
 # Preview, Mermaid & math
@@ -61,4 +61,4 @@ description: Fix Markdown Studio preview problems, including a paused preview, i
 
 ## Report an issue
 
-If a document renders differently from GitHub, [report it on GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new) with a small Markdown sample.
+If a document renders differently from GitHub, [report it on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) with a small Markdown sample.

@@ -8,11 +8,11 @@ name: Release
 # hand with its tag (for example v0.10.0).
 #
 # Asset names are stable so the README can link to them:
-#   MarkdownStudio-<version>-macos-arm64.dmg      Apple Silicon
-#   MarkdownStudio-<version>-macos-x64.dmg        Intel
-#   MarkdownStudio-<version>-linux-x86_64.AppImage
-#   MarkdownStudio-<version>-linux-amd64.deb
-#   MarkdownStudio-<version>-linux-x86_64.rpm
+#   Markpion-<version>-macos-arm64.dmg      Apple Silicon
+#   Markpion-<version>-macos-x64.dmg        Intel
+#   Markpion-<version>-linux-x86_64.AppImage
+#   Markpion-<version>-linux-amd64.deb
+#   Markpion-<version>-linux-x86_64.rpm
 #   SHA256SUMS-macos-linux.txt
 on:
   push:
@@ -108,12 +108,12 @@ jobs:
           bundle="src-tauri/target/${{ matrix.target }}/release/bundle"
           mkdir -p out
           case "${{ matrix.target }}" in
-            aarch64-apple-darwin) cp "$bundle"/dmg/*.dmg "out/MarkdownStudio-$version-macos-arm64.dmg" ;;
-            x86_64-apple-darwin)  cp "$bundle"/dmg/*.dmg "out/MarkdownStudio-$version-macos-x64.dmg" ;;
+            aarch64-apple-darwin) cp "$bundle"/dmg/*.dmg "out/Markpion-$version-macos-arm64.dmg" ;;
+            x86_64-apple-darwin)  cp "$bundle"/dmg/*.dmg "out/Markpion-$version-macos-x64.dmg" ;;
             x86_64-unknown-linux-gnu)
-              cp "$bundle"/appimage/*.AppImage "out/MarkdownStudio-$version-linux-x86_64.AppImage"
-              cp "$bundle"/deb/*.deb "out/MarkdownStudio-$version-linux-amd64.deb"
-              cp "$bundle"/rpm/*.rpm "out/MarkdownStudio-$version-linux-x86_64.rpm"
+              cp "$bundle"/appimage/*.AppImage "out/Markpion-$version-linux-x86_64.AppImage"
+              cp "$bundle"/deb/*.deb "out/Markpion-$version-linux-amd64.deb"
+              cp "$bundle"/rpm/*.rpm "out/Markpion-$version-linux-x86_64.rpm"
               ;;
           esac
           ls -l out

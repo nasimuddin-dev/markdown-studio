@@ -1,6 +1,6 @@
 ---
 title: Code Blocks
-description: Write inline code and fenced code blocks in Markdown Studio, with syntax highlighting in the editor and preview. Includes the list of highlighted languages and aliases.
+description: Write inline code and fenced code blocks in Markpion, with syntax highlighting in the editor and preview. Includes the list of highlighted languages and aliases.
 ---
 
 # Code blocks

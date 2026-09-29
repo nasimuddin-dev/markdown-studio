@@ -1,6 +1,6 @@
 ---
 title: Windows Installation Problems
-description: Fix Markdown Studio installation problems on Windows, including SmartScreen warnings, blocked downloads, WebView2, "app is running" messages, missing Installed apps entries and the right-click menu.
+description: Fix Markpion installation problems on Windows, including SmartScreen warnings, blocked downloads, WebView2, "app is running" messages, missing Installed apps entries and the right-click menu.
 ---
 
 # Windows installation
@@ -21,11 +21,11 @@ description: Fix Markdown Studio installation problems on Windows, including Sma
 
 **Solution:** use the **offline installer**, which includes WebView2, or install the [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/). See [App doesn't start](/troubleshooting/app-does-not-start#blank-or-white-window-on-windows).
 
-## "Markdown Studio is running"
+## "Markpion is running"
 
 **Problem:** the installer says the app is running.
 
-**Solution:** close Markdown Studio (check the taskbar for other windows), then run the installer again.
+**Solution:** close Markpion (check the taskbar for other windows), then run the installer again.
 
 ## Not listed under Installed apps
 
@@ -33,14 +33,14 @@ description: Fix Markdown Studio installation problems on Windows, including Sma
 
 **Solution:** sign in to that account, or reinstall and choose **Anyone who uses this computer**.
 
-## No "Open with Markdown Studio" in the right-click menu
+## No "Open with Markpion" in the right-click menu
 
 **Solution:** on Windows 11, choose **Show more options** first. If it's still missing, reinstall the latest version.
 
 ## Double-clicking a .md file opens another app
 
-**Solution:** right-click a `.md` file → **Open with** → **Choose another app** → **Markdown Studio**, and tick **Always use this app**. Or go to **Settings → Apps → Default apps → Markdown Studio**.
+**Solution:** right-click a `.md` file → **Open with** → **Choose another app** → **Markpion**, and tick **Always use this app**. Or go to **Settings → Apps → Default apps → Markpion**.
 
 ## Report an issue
 
-[Report installation problems on GitHub](https://github.com/nasimuddin-dev/markdown-studio/issues/new) with your Windows version and the installer you used.
+[Report installation problems on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) with your Windows version and the installer you used.

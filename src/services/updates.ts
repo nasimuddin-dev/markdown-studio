@@ -1,5 +1,5 @@
-export const RELEASES_API = "https://api.github.com/repos/nasimuddin-dev/markdown-studio/releases/latest";
-export const RELEASES_PAGE = "https://github.com/nasimuddin-dev/markdown-studio/releases/latest";
+export const RELEASES_API = "https://api.github.com/repos/nasimuddin-dev/markpion/releases/latest";
+export const RELEASES_PAGE = "https://github.com/nasimuddin-dev/markpion/releases/latest";
 
 export interface LatestRelease {
   version: string;

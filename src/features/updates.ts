@@ -5,8 +5,8 @@ import { useSettings } from "../stores/settingsStore";
 import { ask, notify, useUi } from "../stores/uiStore";
 import { saveAll } from "./documents";
 
-const SKIP_KEY = "markdown-studio.update.skip";
-const LAST_KEY = "markdown-studio.update.lastCheck";
+const SKIP_KEY = "markpion.update.skip";
+const LAST_KEY = "markpion.update.lastCheck";
 
 function load(key: string): string | null {
   try {
@@ -66,7 +66,7 @@ const MB = 1024 * 1024;
 /**
  * Downloads, verifies (minisign signature) and installs the update. Open
  * documents are saved first; the installer replaces the current version and
- * restarts Markdown Studio. Returns false if it was cancelled or failed, in
+ * restarts Markpion. Returns false if it was cancelled or failed, in
  * which case the current version keeps running unchanged (UPD-005).
  */
 export async function installUpdate(version: string): Promise<boolean> {
@@ -83,7 +83,7 @@ export async function installUpdate(version: string): Promise<boolean> {
     const finished = total !== null && downloaded >= total;
     useUi.getState().setProgress({
       title: `Updating to ${version}`,
-      message: finished ? "Verifying and installing… Markdown Studio will restart." : `Downloading the update… ${done}`,
+      message: finished ? "Verifying and installing… Markpion will restart." : `Downloading the update… ${done}`,
       fraction: total && !finished ? downloaded / total : null,
     });
   });
@@ -93,7 +93,7 @@ export async function installUpdate(version: string): Promise<boolean> {
     return true; // not normally reached: the app exits while the installer runs
   } catch (e) {
     b.log("error", "update.install", (e as Error)?.message ?? String(e));
-    notify("error", `Markdown Studio ${version} couldn't be installed; your current version is unchanged. ${(e as Error)?.message ?? ""}`.trim());
+    notify("error", `Markpion ${version} couldn't be installed; your current version is unchanged. ${(e as Error)?.message ?? ""}`.trim());
     return false;
   } finally {
     unlisten();
@@ -123,7 +123,7 @@ export async function checkForUpdates({ manual }: { manual: boolean }): Promise<
   if (!found) {
     if (manual) {
       const current = (await b.appInfo().catch(() => null))?.version;
-      notify("success", `You're up to date${current ? `. Markdown Studio ${current} is the latest version` : ""}.`);
+      notify("success", `You're up to date${current ? `. Markpion ${current} is the latest version` : ""}.`);
     }
     return "current";
   }
@@ -133,11 +133,11 @@ export async function checkForUpdates({ manual }: { manual: boolean }): Promise<
   const installable = found.url === null;
   const choice = await ask({
     title: "Update available",
-    message: `Markdown Studio ${found.version} is available. You have ${found.current}.`,
+    message: `Markpion ${found.version} is available. You have ${found.current}.`,
     detail:
       (notes ? notes + "\n\n" : "") +
       (installable
-        ? "Update now to download and install it. The download is verified, then it replaces your current version; your settings and files are kept, and Markdown Studio restarts."
+        ? "Update now to download and install it. The download is verified, then it replaces your current version; your settings and files are kept, and Markpion restarts."
         : "Download the installer and run it; your settings and files are kept."),
     buttons: [
       { id: "skip", label: "Skip This Version" },

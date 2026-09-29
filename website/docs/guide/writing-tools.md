@@ -1,6 +1,6 @@
 ---
 title: Writing Tools
-description: Markdown Studio's formatting commands, heading tools, move section, task lists, footnotes, link completion, table of contents and document templates.
+description: Markpion's formatting commands, heading tools, move section, task lists, footnotes, link completion, table of contents and document templates.
 ---
 
 # Writing tools

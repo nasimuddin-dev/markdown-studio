@@ -1,4 +1,4 @@
-# Markdown Studio: project rules
+# Markpion: project rules
 
 ## Keep the documentation in sync (required)
 

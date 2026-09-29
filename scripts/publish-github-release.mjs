@@ -12,8 +12,8 @@ import { tmpdir } from "node:os";
 const version = JSON.parse(readFileSync("package.json", "utf8")).version;
 const tag = `v${version}`;
 const files = [
-  join("downloads", `MarkdownStudio-${version}-windows-x64-setup.exe`),
-  join("release-assets", `MarkdownStudio-${version}-windows-x64-offline-setup.exe`),
+  join("downloads", `Markpion-${version}-windows-x64-setup.exe`),
+  join("release-assets", `Markpion-${version}-windows-x64-offline-setup.exe`),
   join("downloads", "SHA256SUMS.txt"),
   // Update manifest read by the in-app updater (releases/latest/download/latest.json).
   join("release-assets", "latest.json"),
@@ -24,20 +24,20 @@ if (files.length < 2) {
 }
 
 const gh = (...a) => execFileSync("gh", a, { stdio: ["ignore", "pipe", "inherit"] }).toString();
-const notes = `## Markdown Studio ${version}
+const notes = `## Markpion ${version}
 
 A fast, local-first Markdown editor for Windows. Nothing else needs to be installed.
 
 | File | Use it when |
 | --- | --- |
-| \`MarkdownStudio-${version}-windows-x64-setup.exe\` | **Recommended.** Small download. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet). |
-| \`MarkdownStudio-${version}-windows-x64-offline-setup.exe\` | The PC has **no internet access** or is locked down. It includes the Microsoft Edge WebView2 runtime. |
+| \`Markpion-${version}-windows-x64-setup.exe\` | **Recommended.** Small download. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet). |
+| \`Markpion-${version}-windows-x64-offline-setup.exe\` | The PC has **no internet access** or is locked down. It includes the Microsoft Edge WebView2 runtime. |
 | \`SHA256SUMS.txt\` | Verify a download: \`Get-FileHash <file> -Algorithm SHA256\` |
 
 The installer isn't code-signed yet: if SmartScreen warns, choose **More info → Run anyway**.
 See the [installation guide](https://github.com/${gh("repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner").trim()}/blob/main/docs/INSTALL.md).
 `;
-const notesFile = join(tmpdir(), `markdown-studio-${tag}-notes.md`);
+const notesFile = join(tmpdir(), `markpion-${tag}-notes.md`);
 writeFileSync(notesFile, notes);
 
 let exists = true;
@@ -56,7 +56,7 @@ if (exists) {
   gh("release", "upload", tag, ...small, "--clobber");
 } else {
   console.log(`Creating release ${tag}…`);
-  gh("release", "create", tag, ...small, "--title", `Markdown Studio ${version}`, "--notes-file", notesFile, "--target", "main", "--latest");
+  gh("release", "create", tag, ...small, "--title", `Markpion ${version}`, "--notes-file", notesFile, "--target", "main", "--latest");
 }
 for (const file of large) {
   for (let attempt = 1; ; attempt++) {

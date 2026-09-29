@@ -10,7 +10,7 @@ describe("App shell", () => {
   it("shows the welcome screen with core actions when nothing is open", () => {
     setupBackend();
     render(<App />);
-    expect(screen.getByRole("heading", { name: "Markdown Studio" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Markpion" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /New File/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Open File/ })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /Open Folder/ }).length).toBeGreaterThan(0);

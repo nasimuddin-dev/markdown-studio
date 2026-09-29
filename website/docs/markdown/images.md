@@ -1,6 +1,6 @@
 ---
 title: Images
-description: Add images to Markdown in Markdown Studio with local files, relative paths, pasting and drag and drop into an assets folder, plus alt text, preview and export behaviour.
+description: Add images to Markdown in Markpion with local files, relative paths, pasting and drag and drop into an assets folder, plus alt text, preview and export behaviour.
 ---
 
 # Images
@@ -18,10 +18,10 @@ The alt text is what screen readers read and what shows if the image can't load.
 
 The easiest way to add an image is to **paste** it (for example a screenshot) or **drag an image file** onto the editor:
 
-1. Markdown Studio saves the image in an `assets` folder next to the document, creating the folder if needed.
+1. Markpion saves the image in an `assets` folder next to the document, creating the folder if needed.
 2. It inserts a link with a relative path at the cursor. A pasted screenshot gets a timestamped name, for example `![image 20260925 140512](assets/image-20260925-140512.png)`; a dropped file keeps its name. Replace the alt text with a short description.
 
-The document must be saved first, so Markdown Studio knows where to put the `assets` folder. Supported formats are PNG, JPEG, GIF, WebP, SVG, BMP and AVIF, up to 20 MB per image.
+The document must be saved first, so Markpion knows where to put the `assets` folder. Supported formats are PNG, JPEG, GIF, WebP, SVG, BMP and AVIF, up to 20 MB per image.
 
 ## Local images and paths
 

@@ -285,7 +285,7 @@ export const commands: Record<string, Command> = {
     label: "Check for Updates…",
     run: async () => void (await (await import("./updates")).checkForUpdates({ manual: true })),
   },
-  about: { id: "about", label: "About Markdown Studio", run: () => useUi.getState().setAboutOpen(true) },
+  about: { id: "about", label: "About Markpion", run: () => useUi.getState().setAboutOpen(true) },
   exportLogs: {
     id: "exportLogs",
     label: "Export Diagnostic Logs…",

@@ -1,6 +1,6 @@
 ---
 title: Saving, History & Recovery
-description: How Markdown Studio protects your work, including safe atomic saves, auto save, files changed on disk, local file history with restore, crash recovery, encodings, line endings and save options.
+description: How Markpion protects your work, including safe atomic saves, auto save, files changed on disk, local file history with restore, crash recovery, encodings, line endings and save options.
 ---
 
 # Saving, history & recovery
@@ -32,7 +32,7 @@ Untitled documents are never auto-saved, and auto save never overwrites a file t
 
 ## Files changed on disk
 
-Markdown Studio notices when a file you have open is changed by another program:
+Markpion notices when a file you have open is changed by another program:
 
 - If you have **no unsaved changes**, the tab reloads automatically.
 - If you **have unsaved changes**, a banner offers:
@@ -44,17 +44,17 @@ Saving over a file that changed since you opened it is refused until you choose,
 
 ## File history
 
-Every time you save a file, Markdown Studio keeps the **previous version** in its app data folder, not next to your files. The last **30 versions** of each file are kept.
+Every time you save a file, Markpion keeps the **previous version** in its app data folder, not next to your files. The last **30 versions** of each file are kept.
 
 Open **File → File History…** (or right-click a tab → **File History…**) to see the versions with their dates and a line-by-line diff against the current text. **Restore** puts an old version into the editor as a normal edit, so you can undo it or save it.
 
 ## Crash recovery
 
-While you work, unsaved documents are snapshotted every few seconds to the app data folder. If Markdown Studio or your computer stops unexpectedly, the next start offers to recover those documents. Saved files don't need recovery.
+While you work, unsaved documents are snapshotted every few seconds to the app data folder. If Markpion or your computer stops unexpectedly, the next start offers to recover those documents. Saved files don't need recovery.
 
 ## Session restore
 
-By default, Markdown Studio reopens your last folder and files when it starts. Turn this off in **Settings → Startup → Reopen last folder and files**.
+By default, Markpion reopens your last folder and files when it starts. Turn this off in **Settings → Startup → Reopen last folder and files**.
 
 ## Encodings and line endings
 

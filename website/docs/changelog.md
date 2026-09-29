@@ -1,15 +1,15 @@
 ---
 title: Changelog
-description: Release notes for every Markdown Studio version, listing what was added, changed, fixed and secured in each release, with links to the downloads on GitHub.
+description: Release notes for every Markpion version, listing what was added, changed, fixed and secured in each release, with links to the downloads on GitHub.
 ---
 
 # Changelog
 
-Every release of Markdown Studio, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markdown-studio/releases).
+Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
 ## v0.13.0
 
-Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.13.0)
+Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.13.0)
 
 ### Added
 
@@ -17,11 +17,11 @@ Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ### Changed
 
-- The project moved to the renamed GitHub account **nasimuddin-dev**. The update check, the release links and the website (now at nasimuddin-dev.github.io/markdown-studio) use the new address. Earlier versions still find updates through GitHub's redirect; updating to this version removes that dependency.
+- The project moved to the renamed GitHub account **nasimuddin-dev**. The update check, the release links and the website (then at nasimuddin-dev.github.io/markdown-studio) use the new address. Earlier versions still find updates through GitHub's redirect; updating to this version removes that dependency.
 
 ## v0.12.0
 
-Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.12.0)
+Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.12.0)
 
 ### Added
 
@@ -29,11 +29,11 @@ Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdo
 - **Mermaid diagrams in PDF and Word exports**, drawn as sharp pictures instead of code.
 - **Outline actions:** right-click a heading to copy a link to it (`#anchor` or a Markdown link) or move its section; **Alt+↑ / Alt+↓** moves the focused heading's section.
 - **View → Fold All / Unfold All.**
-- **This website:** documentation, installation guides, troubleshooting, changelog and roadmap at nasimuddin-dev.github.io/markdown-studio.
+- **This website:** documentation, installation guides, troubleshooting, changelog and roadmap at nasimuddin-dev.github.io/markpion.
 
 ## v0.11.0
 
-Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.11.0)
+Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.11.0)
 
 ### Added
 
@@ -51,7 +51,7 @@ Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ## v0.10.0
 
-Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.10.0)
+Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.10.0)
 
 ### Added
 
@@ -60,7 +60,7 @@ Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ## v0.9.0
 
-Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.9.0)
+Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.9.0)
 
 The first release delivered through the in-app updater.
 
@@ -73,11 +73,11 @@ The first release delivered through the in-app updater.
 
 ## v0.8.0
 
-Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.8.0)
+Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.8.0)
 
 ### Added
 
-- **Automatic updates on Windows.** At startup, Markdown Studio offers new versions with **Update Now**, **Later** or **Skip This Version**. It saves open documents, downloads the update, installs it in place and restarts. The startup check can be turned off in Settings.
+- **Automatic updates on Windows.** At startup, Markpion offers new versions with **Update Now**, **Later** or **Skip This Version**. It saves open documents, downloads the update, installs it in place and restarts. The startup check can be turned off in Settings.
 
 ### Security
 
@@ -85,7 +85,7 @@ Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ## v0.7.0
 
-Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.7.0)
+Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.7.0)
 
 ### Added
 
@@ -93,7 +93,7 @@ Released: 2026-09-25 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ## v0.6.0
 
-Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.6.0)
+Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.6.0)
 
 ### Added
 
@@ -106,7 +106,7 @@ Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ## v0.5.0
 
-Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.5.0)
+Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.5.0)
 
 ### Added
 
@@ -116,7 +116,7 @@ Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ## v0.4.0
 
-Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.4.0)
+Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.4.0)
 
 ### Added
 
@@ -130,7 +130,7 @@ Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markdo
 
 ## v0.3.1
 
-Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markdown-studio/releases/tag/v0.3.1)
+Released: 2026-09-24 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.3.1)
 
 The first public release, with a Windows installer (standard, and offline with WebView2 included).
 
