@@ -47,6 +47,8 @@ export interface Backend {
   fileMtime(path: string): Promise<number | null>;
   createFile(directory: string, name: string): Promise<string>;
   createFolder(directory: string, name: string): Promise<string>;
+  /** Moves a file or folder into `directory`, keeping its name; returns the new path. */
+  movePath(path: string, directory: string): Promise<string>;
   /** Creates a subfolder unless it exists; returns its path. */
   ensureFolder(directory: string, name: string): Promise<string>;
   renamePath(path: string, newName: string): Promise<string>;

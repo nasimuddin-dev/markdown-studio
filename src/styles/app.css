@@ -1686,3 +1686,15 @@ select {
   padding: 0 24px;
   line-height: 1.5;
 }
+
+/* Moving files in the explorer by dragging. */
+.tree-row.drop-target,
+.tree.drop-root {
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
+}
+body.dragging-entry,
+body.dragging-entry * {
+  cursor: grabbing !important;
+  user-select: none;
+}

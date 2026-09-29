@@ -27,6 +27,7 @@ The file explorer shows the folder you're working in, your **workspace**. Open i
 | New folder | The **New folder** button, or right-click a folder → **New Folder…** |
 | Duplicate | Right-click a file → **Duplicate**. The copy is named like `notes copy.md` (or `notes copy 2.md`, … if that exists), keeps the original's line endings, and opens. It copies the saved file, so unsaved changes in an open tab aren't included |
 | Rename | Select an item and press **F2**, or right-click → **Rename…**. Open tabs follow the rename |
+| Move | Drag a file or folder onto another folder, or onto the empty space below the tree for the top level; **Esc** cancels. From the keyboard: right-click (or **Shift+F10**) → **Move To…** and type the folder, relative to the open folder (`/` for the top level). Nothing is replaced: moving onto a name that already exists is refused. Open tabs follow the move. Links in other documents that point to the moved file aren't updated; [Check Links in Folder](/guide/checking-documents) finds them |
 | Delete | Right-click → **Delete…**. After you confirm, the item goes to the Trash or Recycle Bin, so it can be restored |
 | Refresh | The **Refresh** button |
 

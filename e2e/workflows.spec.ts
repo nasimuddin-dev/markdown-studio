@@ -419,3 +419,23 @@ test("Tab moves between table cells and adds a row at the end", async ({ page })
   await page.keyboard.press("Tab");
   await expect.poll(text).toMatch(/\n\s+x$/);
 });
+
+test("drag a file onto a folder in the explorer to move it", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const readme = page.locator(".tree-row", { hasText: /^README\.md$/ });
+  const notes = page.locator(".tree-row", { hasText: /^notes$/ });
+  const from = (await readme.boundingBox())!;
+  const to = (await notes.boundingBox())!;
+  await page.mouse.move(from.x + 30, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 30, from.y + 20, { steps: 3 });
+  await page.mouse.move(to.x + 30, to.y + to.height / 2, { steps: 5 });
+  await expect(notes).toHaveClass(/drop-target/);
+  await page.mouse.up();
+  await expect(page.getByText(/Moved “README\.md” to “notes”/)).toBeVisible();
+  // The folder opens to show it; the open tab now points to the new place.
+  await expect(page.getByRole("treeitem", { name: /notes/ }).getByRole("treeitem", { name: /README\.md/ })).toBeVisible();
+  await expect(page.locator('.tree-row.active[data-path$="notes/README.md"]')).toBeVisible();
+});

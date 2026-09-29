@@ -1,6 +1,6 @@
 import { backend } from "../services";
 import { describeError, toAppError } from "../services/errors";
-import { basename, dirname, isInside } from "../services/paths";
+import { basename, dirname, isInside, join, relativePath } from "../services/paths";
 import { useWorkspace } from "../stores/workspaceStore";
 import { useDocuments } from "../stores/documentsStore";
 import { ask, notify, promptText } from "../stores/uiStore";
@@ -119,6 +119,54 @@ export async function renameEntry(entry: DirEntry) {
   } catch (e) {
     notify("error", describeError(e, `rename “${entry.name}”`));
   }
+}
+
+/**
+ * Moves a file or folder into another folder of the workspace (drag and drop
+ * in the explorer, or Move To…). Open tabs follow the move. Links in other
+ * documents that point to it aren't updated.
+ */
+export async function moveEntry(entry: DirEntry, targetDir: string) {
+  const from = entry.path;
+  if (dirname(from) === targetDir) return;
+  try {
+    const to = await backend().movePath(from, targetDir);
+    onPathRenamed(from, to);
+    if (entry.isDir) {
+      const { children } = ws();
+      for (const key of Object.keys(children)) if (isInside(key, from)) delete children[key];
+    }
+    invalidateWorkspaceFiles();
+    await refreshDir(dirname(from));
+    await refreshDir(targetDir);
+    if (targetDir !== ws().root) ws().setExpanded(targetDir, true);
+    ws().select(to);
+    notify("success", `Moved “${entry.name}” to “${basename(targetDir)}”.`);
+  } catch (e) {
+    notify("error", describeError(e, `move “${entry.name}”`));
+  }
+}
+
+/** Keyboard-friendly move: asks for the destination folder, relative to the workspace. */
+export async function moveEntryTo(entry: DirEntry) {
+  const root = ws().root;
+  if (!root) return;
+  const current = relativePath(root, dirname(entry.path)) ?? "";
+  const answer = await promptText({
+    title: "Move To",
+    message: `Folder to move “${entry.name}” into, relative to “${basename(root)}” (/ for the top level)`,
+    value: current || "/",
+    okLabel: "Move",
+  });
+  if (answer === null || answer === undefined) return;
+  // "", "." and "/" mean the top level; separators may be / or \.
+  const parts = answer.trim().split(/[/\\]+/).filter((p) => p && p !== ".");
+  if (parts.includes("..")) {
+    notify("error", "Choose a folder inside the open folder.");
+    return;
+  }
+  const target = parts.reduce((dir, part) => join(dir, part), root);
+  await moveEntry(entry, target);
 }
 
 /** FR-017: deletes after confirmation; the item goes to the OS trash. */

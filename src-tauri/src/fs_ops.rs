@@ -247,6 +247,33 @@ pub fn rename(from: &Path, to: &Path) -> AppResult<()> {
     Ok(())
 }
 
+/// Moves a file or folder into `dir`, keeping its name. Refuses to replace
+/// anything, and to move a folder into itself or one of its subfolders.
+/// Returns the new path.
+pub fn move_into(from: &Path, dir: &Path) -> AppResult<PathBuf> {
+    let name = from
+        .file_name()
+        .ok_or_else(|| AppError::InvalidPath("Cannot move a root folder".into()))?;
+    if !dir.is_dir() {
+        return Err(AppError::InvalidPath("The destination isn't a folder.".into()));
+    }
+    if dir.starts_with(from) {
+        return Err(AppError::InvalidPath("A folder can't be moved into itself.".into()));
+    }
+    let to = dir.join(name);
+    if to == from {
+        return Ok(to);
+    }
+    if to.exists() {
+        return Err(AppError::AlreadyExists(format!(
+            "“{}” already exists in that folder.",
+            name.to_string_lossy()
+        )));
+    }
+    fs::rename(from, &to)?;
+    Ok(to)
+}
+
 /// On case-insensitive filesystems renaming `a.md` to `A.md` must be allowed.
 fn same_file_ignoring_case(a: &Path, b: &Path) -> bool {
     a.to_string_lossy().to_lowercase() == b.to_string_lossy().to_lowercase()
@@ -329,6 +356,27 @@ pub fn join_child(dir: &Path, name: &str) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn move_into_moves_and_refuses_clashes_and_self_moves() {
+        let tmp = tempfile::tempdir().unwrap();
+        let docs = tmp.path().join("docs");
+        let sub = docs.join("sub");
+        fs::create_dir_all(&sub).unwrap();
+        let note = tmp.path().join("note.md");
+        fs::write(&note, "x").unwrap();
+        let moved = move_into(&note, &docs).unwrap();
+        assert_eq!(moved, docs.join("note.md"));
+        assert!(moved.is_file() && !note.exists());
+        // Same name already there.
+        fs::write(&note, "y").unwrap();
+        assert!(matches!(move_into(&note, &docs), Err(AppError::AlreadyExists(_))));
+        // A folder into itself or its subfolder.
+        assert!(move_into(&docs, &docs).is_err());
+        assert!(move_into(&docs, &sub).is_err());
+        // Into a file.
+        assert!(move_into(&note, &moved).is_err());
+    }
 
     #[test]
     fn ensure_dir_creates_once_and_rejects_files() {

@@ -332,6 +332,24 @@ export class MemoryBackend implements Backend {
     if (to !== from && (this.files.has(to) || this.dirs.has(to))) {
       throw new AppError("alreadyExists", "A file or folder with that name already exists.");
     }
+    this.relocate(from, to);
+    return to;
+  }
+
+  async movePath(path: string, directory: string) {
+    const from = this.check(path);
+    const dir = this.check(directory);
+    if (!this.dirs.has(dir)) throw new AppError("invalidPath", "The destination isn't a folder.");
+    if (dir === from || dir.startsWith(from + "/")) throw new AppError("invalidPath", "A folder can't be moved into itself.");
+    const to = join(dir, basename(from));
+    if (to === from) return to;
+    if (this.files.has(to) || this.dirs.has(to)) throw new AppError("alreadyExists", `“${basename(from)}” already exists in that folder.`);
+    this.relocate(from, to);
+    return to;
+  }
+
+  /** Moves a file, or a folder with everything in it, to a new path. */
+  private relocate(from: string, to: string) {
     if (this.files.has(from)) {
       const f = this.files.get(from)!;
       this.files.delete(from);
@@ -345,7 +363,6 @@ export class MemoryBackend implements Backend {
       );
     } else throw new AppError("notFound", "Not found");
     this.persist();
-    return to;
   }
 
   async deletePath(path: string) {

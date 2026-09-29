@@ -316,6 +316,18 @@ pub async fn rename_path(state: State<'_, AppState>, path: String, new_name: Str
     Ok(fs_ops::path_string(&to))
 }
 
+/// Moves a file or folder into another folder (file explorer drag and drop, Move To).
+#[tauri::command]
+pub async fn move_path(state: State<'_, AppState>, path: String, directory: String) -> AppResult<String> {
+    let from = state.scope.check(Path::new(&path))?;
+    let dir = state.scope.check(Path::new(&directory))?;
+    // `dir` is an approved folder (move_into refuses anything else), so the
+    // destination inside it is in scope too.
+    let to = state.track("fs.move", fs_ops::move_into(&from, &dir))?;
+    state.scope.rename_file(&from, &to);
+    Ok(fs_ops::path_string(&to))
+}
+
 #[tauri::command]
 pub async fn delete_path(state: State<'_, AppState>, path: String) -> AppResult<()> {
     let target = state.scope.check(Path::new(&path))?;

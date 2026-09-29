@@ -34,6 +34,7 @@ export const tauriBackend: Backend = {
   createFolder: (directory, name) => call("create_folder", { directory, name }),
   ensureFolder: (directory, name) => call("ensure_folder", { directory, name }),
   renamePath: (path, newName) => call("rename_path", { path, newName }),
+  movePath: (path, directory) => call("move_path", { path, directory }),
   deletePath: (path) => call("delete_path", { path }),
   readImage: (path) => call("read_image", { path }),
   saveImageAsset: (docPath, fileName, dataBase64) => call("save_image_asset", { docPath, fileName, dataBase64 }),

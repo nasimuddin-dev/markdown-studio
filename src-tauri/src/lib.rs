@@ -80,6 +80,7 @@ pub fn run() {
             commands::create_folder,
             commands::ensure_folder,
             commands::rename_path,
+            commands::move_path,
             commands::delete_path,
             commands::read_image,
             commands::save_image_asset,
