@@ -209,3 +209,10 @@ describe("math in PDF export", () => {
     expect((await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown).toContain("\\int_0^1");
   }, 30_000);
 });
+
+describe("emoji shortcodes in PDF export", () => {
+  it("stay as text, because the PDF font has no emoji", async () => {
+    const bytes = await markdownToPdf("Ship it :rocket:");
+    expect((await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown).toContain(":rocket:");
+  }, 30_000);
+});

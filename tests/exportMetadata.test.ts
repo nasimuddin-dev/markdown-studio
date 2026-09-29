@@ -53,3 +53,11 @@ describe("document properties from front matter", () => {
     expect(html).toContain('<meta name="keywords" content="finance, q3">');
   });
 });
+
+describe("emoji shortcodes in exports", () => {
+  it("become emoji in Word", async () => {
+    const xml = await (await JSZip.loadAsync(await markdownToDocx("Ship it :rocket:"))).file("word/document.xml")!.async("string");
+    expect(xml).toContain("🚀");
+    expect(xml).not.toContain(":rocket:");
+  });
+});

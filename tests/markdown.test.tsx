@@ -144,3 +144,21 @@ describe("raw HTML parsing is skipped when there's no HTML (performance)", () =>
     expect(out).not.toContain("<script");
   });
 });
+
+describe("emoji shortcodes, as on GitHub", () => {
+  const html = (md: string) => {
+    const p = markdownPlugins({ math: true });
+    return renderToStaticMarkup(<ReactMarkdown remarkPlugins={p.remarkPlugins} rehypePlugins={p.rehypePlugins}>{md}</ReactMarkdown>);
+  };
+
+  it("turns known shortcodes into emoji", () => {
+    expect(html("Done :white_check_mark: :tada:")).toContain("Done ✅ 🎉");
+  });
+
+  it("leaves code, unknown names and times alone", () => {
+    const out = html("`:tada:` :not_an_emoji_name: at 10:30:45");
+    expect(out).toContain("<code>:tada:</code>");
+    expect(out).toContain(":not_an_emoji_name:");
+    expect(out).toContain("10:30:45");
+  });
+});

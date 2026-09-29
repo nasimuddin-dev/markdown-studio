@@ -303,6 +303,7 @@ async function pdfmake() {
 
 /** Markdown → PDF bytes. */
 export async function markdownToPdf(markdown: string, opts: ExportOptions = {}): Promise<Uint8Array> {
+  // Emoji shortcodes (:tada:) stay as text: the PDF font has no emoji.
   const parser = unified().use(remarkParse).use(remarkGfm);
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
   const tree = parser.parse(stripFrontMatter(markdown)) as Root;

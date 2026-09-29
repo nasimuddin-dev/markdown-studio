@@ -1,5 +1,6 @@
 import { rehypeAlerts } from "./alerts";
 import remarkGfm from "remark-gfm";
+import remarkGemoji from "remark-gemoji";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeHighlight from "rehype-highlight";
@@ -57,7 +58,8 @@ function rehypeRawWhenNeeded() {
  * sanitizing, so it cannot be used to smuggle in unsafe markup.
  */
 export function markdownPlugins(features: MarkdownFeatures = { math: true }) {
-  const remarkPlugins: NonNullable<Options["remarkPlugins"]> = [remarkGfm];
+  // GitHub emoji shortcodes (:tada:) become emoji, as on GitHub.
+  const remarkPlugins: NonNullable<Options["remarkPlugins"]> = [remarkGfm, remarkGemoji];
   // GitHub alerts (> [!NOTE]) are styled after sanitizing; they only add fixed class names.
   const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [rehypeRawWhenNeeded, [rehypeSanitize, sanitizeSchema], rehypeAlerts];
   if (features.math) {

@@ -20,6 +20,7 @@ Markpion renders **GitHub Flavored Markdown (GFM)**, the Markdown dialect used o
 | Alerts | `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]` | See [Alerts](/markdown/extras#alerts) |
 | Heading anchors | `[link](#heading-text)` | The same anchor ids as GitHub |
 | HTML | `<details>`, `<kbd>` and similar | Sanitized with GitHub's allow-list |
+| Emoji shortcodes | `:tada:`, `:white_check_mark:` | GitHub's names. Shortcodes in code stay as typed. PDF export keeps the shortcode text, because its font has no emoji |
 
 ## Extensions beyond GFM
 
@@ -31,6 +32,5 @@ Markpion also supports, and GitHub renders too:
 
 ## Differences from GitHub
 
-- **Emoji shortcodes** such as `:smile:` aren't converted. Type the emoji character itself instead.
 - **Mentions and issue references** such as `@user` and `#123` stay plain text, because they only mean something inside a GitHub repository.
 - **HTML** follows the same allow-list idea as GitHub, but the exact list of allowed attributes can differ slightly.

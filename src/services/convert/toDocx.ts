@@ -8,6 +8,7 @@ import {
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
+import remarkGemoji from "remark-gemoji";
 import remarkMath from "remark-math";
 import { latexToWordMath } from "./omml";
 import type { Root, RootContent, PhrasingContent, List, Table as MdTable, AlignType } from "mdast";
@@ -330,9 +331,10 @@ class DocxBuilder {
 
 /** Markdown → Word document (.docx) bytes. */
 export async function markdownToDocx(markdown: string, opts: ExportOptions = {}): Promise<Uint8Array> {
-  const parser = unified().use(remarkParse).use(remarkGfm);
+  const parser = unified().use(remarkParse).use(remarkGfm).use(remarkGemoji);
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
-  const tree = parser.parse(stripFrontMatter(markdown)) as Root;
+  // runSync applies transforms such as emoji shortcodes; parse alone only builds the tree.
+  const tree = parser.runSync(parser.parse(stripFrontMatter(markdown))) as Root;
   const builder = new DocxBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram);
   const children: Array<Paragraph | Table> = [];
   for (const node of tree.children) children.push(...(await builder.block(node)));
