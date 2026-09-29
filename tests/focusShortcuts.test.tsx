@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { beforeAll, afterEach, describe, expect, it } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "../src/App";
@@ -7,6 +7,9 @@ import { commands, handleGlobalKeydown } from "../src/features/commands";
 import { newDocument } from "../src/features/documents";
 import { useUi } from "../src/stores/uiStore";
 import { setupBackend } from "./helpers";
+
+// The app loads this dialog on first use; load it up front so a cold import doesn't use up a test's time.
+beforeAll(() => import("../src/components/ShortcutsDialog"), 30_000);
 
 afterEach(() => useUi.setState({ focusMode: false, shortcutsOpen: false }));
 

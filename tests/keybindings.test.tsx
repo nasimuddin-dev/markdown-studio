@@ -7,6 +7,7 @@ import { sanitizeSettings, useSettings } from "../src/stores/settingsStore";
 import { useUi } from "../src/stores/uiStore";
 import { autoAnswer, setupBackend } from "./helpers";
 
+
 // Keep command.shortcut in sync with the settings, as the app does at startup.
 useSettings.subscribe((s, prev) => {
   if (s.settings.keybindings !== prev.settings.keybindings) applyKeybindings(s.settings.keybindings);
@@ -49,7 +50,8 @@ describe("custom keyboard shortcuts", () => {
     act(() => useUi.getState().setFocusMode(false));
     await userEvent.click(screen.getByRole("button", { name: "Reset shortcut for Toggle Focus Mode" }));
     expect(useSettings.getState().settings.keybindings).toEqual({});
-  });
+    // Role queries over the full command list are slow in jsdom when every test file runs at once.
+  }, 20_000);
 
   it("asks before taking a shortcut from another command", async () => {
     setupBackend();

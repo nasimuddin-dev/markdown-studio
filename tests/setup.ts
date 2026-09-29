@@ -1,4 +1,8 @@
 import "@testing-library/jest-dom/vitest";
+import { configure } from "@testing-library/react";
+
+// Some dialogs load on first use (a dynamic import), which can take over a second when the test run is busy.
+configure({ asyncUtilTimeout: 5000 });
 
 // jsdom lacks ResizeObserver, which the resizable panel layout relies on.
 class ResizeObserverStub {

@@ -15,10 +15,14 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 // The preview pulls in the Markdown/math/highlighting pipeline; load it in
 // parallel with first paint instead of blocking startup on it.
 const Preview = lazy(() => import("./components/Preview").then((m) => ({ default: m.Preview })));
-// Rarely used dialogs load on first use, keeping them out of the startup bundle.
-const HistoryDialog = lazy(() => import("./components/HistoryDialog").then((m) => ({ default: m.HistoryDialog })));
-const ShortcutsDialog = lazy(() => import("./components/ShortcutsDialog").then((m) => ({ default: m.ShortcutsDialog })));
-const AiPanel = lazy(() => import("./components/AiPanel").then((m) => ({ default: m.AiPanel })));
+// Rarely used dialogs stay out of the startup bundle; they are fetched once the app is idle.
+const loadHistory = () => import("./components/HistoryDialog");
+const loadShortcuts = () => import("./components/ShortcutsDialog");
+const loadAi = () => import("./components/AiPanel");
+const HistoryDialog = lazy(() => loadHistory().then((m) => ({ default: m.HistoryDialog })));
+const ShortcutsDialog = lazy(() => loadShortcuts().then((m) => ({ default: m.ShortcutsDialog })));
+const AiPanel = lazy(() => loadAi().then((m) => ({ default: m.AiPanel })));
+setTimeout(() => void Promise.all([loadHistory(), loadShortcuts(), loadAi()]).catch(() => {}), 3000);
 
 /** Mounts the lazily loaded dialogs only once they are first needed. */
 function OnDemandDialogs() {

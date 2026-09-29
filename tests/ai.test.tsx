@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "../src/App";
@@ -12,6 +12,9 @@ import { useSettings } from "../src/stores/settingsStore";
 import { useAi } from "../src/stores/aiStore";
 import { useUi } from "../src/stores/uiStore";
 import { useWorkspace } from "../src/stores/workspaceStore";
+
+// The app loads this dialog on first use; load it up front so a cold import doesn't use up a test's time.
+beforeAll(() => import("../src/components/AiPanel"), 30_000);
 
 describe("AI assistant: what is sent", () => {
   const doc = "# Title\n\nFirst paragraph here.\nStill first.\n\nSecond paragraph.\n";
