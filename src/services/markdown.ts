@@ -34,6 +34,23 @@ export interface MarkdownFeatures {
   math: boolean;
 }
 
+type HastNode = { type: string; children?: HastNode[] };
+
+function hasRawHtml(node: HastNode): boolean {
+  if (node.type === "raw") return true;
+  return node.children?.some(hasRawHtml) ?? false;
+}
+
+/**
+ * rehype-raw, skipped when the document has no inline or block HTML. It
+ * re-parses the whole tree with an HTML parser, which is the costliest step
+ * for long documents and changes nothing when there's no HTML to parse.
+ */
+function rehypeRawWhenNeeded() {
+  const parseRaw = rehypeRaw();
+  return (tree: HastNode, file: unknown) => (hasRawHtml(tree) ? parseRaw(tree as never, file as never) : undefined);
+}
+
 /**
  * The Markdown pipeline shared by the preview and exports. Math is rendered
  * by KaTeX to native MathML (no fonts or stylesheets needed) *after*
@@ -42,7 +59,7 @@ export interface MarkdownFeatures {
 export function markdownPlugins(features: MarkdownFeatures = { math: true }) {
   const remarkPlugins: NonNullable<Options["remarkPlugins"]> = [remarkGfm];
   // GitHub alerts (> [!NOTE]) are styled after sanitizing; they only add fixed class names.
-  const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [rehypeRaw, [rehypeSanitize, sanitizeSchema], rehypeAlerts];
+  const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [rehypeRawWhenNeeded, [rehypeSanitize, sanitizeSchema], rehypeAlerts];
   if (features.math) {
     remarkPlugins.push([remarkMath, { singleDollarTextMath: true }]);
     rehypePlugins.push([rehypeKatex, { output: "mathml", throwOnError: false, strict: "ignore", trust: false }]);

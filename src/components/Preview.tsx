@@ -156,10 +156,11 @@ function DebouncedMarkdown({ text, docPath }: { text: string; docPath: string | 
   // Large documents render on demand: re-rendering on every keystroke would lag typing.
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const debounced = useDebounced(large ? "" : text, debounceMs);
+  const generation = useBulkChangeGeneration(large ? snapshot ?? "" : debounced);
   if (large) {
     const mb = (text.length / 1_000_000).toFixed(1);
     return (
-      <>
+      <article className="markdown-body" key={generation}>
         <div className="preview-paused" role="status">
           <span>Live preview is paused for large documents ({mb} MB of text) to keep typing fast.</span>
           <button className="button" onClick={() => setSnapshot(text)}>
@@ -167,10 +168,30 @@ function DebouncedMarkdown({ text, docPath }: { text: string; docPath: string | 
           </button>
         </div>
         {snapshot !== null && <MarkdownView text={snapshot} docPath={docPath} />}
-      </>
+      </article>
     );
   }
-  return <MarkdownView text={debounced} docPath={docPath} />;
+  return (
+    <article className="markdown-body" key={generation}>
+      <MarkdownView text={debounced} docPath={docPath} />
+    </article>
+  );
+}
+
+/** A jump in length this big (a paste, a reload) re-creates the preview instead of updating it. */
+const BULK_CHANGE_CHARS = 20_000;
+
+/**
+ * Counts bulk changes of the text. Keying the preview on it makes React build
+ * thousands of new blocks off-document and insert them at once; inserting them
+ * one by one into the existing preview costs quadratic time (seconds for a
+ * few hundred KB).
+ */
+function useBulkChangeGeneration(text: string): number {
+  const state = useRef({ length: text.length, generation: 0 });
+  if (Math.abs(text.length - state.current.length) >= BULK_CHANGE_CHARS) state.current.generation++;
+  state.current.length = text.length;
+  return state.current.generation;
 }
 
 export function Preview() {
@@ -236,9 +257,7 @@ export function Preview() {
 
   return (
     <div className="preview" ref={ref} onClick={onClick} role="document" aria-label="Markdown preview" tabIndex={0}>
-      <article className="markdown-body">
-        {doc ? <DebouncedMarkdown key={doc.id} text={doc.content} docPath={docPath} /> : null}
-      </article>
+      {doc ? <DebouncedMarkdown key={doc.id} text={doc.content} docPath={docPath} /> : <article className="markdown-body" />}
     </div>
   );
 }

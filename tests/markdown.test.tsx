@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
 import ReactMarkdown from "react-markdown";
-import { classifyLink, countWords, rehypePlugins, remarkPlugins } from "../src/services/markdown";
+import { renderToStaticMarkup } from "react-dom/server";
+import rehypeRaw from "rehype-raw";
+import { classifyLink, countWords, markdownPlugins, rehypePlugins, remarkPlugins } from "../src/services/markdown";
 
 function renderMd(md: string) {
   const { container } = render(
@@ -112,5 +114,33 @@ describe("countWords", () => {
   it("counts words across scripts", () => {
     expect(countWords("Hello, world! It's 2026 — café")).toBe(5);
     expect(countWords("")).toBe(0);
+  });
+});
+
+describe("raw HTML parsing is skipped when there's no HTML (performance)", () => {
+  const html = (md: string, plugins: { remarkPlugins: unknown[]; rehypePlugins: unknown[] }) =>
+    renderToStaticMarkup(<ReactMarkdown remarkPlugins={plugins.remarkPlugins as never} rehypePlugins={plugins.rehypePlugins as never}>{md}</ReactMarkdown>);
+  const withRaw = () => {
+    const p = markdownPlugins({ math: true });
+    return { remarkPlugins: p.remarkPlugins, rehypePlugins: [rehypeRaw, ...p.rehypePlugins.slice(1)] };
+  };
+
+  it("renders the same HTML as with rehype-raw for documents without HTML", () => {
+    const md = [
+      "# Title", "", "Some **bold**, *italic*, `code`, ~~gone~~ and a [link](https://example.com) or https://auto.link.", "",
+      "> [!NOTE]", "> An alert.", "", "- [x] done", "- [ ] open", "", "| a | b |", "|---|---:|", "| 1 | 2 |", "",
+      "```js", "const x = 1 < 2;", "```", "", "Math $x^2$ and", "", "$$", String.raw`\int_0^1 x`, "$$", "", "Footnote[^1].", "", "[^1]: The note.",
+    ].join("\n");
+    // Only insignificant differences are allowed: blank text between blocks,
+    // and boolean data attributes written as "" instead of "true".
+    const normalize = (h: string) => h.replace(/>\s+</g, "><").replace(/(data-footnote[\w-]*)="(?:true)?"/g, "$1");
+    expect(normalize(html(md, markdownPlugins({ math: true })))).toBe(normalize(html(md, withRaw())));
+  });
+
+  it("still parses inline and block HTML, and still sanitizes it", () => {
+    const out = html("Press <kbd>Ctrl</kbd>.\n\n<details><summary>More</summary>\n\nHidden\n\n</details>\n\n<script>alert(1)</script>", markdownPlugins({ math: true }));
+    expect(out).toContain("<kbd>Ctrl</kbd>");
+    expect(out).toContain("<details>");
+    expect(out).not.toContain("<script");
   });
 });
