@@ -41,6 +41,13 @@ describe("workspace link check", () => {
     expect(report.files[0].problems.map((p) => `${p.line}:${p.message}`)).toEqual(["6:Linked file not found: c.md"]);
   });
 
+  it("checks HTML image sources and link targets", async () => {
+    setupBackend({ "/ws/a.md": '# A\n\n<img src="logo.png" alt="Logo">\n<a href="b.md">B</a>\n', "/ws/b.md": "# B\n" });
+    const report = await checkWorkspaceLinks("/ws");
+    expect(report.linksChecked).toBe(2);
+    expect(report.files[0].problems.map((p) => `${p.line}:${p.rule}`)).toEqual(["3:missing-image"]);
+  });
+
   it("reports a clean workspace", async () => {
     setupBackend({ "/ws/a.md": "# A\n\n[b](b.md)\n", "/ws/b.md": "# B\n" });
     const report = await checkWorkspaceLinks("/ws");

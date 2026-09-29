@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findAllLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
+import { findAllLinks, findHtmlLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
 
 const rules = (text: string) => lintMarkdown(text).map((p) => p.rule);
 
@@ -37,6 +37,16 @@ describe("markdown lint: document rules", () => {
     const links = findAllLinks(text);
     expect(links.map((l) => [l.target, !!l.definition])).toEqual([["b.md", false], ["docs/guide.md", true], ["img/my logo.png", true]]);
     for (const l of links) expect(text.slice(l.targetFrom, l.targetFrom + l.target.length)).toBe(l.target);
+  });
+
+  it("finds HTML links and images, with where each destination starts", () => {
+    const text = '<p align="center"><img alt="logo.png" width="80" src="logo.png"></p>\n<a href="docs/guide.md#x">Guide</a> <a name="top"></a>\n\n`<img src="code.png">`';
+    const links = findHtmlLinks(text);
+    expect(links.map((l) => [l.target, l.image])).toEqual([["logo.png", true], ["docs/guide.md#x", false]]);
+    for (const l of links) expect(text.slice(l.targetFrom, l.targetFrom + l.target.length)).toBe(l.target);
+    expect(links[0].targetFrom).toBe(text.indexOf('src="') + 5);
+    // HTML images aren't held to the Markdown alt-text rule; their targets are checked.
+    expect(rules('<img src="a.png">\n\n<a href="#nope">x</a>')).toEqual(["broken-anchor"]);
   });
 
   it("flags reference definitions to missing files and anchors", async () => {

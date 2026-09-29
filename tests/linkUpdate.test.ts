@@ -47,6 +47,13 @@ describe("rewriteLinks", () => {
     expect(out).toBe('See [the guide][g].\n\n[g]: docs/guide.md#setup "Guide"\n[logo]: <img/logo.png>\n\n    [g]: guide.md');
   });
 
+  it("updates HTML image sources and link targets", () => {
+    const text = '<img alt="logo" src="img/logo.png" width="80">\n<a href="img/logo.png">full size</a>';
+    const { text: out, count } = rewriteLinks(text, "/ws/README.md", "/ws/README.md", moved("/ws/img", "/ws/assets/img"));
+    expect(count).toBe(2);
+    expect(out).toBe('<img alt="logo" src="assets/img/logo.png" width="80">\n<a href="assets/img/logo.png">full size</a>');
+  });
+
   it("leaves links between files that moved together unchanged, and escapes spaces", () => {
     const inside = rewriteLinks("[n](n2.md)", "/ws/notes/n1.md", "/ws/archive/notes/n1.md", moved("/ws/notes", "/ws/archive/notes"));
     expect(inside.count).toBe(0);

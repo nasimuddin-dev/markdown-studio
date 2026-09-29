@@ -23,6 +23,8 @@ export interface LinkRef {
   targetFrom: number;
   /** True for a reference-style definition (`[id]: path`). */
   definition?: boolean;
+  /** True for an HTML `<a href>` or `<img src>`. */
+  html?: boolean;
 }
 
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
@@ -74,9 +76,24 @@ export function findLinkDefinitions(text: string): LinkRef[] {
   return out;
 }
 
-/** Every link destination in the text: inline links and images, and reference definitions. */
+const HTML_LINK = /<(a|img)\b[^>]*?\s(href|src)\s*=\s*("[^"]*"|'[^']*')[^>]*>/dgi;
+
+/** `href` of HTML `<a>` tags and `src` of `<img>` tags, outside code. */
+export function findHtmlLinks(text: string): LinkRef[] {
+  const out: LinkRef[] = [];
+  for (const m of maskCode(text).matchAll(HTML_LINK)) {
+    const image = m[1].toLowerCase() === "img";
+    if ((m[2].toLowerCase() === "src") !== image) continue;
+    const value = m[3].slice(1, -1);
+    const targetFrom = m.indices![3]![0] + 1;
+    out.push({ from: m.index!, to: m.index! + m[0].length, image, text: "", target: value.trim(), targetFrom: targetFrom + (value.length - value.trimStart().length), html: true });
+  }
+  return out;
+}
+
+/** Every link destination in the text: inline links and images, reference definitions and HTML links and images. */
 export function findAllLinks(text: string): LinkRef[] {
-  return [...findLinks(text), ...findLinkDefinitions(text)].sort((a, b) => a.from - b.from);
+  return [...findLinks(text), ...findLinkDefinitions(text), ...findHtmlLinks(text)].sort((a, b) => a.from - b.from);
 }
 
 function lineStarts(text: string) {
@@ -127,7 +144,7 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
       problems.push({ ...at, severity: "warning", rule: "empty-link", message: link.image ? "Image has no source." : "Link has no destination." });
       continue;
     }
-    if (link.image && !link.text.trim()) {
+    if (link.image && !link.html && !link.text.trim()) {
       problems.push({ ...at, severity: "info", rule: "image-alt", message: "Image has no alt text (describe it for screen readers)." });
     }
     if (link.target.startsWith("#")) {
