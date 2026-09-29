@@ -33,6 +33,7 @@ These come with the [CodeMirror](https://codemirror.net) editor.
 | Copy line up / down | <kbd>Shift+Alt+↑</kbd> / <kbd>Shift+Alt+↓</kbd> | <kbd>Shift+Option+↑</kbd> / <kbd>Shift+Option+↓</kbd> |
 | Delete line | <kbd>Ctrl+Shift+K</kbd> | <kbd>Cmd+Shift+K</kbd> |
 | Indent / outdent | <kbd>Tab</kbd> / <kbd>Shift+Tab</kbd>, <kbd>Ctrl+]</kbd> / <kbd>Ctrl+[</kbd> | <kbd>Tab</kbd> / <kbd>Shift+Tab</kbd>, <kbd>Cmd+]</kbd> / <kbd>Cmd+[</kbd> |
+| Next / previous table cell (in a table) | <kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> | <kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> |
 | Fold / unfold | <kbd>Ctrl+Shift+[</kbd> / <kbd>Ctrl+Shift+]</kbd> | <kbd>Cmd+Option+[</kbd> / <kbd>Cmd+Option+]</kbd> |
 | Fold all / unfold all (also in the View menu) | <kbd>Ctrl+Alt+[</kbd> / <kbd>Ctrl+Alt+]</kbd> | <kbd>Ctrl+Option+[</kbd> / <kbd>Ctrl+Option+]</kbd> |
 | Next / previous match (in the search bar) | <kbd>Enter</kbd> / <kbd>Shift+Enter</kbd> | <kbd>Enter</kbd> / <kbd>Shift+Enter</kbd> |

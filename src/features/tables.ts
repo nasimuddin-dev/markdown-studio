@@ -291,3 +291,63 @@ export const deleteRow = editTableAtCursor(deleteTableRow, "delete.tableRow");
 export const insertColumnLeft = editTableAtCursor((l, row, cell) => insertTableColumn(l, row, cell, false), "input.tableColumn");
 export const insertColumnRight = editTableAtCursor((l, row, cell) => insertTableColumn(l, row, cell, true), "input.tableColumn");
 export const deleteColumn = editTableAtCursor(deleteTableColumn, "delete.tableColumn");
+
+/** The text of cell `cell` in a formatted row ("| a   | b |"), as [start, end) offsets. */
+function cellTextRange(row: string, cell: number): [number, number] {
+  const start = cellTextOffset(row, cell);
+  let end = start;
+  while (end < row.length && !(row[end] === "|" && row[end - 1] !== "\\")) end++;
+  while (end > start && row[end - 1] === " ") end--;
+  return [start, end];
+}
+
+/**
+ * Tab / Shift+Tab in a table: formats it and selects the text of the next or
+ * previous cell, skipping the delimiter row. Tab in the last cell adds a row.
+ * Outside a table (or with a multi-line selection) it does nothing, so Tab
+ * indents as usual.
+ */
+export function moveTableCell(forward: boolean): StateCommand {
+  return ({ state, dispatch }) => {
+    const sel = state.selection.main;
+    const line = state.doc.lineAt(sel.head);
+    if (state.doc.lineAt(sel.anchor).number !== line.number) return false;
+    const range = tableAround(state, line.number);
+    if (!range) return false;
+    let lines: string[] = [];
+    for (let n = range.first; n <= range.last; n++) lines.push(state.doc.line(n).text);
+    let formatted = formatTable(lines);
+    if (!formatted) return false;
+    const cols = splitRow(formatted[0]).length;
+    let row = line.number - range.first;
+    let cell = Math.min(cellIndexAt(line.text, sel.head - line.from), cols - 1);
+    if (forward) {
+      if (row === 1) [row, cell] = [2, -1];
+      if (++cell >= cols) [row, cell] = [row + 1, 0];
+      if (row === 1) row = 2;
+      if (row >= formatted.length) {
+        lines = insertTableRow(formatted, formatted.length - 1, true)!.lines;
+        formatted = formatTable(lines)!;
+      }
+    } else {
+      if (row === 1) [row, cell] = [0, cols];
+      if (--cell < 0) [row, cell] = [row - 1, cols - 1];
+      if (row === 1) row = 0;
+      if (row < 0) [row, cell] = [0, 0];
+    }
+    const from = state.doc.line(range.first).from;
+    const to = state.doc.line(range.last).to;
+    const rowStart = from + formatted.slice(0, row).reduce((n, l) => n + l.length + 1, 0);
+    const [start, end] = cellTextRange(formatted[row], cell);
+    const insert = formatted.join("\n");
+    dispatch(
+      state.update({
+        changes: insert === state.sliceDoc(from, to) ? undefined : { from, to, insert },
+        selection: { anchor: rowStart + start, head: rowStart + end },
+        scrollIntoView: true,
+        userEvent: "select.tableCell",
+      }),
+    );
+    return true;
+  };
+}

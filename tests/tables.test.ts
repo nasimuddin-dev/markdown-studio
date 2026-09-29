@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EditorSelection, EditorState } from "@codemirror/state";
 import {
   deleteColumn, deleteRow, deleteTableColumn, deleteTableRow, displayWidth, formatTable, formatTableAtCursor, insertColumnLeft,
-  insertColumnRight, insertRowAbove, insertRowBelow, insertTableColumn, insertTableRow, sortTableAtCursor, sortTableRows, splitRow,
+  insertColumnRight, insertRowAbove, insertRowBelow, insertTableColumn, insertTableRow, moveTableCell, sortTableAtCursor, sortTableRows, splitRow,
 } from "../src/features/tables";
 import { applyCommand } from "../src/features/formatting";
 
@@ -120,5 +120,39 @@ describe("table rows and columns", () => {
   it("does nothing outside a table", () => {
     const state = EditorState.create({ doc: "plain text" });
     expect(insertRowBelow({ state, dispatch: () => {} })).toBe(false);
+  });
+});
+
+describe("Tab and Shift+Tab in tables", () => {
+  const doc = ["|a|b|", "|-|-|", "|1|2|"].join("\n");
+  const press = (text: string, at: number, forward: boolean) => {
+    const state = applyCommand(EditorState.create({ doc: text, selection: EditorSelection.cursor(at) }), moveTableCell(forward));
+    const { from, to } = state.selection.main;
+    return { doc: state.doc.toString(), selected: state.sliceDoc(from, to), line: state.doc.lineAt(from).number };
+  };
+
+  it("formats the table and selects the next cell, skipping the delimiter row", () => {
+    expect(press(doc, doc.indexOf("a"), true)).toMatchObject({ selected: "b", line: 1 });
+    expect(press(doc, doc.indexOf("b"), true)).toMatchObject({ selected: "1", line: 3 });
+    expect(press(doc, doc.indexOf("a"), true).doc.split("\n")[0]).toBe("| a   | b   |");
+  });
+
+  it("adds a row after the last cell", () => {
+    const r = press(doc, doc.indexOf("2"), true);
+    expect(r.doc.split("\n")).toEqual(["| a   | b   |", "| --- | --- |", "| 1   | 2   |", "|     |     |"]);
+    expect(r).toMatchObject({ selected: "", line: 4 });
+  });
+
+  it("goes back with Shift+Tab, and stops at the first cell", () => {
+    expect(press(doc, doc.indexOf("1"), false)).toMatchObject({ selected: "b", line: 1 });
+    expect(press(doc, doc.indexOf("2"), false)).toMatchObject({ selected: "1", line: 3 });
+    expect(press(doc, doc.indexOf("a"), false)).toMatchObject({ selected: "a", line: 1 });
+  });
+
+  it("leaves Tab to indentation outside tables and for multi-line selections", () => {
+    const plain = EditorState.create({ doc: "text | with a pipe" });
+    expect(moveTableCell(true)({ state: plain, dispatch: () => {} })).toBe(false);
+    const multi = EditorState.create({ doc, selection: EditorSelection.range(0, doc.length) });
+    expect(moveTableCell(true)({ state: multi, dispatch: () => {} })).toBe(false);
   });
 });

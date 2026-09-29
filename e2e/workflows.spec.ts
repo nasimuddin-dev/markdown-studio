@@ -396,3 +396,26 @@ test("emoji shortcode completion inserts a shortcode the preview shows as emoji"
   await expect(page.locator(".cm-content")).toContainText("Launch :rocket:");
   await expect(page.locator(".markdown-body p")).toHaveText("Launch 🚀");
 });
+
+test("Tab moves between table cells and adds a row at the end", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("|a|b|\n|-|-|\n|1|2|");
+  await page.keyboard.press("Tab");
+  await page.keyboard.type("new");
+  const text = () => page.locator(".cm-content").innerText();
+  // Typing doesn't reformat; the next Tab does.
+  await expect.poll(async () => (await text()).replace(/\u00a0/g, " ")).toMatch(/\| 1 +\| 2 +\|\n\| new +\| +\|/);
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.type("two");
+  await expect.poll(async () => (await text()).replace(/\u00a0/g, " ")).toMatch(/\| 1 +\| two +\|\n\| new \| +\|/);
+  // Outside a table, Tab still indents.
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Enter");
+  await page.keyboard.type("x");
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Tab");
+  await expect.poll(text).toMatch(/\n\s+x$/);
+});

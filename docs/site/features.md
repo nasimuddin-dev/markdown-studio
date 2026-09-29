@@ -17,7 +17,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - A CodeMirror 6 editor with Markdown syntax highlighting, highlighting for code-block languages, line numbers, code folding, multiple cursors, and undo and redo per tab. [Editor guide](/guide/editor)
 - A Format menu and shortcuts for bold, italic, strikethrough, inline code, links, headings 1–3, promoting and demoting headings, bulleted, numbered and task lists, quotes, code blocks, tables, horizontal rules and footnotes. [Writing tools](/guide/writing-tools)
 - **Move Section Up/Down** moves a heading with its text and subsections past its neighbour.
-- Tables: **Format Table** aligns columns (CJK-aware), rows and columns can be inserted or deleted at the cursor, and **Sort Table by Column** sorts rows. You can also paste cells from Excel or Google Sheets as a table, and copy a table as CSV. [Tables](/markdown/tables)
+- Tables: **Format Table** aligns columns (CJK-aware), **Tab** and **Shift+Tab** move between cells (Tab in the last cell adds a row), rows and columns can be inserted or deleted at the cursor, and **Sort Table by Column** sorts rows. You can also paste cells from Excel or Google Sheets as a table, and copy a table as CSV. [Tables](/markdown/tables)
 - A table of contents that stays up to date on save, and templates for new documents (meeting notes, README, blog post, ADR, status report, changelog, journal, plus your own). [Writing tools](/guide/writing-tools)
 - Link autocompletion for workspace files, images and headings. Paste a URL over selected text to make a link.
 - Paste or drop images. They're copied into an `assets/` folder next to the document and linked. [Images](/markdown/images)

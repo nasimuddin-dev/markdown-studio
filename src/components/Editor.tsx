@@ -20,6 +20,7 @@ import { editorShowing, openReplacePanel, registerEditorView } from "../features
 import { scrollSync } from "../features/scrollSync";
 import { editorKeymap } from "../features/commands";
 import { minimalChange } from "../features/saveTransforms";
+import { moveTableCell } from "../features/tables";
 import { insertImageFiles, isImageFile } from "../features/images";
 import { linkOverSelection, pasteHtmlAsMarkdown, pastePlainTable } from "../features/richPaste";
 import { markdownLinter } from "../features/lintExtension";
@@ -163,6 +164,8 @@ export function Editor() {
           ...searchKeymap,
           ...historyKeymap,
           ...foldKeymap,
+          // In a table, Tab and Shift+Tab move between cells; elsewhere they indent.
+          { key: "Tab", run: moveTableCell(true), shift: moveTableCell(false) },
           indentWithTab,
         ]),
         appearance.of(appearanceExt(s)),
