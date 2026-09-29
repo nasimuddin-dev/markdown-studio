@@ -21,31 +21,35 @@ From the repository root (after `npm run docs:install` once):
 | `npm run docs:preview` | Serves the build at http://localhost:4173/markpion/ |
 | `npm run docs:check` | Type check, content check, build (fails on dead links), link check of the output |
 | `npm run docs:test` | Browser checks of the build: WCAG 2.1 AA audits in light and dark, mobile layout |
-| `npm run docs:screenshots` | Recaptures the app screenshots in `docs/images/` (needs the root dependencies) |
+| `npm run docs:screenshots` | Recaptures the app screenshots in `docs/site/images/` (needs the root dependencies) |
 
 Inside `website/`, the same commands are `npm run dev`, `build`, `preview`, `check` and `typecheck`. `node scripts/check-links.mjs --external` also checks the GitHub and release download links (needs network).
 
 ## Layout
 
+The pages live with the rest of the documentation in `docs/site/`; this folder holds the tooling.
+
 ```text
+docs/site/                   the pages (srcDir); URLs follow the file paths
+├── data/
+│   ├── release.data.ts      version, release date and installer links, from the app's package.json and git tags
+│   └── shortcuts.data.ts    keyboard shortcuts parsed from src/features/commands.ts
+├── images/                  app screenshots (bundled with hashed names)
+└── public/                  copied as-is: logo, robots.txt, the social preview image
 website/
 ├── .vitepress/
 │   ├── config.ts            site config: navigation, sidebar, SEO (canonical, Open Graph, JSON-LD), sitemap
 │   └── theme/               default theme + <Downloads> and <Shortcuts> components, custom CSS
-├── docs/                    the pages (srcDir); URLs follow the file paths
-│   ├── data/
-│   │   ├── release.data.ts  version, release date and installer links, from the app's package.json and git tags
-│   │   └── shortcuts.data.ts keyboard shortcuts parsed from src/features/commands.ts
-│   ├── images/              app screenshots (bundled with hashed names)
-│   └── public/              copied as-is: logo, robots.txt, the social preview image
 └── scripts/                 content check, link check, screenshot capture, browser checks
 ```
+
+Because the pages are outside `website/`, `config.ts` resolves their package imports (Vue) from `website/node_modules`, never from the desktop app's dependencies at the repository root, and the shortcut loader uses the website's TypeScript.
 
 ## Single sources of truth
 
 - **Version and downloads.** Nothing on the site hard-codes the version. `release.data.ts` reads it from the root `package.json`, and the installer names follow the convention of `scripts/release-installer.mjs` and `.github/workflows/release.yml`. The release commit's version bump redeploys the site.
 - **Keyboard shortcuts** are parsed from the app's command definitions at build time. If the structure of `src/features/commands.ts` changes so that fewer than 30 shortcuts are found, the build fails instead of publishing an incomplete table.
-- **Changelog.** `docs/changelog.md` is updated with each release, from the release's commits (see the dev log). Never add a release that isn't published.
+- **Changelog.** `docs/site/changelog.md` is updated with each release, from the release's commits (see the dev log). Never add a release that isn't published.
 
 ## Writing pages
 
@@ -57,7 +61,7 @@ website/
 
 ## Deployment
 
-`.github/workflows/documentation.yml` runs on pushes to `main` that change the website, the app version or the shortcut definitions (so each release's version bump redeploys it), and by hand. It doesn't run on release events: the `github-pages` environment only accepts deployments from `main`. It installs the website's dependencies, runs `npm run check`, uploads the build, and deploys it with GitHub Pages. Pull requests are built and checked, not deployed.
+`.github/workflows/documentation.yml` runs on pushes to `main` that change the website or its pages (`docs/site/`), the app version or the shortcut definitions (so each release's version bump redeploys it), and by hand. It doesn't run on release events: the `github-pages` environment only accepts deployments from `main`. It installs the website's dependencies, runs `npm run check`, uploads the build, and deploys it with GitHub Pages. Pull requests are built and checked, not deployed.
 
 **One-time setup** (repository owner): in GitHub, go to **Settings → Pages → Build and deployment → Source** and choose **GitHub Actions**. Then run the workflow (**Actions → Documentation website → Run workflow**) or push a change.
 
@@ -75,4 +79,4 @@ If the site later moves to a custom domain, update `SITE` and `BASE` in `.vitepr
 
 ## Future pages
 
-The navigation leaves room for pages such as `/pricing`, `/pro`, `/ai`, `/cloud`, `/teams` or `/enterprise`: add a Markdown file in `docs/`, a nav or sidebar entry in `config.ts`, and it's included in the sitemap automatically. Don't publish them until the offering exists.
+The navigation leaves room for pages such as `/pricing`, `/pro`, `/ai`, `/cloud`, `/teams` or `/enterprise`: add a Markdown file in `docs/site/`, a nav or sidebar entry in `config.ts`, and it's included in the sitemap automatically. Don't publish them until the offering exists.

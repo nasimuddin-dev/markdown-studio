@@ -3,14 +3,14 @@
  * (run: npm run docs:screenshots from the repository root). It drives the
  * browser build of the app (the same React UI as the desktop app, with the
  * in-memory demo workspace) and saves optimized WebP images to
- * website/docs/images/ (and the social preview to docs/public/images/).
+ * docs/site/images/ (and the social preview to docs/site/public/images/).
  */
 import { expect, test, type Page } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const OUT = join(process.cwd(), "website", "docs", "images");
-const PUBLIC = join(process.cwd(), "website", "docs", "public", "images");
+const OUT = join(process.cwd(), "docs", "site", "images");
+const PUBLIC = join(process.cwd(), "docs", "site", "public", "images");
 const mod = process.platform === "darwin" ? "Meta" : "Control";
 
 async function start(page: Page, theme: "light" | "dark" = "light") {

@@ -6,8 +6,12 @@
  * macOS and Windows/Linux variants.
  */
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import type TS from "typescript";
+
+// The website's own TypeScript (5.x, with the compiler API), not the app's.
+const ts: typeof TS = createRequire(new URL("../../../website/package.json", import.meta.url))("typescript");
 
 export interface Shortcut {
   id: string;
@@ -37,7 +41,7 @@ function display(shortcut: string, mac: boolean) {
     .replace("++", "+Plus");
 }
 
-function literal(node: ts.Expression | undefined): { win: string; mac: string } | null {
+function literal(node: TS.Expression | undefined): { win: string; mac: string } | null {
   if (!node) return null;
   if (ts.isStringLiteral(node)) return { win: node.text, mac: node.text };
   if (ts.isConditionalExpression(node) && ts.isStringLiteral(node.whenTrue) && ts.isStringLiteral(node.whenFalse)) {
@@ -54,7 +58,7 @@ export default {
     const file = ts.createSourceFile(path, readFileSync(path, "utf8"), ts.ScriptTarget.Latest, true);
     const out: Shortcut[] = [];
     let group = "";
-    const visit = (node: ts.Node) => {
+    const visit = (node: TS.Node) => {
       // Which exported table a command belongs to: formatCommands (Format) or commands (App).
       if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
         if (node.name.text === "formatCommands") group = "format";
@@ -71,7 +75,7 @@ export default {
       // { id: "save", label: "Save", shortcut: "Mod+S", ... }
       if (ts.isObjectLiteralExpression(node) && group === "app") {
         const prop = (name: string) =>
-          node.properties.find((p): p is ts.PropertyAssignment => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === name)?.initializer;
+          node.properties.find((p): p is TS.PropertyAssignment => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === name)?.initializer;
         const id = prop("id");
         const label = prop("label");
         const keys = literal(prop("shortcut"));

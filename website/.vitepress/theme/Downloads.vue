@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { withBase } from "vitepress";
-import { data as release } from "../../docs/data/release.data";
+import { data as release } from "../../../docs/site/data/release.data";
 
 /** Which platforms to show; all by default. */
 const props = defineProps<{ only?: "windows" | "macos" | "linux" }>();

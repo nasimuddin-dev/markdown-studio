@@ -8,6 +8,7 @@ const app = JSON.parse(readFileSync(fileURLToPath(new URL("../../package.json", 
 export const REPO = "https://github.com/nasimuddin-dev/markpion";
 const SITE = "https://nasimuddin-dev.github.io/markpion/";
 const BASE = "/markpion/";
+const PAGES = fileURLToPath(new URL("../../docs/site/", import.meta.url)).replace(/\\/g, "/");
 const SOCIAL_IMAGE = `${SITE}images/social-preview.webp`;
 
 /** Page URL (clean URLs) for a source file such as `guide/editor.md`. */
@@ -74,7 +75,8 @@ export default defineConfig({
   titleTemplate: ":title | Markpion",
   description: "Markpion is a local-first desktop Markdown editor for Windows, macOS and Linux with live preview, tabs, a file explorer, and import and export.",
   base: BASE,
-  srcDir: "docs",
+  // The pages live with the rest of the project's documentation, in docs/site/.
+  srcDir: "../docs/site",
   cleanUrls: true,
   lastUpdated: true,
   appearance: true,
@@ -94,6 +96,24 @@ export default defineConfig({
         },
       ],
     },
+    // Vue runs from website/node_modules in the server build (the pages are outside website/).
+    ssr: { external: ["vue", "vue/server-renderer", "@vue/server-renderer"] },
+    plugins: [
+      {
+        // The pages live in docs/site/, outside website/. Resolve their package
+        // imports (vue, vitepress…) from the website's dependencies, never from
+        // the desktop app's node_modules at the repository root.
+        name: "markpion:pages-resolve-from-website",
+        enforce: "pre",
+        async resolveId(source, importer, options) {
+          if (!importer || !/^[\w@]/.test(source) || /^[A-Za-z]:/.test(source)) return null;
+          if (!importer.replace(/\\/g, "/").startsWith(PAGES)) return null;
+          // The server build leaves Vue to Node, which finds it from website/.vitepress/.temp.
+          if (options?.ssr && /^vue(\/|$)/.test(source)) return { id: source, external: true };
+          return this.resolve(source, fileURLToPath(import.meta.url), { ...options, skipSelf: true });
+        },
+      },
+    ],
   },
   sitemap: {
     hostname: SITE,
@@ -229,7 +249,7 @@ export default defineConfig({
       ],
     },
     socialLinks: [{ icon: "github", link: REPO, ariaLabel: "Markpion on GitHub" }],
-    editLink: { pattern: `${REPO}/edit/main/website/docs/:path`, text: "Edit this page on GitHub" },
+    editLink: { pattern: `${REPO}/edit/main/docs/site/:path`, text: "Edit this page on GitHub" },
     search: { provider: "local" },
     outline: { level: [2, 3] },
     footer: {

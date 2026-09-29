@@ -1,6 +1,6 @@
 name: Documentation website
 
-# Builds the VitePress site in website/ and deploys it to GitHub Pages
+# Builds the VitePress site (tooling in website/, pages in docs/site/) and deploys it to GitHub Pages
 # (https://nasimuddin-dev.github.io/markpion/). Pull requests are built
 # and checked but not deployed. A release's version bump on main redeploys the
 # site, so the download page and changelog pick up the new version. (Releases
@@ -10,12 +10,14 @@ on:
     branches: [main]
     paths:
       - "website/**"
+      - "docs/site/**" # the pages
       - "package.json" # the app version shown on the site
       - "src/features/commands.ts" # the source of the keyboard shortcut tables
       - ".github/workflows/documentation.yml"
   pull_request:
     paths:
       - "website/**"
+      - "docs/site/**"
       - "package.json"
       - "src/features/commands.ts"
       - ".github/workflows/documentation.yml"

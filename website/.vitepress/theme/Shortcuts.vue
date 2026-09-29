@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { data as shortcuts } from "../../docs/data/shortcuts.data";
+import { data as shortcuts } from "../../../docs/site/data/shortcuts.data";
 
 const props = defineProps<{ group: "app" | "format" }>();
 const rows = computed(() => shortcuts.filter((s) => s.group === props.group));
