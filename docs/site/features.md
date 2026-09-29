@@ -66,7 +66,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 
 - Light, dark and system themes; configurable editor font, size, wrapping and tab size. [Settings](/guide/settings)
 - Keyboard-first: every command has a menu entry, many have [shortcuts](/reference/keyboard-shortcuts), and the command palette finds them all.
-- Accessibility: keyboard navigation and visible focus throughout; the UI is audited automatically against WCAG 2.1 AA in light and dark themes.
+- Accessibility: keyboard navigation and visible focus throughout; the UI is audited automatically against WCAG 2.1 AA in light and dark themes; in Windows High Contrast (and other forced-colour modes), selections, the active tab, focus and unsaved-change markers stay visible.
 - Automatic updates on Windows, verified with a signature before installing. macOS and Linux are notified of new versions.
 - Diagnostic logs you can export for support. They never contain document text.
 

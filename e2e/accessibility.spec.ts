@@ -17,10 +17,11 @@ async function start(page: Page, theme: "light" | "dark") {
 }
 
 /** WCAG 2.1 A/AA checks (SRS §15). CodeMirror's editable surface is excluded: its internals are managed by the library. */
-async function audit(page: Page, label: string) {
+async function audit(page: Page, label: string, disableRules: string[] = []) {
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .exclude(".cm-scroller")
+    .disableRules(disableRules)
     .analyze();
   const summary = results.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length}× ${v.nodes[0]?.target.join(" ")} — ${v.help}`);
   expect(summary, `${label}\n${summary.join("\n")}`).toEqual([]);
@@ -69,3 +70,24 @@ for (const theme of ["light", "dark"] as const) {
     });
   });
 }
+
+test("Windows High Contrast (forced colors): selection, active tab and focus stay visible", async ({ page }) => {
+  await start(page, "light");
+  await page.emulateMedia({ forcedColors: "active" });
+  await page.getByRole("button", { name: "Open Folder" }).first().click();
+  await page.locator(".tree-row", { hasText: /^README\.md$/ }).click();
+  const outline = (selector: string) =>
+    page.locator(selector).first().evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { style: s.outlineStyle, width: parseFloat(s.outlineWidth) };
+    });
+  // Shown only by a background colour normally; the system replaces that colour, so they need an outline.
+  expect(await outline(".tree-row.selected")).toEqual({ style: "solid", width: 2 });
+  expect(await outline(".tab.active")).toEqual({ style: "solid", width: 2 });
+  await page.keyboard.press("Tab");
+  // Keyboard focus lands in the editor, whose frame shows it.
+  expect(await outline(".cm-editor.cm-focused")).toEqual({ style: "solid", width: 2 });
+  // In forced colors the operating system chooses every colour, so axe's contrast
+  // rule (which reads the page's own colours) doesn't apply; the other rules do.
+  await audit(page, "forced colors", ["color-contrast"]);
+});

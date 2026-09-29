@@ -93,7 +93,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - UTF-8 (with or without BOM), with LF/CRLF line endings preserved per file
 - Word count in the status bar, with a statistics popover (words, characters, lines, paragraphs, reading time) for the document and the selection
 - Spell checking with the system dictionary (Settings)
-- Keyboard-first: every core action has a shortcut and an accessible menu, with visible focus states
+- Keyboard-first: every core action has a shortcut and an accessible menu, with visible focus states; works with Windows High Contrast (forced colours): selections, active tab, focus and unsaved markers are drawn with outlines in system colours
 - Help → Export Diagnostic Logs for support requests (logs never contain document text)
 - Runs on Windows, macOS and Linux, with a separate native installer for each (see [Download](#download))
 

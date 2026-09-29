@@ -1789,3 +1789,62 @@ body.dragging-entry * {
   border-radius: 6px;
   font-size: 13px;
 }
+
+/*
+ * Windows High Contrast and other forced-colors modes: the system replaces
+ * colours and drops shadows, so states that were shown only by a background
+ * or a shadow get an outline or a border (drawn in system colours) instead.
+ */
+@media (forced-colors: active) {
+  :focus-visible,
+  .resize-handle:focus-visible,
+  .preview:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .tree-row.selected,
+  .tab.active,
+  .palette-item.active,
+  .outline-item.current,
+  .history-item.active,
+  .icon-button.active,
+  .editor-host .cm-panel.cm-panel-lint ul [aria-selected] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .sidebar-tab.active {
+    border-bottom: 2px solid Highlight;
+  }
+  /* The editor shows that it has focus, and its selection is drawn in system colours. */
+  .editor-host .cm-editor.cm-focused {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .editor-host .cm-selectionBackground,
+  .editor-host .cm-editor.cm-focused .cm-selectionBackground {
+    forced-color-adjust: none;
+    background: Highlight !important;
+  }
+  /* The unsaved-changes dots are drawn with the text colour so they stay visible. */
+  .dirty-dot,
+  .tab.dirty .tab-dirty-dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+  .outline-item.drop-before {
+    border-top: 2px solid Highlight;
+  }
+  .outline-list.drop-end {
+    border-bottom: 2px solid Highlight;
+  }
+  .ai-busy,
+  .area-error,
+  .settings-managed {
+    border: 1px solid CanvasText;
+  }
+  .ai-spinner {
+    forced-color-adjust: none;
+    border-color: GrayText;
+    border-top-color: Highlight;
+  }
+}
