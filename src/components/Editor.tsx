@@ -22,7 +22,7 @@ import { editorKeymap } from "../features/commands";
 import { minimalChange } from "../features/saveTransforms";
 import { moveTableCell } from "../features/tables";
 import { insertImageFiles, isImageFile } from "../features/images";
-import { linkOverSelection, pasteHtmlAsMarkdown, pastePlainTable } from "../features/richPaste";
+import { linkOverSelection, pasteHtmlAsMarkdown, pastePlainTable, pendingPastes } from "../features/richPaste";
 import { markdownLinter } from "../features/lintExtension";
 import { linkCompletion } from "../features/completion";
 
@@ -130,6 +130,7 @@ export function Editor() {
         highlightSelectionMatches(),
         search({ top: true }),
         linkCompletion(),
+        pendingPastes,
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         syntaxHighlighting(markdownHighlight),
         placeholder("Start writing Markdown…"),
