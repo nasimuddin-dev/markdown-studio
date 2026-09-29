@@ -37,6 +37,26 @@ Long documents (from about 150 paragraphs, headings, lists and other blocks) are
 
 Above **1 MB** of text, the live preview pauses so typing stays fast. A bar at the top of the preview offers **Render Now** (and then **Refresh Preview**) to render on demand. The editor handles large files normally, and files up to 50 MB can be opened.
 
+## Presenting as slides
+
+**View → Present as Slides** (also in the command palette) shows the current document as slides that fill the window. Press **F11** first for full screen.
+
+- Put a line with just `---` between slides, with a blank line before it (a `---` directly under a line of text makes that line a heading instead). A document without any `---` gets a slide for each `#` and `##` heading.
+- **→**, **↓**, **Space** or **Page Down**, or a click on the slide, go to the next slide; **←**, **↑**, **Shift+Space** or **Page Up** go back; **Home** and **End** go to the first and last slide.
+- **Esc** ends the show.
+- Slides show everything the preview does: images, tables, code, formulas and diagrams. Links open in your browser. Front matter isn't shown.
+
+```markdown
+# Quarterly review
+
+---
+
+## Agenda
+
+- Results
+- Roadmap
+```
+
 ## Printing and exporting
 
 What you see in the preview is what **Export as HTML**, **Export as PDF**, **Export as Word** and **Print / Save as PDF** produce, without the front matter table. See [Import & export](/guide/import-export#export).

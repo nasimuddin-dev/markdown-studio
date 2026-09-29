@@ -472,3 +472,28 @@ test("long documents render in chunks; the outline, anchors and tasks still work
   await preview.getByRole("checkbox", { name: "Open task" }).click();
   await expect(page.locator(".cm-line").filter({ hasText: "- [x] last task" })).toHaveCount(1);
 });
+
+test("present a document as slides", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Welcome\n\nFirst slide\n\n---\n\n## Agenda\n\n- one\n- two\n\n---\n\nThanks, see [the site](https://example.com)\n");
+  await page.getByRole("menuitem", { name: "View" }).or(page.getByRole("button", { name: "View" })).first().click();
+  await page.getByRole("menuitem", { name: "Present as Slides" }).click();
+  const show = page.getByRole("dialog", { name: "Slide show" });
+  await expect(show.getByRole("heading", { name: "Welcome" })).toBeVisible();
+  await expect(show).toContainText("Slide 1 of 3");
+  await page.keyboard.press("ArrowRight");
+  await expect(show.getByRole("heading", { name: "Agenda" })).toBeVisible();
+  await show.locator(".slide").click();
+  await expect(show).toContainText("Slide 3 of 3");
+  await page.keyboard.press("Home");
+  await expect(show).toContainText("Slide 1 of 3");
+  await page.keyboard.press("End");
+  // Links open outside the app, never inside the window.
+  await show.getByRole("link", { name: "the site" }).click();
+  await expect(show).toContainText("Slide 3 of 3");
+  await page.keyboard.press("Escape");
+  await expect(show).toBeHidden();
+  await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
+});

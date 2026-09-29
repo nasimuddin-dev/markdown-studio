@@ -1185,6 +1185,52 @@ select {
 #print-root {
   display: none;
 }
+/* View → Present as Slides */
+.slideshow {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  outline: none;
+}
+.slideshow .slide {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 6vh 6vw;
+  overflow: auto;
+  font-size: clamp(18px, 2.2vw, 36px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* A slide taller than the screen scrolls from its top instead of being cut off. */
+  justify-content: safe center;
+}
+.slideshow .slide > :first-child {
+  margin-top: 0;
+}
+.slideshow .slide h1 {
+  font-size: 2.2em;
+  border-bottom: none;
+}
+.slideshow .slide h2 {
+  font-size: 1.6em;
+  border-bottom: none;
+}
+.slideshow-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 @media print {
   body.printing {
     overflow: visible;

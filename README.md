@@ -79,6 +79,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - GitHub alerts: `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` render as coloured callouts with icons in the preview and HTML export, and as labelled callouts in PDF and Word
 - New from Template (File menu): meeting notes, README, blog post, decision record (ADR), weekly status report, changelog and daily journal, with `{{date}}`, `{{time}}`, `{{week}}` and `{{cursor}}` placeholders. Markdown files in a `templates/` folder of the open workspace appear as templates too
 - Editor-only, split and preview-only views, resizable panels and synced scrolling
+- Present as Slides (View menu): the document as full-window slides, split at `---` lines (or at `#`/`##` headings), with keyboard navigation
 - Light, dark and system themes; configurable font, font size, line numbers, wrapping and tab size
 - Optional auto save (after a delay, or on tab/window focus change) that never overwrites external changes
 - Save options: trim trailing whitespace (keeps Markdown hard breaks and code blocks), final newline, default line ending for new files

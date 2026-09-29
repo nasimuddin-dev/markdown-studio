@@ -22,6 +22,7 @@ const loadAi = () => import("./components/AiPanel");
 const HistoryDialog = lazy(() => loadHistory().then((m) => ({ default: m.HistoryDialog })));
 const ShortcutsDialog = lazy(() => loadShortcuts().then((m) => ({ default: m.ShortcutsDialog })));
 const AiPanel = lazy(() => loadAi().then((m) => ({ default: m.AiPanel })));
+const SlideShow = lazy(() => import("./components/SlideShow").then((m) => ({ default: m.SlideShow })));
 setTimeout(() => void Promise.all([loadHistory(), loadShortcuts(), loadAi()]).catch(() => {}), 3000);
 
 /** Mounts the lazily loaded dialogs only once they are first needed. */
@@ -29,11 +30,13 @@ function OnDemandDialogs() {
   const history = useUi((s) => s.historyDocId !== null);
   const shortcuts = useUi((s) => s.shortcutsOpen);
   const ai = useAi((s) => !!s.busy || !!s.review);
+  const presenting = useUi((s) => s.presenting);
   return (
     <Suspense fallback={null}>
       {history && <HistoryDialog />}
       {shortcuts && <ShortcutsDialog />}
       {ai && <AiPanel />}
+      {presenting && <SlideShow />}
     </Suspense>
   );
 }

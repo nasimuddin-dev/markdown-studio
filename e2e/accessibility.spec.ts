@@ -45,6 +45,17 @@ for (const theme of ["light", "dark"] as const) {
       await audit(page, "editor");
     });
 
+    test("slide show", async ({ page }) => {
+      await start(page, theme);
+      await page.getByRole("button", { name: "Open Folder" }).first().click();
+      await page.locator(".tree-row", { hasText: /^README\.md$/ }).click();
+      await page.keyboard.press(`${mod}+Shift+P`);
+      await page.keyboard.type("present as slides");
+      await page.keyboard.press("Enter");
+      await expect(page.getByRole("dialog", { name: "Slide show" })).toBeVisible();
+      await audit(page, "slide show");
+    });
+
     test("settings dialog and command palette", async ({ page }) => {
       await start(page, theme);
       await page.keyboard.press(`${mod}+,`);

@@ -290,6 +290,12 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().setPaletteOpen(!useUi.getState().paletteOpen),
   },
   settings: { id: "settings", label: "Settings…", shortcut: "Mod+,", run: () => useUi.getState().setSettingsOpen(true) },
+  presentSlides: {
+    id: "presentSlides",
+    label: "Present as Slides",
+    run: () => useUi.getState().setPresenting(true),
+    enabled: hasActive,
+  },
   focusMode: {
     id: "focusMode",
     label: "Toggle Focus Mode",

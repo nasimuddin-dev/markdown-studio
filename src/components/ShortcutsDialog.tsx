@@ -11,7 +11,7 @@ const GROUPS: Array<{ title: string; ids: string[] }> = [
   { title: "Format", ids: [...Object.keys(formatCommands), "insertImage"] },
   {
     title: "View & Navigation",
-    ids: ["commandPalette", "viewEditor", "viewSplit", "viewPreview", "toggleView", "toggleExplorer", "toggleOutline", "focusMode", "fullScreen", "zoomIn", "zoomOut", "zoomReset", "nextTab", "prevTab", "settings"],
+    ids: ["commandPalette", "viewEditor", "viewSplit", "viewPreview", "toggleView", "toggleExplorer", "toggleOutline", "focusMode", "fullScreen", "presentSlides", "zoomIn", "zoomOut", "zoomReset", "nextTab", "prevTab", "settings"],
   },
   { title: "AI", ids: Object.keys(commands).filter((id) => id.startsWith("ai")) },
 ];
