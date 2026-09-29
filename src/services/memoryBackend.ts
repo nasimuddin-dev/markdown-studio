@@ -19,7 +19,15 @@ export interface MemoryBackendOptions {
   prompt?: (message: string, defaultValue: string) => string | null;
   /** Folders that are pre-approved (as if opened via a dialog). */
   approved?: string[];
+  /**
+   * Stands in for Claude in tests. Without it the browser demo has no AI
+   * assistant: the API key belongs in the desktop app's credential store.
+   */
+  ai?: (request: { model: string; system: string; prompt: string }) => Promise<string>;
 }
+
+const AI_MODELS = ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-4-5"];
+const AI_DESKTOP_ONLY = "The AI assistant is available in the Markpion desktop app, which keeps your API key in the system's credential store.";
 
 const STORAGE_PREFIX = "markpion:";
 
@@ -48,11 +56,14 @@ export class MemoryBackend implements Backend {
   private clock = Date.now();
   private readonly storageKey: string | null;
   private readonly promptFn: (message: string, defaultValue: string) => string | null;
+  private readonly aiFn: MemoryBackendOptions["ai"];
+  private aiKey: string | null = null;
   readonly logs: string[] = [];
 
   constructor(opts: MemoryBackendOptions = {}) {
     this.storageKey = opts.storageKey ?? null;
     this.promptFn = opts.prompt ?? ((m, d) => window.prompt(m, d));
+    this.aiFn = opts.ai;
     if (!this.restore()) {
       for (const [path, content] of Object.entries(opts.files ?? {})) this.put(path, content);
     }
@@ -169,6 +180,23 @@ export class MemoryBackend implements Backend {
     this.roots.add(p);
     this.remember(p, "folder");
     return p;
+  }
+
+  async aiStatus() {
+    return { hasKey: !!this.aiKey, keyStorage: "memory (tests)", models: AI_MODELS };
+  }
+
+  async aiSetKey(key: string | null) {
+    if (!this.aiFn) throw new AppError("ai", AI_DESKTOP_ONLY);
+    if (key !== null && !key.trim().startsWith("sk-ant-")) throw new AppError("ai", "That doesn't look like an Anthropic API key.");
+    this.aiKey = key?.trim() ?? null;
+    return this.aiStatus();
+  }
+
+  async aiComplete(request: { model: string; system: string; prompt: string }) {
+    if (!this.aiFn) throw new AppError("ai", AI_DESKTOP_ONLY);
+    if (!this.aiKey) throw new AppError("ai", "Add your Anthropic API key in Settings → AI Assistant first.");
+    return this.aiFn(request);
   }
 
   async pickExportFolder() {

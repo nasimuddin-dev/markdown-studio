@@ -14,6 +14,7 @@ This roadmap comes from the project's [requirements specification](https://githu
 - **Rich Markdown:** GitHub Flavored Markdown, Mermaid diagrams, LaTeX math, front matter, alerts and footnotes.
 - **Productivity:** outline, command palette, Find in Files, formatting tools, tables, templates, table of contents, Markdown lint and link checking.
 - **Conversion:** import from Word, PDF, HTML and CSV; export to PDF, Word and HTML, including whole folders.
+- **AI assistant (optional):** Claude improves, fixes, shortens, summarizes, translates or continues text, with your own API key and a review before any change.
 - **Distribution:** separate installers for Windows, macOS and Linux on every release, and signed automatic updates on Windows.
 
 See the [changelog](/changelog) for details per version.
@@ -37,4 +38,4 @@ These depend on decisions or resources that aren't settled yet:
 - **ARM64 builds** for Windows and Linux.
 - **Localization** of the interface into other languages.
 - **A native macOS menu bar.**
-- **Future enhancements from the specification:** an optional AI writing assistant (with clear consent before any text leaves your computer), Git integration, plugins, cloud sync, collaboration and publishing workflows.
+- **Future enhancements from the specification:** Git integration, plugins, cloud sync, collaboration and publishing workflows.

@@ -1,3 +1,4 @@
+import { AiSettings } from "./AiSettings";
 import { useEffect, useState } from "react";
 import { useUi } from "../stores/uiStore";
 import { DEFAULT_SETTINGS, useSettings } from "../stores/settingsStore";
@@ -116,6 +117,8 @@ export function SettingsDialog() {
             <option value="letter">Letter (8.5 × 11 in)</option>
           </select>
         </section>
+
+        <AiSettings />
 
         <section>
           <h3>Startup</h3>

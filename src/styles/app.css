@@ -1698,3 +1698,86 @@ body.dragging-entry * {
   cursor: grabbing !important;
   user-select: none;
 }
+
+/* AI assistant */
+.ai-busy {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.18);
+  font-size: 13px;
+}
+.ai-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: ai-spin 0.8s linear infinite;
+}
+@keyframes ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-spinner {
+    animation-duration: 3s;
+  }
+}
+.ai-review-modal {
+  width: min(760px, 92vw);
+}
+.ai-review h3 {
+  margin: 8px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ai-original {
+  max-height: 160px;
+  overflow: auto;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  white-space: pre-wrap;
+  font: inherit;
+  font-size: 13px;
+  opacity: 0.85;
+}
+.ai-suggestion {
+  width: 100%;
+  min-height: 180px;
+  max-height: 45vh;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+.inline-row {
+  display: flex;
+  gap: 8px;
+}
+.inline-row input {
+  flex: 1;
+}
+.button.small {
+  padding: 2px 8px;
+  font-size: 12px;
+}

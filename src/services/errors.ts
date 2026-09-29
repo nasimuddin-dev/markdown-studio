@@ -13,7 +13,7 @@ export class AppError extends Error {
 
 const KINDS: ErrorKind[] = [
   "notFound", "permissionDenied", "outOfScope", "invalidPath", "encoding",
-  "conflict", "alreadyExists", "diskFull", "tooLarge", "io",
+  "conflict", "alreadyExists", "diskFull", "tooLarge", "io", "ai",
 ];
 
 export function toAppError(e: unknown): AppError {
@@ -51,6 +51,8 @@ export function describeError(e: unknown, action: string): string {
       return `Couldn't ${action}: the disk is full. Free up space and try again — your text is still in the editor.`;
     case "tooLarge":
       return `Couldn't ${action}: ${err.message}`;
+    case "ai":
+      return err.message;
     default:
       return `Couldn't ${action}: ${err.message}`;
   }

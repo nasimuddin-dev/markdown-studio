@@ -42,6 +42,10 @@ const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
       sep, c("zoomIn"), c("zoomOut"), c("zoomReset"), sep, c("nextTab"), c("prevTab"),
     ],
   },
+  {
+    label: "AI",
+    items: () => [c("aiImprove"), c("aiFixGrammar"), c("aiShorter"), sep, c("aiSummarize"), c("aiContinue"), c("aiTranslate"), sep, c("aiAsk")],
+  },
   { label: "Help", items: () => [c("shortcuts"), c("commandPalette"), sep, c("exportLogs"), c("checkUpdates"), c("about")] },
 ];
 

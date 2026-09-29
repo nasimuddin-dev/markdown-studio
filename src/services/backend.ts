@@ -1,5 +1,5 @@
 import type {
-  AppInfo, AppUpdate, HistoryEntry, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
+  AiStatus, AppInfo, AppUpdate, HistoryEntry, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
 } from "../types";
 
 export type ExportKind = "html";
@@ -29,6 +29,13 @@ export interface Backend {
   pickSavePath(suggestedName: string, directory: string | null): Promise<string | null>;
   /** Asks for a folder to export into; approves it for writing without opening it. */
   pickExportFolder(): Promise<string | null>;
+
+  /** The optional AI assistant (desktop only; the key stays in the native process). */
+  aiStatus(): Promise<AiStatus>;
+  /** Checks and stores the Anthropic API key, or removes it (`null`). */
+  aiSetKey(key: string | null): Promise<AiStatus>;
+  /** Sends one request to Claude and returns the answer's text. */
+  aiComplete(request: { model: string; system: string; prompt: string }): Promise<string>;
 
   /** Native Open dialog for a document to import (desktop only). */
   pickImportFile(kind: "docx" | "html" | "pdf" | "csv"): Promise<string | null>;

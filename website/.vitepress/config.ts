@@ -206,6 +206,7 @@ export default defineConfig({
             { text: "Saving, History & Recovery", link: "/guide/saving-and-recovery" },
             { text: "Checking Documents", link: "/guide/checking-documents" },
             { text: "Import & Export", link: "/guide/import-export" },
+            { text: "AI Assistant", link: "/guide/ai-assistant" },
             { text: "Settings", link: "/guide/settings" },
             { text: "Keyboard Shortcuts", link: "/reference/keyboard-shortcuts" },
           ],

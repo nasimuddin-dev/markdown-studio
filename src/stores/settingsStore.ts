@@ -28,6 +28,9 @@ export const DEFAULT_SETTINGS: Settings = {
   insertFinalNewline: false,
   newFileLineEnding: "lf",
   exportPageSize: "auto",
+  aiEnabled: false,
+  aiModel: "claude-opus-5-5",
+  aiConsent: false,
   session: { workspace: null, files: [] },
 };
 
@@ -72,6 +75,9 @@ export function sanitizeSettings(raw: unknown): Settings {
         ? s.newFileLineEnding
         : d.newFileLineEnding,
     exportPageSize: s.exportPageSize === "a4" || s.exportPageSize === "letter" || s.exportPageSize === "auto" ? s.exportPageSize : d.exportPageSize,
+    aiEnabled: bool(s.aiEnabled, d.aiEnabled),
+    aiModel: typeof s.aiModel === "string" && /^claude-[a-z0-9-]{3,60}$/.test(s.aiModel) ? s.aiModel : d.aiModel,
+    aiConsent: bool(s.aiConsent, d.aiConsent),
     session: {
       workspace: typeof session.workspace === "string" ? session.workspace : null,
       files: Array.isArray(session.files) ? session.files.filter((f): f is string => typeof f === "string").slice(0, 50) : [],

@@ -18,6 +18,8 @@ pub enum AppError {
     DiskFull(String),
     TooLarge(String),
     Io(String),
+    /// The AI assistant couldn't complete a request; the message is for the user.
+    Ai(String),
 }
 
 impl AppError {
@@ -33,6 +35,7 @@ impl AppError {
             AppError::DiskFull(_) => "diskFull",
             AppError::TooLarge(_) => "tooLarge",
             AppError::Io(_) => "io",
+            AppError::Ai(_) => "ai",
         }
     }
 }
@@ -49,7 +52,8 @@ impl std::fmt::Display for AppError {
             | AppError::AlreadyExists(m)
             | AppError::DiskFull(m)
             | AppError::TooLarge(m)
-            | AppError::Io(m) => m,
+            | AppError::Io(m)
+            | AppError::Ai(m) => m,
         };
         write!(f, "{}: {}", self.category(), msg)
     }

@@ -43,6 +43,7 @@ import { Welcome } from "./components/Welcome";
 import { CommandPalette } from "./components/CommandPalette";
 import { HistoryDialog } from "./components/HistoryDialog";
 import { ShortcutsDialog } from "./components/ShortcutsDialog";
+import { AiPanel } from "./components/AiPanel";
 import { useSettings } from "./stores/settingsStore";
 import { useDocuments } from "./stores/documentsStore";
 
@@ -188,6 +189,7 @@ export default function App() {
       <CommandPalette />
       <HistoryDialog />
       <ShortcutsDialog />
+      <AiPanel />
       <DialogHost />
       <Toasts />
     </div>

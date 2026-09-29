@@ -18,6 +18,9 @@ export const tauriBackend: Backend = {
   pickOpenFile: () => call("pick_open_file"),
   pickOpenFolder: () => call("pick_open_folder"),
   pickExportFolder: () => call("pick_export_folder"),
+  aiStatus: () => call("ai_status"),
+  aiSetKey: (key) => call("ai_set_key", { key }),
+  aiComplete: ({ model, system, prompt }) => call("ai_complete", { model, system, prompt }),
   pickSavePath: (suggestedName, directory) => call("pick_save_path", { suggestedName, directory }),
 
   pickImportFile: (kind) => call("pick_import_file", { kind }),

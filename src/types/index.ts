@@ -45,7 +45,17 @@ export type ErrorKind =
   | "alreadyExists"
   | "diskFull"
   | "tooLarge"
-  | "io";
+  | "io"
+  | "ai";
+
+/** The AI assistant's setup, as reported by the backend. */
+export interface AiStatus {
+  hasKey: boolean;
+  /** Where the key is kept, e.g. "Windows Credential Manager". */
+  keyStorage: string;
+  /** Models to offer, the default first. */
+  models: string[];
+}
 
 export type AutoSaveMode = "off" | "afterDelay" | "onFocusChange";
 export type ViewMode = "editor" | "split" | "preview";
@@ -78,6 +88,11 @@ export interface Settings {
   newFileLineEnding: "auto" | LineEnding;
   /** Paper size for PDF and Word export; "auto" follows the system region. */
   exportPageSize: "auto" | "a4" | "letter";
+  /** The optional AI assistant (off until turned on and given an API key). */
+  aiEnabled: boolean;
+  aiModel: string;
+  /** Set once the user has accepted that AI commands send text to Anthropic. */
+  aiConsent: boolean;
   /** Last session's workspace and open files, restored on launch (FR-003). */
   session: { workspace: string | null; files: string[] };
 }

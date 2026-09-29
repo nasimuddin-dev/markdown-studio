@@ -13,6 +13,7 @@ import { editorCommand, runOnEditor } from "./editorBridge";
 // Export/print pull in the unified pipeline; load them on first use.
 const exporting = () => import("./exporting");
 const importing = () => import("./importing");
+const ai = () => import("./ai");
 import type { StateCommand } from "@codemirror/state";
 import type { KeyBinding } from "@codemirror/view";
 import * as fmt from "./formatting";
@@ -299,6 +300,13 @@ export const commands: Record<string, Command> = {
     label: "Check for Updates…",
     run: async () => void (await (await import("./updates")).checkForUpdates({ manual: true })),
   },
+  aiImprove: { id: "aiImprove", label: "AI: Improve Writing", run: async () => (await ai()).runAiAction("improve"), enabled: hasActive },
+  aiFixGrammar: { id: "aiFixGrammar", label: "AI: Fix Spelling and Grammar", run: async () => (await ai()).runAiAction("fixGrammar"), enabled: hasActive },
+  aiShorter: { id: "aiShorter", label: "AI: Make Shorter", run: async () => (await ai()).runAiAction("shorter"), enabled: hasActive },
+  aiSummarize: { id: "aiSummarize", label: "AI: Summarize", run: async () => (await ai()).runAiAction("summarize"), enabled: hasActive },
+  aiContinue: { id: "aiContinue", label: "AI: Continue Writing", run: async () => (await ai()).runAiAction("continue"), enabled: hasActive },
+  aiTranslate: { id: "aiTranslate", label: "AI: Translate…", run: async () => (await ai()).runAiAction("translate"), enabled: hasActive },
+  aiAsk: { id: "aiAsk", label: "AI: Ask Claude…", shortcut: "Mod+J", run: async () => (await ai()).runAiAction("ask"), enabled: hasActive },
   about: { id: "about", label: "About Markpion", run: () => useUi.getState().setAboutOpen(true) },
   exportLogs: {
     id: "exportLogs",

@@ -6,7 +6,7 @@ Requirements are in [SRS.md](SRS.md) and their implementation status in [TRACEAB
 
 ## 1. System context
 
-Markpion is a local-first desktop app. Documents are ordinary Markdown files on the user's disk; nothing is uploaded. The only network request the app makes on its own is the update check, which asks GitHub for the latest release and can be turned off.
+Markpion is a local-first desktop app. Documents are ordinary Markdown files on the user's disk; nothing is uploaded. The only network request the app makes on its own is the update check, which asks GitHub for the latest release and can be turned off. The optional AI assistant sends text to Anthropic's Claude API only when the user runs an AI command, with their own key.
 
 ```mermaid
 flowchart LR
@@ -18,12 +18,14 @@ flowchart LR
     os[OS shell<br/>dialogs, trash,<br/>file associations]
   end
   gh[(GitHub Releases<br/>latest.json + signed installers)]
+  claude[(Anthropic Claude API<br/>api.anthropic.com)]
 
   user --> app
   app <-->|read / atomic write| files
   app <--> appdata
   app <--> os
   app -.->|update check, optional| gh
+  app -.->|"AI commands, opt-in, user's key"| claude
 ```
 
 ## 2. Technology stack
@@ -77,6 +79,7 @@ flowchart TB
     WA["watcher.rs<br/>external changes"]
     UP["updater.rs<br/>signed updates"]
     OP["open_paths.rs<br/>files from the OS"]
+    AI["ai.rs<br/>Claude API, key in OS store"]
     CMD --> SC
     SC --> FS
     CMD --> ST
@@ -85,6 +88,7 @@ flowchart TB
     CMD --> WA
     CMD --> UP
     CMD --> OP
+    CMD --> AI
   end
 
   TB -->|"IPC (invoke)"| CMD
@@ -130,6 +134,7 @@ Other safeguards:
 - **Preview:** raw HTML in documents is sanitized (rehype-sanitize) before rendering; math is rendered after sanitizing, so it can't be used to inject markup. The Content Security Policy allows scripts only from the app itself, no plugins or frames, and network requests (`connect-src`) only to the GitHub API; remote images in documents may still load.
 - **Links:** external links open in the system browser, never inside the app window.
 - **Updates:** every installer is verified against the minisign public key built into the app before it runs.
+- **AI assistant:** off by default. The Anthropic API key is kept in the OS credential store and read only by the Rust core, which makes the HTTPS request; the web view sends the instruction and text and gets the answer back, never the key. The document text is wrapped in `<document>` tags and the system prompt tells Claude to treat it as content, not instructions. Answers are shown for review and applied as one undoable edit.
 
 ## 5. Document model and lifecycle
 
@@ -275,6 +280,7 @@ flowchart LR
 | Crash recovery | App data folder, `recovery/session.json` | Recovery timer (section 7) |
 | File history | App data folder, `history/` | `history.rs`, before each overwrite |
 | Diagnostic log | App log folder, `markpion.log` (1 MB cap) | `storage.rs` Logger; exportable from Help |
+| Anthropic API key (optional) | Windows Credential Manager, macOS Keychain; on Linux `ai-key` (mode 600) in the app config folder | `ai.rs` |
 
 The app folders are named after the bundle identifier, `com.markpion.app` (for example `%APPDATA%\com.markpion.app` on Windows). On first start Markpion copies them from `com.markdownstudio.app`, the identifier used before the app was renamed.
 

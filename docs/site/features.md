@@ -70,10 +70,14 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Automatic updates on Windows, verified with a signature before installing. macOS and Linux are notified of new versions.
 - Diagnostic logs you can export for support. They never contain document text.
 
+## AI assistant (optional)
+
+- Off by default. With your own Anthropic API key, the **AI** menu asks Claude to improve, fix, shorten, summarize, translate or continue the selected text, or to follow your own instruction (**Ctrl+J**). You review and can edit every answer before it changes the document, and the key stays in the system's credential store. [AI Assistant](/guide/ai-assistant)
+
 ## Not included
 
 These aren't part of Markpion today. Some are [on the roadmap](/roadmap):
 
-- AI writing features, cloud sync, collaboration, Git integration and plugins.
+- Cloud sync, collaboration, Git integration and plugins.
 - MDX, and Markdown flavours beyond GitHub Flavored Markdown with the extensions listed above.
 - Signed installers (Windows Authenticode, Apple notarization) and ARM64 builds for Windows and Linux.

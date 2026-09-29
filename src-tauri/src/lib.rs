@@ -1,3 +1,4 @@
+mod ai;
 mod commands;
 mod error;
 mod fs_ops;
@@ -134,6 +135,9 @@ pub fn run() {
             commands::clear_recovery,
             commands::log_event,
             commands::export_logs,
+            commands::ai_status,
+            commands::ai_set_key,
+            commands::ai_complete,
             updater::check_app_update,
             updater::install_app_update,
         ])
