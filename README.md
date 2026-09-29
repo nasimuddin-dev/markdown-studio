@@ -9,20 +9,20 @@ The requirements are in [docs/SRS.md](docs/SRS.md), and implementation status pe
 ## Download
 
 <!-- download:start -->
-Markpion 0.13.0 was released on 2026-09-25 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.13.0 release page](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.13.0).
+Markpion 0.14.0 was released on 2026-09-29 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.14.0 release page](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.14.0).
 
 | Operating system | Download |
 | --- | --- |
-| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/Markpion-0.13.0-windows-x64-setup.exe?raw=true) (6.9 MB) · [Offline installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-windows-x64-offline-setup.exe) (211.9 MB) |
-| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-macos-x64.dmg) |
-| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
+| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/Markpion-0.14.0-windows-x64-setup.exe?raw=true) (6.9 MB) · [Offline installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.14.0/Markpion-0.14.0-windows-x64-offline-setup.exe) (212.0 MB) |
+| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markpion/releases/download/v0.14.0/Markpion-0.14.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markpion/releases/download/v0.14.0/Markpion-0.14.0-macos-x64.dmg) |
+| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.14.0/Markpion-0.14.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.14.0/Markpion-0.14.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.14.0/Markpion-0.14.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
 
 ### Windows
 
 | Installer | When to use it | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **Standard**: [Markpion-0.13.0-windows-x64-setup.exe](downloads/Markpion-0.13.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 6.9 MB | `d83a901c8d3b446eb716be9c1e9ac706d51a7b2080d1c3cb2660ebe60ad56a8a` |
-| **Offline**: [Markpion-0.13.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.13.0/Markpion-0.13.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 211.9 MB | `2d877ec1a05e1c7e8556b1fd2de7f5bba2810a9a2f385da05e0166bae48c8c6d` |
+| **Standard**: [Markpion-0.14.0-windows-x64-setup.exe](downloads/Markpion-0.14.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 6.9 MB | `6d0af46134a399e0b6b749882d221bac435a8e960720a831e82c4a5d913c9768` |
+| **Offline**: [Markpion-0.14.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.14.0/Markpion-0.14.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 212.0 MB | `83585c06b0043d426ccabf0915b18fcb7715cdca9753d4f13d397eb8493b7435` |
 
 1. **Download** an installer above.
 2. **Run** it and choose **Anyone who uses this computer**, which needs administrator approval, or **Only for me**, which doesn't. The installer isn't code-signed yet, so if Windows SmartScreen says *"Windows protected your PC"*, choose **More info → Run anyway**.
@@ -39,8 +39,8 @@ The app appears in **Settings → Apps → Installed apps** and in **Control Pan
 ### Linux
 
 - **AppImage** (any distribution, no installation needed): download it, run `chmod +x Markpion-*.AppImage`, then start it.
-- **Debian, Ubuntu, Mint**: `sudo apt install ./Markpion-0.13.0-linux-amd64.deb` (apt installs the required system libraries automatically).
-- **Fedora, RHEL, openSUSE**: `sudo dnf install ./Markpion-0.13.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
+- **Debian, Ubuntu, Mint**: `sudo apt install ./Markpion-0.14.0-linux-amd64.deb` (apt installs the required system libraries automatically).
+- **Fedora, RHEL, openSUSE**: `sudo dnf install ./Markpion-0.14.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
 
 On macOS and Linux, the app tells you when a new version is available and opens its download page.
 

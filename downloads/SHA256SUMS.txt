@@ -1,2 +1,2 @@
-d83a901c8d3b446eb716be9c1e9ac706d51a7b2080d1c3cb2660ebe60ad56a8a  MarkdownStudio-0.13.0-windows-x64-setup.exe
-2d877ec1a05e1c7e8556b1fd2de7f5bba2810a9a2f385da05e0166bae48c8c6d  MarkdownStudio-0.13.0-windows-x64-offline-setup.exe
+6d0af46134a399e0b6b749882d221bac435a8e960720a831e82c4a5d913c9768  Markpion-0.14.0-windows-x64-setup.exe
+83585c06b0043d426ccabf0915b18fcb7715cdca9753d4f13d397eb8493b7435  Markpion-0.14.0-windows-x64-offline-setup.exe

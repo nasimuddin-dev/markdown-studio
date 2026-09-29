@@ -7,6 +7,27 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.14.0
+
+Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.14.0)
+
+### Added
+
+- **Replace in Files:** replace a search term across every file in the open folder.
+- **Go to File** (Ctrl/Cmd+Alt+O): open a file in the folder by typing part of its name.
+- **Duplicate** a file from the Explorer's context menu.
+- **Copy as Formatted Text** (File menu): copies the rendered document, with formatting, tables, links and images, for pasting into Word, an email or Google Docs.
+- **Math in Word export:** LaTeX formulas become native Word equations (a common subset; matrices and environments stay as LaTeX).
+- **Math in PDF export:** display formulas are drawn as pictures where the web engine allows it (Windows).
+
+### Changed
+
+- **Markdown Studio is now Markpion**, with a new logo. The installers, the app's folder and the GitHub repository (github.com/nasimuddin-dev/markpion) use the new name, and the website moved to nasimuddin-dev.github.io/markpion. Updating keeps your settings, recent files and version history, and on Windows the installer removes the old Markdown Studio installation.
+
+### Fixed
+
+- Tabs with long file names show their icon, name and close button on one row again, and saved tabs are no longer shown in italics.
+
 ## v0.13.0
 
 Released: 2026-09-26 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.13.0)
