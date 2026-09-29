@@ -5,11 +5,15 @@ import { activeDoc } from "../stores/documentsStore";
 import { notify } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
 import { basename } from "../services/paths";
+import { resolvePageSize } from "../services/convert/pageSize";
 
 const features = () => {
   const s = useSettings.getState().settings;
   return { math: s.renderMath, diagrams: s.renderDiagrams };
 };
+
+/** Paper size for PDF and Word, from the setting and the system language. */
+const pageSize = () => resolvePageSize(useSettings.getState().settings.exportPageSize, navigator.language);
 
 const loadImage = (path: string) => backend().readImage(path);
 
@@ -66,6 +70,7 @@ async function exportAsDocx(src: ExportSource) {
       loadImage: makeImageLoader(src.path, loadImage),
       renderDiagram: await diagramRenderer(src.content),
       math: features().math,
+      pageSize: pageSize(),
       renderMath: await mathRenderer(src.content),
     });
     const saved = await backend().exportBinaryFile(exportFileName(src.name, "docx"), bytesToBase64(bytes), "docx");
@@ -108,6 +113,7 @@ async function exportAsPdf(src: ExportSource, onPrint?: () => Promise<void>) {
       loadImage: makeImageLoader(src.path, loadImage),
       renderDiagram: await diagramRenderer(src.content),
       math: features().math,
+      pageSize: pageSize(),
       renderMath: await mathRenderer(src.content),
     });
     const saved = await backend().exportBinaryFile(exportFileName(src.name, "pdf"), bytesToBase64(bytes), "pdf");

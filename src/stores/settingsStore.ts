@@ -27,6 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
   trimTrailingWhitespace: false,
   insertFinalNewline: false,
   newFileLineEnding: "lf",
+  exportPageSize: "auto",
   session: { workspace: null, files: [] },
 };
 
@@ -70,6 +71,7 @@ export function sanitizeSettings(raw: unknown): Settings {
       s.newFileLineEnding === "auto" || s.newFileLineEnding === "lf" || s.newFileLineEnding === "crlf"
         ? s.newFileLineEnding
         : d.newFileLineEnding,
+    exportPageSize: s.exportPageSize === "a4" || s.exportPageSize === "letter" || s.exportPageSize === "auto" ? s.exportPageSize : d.exportPageSize,
     session: {
       workspace: typeof session.workspace === "string" ? session.workspace : null,
       files: Array.isArray(session.files) ? session.files.filter((f): f is string => typeof f === "string").slice(0, 50) : [],

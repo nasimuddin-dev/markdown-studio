@@ -44,6 +44,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `insertFinalNewline` | `false` | |
 | `updateTocOnSave` | `true` | |
 | `newFileLineEnding` | `"lf"` | `"lf"`, `"crlf"`, `"auto"` |
+| `exportPageSize` | `"auto"` | `"auto"`, `"a4"`, `"letter"` |
 | `restoreSession` | `true` | |
 | `checkForUpdates` | `true` | |
 

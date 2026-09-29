@@ -13,6 +13,7 @@ import { latexToWordMath } from "./omml";
 import type { Root, RootContent, PhrasingContent, List, Table as MdTable, AlignType } from "mdast";
 import { resolveRelative } from "../paths";
 import { collectFootnotes, type Footnotes } from "./footnotes";
+import { PAGE_POINTS, type PageSize } from "./pageSize";
 
 /** Loads an image referenced by the document; returns bytes or null. */
 export type DocxImageLoader = (src: string) => Promise<{ data: Uint8Array; type: "png" | "jpg" | "gif" | "bmp" } | null>;
@@ -33,6 +34,8 @@ export interface ExportOptions {
   math?: boolean;
   /** Draws a display formula ($$…$$) as a PNG for PDF export; null or an error keeps the LaTeX. */
   renderMath?: DiagramRenderer;
+  /** Paper size for PDF and Word (default A4). */
+  pageSize?: PageSize;
 }
 
 const MONO = "Consolas";
@@ -330,6 +333,7 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
   const children: Array<Paragraph | Table> = [];
   for (const node of tree.children) children.push(...(await builder.block(node)));
   const footnotes = await builder.footnoteContent();
+  const page = PAGE_POINTS[opts.pageSize ?? "a4"];
   const doc = new Document({
     footnotes,
     title: opts.title,
@@ -352,7 +356,13 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
         },
       ],
     },
-    sections: [{ children }],
+    sections: [
+      {
+        // Twips (1/20 pt); Word's default margins fit both sizes.
+        properties: { page: { size: { width: Math.round(page.width * 20), height: Math.round(page.height * 20) } } },
+        children,
+      },
+    ],
   });
   const blob = await Packer.toBlob(doc);
   return new Uint8Array(await blob.arrayBuffer());

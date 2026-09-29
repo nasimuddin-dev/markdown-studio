@@ -74,6 +74,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.15.0. **Done** means im
 | Feature | Where | SRS reference |
 | --- | --- | --- |
 | Upgrade from Markdown Studio (the old name): settings, recent files, recovery and history are copied from the old `com.markdownstudio.app` folder on first start, and the Windows installer silently removes the old install and recreates the Start menu and desktop shortcuts it took with it (once; installs already updated to 0.14.0 are repaired by the next update) | `src-tauri/src/storage.rs` (`migrate_legacy_dir`), `src-tauri/windows/hooks.nsh` (`NSIS_HOOK_PREINSTALL`, `MS_RESTORE_SHORTCUTS`) | §13 upgrade, FR-062 |
+| Export page size (A4 or Letter; automatic from the system region) for PDF and Word | `services/convert/pageSize.ts`, `toPdf.ts`, `toDocx.ts`, Settings → Export | §12 export options |
 | Document outline, with Copy Link to Heading / Copy Markdown Link and moving sections (drag and drop, context menu, Alt+Up/Down) | `components/Outline.tsx`, `features/outline.ts`, `features/sections.ts` | §19 document outline and navigation |
 | Mermaid diagrams and LaTeX math (preview, exports; native Word equations) | `components/MermaidDiagram.tsx`, `services/markdown.ts`, `services/convert/latex.ts`, `omml.ts`, `services/mathImage.ts` | §18 v0.3 |
 | Markdown lint with a Problems panel | `features/lint.ts`, `features/lintExtension.ts` | §19 Markdown linting |

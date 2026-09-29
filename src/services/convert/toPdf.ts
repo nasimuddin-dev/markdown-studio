@@ -9,6 +9,7 @@ import remarkMath from "remark-math";
 import type { Root, RootContent, PhrasingContent, List, Table as MdTable } from "mdast";
 import type { Content, TDocumentDefinitions } from "pdfmake/interfaces";
 import type { DiagramRenderer, DocxImageLoader, ExportOptions } from "./toDocx";
+import { PAGE_POINTS } from "./pageSize";
 
 /**
  * Markdown → PDF with real, selectable text (pdfmake, vector output):
@@ -20,7 +21,7 @@ import type { DiagramRenderer, DocxImageLoader, ExportOptions } from "./toDocx";
 
 type Inline = string | { text: Inline | Inline[]; [k: string]: unknown };
 
-const CONTENT_WIDTH = 515; // A4 width minus margins, in points
+const SIDE_MARGIN = 40; // points
 
 function plain(node: RootContent | PhrasingContent): string {
   if ("value" in node && typeof node.value === "string") return node.value;
@@ -55,6 +56,8 @@ class PdfBuilder {
     private footnotes?: Footnotes,
     private renderDiagram?: DiagramRenderer,
     private renderMath?: DiagramRenderer,
+    /** Page width minus the side margins, in points. */
+    private contentWidth = PAGE_POINTS.a4.width - 2 * SIDE_MARGIN,
   ) {}
 
   private async inline(nodes: PhrasingContent[], style: Record<string, unknown> = {}): Promise<Inline[]> {
@@ -120,7 +123,7 @@ class PdfBuilder {
     const mime = img.type === "png" ? "image/png" : "image/jpeg";
     const { imageSize } = await import("./toDocx");
     const size = imageSize(img.data);
-    const width = size ? Math.min(CONTENT_WIDTH, size.width * 0.75) : CONTENT_WIDTH;
+    const width = size ? Math.min(this.contentWidth, size.width * 0.75) : this.contentWidth;
     return { image: `data:${mime};base64,${btoa(bin)}`, width, margin: [0, 4, 0, 10] };
   }
 
@@ -208,7 +211,7 @@ class PdfBuilder {
           if (png) {
             let bin = "";
             for (let i = 0; i < png.data.length; i += 0x8000) bin += String.fromCharCode(...png.data.subarray(i, i + 0x8000));
-            return [{ image: `data:image/png;base64,${btoa(bin)}`, width: Math.min(CONTENT_WIDTH, png.width * 0.75), margin: [0, 4, 0, 10] }];
+            return [{ image: `data:image/png;base64,${btoa(bin)}`, width: Math.min(this.contentWidth, png.width * 0.75), margin: [0, 4, 0, 10] }];
           }
         }
         return [
@@ -239,7 +242,7 @@ class PdfBuilder {
       case "table":
         return [await this.table(node)];
       case "thematicBreak":
-        return [{ canvas: [{ type: "line", x1: 0, y1: 0, x2: CONTENT_WIDTH, y2: 0, lineWidth: 1, lineColor: "#C3C9D2" }], margin: [0, 6, 0, 12] }];
+        return [{ canvas: [{ type: "line", x1: 0, y1: 0, x2: this.contentWidth, y2: 0, lineWidth: 1, lineColor: "#C3C9D2" }], margin: [0, 6, 0, 12] }];
       case "html": {
         const text = node.value.replace(/<[^>]+>/g, "").trim();
         return text ? [{ text, margin: [0, 0, 0, 8] }] : [];
@@ -251,7 +254,7 @@ class PdfBuilder {
         if (png) {
           let bin = "";
           for (let i = 0; i < png.data.length; i += 0x8000) bin += String.fromCharCode(...png.data.subarray(i, i + 0x8000));
-          return [{ image: `data:image/png;base64,${btoa(bin)}`, width: Math.min(CONTENT_WIDTH, png.width * 0.75), alignment: "center", margin: [0, 4, 0, 10] }];
+          return [{ image: `data:image/png;base64,${btoa(bin)}`, width: Math.min(this.contentWidth, png.width * 0.75), alignment: "center", margin: [0, 4, 0, 10] }];
         }
         return [{ text: `$$ ${node.value} $$`, style: "code", margin: [0, 2, 0, 10] }];
       }
@@ -267,7 +270,7 @@ class PdfBuilder {
     const notes = this.footnotes?.notes ?? [];
     if (!notes.length) return [];
     const out: Content[] = [
-      { canvas: [{ type: "line", x1: 0, y1: 0, x2: CONTENT_WIDTH / 3, y2: 0, lineWidth: 0.8, lineColor: "#C3C9D2" }], margin: [0, 14, 0, 6] },
+      { canvas: [{ type: "line", x1: 0, y1: 0, x2: this.contentWidth / 3, y2: 0, lineWidth: 0.8, lineColor: "#C3C9D2" }], margin: [0, 14, 0, 6] },
       { text: "Footnotes", bold: true, fontSize: 11, margin: [0, 0, 0, 4] },
     ];
     for (const { number, definition } of notes) {
@@ -303,15 +306,16 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
   const parser = unified().use(remarkParse).use(remarkGfm);
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
   const tree = parser.parse(stripFrontMatter(markdown)) as Root;
-  const builder = new PdfBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, opts.renderMath);
+  const page = PAGE_POINTS[opts.pageSize ?? "a4"];
+  const builder = new PdfBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, opts.renderMath, page.width - 2 * SIDE_MARGIN);
   const content: Content[] = [];
   for (const node of tree.children) content.push(...(await builder.block(node)));
   content.push(...(await builder.footnoteSection()));
 
   const doc: TDocumentDefinitions = {
     info: { title: opts.title, creator: "Markpion", producer: "Markpion" },
-    pageSize: "A4",
-    pageMargins: [40, 48, 40, 56],
+    pageSize: { width: page.width, height: page.height },
+    pageMargins: [SIDE_MARGIN, 48, SIDE_MARGIN, 56],
     content,
     footer: (page, pages) => ({ text: `${page} / ${pages}`, alignment: "center", fontSize: 8, color: "#8A93A3", margin: [0, 20, 0, 0] }),
     defaultStyle: { font: "Roboto", fontSize: 10.5, lineHeight: 1.3, color: "#1D2330" },

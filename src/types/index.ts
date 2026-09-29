@@ -76,6 +76,8 @@ export interface Settings {
   trimTrailingWhitespace: boolean;
   insertFinalNewline: boolean;
   newFileLineEnding: "auto" | LineEnding;
+  /** Paper size for PDF and Word export; "auto" follows the system region. */
+  exportPageSize: "auto" | "a4" | "letter";
   /** Last session's workspace and open files, restored on launch (FR-003). */
   session: { workspace: string | null; files: string[] };
 }

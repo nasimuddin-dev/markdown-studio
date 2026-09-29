@@ -108,6 +108,16 @@ export function SettingsDialog() {
         </section>
 
         <section>
+          <h3>Export</h3>
+          <label htmlFor="setting-exportPageSize">Page size for PDF and Word</label>
+          <select {...field("exportPageSize")} onChange={(e) => update({ exportPageSize: e.target.value as Settings["exportPageSize"] })}>
+            <option value="auto">Automatic (from your region: Letter or A4)</option>
+            <option value="a4">A4 (210 × 297 mm)</option>
+            <option value="letter">Letter (8.5 × 11 in)</option>
+          </select>
+        </section>
+
+        <section>
           <h3>Startup</h3>
           <label className="check"><input type="checkbox" checked={settings.restoreSession} onChange={(e) => update({ restoreSession: e.target.checked })} /> Reopen last folder and files</label>
           <label className="check"><input type="checkbox" checked={settings.checkForUpdates} onChange={(e) => update({ checkForUpdates: e.target.checked })} /> Check for updates when Markpion starts (asks GitHub for the latest version; nothing else is sent)</label>

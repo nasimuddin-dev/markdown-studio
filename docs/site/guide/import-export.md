@@ -56,6 +56,8 @@ Export commands are in the **File** menu. You choose where to save the file.
 | Clipboard | Copy as HTML | The HTML source, for pasting into a CMS or an HTML file |
 | Printer or PDF | Print / Save as PDF… (Ctrl+P) | The preview, printed with your system's print dialog |
 
+PDF and Word exports use A4 or Letter paper: automatically from your system's region, or the size you choose in [Settings → Export](/guide/settings#export).
+
 The document's front matter isn't exported; its `title`, if any, becomes the exported document's title.
 
 ### Mermaid, math, footnotes and special characters
