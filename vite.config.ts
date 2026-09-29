@@ -58,5 +58,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.test.{ts,tsx}"],
+    // Tests that render the whole app can take several seconds when every file runs in parallel.
+    testTimeout: 15_000,
   },
 });

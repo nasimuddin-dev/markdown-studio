@@ -772,6 +772,16 @@ select {
 .preview:focus-visible {
   outline-offset: -3px;
 }
+/* Long documents: rendered chunks don't affect layout; pending ones hold their estimated height. */
+.preview-chunk {
+  display: contents;
+}
+.preview-chunk.pending {
+  display: block;
+}
+.markdown-body > .preview-chunk:first-child > :first-child {
+  margin-top: 0;
+}
 
 /* ------------------------------------------------------------ status bar */
 

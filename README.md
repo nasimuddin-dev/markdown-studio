@@ -82,7 +82,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Light, dark and system themes; configurable font, font size, line numbers, wrapping and tab size
 - Optional auto save (after a delay, or on tab/window focus change) that never overwrites external changes
 - Save options: trim trailing whitespace (keeps Markdown hard breaks and code blocks), final newline, default line ending for new files
-- Large-document mode: live preview pauses above 1 MB of text, with render-on-demand
+- Large documents: long previews are built in parts as you scroll to them; live preview pauses above 1 MB of text, with render-on-demand
 - Local file history: the previous version is kept on every save (30 per file, in app data); browse with a line diff and restore (undoable)
 - Safe saves: atomic temp-file writes, conflict detection when a file changed on disk, and actionable errors (permission denied → Save As, disk full, and so on)
 - Live folder watching: the explorer and open files update immediately when other programs change files on disk

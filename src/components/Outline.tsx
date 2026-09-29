@@ -8,9 +8,11 @@ import { copyText } from "../features/pathActions";
 import { ContextMenu } from "./ContextMenu";
 import { revealLine } from "../features/editorBridge";
 import { Icon } from "./Icon";
+import { mountAllChunks } from "./PreviewChunks";
 
-/** Scrolls the preview to the n-th rendered heading. */
-function revealInPreview(index: number) {
+/** Scrolls the preview to the n-th heading. */
+async function revealInPreview(index: number) {
+  await mountAllChunks();
   const headings = document.querySelectorAll<HTMLElement>(".markdown-body :is(h1,h2,h3,h4,h5,h6)");
   headings[index]?.scrollIntoView({ block: "start" });
 }
@@ -112,7 +114,7 @@ export function Outline() {
   const go = (h: Heading, index: number) => {
     const viewMode = useSettings.getState().settings.viewMode;
     if (viewMode !== "preview") revealLine(h.line);
-    if (viewMode !== "editor") revealInPreview(index);
+    if (viewMode !== "editor") void revealInPreview(index);
   };
 
   return (

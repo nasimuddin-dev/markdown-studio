@@ -12,13 +12,18 @@ import { useSettings } from "../stores/settingsStore";
 import { openPath } from "../features/documents";
 import { scrollSync } from "../features/scrollSync";
 import { toggleTaskInDocument } from "../features/tasks";
+import { mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
 
-/** The position of a task checkbox among the preview's task list items, or -1. */
+/** The position of a task checkbox among the document's task list items, or -1. */
 function taskIndex(root: HTMLElement, box: HTMLInputElement): number {
-  const boxes = [...root.querySelectorAll<HTMLLIElement>("li.task-list-item")].map((li) =>
+  // In a long document only some chunks are rendered; each knows how many tasks come before it.
+  const chunk = box.closest<HTMLElement>(".preview-chunk");
+  const scope = chunk ?? root;
+  const boxes = [...scope.querySelectorAll<HTMLLIElement>("li.task-list-item")].map((li) =>
     li.querySelector<HTMLInputElement>(':scope > input[type="checkbox"], :scope > p > input[type="checkbox"]'),
   );
-  return boxes.indexOf(box);
+  const i = boxes.indexOf(box);
+  return i < 0 ? -1 : i + Number(chunk?.dataset.tasksBefore ?? 0);
 }
 
 function useDebounced<T>(value: T, ms: number): T {
@@ -103,7 +108,10 @@ function FrontMatterTable({ entries }: { entries: Array<[string, string]> }) {
 const MarkdownView = memo(function MarkdownView({ text, docPath }: { text: string; docPath: string | null }) {
   const renderMath = useSettings((s) => s.settings.renderMath);
   const renderDiagrams = useSettings((s) => s.settings.renderDiagrams);
-  const plugins = useMemo(() => markdownPlugins({ math: renderMath }), [renderMath]);
+  const plugins = useMemo(() => {
+    const base = markdownPlugins({ math: renderMath });
+    return { ...base, rehypePlugins: [...base.rehypePlugins, rehypeChunks] };
+  }, [renderMath]);
   const frontMatter = useMemo(() => splitFrontMatter(text), [text]);
   const components = useMemo<Components>(
     () => ({
@@ -128,6 +136,15 @@ const MarkdownView = memo(function MarkdownView({ text, docPath }: { text: strin
         ) : (
           <input {...props} />
         ),
+      section: ({ node, children, ...rest }) => {
+        const chunk = node?.properties?.dataChunk;
+        if (typeof chunk !== "string") return <section {...rest}>{children}</section>;
+        return (
+          <PreviewChunk index={chunk} height={String(node!.properties.dataHeight)} tasksBefore={String(node!.properties.dataTasksBefore)}>
+            {children}
+          </PreviewChunk>
+        );
+      },
       a: ({ href, children, title }) => (
         <a href={href} title={title ?? href} data-href={href}>
           {children}
@@ -232,6 +249,7 @@ export function Preview() {
     const target = classifyLink(anchor.getAttribute("data-href") ?? anchor.getAttribute("href"));
     switch (target.type) {
       case "anchor": {
+        await mountAllChunks();
         const el = ref.current?.querySelector(`[id="${CSS.escape(target.id)}"], [id="user-content-${CSS.escape(target.id)}"]`);
         el?.scrollIntoView({ behavior: "smooth", block: "start" });
         break;

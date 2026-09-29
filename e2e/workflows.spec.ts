@@ -445,3 +445,26 @@ test("drag a file onto a folder in the explorer to move it", async ({ page }) =>
   await expect(page.getByText("Updated links in 2 files.")).toBeVisible();
   await expect(page.locator(".preview").getByRole("link", { name: "guide" })).toHaveAttribute("href", /\.\.\/docs\/guide\.md$/);
 });
+
+test("long documents render in chunks; the outline, anchors and tasks still work", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  const sections = Array.from({ length: 120 }, (_, i) => `## Section ${i}\n\nParagraph ${i}.`).join("\n\n");
+  await page.keyboard.insertText(`[Jump](#section-110)\n\n${sections}\n\n- [ ] last task\n`);
+  await page.keyboard.press(`${mod}+Home`);
+  const preview = page.locator(".preview");
+  await expect(preview.locator(".preview-chunk").first()).toBeVisible();
+  // Chunks far below the visible area are placeholders until needed.
+  await expect(preview.locator(".preview-chunk.pending").first()).toBeAttached();
+
+  await preview.getByRole("link", { name: "Jump" }).click();
+  await expect(preview.getByRole("heading", { name: "Section 110" })).toBeInViewport();
+
+  await page.keyboard.press(`${mod}+Home`);
+  await page.getByRole("region", { name: "Outline" }).getByRole("button", { name: "Section 115" }).click();
+  await expect(preview.getByRole("heading", { name: "Section 115" })).toBeInViewport();
+
+  await preview.getByRole("checkbox", { name: "Open task" }).click();
+  await expect(page.locator(".cm-line").filter({ hasText: "- [x] last task" })).toHaveCount(1);
+});

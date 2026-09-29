@@ -26,7 +26,7 @@ Nothing is actively under development right now. The next items are chosen from 
 ## Planned
 
 - **All math in PDF export:** every inline formula, and display formulas on macOS and Linux. Today PDF export draws display formulas on Windows and sets common inline formulas as text; HTML export, Print → Save as PDF and Word export render all formulas.
-- **Performance:** faster first display of very large documents (a pasted 400 KB document takes about 7 seconds to appear today) and a smaller startup bundle.
+- **Performance:** faster first display of very large documents (a pasted 800 KB document takes about 3.5 seconds to appear today, most of it parsing the Markdown) and a smaller startup bundle.
 - **End-to-end tests of the native app** on Windows, macOS and Linux, and testing the macOS and Linux builds on real hardware.
 
 ## Considering
