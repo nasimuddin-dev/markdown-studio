@@ -49,9 +49,7 @@ pub fn log_event(state: State<'_, AppState>, level: String, category: String, me
 
 #[tauri::command]
 pub async fn export_logs(app: AppHandle, state: State<'_, AppState>) -> AppResult<Option<String>> {
-    let picked = app
-        .dialog()
-        .file()
+    let picked = file_dialog(&app)
         .set_title("Export Diagnostic Logs")
         .add_filter("Log file", &["log", "txt"])
         .set_file_name("markpion-diagnostics.log")

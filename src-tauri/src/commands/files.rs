@@ -176,9 +176,7 @@ pub async fn export_file(
         _ => return Err(AppError::InvalidPath("Unsupported export type".into())),
     };
     scope::validate_file_name(&suggested_name)?;
-    let picked = app
-        .dialog()
-        .file()
+    let picked = file_dialog(&app)
         .set_title("Export")
         .add_filter(filter, exts)
         .set_file_name(suggested_name)
@@ -216,9 +214,7 @@ pub async fn export_binary_file(
     let bytes = base64::engine::general_purpose::STANDARD
         .decode(data_base64.as_bytes())
         .map_err(|_| AppError::InvalidPath("Invalid export data".into()))?;
-    let picked = app
-        .dialog()
-        .file()
+    let picked = file_dialog(&app)
         .set_title("Export")
         .add_filter(filter, &[ext])
         .set_file_name(suggested_name)

@@ -5,9 +5,7 @@ use super::*;
 
 #[tauri::command]
 pub async fn pick_open_file(app: AppHandle, state: State<'_, AppState>) -> AppResult<Option<String>> {
-    let picked = app
-        .dialog()
-        .file()
+    let picked = file_dialog(&app)
         .set_title("Open Markdown File")
         .add_filter(md_filter_name(), fs_ops::MARKDOWN_EXTENSIONS)
         .add_filter("All files", &["*"])
@@ -22,7 +20,7 @@ pub async fn pick_open_file(app: AppHandle, state: State<'_, AppState>) -> AppRe
 
 #[tauri::command]
 pub async fn pick_open_folder(app: AppHandle, state: State<'_, AppState>) -> AppResult<Option<String>> {
-    let picked = app.dialog().file().set_title("Open Folder").blocking_pick_folder();
+    let picked = file_dialog(&app).set_title("Open Folder").blocking_pick_folder();
     let Some(path) = picked.and_then(|p| p.into_path().ok()) else {
         return Ok(None);
     };
@@ -35,7 +33,7 @@ pub async fn pick_open_folder(app: AppHandle, state: State<'_, AppState>) -> App
 /// writing but, unlike Open Folder, not opened or added to recent folders.
 #[tauri::command]
 pub async fn pick_export_folder(app: AppHandle, state: State<'_, AppState>) -> AppResult<Option<String>> {
-    let picked = app.dialog().file().set_title("Export to Folder").blocking_pick_folder();
+    let picked = file_dialog(&app).set_title("Export to Folder").blocking_pick_folder();
     let Some(path) = picked.and_then(|p| p.into_path().ok()) else {
         return Ok(None);
     };
@@ -50,9 +48,7 @@ pub async fn pick_save_path(
     suggested_name: Option<String>,
     directory: Option<String>,
 ) -> AppResult<Option<String>> {
-    let mut dialog = app
-        .dialog()
-        .file()
+    let mut dialog = file_dialog(&app)
         .set_title("Save Markdown File")
         .add_filter(md_filter_name(), fs_ops::MARKDOWN_EXTENSIONS)
         .set_file_name(suggested_name.unwrap_or_else(|| "Untitled.md".into()));
@@ -87,9 +83,7 @@ fn import_filter(kind: &str) -> AppResult<(&'static str, &'static [&'static str]
 #[tauri::command]
 pub async fn pick_import_file(app: AppHandle, state: State<'_, AppState>, kind: String) -> AppResult<Option<String>> {
     let (name, exts) = import_filter(&kind)?;
-    let picked = app
-        .dialog()
-        .file()
+    let picked = file_dialog(&app)
         .set_title("Import")
         .add_filter(name, exts)
         .blocking_pick_file();

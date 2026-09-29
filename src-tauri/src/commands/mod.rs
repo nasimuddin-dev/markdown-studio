@@ -110,6 +110,17 @@ pub fn app_info(state: State<'_, AppState>) -> AppInfo {
     }
 }
 
+/// A native file dialog owned by the main window, so it opens in front of it
+/// (and stays there) instead of behind it.
+fn file_dialog(app: &AppHandle) -> tauri_plugin_dialog::FileDialogBuilder<tauri::Wry> {
+    use tauri::Manager;
+    let dialog = app.dialog().file();
+    match app.get_webview_window("main") {
+        Some(window) => dialog.set_parent(&window),
+        None => dialog,
+    }
+}
+
 pub mod ai;
 pub mod app_data;
 pub mod dialogs;
