@@ -10,15 +10,31 @@ import { commands, formatShortcut } from "./features/commands";
 import { TabBar } from "./components/TabBar";
 import { Editor } from "./components/Editor";
 import { lazy, Suspense } from "react";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // The preview pulls in the Markdown/math/highlighting pipeline; load it in
 // parallel with first paint instead of blocking startup on it.
 const Preview = lazy(() => import("./components/Preview").then((m) => ({ default: m.Preview })));
-const PreviewPane = () => (
-  <Suspense fallback={<div className="preview preview-loading">Loading preview…</div>}>
-    <Preview />
-  </Suspense>
-);
+function PreviewPane() {
+  // A document that broke the preview is retried as soon as it changes.
+  const content = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.content);
+  return (
+    <ErrorBoundary area="preview" resetKey={content}>
+      <Suspense fallback={<div className="preview preview-loading">Loading preview…</div>}>
+        <Preview />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+function EditorPane() {
+  const activeId = useDocuments((s) => s.activeId);
+  return (
+    <ErrorBoundary area="editor" resetKey={activeId}>
+      <Editor />
+    </ErrorBoundary>
+  );
+}
 import { StatusBar } from "./components/StatusBar";
 import { ChangeBanner } from "./components/ChangeBanner";
 import { DialogHost, Toasts } from "./components/Dialogs";
@@ -103,11 +119,11 @@ function EditorArea() {
   const viewMode = focusMode && settingsViewMode === "split" ? "editor" : settingsViewMode;
   const layout = useDefaultLayout({ id: "editor-preview", storage: layoutStorage, panelIds: ["editor", "preview"] });
 
-  if (viewMode === "editor") return <div className="pane"><Editor /></div>;
+  if (viewMode === "editor") return <div className="pane"><EditorPane /></div>;
   if (viewMode === "preview") return <div className="pane"><PreviewPane /></div>;
   return (
     <Group id="editor-preview" orientation="horizontal" className="split" defaultLayout={layout.defaultLayout} onLayoutChanged={layout.onLayoutChanged}>
-      <Panel id="editor" minSize="20" className="pane"><Editor /></Panel>
+      <Panel id="editor" minSize="20" className="pane"><EditorPane /></Panel>
       <Separator className="resize-handle" aria-label="Resize editor and preview" />
       <Panel id="preview" minSize="20" className="pane"><PreviewPane /></Panel>
     </Group>
@@ -135,7 +151,9 @@ export default function App() {
         {showExplorer && (
           <>
             <Panel id="explorer" defaultSize="20" minSize={170} maxSize="45">
-              <Sidebar />
+              <ErrorBoundary area="sidebar">
+                <Sidebar />
+              </ErrorBoundary>
             </Panel>
             <Separator className="resize-handle" aria-label="Resize file explorer" />
           </>
@@ -144,7 +162,11 @@ export default function App() {
           <main className="main-area">
             {hasDocs ? (
               <>
-                {!focusMode && <TabBar />}
+                {!focusMode && (
+                  <ErrorBoundary area="tab bar">
+                    <TabBar />
+                  </ErrorBoundary>
+                )}
                 <ChangeBanner />
                 <div className="editor-area">
                   <EditorArea />
@@ -156,7 +178,11 @@ export default function App() {
           </main>
         </Panel>
       </Group>
-      {!focusMode && <StatusBar />}
+      {!focusMode && (
+        <ErrorBoundary area="status bar">
+          <StatusBar />
+        </ErrorBoundary>
+      )}
       <SettingsDialog />
       <AboutDialog />
       <CommandPalette />

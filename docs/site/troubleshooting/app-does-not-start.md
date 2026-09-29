@@ -42,6 +42,8 @@ description: What to do when Markpion doesn't start, shows a blank window, or qu
 
 **Possible cause:** varies. If it quit with unsaved documents, they were snapshotted every few seconds.
 
+If a single area fails (for example the preview, the sidebar or the status bar), it shows "couldn't be shown because of an unexpected error" with a **Try Again** button, and the rest of the window keeps working. If the whole window fails, Markpion shows "Markpion hit an unexpected error" with a **Reload** button: it saves your unsaved changes for recovery first, then reloads and offers to restore them.
+
 **Solution:**
 
 1. Start Markpion again. It offers to **recover** unsaved documents from the last session (see [Crash recovery](/guide/saving-and-recovery#crash-recovery)).

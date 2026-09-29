@@ -326,7 +326,7 @@ The updater's private signing key never enters the repository; it stays in `~/.t
 ## 13. Design principles
 
 - **Local first.** Files stay plain Markdown on the user's disk, readable without Markpion. No account, no cloud.
-- **Never lose work.** Atomic saves, conflict detection, file history, crash recovery, and trash instead of permanent deletion.
+- **Never lose work.** Atomic saves, conflict detection, file history, crash recovery, and trash instead of permanent deletion. A rendering error is contained to its area (error boundaries), so the rest of the window, including saving, keeps working.
 - **Least privilege.** The web view can't touch the filesystem; the Rust core validates every path.
 - **One pipeline.** Preview and HTML export share the Markdown pipeline; exports convert the syntax tree to each format's native structures.
 - **Fast start.** Heavy features load on first use.

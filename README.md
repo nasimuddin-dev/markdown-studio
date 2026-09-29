@@ -87,6 +87,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Live folder watching: the explorer and open files update immediately when other programs change files on disk
 - External change detection: clean tabs reload automatically; dirty tabs get Reload / Compare / Keep Mine
 - Crash recovery for unsaved documents, and session restore for the last folder and open files
+- Rendering errors are contained: if the preview or another area fails, it shows the error with Try Again while the rest of the window, including saving, keeps working
 - UTF-8 (with or without BOM), with LF/CRLF line endings preserved per file
 - Word count in the status bar, with a statistics popover (words, characters, lines, paragraphs, reading time) for the document and the selection
 - Spell checking with the system dictionary (Settings)

@@ -1657,3 +1657,32 @@ select {
   padding: 4px 10px;
   font-size: 12px;
 }
+
+/* A component that failed to render (ErrorBoundary). */
+.area-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-strong);
+  border-left: 4px solid var(--danger);
+  border-radius: 7px;
+  font-size: 13px;
+}
+.area-error p {
+  margin: 0;
+}
+.area-error code {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.app-crash {
+  max-width: 560px;
+  margin: 15vh auto 0;
+  padding: 0 24px;
+  line-height: 1.5;
+}

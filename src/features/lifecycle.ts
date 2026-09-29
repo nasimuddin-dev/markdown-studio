@@ -115,6 +115,19 @@ function snapshotDirtyDocs(): RecoverySnapshot {
   };
 }
 
+/**
+ * Writes the recovery snapshot right away (instead of after the usual delay),
+ * e.g. before reloading after an unexpected error.
+ */
+export async function saveRecoveryNow() {
+  clearTimeout(recoveryTimer);
+  const snap = snapshotDirtyDocs();
+  if (snap.docs.length > 0) {
+    await backend().saveRecovery(snap);
+    hadRecovery = true;
+  }
+}
+
 let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
 let hadRecovery = false;
 

@@ -59,6 +59,12 @@ description: Fix Markpion preview problems, including a paused preview, images t
 
 **Possible cause:** for safety, the preview opens only `http`, `https` and `mailto` links (in your browser), `#heading` links, and links to Markdown files. Other link types are blocked, and a message says so.
 
+## "The preview couldn't be shown because of an unexpected error"
+
+**Cause:** something in the document triggered a bug while drawing the preview. Only the preview stops; the editor, tabs and saving keep working, and nothing in your document is lost.
+
+**Solution:** keep editing. The preview tries again as soon as the text changes, or choose **Try Again**. If it keeps happening with the same text, please [report an issue](https://github.com/nasimuddin-dev/markpion/issues) with the part of the document that causes it and the diagnostic log (**Help → Export Diagnostic Logs…**), which records the error.
+
 ## Report an issue
 
 If a document renders differently from GitHub, [report it on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) with a small Markdown sample.
