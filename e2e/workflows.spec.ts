@@ -438,4 +438,10 @@ test("drag a file onto a folder in the explorer to move it", async ({ page }) =>
   // The folder opens to show it; the open tab now points to the new place.
   await expect(page.getByRole("treeitem", { name: /notes/ }).getByRole("treeitem", { name: /README\.md/ })).toBeVisible();
   await expect(page.locator('.tree-row.active[data-path$="notes/README.md"]')).toBeVisible();
+  // README links to docs/guide.md and assets/logo.svg, and the guide links back: all three are offered for updating.
+  const dialog = page.getByRole("dialog", { name: "Update links?" });
+  await expect(dialog).toContainText("3 links in 2 files");
+  await dialog.getByRole("button", { name: "Update Links" }).click();
+  await expect(page.getByText("Updated links in 2 files.")).toBeVisible();
+  await expect(page.locator(".preview").getByRole("link", { name: "guide" })).toHaveAttribute("href", /\.\.\/docs\/guide\.md$/);
 });

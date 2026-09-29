@@ -26,12 +26,22 @@ The file explorer shows the folder you're working in, your **workspace**. Open i
 | New file | The **New file** button at the top of the Explorer, or right-click a folder → **New File…** |
 | New folder | The **New folder** button, or right-click a folder → **New Folder…** |
 | Duplicate | Right-click a file → **Duplicate**. The copy is named like `notes copy.md` (or `notes copy 2.md`, … if that exists), keeps the original's line endings, and opens. It copies the saved file, so unsaved changes in an open tab aren't included |
-| Rename | Select an item and press **F2**, or right-click → **Rename…**. Open tabs follow the rename |
-| Move | Drag a file or folder onto another folder, or onto the empty space below the tree for the top level; **Esc** cancels. From the keyboard: right-click (or **Shift+F10**) → **Move To…** and type the folder, relative to the open folder (`/` for the top level). Nothing is replaced: moving onto a name that already exists is refused. Open tabs follow the move. Links in other documents that point to the moved file aren't updated; [Check Links in Folder](/guide/checking-documents) finds them |
+| Rename | Select an item and press **F2**, or right-click → **Rename…**. Open tabs follow the rename, and links to it can be updated (see below) |
+| Move | Drag a file or folder onto another folder, or onto the empty space below the tree for the top level; **Esc** cancels. From the keyboard: right-click (or **Shift+F10**) → **Move To…** and type the folder, relative to the open folder (`/` for the top level). Nothing is replaced: moving onto a name that already exists is refused. Open tabs follow the move, and links to it can be updated (see below) |
 | Delete | Right-click → **Delete…**. After you confirm, the item goes to the Trash or Recycle Bin, so it can be restored |
 | Refresh | The **Refresh** button |
 
 Other right-click actions: **Open**, **Reveal in File Explorer** (**Reveal in Finder** on macOS, **Open Containing Folder** on Linux), **Copy Path** and **Copy Relative Path**.
+
+## Links follow renamed and moved files
+
+When you rename or move a file or folder, Markpion looks through the Markdown files in the open folder for relative links and images that would stop working: links in other documents that point to it, and the moved documents' own links to files that stayed where they were. If it finds any, it asks **Update links?** with the number of links and files; **Update Links** rewrites them, **Don't Update** leaves every file as it is.
+
+- Anchors (`#section`), a leading `./` and `<…>` brackets are kept; spaces and brackets in new names are written as `%20`, `%28` and `%29`.
+- Files open with unsaved changes are skipped (the dialog names them). Open tabs without changes reload with the new links.
+- The previous version of each rewritten file is kept in [File History](/guide/saving-and-recovery#file-history).
+- Only inline links and images (`[text](path)`, `![alt](path)`) are updated. Reference-style link definitions (`[id]: path`), HTML `<a>`/`<img>` tags and absolute paths aren't; [Check Links in Folder](/guide/checking-documents) finds any that broke.
+- Renaming or moving files outside Markpion (in your file manager or with Git) doesn't update links.
 
 ## Changes made by other programs
 

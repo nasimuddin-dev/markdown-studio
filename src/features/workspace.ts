@@ -104,8 +104,9 @@ export async function renameEntry(entry: DirEntry) {
     selectUntil: dot > 0 ? dot : entry.name.length,
   });
   if (!name || name === entry.name) return;
+  let to: string;
   try {
-    const to = await backend().renamePath(entry.path, name);
+    to = await backend().renamePath(entry.path, name);
     onPathRenamed(entry.path, to);
     const parent = dirname(entry.path);
     // Move cached expansion/children for renamed folders.
@@ -114,17 +115,31 @@ export async function renameEntry(entry: DirEntry) {
       for (const key of Object.keys(children)) if (isInside(key, entry.path)) delete children[key];
       if (expanded[entry.path]) ws().setExpanded(to, true);
     }
+    invalidateWorkspaceFiles();
     await refreshDir(parent);
     ws().select(to);
   } catch (e) {
     notify("error", describeError(e, `rename “${entry.name}”`));
+    return;
+  }
+  await offerLinkUpdate(entry.path, to);
+}
+
+/** Offers to fix links that pointed to a renamed or moved item (only Markdown and linkable files are affected). */
+async function offerLinkUpdate(from: string, to: string) {
+  const root = ws().root;
+  if (!root || !isInside(to, root)) return;
+  try {
+    await (await import("./linkUpdate")).updateLinksAfterMove(root, from, to);
+  } catch (e) {
+    notify("error", describeError(e, "update links"));
   }
 }
 
 /**
  * Moves a file or folder into another folder of the workspace (drag and drop
- * in the explorer, or Move To…). Open tabs follow the move. Links in other
- * documents that point to it aren't updated.
+ * in the explorer, or Move To…). Open tabs follow the move, and links that
+ * pointed to it (or from it) can be updated.
  */
 export async function moveEntry(entry: DirEntry, targetDir: string) {
   const from = entry.path;
@@ -142,6 +157,7 @@ export async function moveEntry(entry: DirEntry, targetDir: string) {
     if (targetDir !== ws().root) ws().setExpanded(targetDir, true);
     ws().select(to);
     notify("success", `Moved “${entry.name}” to “${basename(targetDir)}”.`);
+    await offerLinkUpdate(from, to);
   } catch (e) {
     notify("error", describeError(e, `move “${entry.name}”`));
   }

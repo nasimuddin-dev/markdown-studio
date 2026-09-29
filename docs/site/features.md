@@ -35,7 +35,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 
 ## Files and workspaces
 
-- Open a single file or a whole folder. The file explorer can create, duplicate, rename (F2), move (drag and drop, or Move To…) and delete files and folders (to the Trash or Recycle Bin), reveal them in your file manager, and copy their paths. [File explorer](/guide/file-explorer)
+- Open a single file or a whole folder. The file explorer can create, duplicate, rename (F2), move (drag and drop, or Move To…) and delete files and folders (to the Trash or Recycle Bin), reveal them in your file manager, and copy their paths. Links to a renamed or moved file are updated after you confirm. [File explorer](/guide/file-explorer)
 - Tabs with unsaved-change markers, reordering, context actions (Close Others, Close to the Right, Close Saved), and Reopen Closed Tab. [Tabs](/guide/tabs)
 - Find and replace in the document (case, whole word, regex), and Find in Files and Replace in Files across the folder (unsaved files are skipped; previous versions go to File History). [Search & replace](/guide/search-replace)
 - A document outline (drag to reorder sections, copy a link to a heading), a command palette, Go to File (open any file in the folder by typing part of its name), and recent files and folders.
