@@ -188,3 +188,106 @@ export function sortTableAtCursor(descending: boolean): StateCommand {
     return true;
   };
 }
+
+/** A change to a table's structure: new lines, and the row and cell to put the cursor in. */
+type TableEdit = { lines: string[]; row: number; cell: number } | null;
+
+const isTable = (lines: string[]) => lines.length >= 2 && splitRow(lines[1]).every((c) => DELIMITER_CELL.test(c));
+const columnCount = (lines: string[]) => Math.max(...lines.map((l) => splitRow(l).length));
+const indentOf = (line: string) => /^\s*/.exec(line)![0];
+const joinRow = (indent: string, cells: string[]) => `${indent}| ${cells.join(" | ")} |`;
+
+/**
+ * Inserts an empty row above or below table line `row` (0 = header,
+ * 1 = delimiter). Rows can't go above the header; "below" the header or the
+ * delimiter row adds the first body row.
+ */
+export function insertTableRow(lines: string[], row: number, below: boolean): TableEdit {
+  if (!isTable(lines) || (row <= 1 && !below)) return null;
+  const at = row <= 1 ? 2 : below ? row + 1 : row;
+  const empty = joinRow(indentOf(lines[0]), Array.from({ length: columnCount(lines) }, () => ""));
+  return { lines: [...lines.slice(0, at), empty, ...lines.slice(at)], row: at, cell: 0 };
+}
+
+/** Deletes body row `row`; the header and delimiter rows stay. */
+export function deleteTableRow(lines: string[], row: number, cell: number): TableEdit {
+  if (!isTable(lines) || row <= 1) return null;
+  const next = [...lines.slice(0, row), ...lines.slice(row + 1)];
+  // The row that took its place, or the one above; the header if no body rows are left.
+  const at = Math.min(row, next.length - 1);
+  return { lines: next, row: at === 1 ? 0 : at, cell };
+}
+
+/** Inserts an empty column left or right of column `col` (0-based). */
+export function insertTableColumn(lines: string[], row: number, col: number, right: boolean): TableEdit {
+  if (!isTable(lines)) return null;
+  const cols = columnCount(lines);
+  const at = Math.min(right ? col + 1 : col, cols);
+  const next = lines.map((line, i) => {
+    const cells = splitRow(line);
+    while (cells.length < cols) cells.push("");
+    cells.splice(at, 0, i === 1 ? "---" : "");
+    return joinRow(indentOf(line), cells);
+  });
+  return { lines: next, row, cell: at };
+}
+
+/** Deletes column `col`; a table keeps at least one column. */
+export function deleteTableColumn(lines: string[], row: number, col: number): TableEdit {
+  if (!isTable(lines)) return null;
+  const cols = columnCount(lines);
+  if (cols <= 1 || col >= cols) return null;
+  const next = lines.map((line) => {
+    const cells = splitRow(line);
+    while (cells.length < cols) cells.push("");
+    cells.splice(col, 1);
+    return joinRow(indentOf(line), cells);
+  });
+  return { lines: next, row, cell: Math.min(col, cols - 2) };
+}
+
+/** Offset of the start of cell `cell`'s text in a formatted row ("| a | b |"). */
+function cellTextOffset(row: string, cell: number): number {
+  let pipes = 0;
+  for (let i = 0; i < row.length; i++) {
+    if (row[i] === "|" && row[i - 1] !== "\\" && pipes++ === cell) return Math.min(i + 2, row.length);
+  }
+  return row.length;
+}
+
+/**
+ * Runs a structural edit on the table around the cursor, formats the result
+ * and moves the cursor into the cell the edit points to.
+ */
+function editTableAtCursor(edit: (lines: string[], row: number, cell: number) => TableEdit, userEvent: string): StateCommand {
+  return ({ state, dispatch }) => {
+    const head = state.selection.main.head;
+    const line = state.doc.lineAt(head);
+    const range = tableAround(state, line.number);
+    if (!range) return false;
+    const lines: string[] = [];
+    for (let n = range.first; n <= range.last; n++) lines.push(state.doc.line(n).text);
+    const result = edit(lines, line.number - range.first, cellIndexAt(line.text, head - line.from));
+    const formatted = result && formatTable(result.lines);
+    if (!result || !formatted) return false;
+    const from = state.doc.line(range.first).from;
+    const to = state.doc.line(range.last).to;
+    const rowStart = from + formatted.slice(0, result.row).reduce((n, l) => n + l.length + 1, 0);
+    const anchor = rowStart + cellTextOffset(formatted[result.row], result.cell);
+    dispatch(state.update({ changes: { from, to, insert: formatted.join("\n") }, selection: { anchor }, userEvent }));
+    return true;
+  };
+}
+
+export const insertRowAbove = editTableAtCursor((l, row, cell) => {
+  const r = insertTableRow(l, row, false);
+  return r && { ...r, cell };
+}, "input.tableRow");
+export const insertRowBelow = editTableAtCursor((l, row, cell) => {
+  const r = insertTableRow(l, row, true);
+  return r && { ...r, cell };
+}, "input.tableRow");
+export const deleteRow = editTableAtCursor(deleteTableRow, "delete.tableRow");
+export const insertColumnLeft = editTableAtCursor((l, row, cell) => insertTableColumn(l, row, cell, false), "input.tableColumn");
+export const insertColumnRight = editTableAtCursor((l, row, cell) => insertTableColumn(l, row, cell, true), "input.tableColumn");
+export const deleteColumn = editTableAtCursor(deleteTableColumn, "delete.tableColumn");

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { EditorSelection, EditorState } from "@codemirror/state";
-import { displayWidth, formatTable, formatTableAtCursor, sortTableAtCursor, sortTableRows, splitRow } from "../src/features/tables";
+import {
+  deleteColumn, deleteRow, deleteTableColumn, deleteTableRow, displayWidth, formatTable, formatTableAtCursor, insertColumnLeft,
+  insertColumnRight, insertRowAbove, insertRowBelow, insertTableColumn, insertTableRow, sortTableAtCursor, sortTableRows, splitRow,
+} from "../src/features/tables";
 import { applyCommand } from "../src/features/formatting";
 
 describe("table formatting", () => {
@@ -64,5 +67,58 @@ describe("sort table by column", () => {
     const out = applyCommand(state, sortTableAtCursor(true)).doc.toString();
     expect(out).toBe("Intro\n\n| Name | Qty |\n| ---- | --- |\n| a    | 10  |\n| b    | 2   |\n");
     expect(sortTableRows(["| a |", "| b |"], 0, false)).toBeNull();
+  });
+});
+
+describe("table rows and columns", () => {
+  const t = ["| A | B |", "| :-- | --: |", "| 1 | 2 |", "| 3 | 4 |"];
+
+  it("inserts rows, never above the header", () => {
+    expect(insertTableRow(t, 2, true)?.lines).toEqual(["| A | B |", "| :-- | --: |", "| 1 | 2 |", "|  |  |", "| 3 | 4 |"]);
+    expect(insertTableRow(t, 2, false)?.lines[2]).toBe("|  |  |");
+    expect(insertTableRow(t, 0, true)?.row).toBe(2);
+    expect(insertTableRow(t, 0, false)).toBeNull();
+    expect(insertTableRow(["no", "table"], 0, true)).toBeNull();
+  });
+
+  it("deletes body rows only", () => {
+    expect(deleteTableRow(t, 2, 0)?.lines).toEqual(["| A | B |", "| :-- | --: |", "| 3 | 4 |"]);
+    expect(deleteTableRow(t, 0, 0)).toBeNull();
+    expect(deleteTableRow(t, 1, 0)).toBeNull();
+    // Deleting the only body row moves the cursor to the header.
+    expect(deleteTableRow(["| A |", "| - |", "| 1 |"], 2, 0)?.row).toBe(0);
+  });
+
+  it("inserts and deletes columns, keeping the other columns' alignment", () => {
+    expect(insertTableColumn(t, 2, 0, true)?.lines).toEqual(["| A |  | B |", "| :-- | --- | --: |", "| 1 |  | 2 |", "| 3 |  | 4 |"]);
+    expect(insertTableColumn(t, 2, 0, false)?.lines[1]).toBe("| --- | :-- | --: |");
+    expect(deleteTableColumn(t, 2, 0)?.lines).toEqual(["| B |", "| --: |", "| 2 |", "| 4 |"]);
+    expect(deleteTableColumn(["| A |", "| - |"], 0, 0)).toBeNull();
+  });
+
+  const run = (doc: string, at: string, command: typeof insertRowBelow) => {
+    const state = applyCommand(EditorState.create({ doc, selection: EditorSelection.cursor(doc.indexOf(at)) }), command);
+    const line = state.doc.lineAt(state.selection.main.head);
+    return { doc: state.doc.toString(), line: line.text, column: state.selection.main.head - line.from };
+  };
+  const doc = ["|a|b|", "|-|-|", "|1|2|"].join("\n");
+  const rows = (s: string) => s.split("\n");
+
+  it("edits the table around the cursor, formats it and keeps the cursor in the right cell", () => {
+    const below = run(doc, "2|", insertRowBelow);
+    expect(rows(below.doc)).toEqual(["| a   | b   |", "| --- | --- |", "| 1   | 2   |", "|     |     |"]);
+    expect(below).toMatchObject({ line: "|     |     |", column: 8 });
+    expect(rows(run(doc, "1|", insertRowAbove).doc)[2]).toBe("|     |     |");
+    const right = run(doc, "1|", insertColumnRight);
+    expect(rows(right.doc)[0]).toBe("| a   |     | b   |");
+    expect(right.column).toBe(8);
+    expect(rows(run(doc, "1|", insertColumnLeft).doc)[0]).toBe("|     | a   | b   |");
+    expect(rows(run(doc, "1|", deleteRow).doc)).toEqual(["| a   | b   |", "| --- | --- |"]);
+    expect(rows(run(doc, "2|", deleteColumn).doc)).toEqual(["| a   |", "| --- |", "| 1   |"]);
+  });
+
+  it("does nothing outside a table", () => {
+    const state = EditorState.create({ doc: "plain text" });
+    expect(insertRowBelow({ state, dispatch: () => {} })).toBe(false);
   });
 });

@@ -16,7 +16,9 @@ const importing = () => import("./importing");
 import type { StateCommand } from "@codemirror/state";
 import type { KeyBinding } from "@codemirror/view";
 import * as fmt from "./formatting";
-import { formatTableAtCursor, sortTableAtCursor } from "./tables";
+import {
+  deleteColumn, deleteRow, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
+} from "./tables";
 import { insertOrUpdateToc } from "./toc";
 import { moveSectionDown, moveSectionUp } from "./sections";
 
@@ -65,6 +67,12 @@ export const formatCommands: Record<string, Command> = {
   formatTable: formatCommand("formatTable", "Format Table", formatTableAtCursor, "Mod+Alt+T"),
   sortTableAsc: formatCommand("sortTableAsc", "Sort Table by Column (A to Z)", sortTableAtCursor(false)),
   sortTableDesc: formatCommand("sortTableDesc", "Sort Table by Column (Z to A)", sortTableAtCursor(true)),
+  tableRowAbove: formatCommand("tableRowAbove", "Table: Insert Row Above", insertRowAbove),
+  tableRowBelow: formatCommand("tableRowBelow", "Table: Insert Row Below", insertRowBelow),
+  tableColumnLeft: formatCommand("tableColumnLeft", "Table: Insert Column Left", insertColumnLeft),
+  tableColumnRight: formatCommand("tableColumnRight", "Table: Insert Column Right", insertColumnRight),
+  tableDeleteRow: formatCommand("tableDeleteRow", "Table: Delete Row", deleteRow),
+  tableDeleteColumn: formatCommand("tableDeleteColumn", "Table: Delete Column", deleteColumn),
   toc: formatCommand("toc", "Insert / Update Table of Contents", insertOrUpdateToc),
   horizontalRule: formatCommand("horizontalRule", "Horizontal Rule", fmt.insertHorizontalRule),
 };

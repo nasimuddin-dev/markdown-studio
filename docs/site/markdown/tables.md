@@ -34,6 +34,9 @@ Colons in the delimiter row align a column:
 | --- | --- | --- |
 | Insert Table | | Inserts a two-column table to fill in |
 | Format Table | Ctrl+Alt+T | Pads every column to the same width and normalizes the delimiter row. Wide characters (Chinese, Japanese, Korean, emoji) count as two columns, so tables stay aligned |
+| Table: Insert Row Above / Below | | Adds an empty row next to the cursor's row (below the header when the cursor is in the header) and moves the cursor into it |
+| Table: Insert Column Left / Right | | Adds an empty column next to the cursor's column; the other columns keep their alignment |
+| Table: Delete Row / Delete Column | | Removes the cursor's body row or column. The header row, and a table's last column, can't be deleted |
 | Sort Table by Column (A to Z / Z to A) | | Sorts the body rows by the column the cursor is in, then formats the table |
 | Copy Table as CSV | | Copies the table at the cursor as CSV for a spreadsheet |
 

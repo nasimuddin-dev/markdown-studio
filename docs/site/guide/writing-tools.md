@@ -57,7 +57,7 @@ The list commands work on all selected lines, and applying one again removes it.
 ## Blocks
 
 - **Code Block** (**Ctrl+Alt+C**) inserts a fenced code block. Type the language after the backticks.
-- **Insert Table** inserts a two-column table to fill in. **Format Table** (**Ctrl+Alt+T**) aligns it, and **Sort Table by Column** sorts it. See [Tables](/markdown/tables).
+- **Insert Table** inserts a two-column table to fill in. **Format Table** (**Ctrl+Alt+T**) aligns it, the **Table: Insert/Delete Row and Column** commands change its shape, and **Sort Table by Column** sorts it. See [Tables](/markdown/tables).
 - **Horizontal Rule** inserts `---`.
 - **Insert Footnote** (**Ctrl+Alt+R**) inserts the next numbered reference, such as `[^1]`, at the cursor and adds its definition at the end of the document, where the cursor moves so you can type the note. See [Footnotes](/markdown/extras#footnotes).
 
