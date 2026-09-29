@@ -165,6 +165,7 @@ export const commands: Record<string, Command> = {
   exportPdf: { id: "exportPdf", label: "Export as PDF…", run: async () => (await exporting()).exportActiveAsPdf(), enabled: hasActive },
   exportDocx: { id: "exportDocx", label: "Export as Word (.docx)…", run: async () => (await exporting()).exportActiveAsDocx(), enabled: hasActive },
   copyHtml: { id: "copyHtml", label: "Copy as HTML", run: async () => (await exporting()).copyActiveAsHtml(), enabled: hasActive },
+  copyFormatted: { id: "copyFormatted", label: "Copy as Formatted Text", run: async () => (await exporting()).copyActiveAsFormattedText(), enabled: hasActive },
   print: { id: "print", label: "Print / Save as PDF…", shortcut: "Mod+P", run: async () => (await exporting()).printActive(), enabled: hasActive },
   reopenClosedTab: {
     id: "reopenClosedTab",

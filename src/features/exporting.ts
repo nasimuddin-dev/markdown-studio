@@ -145,6 +145,50 @@ export async function exportFolder(format: "pdf" | "docx") {
   await (format === "pdf" ? exportAsPdf(src) : exportAsDocx(src));
 }
 
+/**
+ * Copies the rendered document as formatted text, for pasting into Word,
+ * email or Google Docs: the clipboard gets an HTML version (formatting,
+ * tables, links, embedded images) and the Markdown as plain text.
+ */
+export async function copyActiveAsFormattedText() {
+  const doc = activeDoc();
+  if (!doc) return;
+  try {
+    const html = await renderHtml(doc.content, doc.path, loadImage, features());
+    if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([doc.content], { type: "text/plain" }),
+        }),
+      ]);
+    } else {
+      copyHtmlWithSelection(html);
+    }
+    notify("success", "Formatted text copied. Paste it into Word, an email or a document.");
+  } catch (e) {
+    notify("error", describeError(e, "copy the formatted text"));
+  }
+}
+
+/** Fallback for engines without ClipboardItem: select rendered HTML and use the copy command. */
+function copyHtmlWithSelection(html: string) {
+  const holder = document.createElement("div");
+  holder.contentEditable = "true";
+  holder.style.cssText = "position:fixed;left:-10000px;top:0;opacity:0";
+  holder.innerHTML = html;
+  document.body.appendChild(holder);
+  const range = document.createRange();
+  range.selectNodeContents(holder);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+  const ok = document.execCommand("copy");
+  selection?.removeAllRanges();
+  holder.remove();
+  if (!ok) throw new Error("The clipboard isn't available.");
+}
+
 /** Copies the rendered HTML of the active document to the clipboard. */
 export async function copyActiveAsHtml() {
   const doc = activeDoc();

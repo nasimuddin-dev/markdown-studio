@@ -365,3 +365,24 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.getByRole("treeitem", { name: /README copy\.md/ })).toBeVisible();
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markdown Studio");
 });
+
+test("copy as formatted text puts HTML and Markdown on the clipboard", async ({ page }) => {
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Report\n\nSome **bold** text.");
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("copy as formatted");
+  await page.getByRole("option", { name: /^Copy as Formatted Text/ }).click();
+  await expect(page.getByText(/Formatted text copied/)).toBeVisible();
+  const clip = await page.evaluate(async () => {
+    const [item] = await navigator.clipboard.read();
+    return { types: item.types, html: await (await item.getType("text/html")).text(), text: await (await item.getType("text/plain")).text() };
+  });
+  expect(clip.types).toEqual(expect.arrayContaining(["text/html", "text/plain"]));
+  expect(clip.html).toMatch(/<h1[^>]*>Report<\/h1>/);
+  expect(clip.html).toContain("<strong>bold</strong>");
+  // The Windows clipboard stores line breaks as CRLF.
+  expect(clip.text.replace(/\r\n/g, "\n")).toBe("# Report\n\nSome **bold** text.");
+});
