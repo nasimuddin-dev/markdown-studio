@@ -36,6 +36,10 @@ export interface ExportOptions {
   renderMath?: DiagramRenderer;
   /** Paper size for PDF and Word (default A4). */
   pageSize?: PageSize;
+  /** Document properties (from the front matter). */
+  author?: string;
+  description?: string;
+  keywords?: string;
 }
 
 const MONO = "Consolas";
@@ -337,7 +341,9 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
   const doc = new Document({
     footnotes,
     title: opts.title,
-    creator: "Markpion",
+    creator: opts.author ?? "Markpion",
+    ...(opts.description ? { description: opts.description, subject: opts.description } : {}),
+    ...(opts.keywords ? { keywords: opts.keywords } : {}),
     styles: {
       default: { document: { run: { font: "Calibri", size: 22 } } },
       characterStyles: [{ id: "Hyperlink", name: "Hyperlink", run: { color: "2F5BEA", underline: {} } }],

@@ -6,6 +6,7 @@ import { notify } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
 import { basename } from "../services/paths";
 import { resolvePageSize } from "../services/convert/pageSize";
+import { frontMatterMetadata } from "../services/frontMatter";
 
 const features = () => {
   const s = useSettings.getState().settings;
@@ -71,6 +72,7 @@ async function exportAsDocx(src: ExportSource) {
       renderDiagram: await diagramRenderer(src.content),
       math: features().math,
       pageSize: pageSize(),
+      ...frontMatterMetadata(src.content),
       renderMath: await mathRenderer(src.content),
     });
     const saved = await backend().exportBinaryFile(exportFileName(src.name, "docx"), bytesToBase64(bytes), "docx");
@@ -114,6 +116,7 @@ async function exportAsPdf(src: ExportSource, onPrint?: () => Promise<void>) {
       renderDiagram: await diagramRenderer(src.content),
       math: features().math,
       pageSize: pageSize(),
+      ...frontMatterMetadata(src.content),
       renderMath: await mathRenderer(src.content),
     });
     const saved = await backend().exportBinaryFile(exportFileName(src.name, "pdf"), bytesToBase64(bytes), "pdf");

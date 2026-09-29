@@ -313,7 +313,14 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
   content.push(...(await builder.footnoteSection()));
 
   const doc: TDocumentDefinitions = {
-    info: { title: opts.title, creator: "Markpion", producer: "Markpion" },
+    info: {
+      title: opts.title,
+      creator: "Markpion",
+      producer: "Markpion",
+      ...(opts.author ? { author: opts.author } : {}),
+      ...(opts.description ? { subject: opts.description } : {}),
+      ...(opts.keywords ? { keywords: opts.keywords } : {}),
+    },
     pageSize: { width: page.width, height: page.height },
     pageMargins: [SIDE_MARGIN, 48, SIDE_MARGIN, 56],
     content,

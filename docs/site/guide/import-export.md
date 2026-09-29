@@ -58,7 +58,7 @@ Export commands are in the **File** menu. You choose where to save the file.
 
 PDF and Word exports use A4 or Letter paper: automatically from your system's region, or the size you choose in [Settings → Export](/guide/settings#export).
 
-The document's front matter isn't exported; its `title`, if any, becomes the exported document's title.
+The document's front matter isn't exported; its `title` becomes the exported document's title, and `author`, `description` and `keywords` its document properties (see [Front matter](/markdown/extras#front-matter)).
 
 ### Mermaid, math, footnotes and special characters
 

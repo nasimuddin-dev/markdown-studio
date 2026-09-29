@@ -23,6 +23,7 @@ date: 2026-09-25
 - In the **preview**, the front matter is shown as a small table of keys and values, like on GitHub.
 - It's **left out of exports** (HTML, PDF and Word).
 - If it has a `title`, that becomes the title of the exported document.
+- `author` (or `authors`), `description` (or `summary`, `subject`) and `keywords` (or `tags`) become the exported file's document properties: the Author, Subject and Keywords of a PDF, the Author, Subject, Comments and Tags of a Word document, and `<meta>` tags in HTML. Lists are joined with commas.
 
 ## Alerts
 

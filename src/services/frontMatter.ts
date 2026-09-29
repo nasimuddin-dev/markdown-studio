@@ -68,6 +68,37 @@ export function stripFrontMatter(text: string): string {
   return m ? text.slice(m[0].length).replace(/^\s*\n/, "") : text;
 }
 
+/** Document properties for exports, from the front matter. */
+export interface DocumentMetadata {
+  author?: string;
+  description?: string;
+  keywords?: string;
+}
+
+/**
+ * `author`/`authors`, `description`/`summary`/`subject` and `keywords`/`tags`
+ * from the front matter (lists are joined with ", "), for the document
+ * properties of exported files.
+ */
+export function frontMatterMetadata(text: string): DocumentMetadata {
+  const entries = splitFrontMatter(text)?.entries ?? [];
+  const pick = (...keys: string[]) => {
+    for (const key of keys) {
+      const value = entries.find(([k]) => k.toLowerCase() === key)?.[1].trim();
+      if (value) return value.slice(0, 1000);
+    }
+    return undefined;
+  };
+  const meta: DocumentMetadata = {};
+  const author = pick("author", "authors");
+  const description = pick("description", "summary", "subject");
+  const keywords = pick("keywords", "tags");
+  if (author) meta.author = author;
+  if (description) meta.description = description;
+  if (keywords) meta.keywords = keywords;
+  return meta;
+}
+
 /** The `title` entry of the front matter, if any. */
 export function frontMatterTitle(text: string): string | null {
   const fm = splitFrontMatter(text);

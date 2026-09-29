@@ -1,4 +1,4 @@
-import { frontMatterTitle, stripFrontMatter } from "./frontMatter";
+import { frontMatterMetadata, frontMatterTitle, stripFrontMatter } from "./frontMatter";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
@@ -110,6 +110,12 @@ export async function buildHtmlDocument(opts: {
 }) {
   const body = await renderHtml(opts.markdown, opts.docPath, opts.loadImage, opts.features);
   const title = escapeHtml(documentTitle(opts.markdown, opts.name));
+  const meta = frontMatterMetadata(opts.markdown);
+  const metaTags = (["author", "description", "keywords"] as const)
+    .filter((k) => meta[k])
+    .map((k) => `<meta name="${k}" content="${escapeHtml(meta[k]!)}">
+`)
+    .join("");
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -117,7 +123,7 @@ export async function buildHtmlDocument(opts: {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: https: http:; style-src 'unsafe-inline'">
 <meta name="generator" content="Markpion">
-<title>${title}</title>
+${metaTags}<title>${title}</title>
 <style>${EXPORT_TOKENS}
 ${markdownCss}</style>
 </head>
