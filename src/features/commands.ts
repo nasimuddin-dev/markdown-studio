@@ -148,6 +148,12 @@ export const commands: Record<string, Command> = {
     run: async () => void (await (await import("./combine")).combineWorkspace()),
     enabled: () => !!useWorkspace.getState().root,
   },
+  exportFolderHtml: {
+    id: "exportFolderHtml",
+    label: "Export Folder as HTML Site…",
+    run: async () => (await import("./siteExport")).exportFolderAsHtmlSite(),
+    enabled: () => !!useWorkspace.getState().root,
+  },
   exportFolderPdf: {
     id: "exportFolderPdf",
     label: "Export Folder as One PDF…",

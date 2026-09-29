@@ -19,7 +19,7 @@ const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
     items: (recent) => [
       c("newFile"), c("newFromTemplate"), c("newFileInWorkspace"), sep, c("openFile"), c("openFolder"), c("goToFile"),
       ...(recent.length ? [sep, ...recent.slice(0, 10).map((entry): Item => ({ type: "recent", entry }))] : []),
-      sep, c("save"), c("saveAs"), c("saveAll"), c("fileHistory"), sep, c("importDocx"), c("importPdf"), c("importHtml"), c("importCsv"), c("convertFolder"), c("combineFolder"), sep, c("exportPdf"), c("exportDocx"), c("exportHtml"), c("copyFormatted"), c("copyHtml"), c("print"), c("exportFolderPdf"), c("exportFolderDocx"), sep, c("closeTab"), c("reopenClosedTab"), c("closeFolder"), sep, c("settings"),
+      sep, c("save"), c("saveAs"), c("saveAll"), c("fileHistory"), sep, c("importDocx"), c("importPdf"), c("importHtml"), c("importCsv"), c("convertFolder"), c("combineFolder"), sep, c("exportPdf"), c("exportDocx"), c("exportHtml"), c("copyFormatted"), c("copyHtml"), c("print"), c("exportFolderPdf"), c("exportFolderDocx"), c("exportFolderHtml"), sep, c("closeTab"), c("reopenClosedTab"), c("closeFolder"), sep, c("settings"),
     ],
   },
   {

@@ -27,6 +27,8 @@ export interface Backend {
   pickOpenFile(): Promise<string | null>;
   pickOpenFolder(): Promise<string | null>;
   pickSavePath(suggestedName: string, directory: string | null): Promise<string | null>;
+  /** Asks for a folder to export into; approves it for writing without opening it. */
+  pickExportFolder(): Promise<string | null>;
 
   /** Native Open dialog for a document to import (desktop only). */
   pickImportFile(kind: "docx" | "html" | "pdf" | "csv"): Promise<string | null>;
@@ -45,6 +47,8 @@ export interface Backend {
   fileMtime(path: string): Promise<number | null>;
   createFile(directory: string, name: string): Promise<string>;
   createFolder(directory: string, name: string): Promise<string>;
+  /** Creates a subfolder unless it exists; returns its path. */
+  ensureFolder(directory: string, name: string): Promise<string>;
   renamePath(path: string, newName: string): Promise<string>;
   deletePath(path: string): Promise<void>;
   /** Markdown and image files under an approved folder (for link completion). */

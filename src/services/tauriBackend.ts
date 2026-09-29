@@ -17,6 +17,7 @@ export const tauriBackend: Backend = {
 
   pickOpenFile: () => call("pick_open_file"),
   pickOpenFolder: () => call("pick_open_folder"),
+  pickExportFolder: () => call("pick_export_folder"),
   pickSavePath: (suggestedName, directory) => call("pick_save_path", { suggestedName, directory }),
 
   pickImportFile: (kind) => call("pick_import_file", { kind }),
@@ -31,6 +32,7 @@ export const tauriBackend: Backend = {
   fileMtime: (path) => call("file_mtime", { path }),
   createFile: (directory, name) => call("create_file", { directory, name }),
   createFolder: (directory, name) => call("create_folder", { directory, name }),
+  ensureFolder: (directory, name) => call("ensure_folder", { directory, name }),
   renamePath: (path, newName) => call("rename_path", { path, newName }),
   deletePath: (path) => call("delete_path", { path }),
   readImage: (path) => call("read_image", { path }),

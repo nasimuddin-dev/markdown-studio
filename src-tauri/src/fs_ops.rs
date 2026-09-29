@@ -228,6 +228,15 @@ pub fn create_dir(path: &Path) -> AppResult<()> {
     Ok(())
 }
 
+/// Creates a folder unless it already exists; fails if a file has that name.
+pub fn ensure_dir(path: &Path) -> AppResult<()> {
+    if path.is_dir() {
+        return Ok(());
+    }
+    fs::create_dir(path)?;
+    Ok(())
+}
+
 pub fn rename(from: &Path, to: &Path) -> AppResult<()> {
     if to.exists() && !same_file_ignoring_case(from, to) {
         return Err(AppError::AlreadyExists(
@@ -320,6 +329,18 @@ pub fn join_child(dir: &Path, name: &str) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ensure_dir_creates_once_and_rejects_files() {
+        let tmp = tempfile::tempdir().unwrap();
+        let dir = tmp.path().join("site");
+        ensure_dir(&dir).unwrap();
+        assert!(dir.is_dir());
+        ensure_dir(&dir).unwrap();
+        let file = tmp.path().join("page.html");
+        fs::write(&file, "x").unwrap();
+        assert!(ensure_dir(&file).is_err());
+    }
 
     #[test]
     fn atomic_write_round_trips_and_detects_conflicts() {

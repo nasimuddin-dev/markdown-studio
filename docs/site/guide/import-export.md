@@ -77,3 +77,14 @@ The document's front matter isn't exported; its `title` becomes the exported doc
 - **File → Combine Folder into One Document…** writes the combined Markdown to `<Folder> (combined).md` and opens it, so you can review or edit it before exporting.
 
 Either way, files are combined in folder order (a `README` or `index` first, then natural order, folder by folder), with a table of contents. Headings move down a level under the folder's title, links between the files become links within the document, and image paths are adjusted. Unsaved changes in open tabs are included.
+
+### A whole folder as an HTML site
+
+**File → Export Folder as HTML Site…** turns every Markdown file in the open folder into its own HTML page, for a shared drive, an intranet or a static web server:
+
+- Choose an empty folder, or a new one, to export into. The folder structure is mirrored (`guide/setup.md` becomes `guide/setup.html`).
+- Links between your documents point to their HTML pages, headings keep their anchors, and images are embedded in the pages, so the site needs no other files.
+- Every page has a **← Contents** link to `index.html`, which lists all pages by folder with their titles. If the folder has its own `index.md`, that page is the start page instead.
+- If some of the HTML files already exist, Markpion asks before replacing them. Unsaved changes in open tabs are included.
+
+Open `index.html` in any browser to read the site.

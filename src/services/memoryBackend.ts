@@ -171,6 +171,18 @@ export class MemoryBackend implements Backend {
     return p;
   }
 
+  async pickExportFolder() {
+    const answer = this.promptFn("Export to folder:", "/export");
+    if (!answer) return null;
+    const p = this.validate(answer.trim());
+    if (this.files.has(p)) throw new AppError("invalidPath", "That is a file, not a folder");
+    // Like choosing a new folder in a native dialog, it may not exist yet.
+    for (let dir = p; dir && !this.dirs.has(dir); dir = dirname(dir)) this.dirs.add(dir);
+    this.roots.add(p);
+    this.persist();
+    return p;
+  }
+
   async pickSavePath(suggestedName: string, directory: string | null) {
     const answer = this.promptFn("Save as:", join(directory ?? "/demo", suggestedName));
     if (!answer) return null;
@@ -301,6 +313,16 @@ export class MemoryBackend implements Backend {
     if (this.files.has(p) || this.dirs.has(p)) throw new AppError("alreadyExists", "Already exists");
     this.dirs.add(p);
     this.persist();
+    return p;
+  }
+
+  async ensureFolder(directory: string, name: string) {
+    const p = this.check(join(this.check(directory), this.validateName(name)));
+    if (this.files.has(p)) throw new AppError("alreadyExists", "A file has that name");
+    if (!this.dirs.has(p)) {
+      this.dirs.add(p);
+      this.persist();
+    }
     return p;
   }
 

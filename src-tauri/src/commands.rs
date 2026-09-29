@@ -138,6 +138,18 @@ pub async fn pick_open_folder(app: AppHandle, state: State<'_, AppState>) -> App
     Ok(Some(fs_ops::path_string(&resolved)))
 }
 
+/// Asks for a folder to export into (an HTML site). The folder is approved for
+/// writing but, unlike Open Folder, not opened or added to recent folders.
+#[tauri::command]
+pub async fn pick_export_folder(app: AppHandle, state: State<'_, AppState>) -> AppResult<Option<String>> {
+    let picked = app.dialog().file().set_title("Export to Folder").blocking_pick_folder();
+    let Some(path) = picked.and_then(|p| p.into_path().ok()) else {
+        return Ok(None);
+    };
+    let resolved = state.track("dialog.exportFolder", state.scope.allow_dir(&path))?;
+    Ok(Some(fs_ops::path_string(&resolved)))
+}
+
 #[tauri::command]
 pub async fn pick_save_path(
     app: AppHandle,
@@ -278,6 +290,16 @@ pub async fn create_folder(state: State<'_, AppState>, directory: String, name: 
     let dir = state.scope.check(Path::new(&directory))?;
     let target = state.scope.check(&fs_ops::join_child(&dir, &name))?;
     state.track("fs.createFolder", fs_ops::create_dir(&target))?;
+    Ok(fs_ops::path_string(&target))
+}
+
+/// Creates a subfolder unless it already exists (for exports that mirror a folder tree).
+#[tauri::command]
+pub async fn ensure_folder(state: State<'_, AppState>, directory: String, name: String) -> AppResult<String> {
+    scope::validate_file_name(&name)?;
+    let dir = state.scope.check(Path::new(&directory))?;
+    let target = state.scope.check(&fs_ops::join_child(&dir, &name))?;
+    state.track("fs.ensureFolder", fs_ops::ensure_dir(&target))?;
     Ok(fs_ops::path_string(&target))
 }
 
