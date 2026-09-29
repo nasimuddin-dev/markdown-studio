@@ -98,7 +98,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 
 ## Security model
 
-- The frontend has **no direct filesystem, dialog or shell permissions** ([capabilities/default.json](src-tauri/capabilities/default.json)). Every native operation goes through validated Rust commands ([src-tauri/src/commands.rs](src-tauri/src/commands.rs)).
+- The frontend has **no direct filesystem, dialog or shell permissions** ([capabilities/default.json](src-tauri/capabilities/default.json)). Every native operation goes through validated Rust commands ([src-tauri/src/commands/](src-tauri/src/commands/), one module per domain).
 - A path is accessible only after the user selects it in a native dialog, or re-opens it from the backend-owned recent list. Relative paths and `..` traversal are rejected, and symlinks are resolved before the scope check ([scope.rs](src-tauri/src/scope.rs)).
 - The preview parses raw HTML and then sanitizes it with GitHub's allow-list. Scripts, event handlers, iframes, forms, styles and `javascript:` URLs are removed. A strict CSP forbids inline scripts.
 - Links open in the system browser, and only `http`, `https` and `mailto` links are allowed.
@@ -142,18 +142,23 @@ When it runs outside Tauri, the app uses [`MemoryBackend`](src/services/memoryBa
 ```text
 src/
   components/   UI: MenuBar, FileExplorer, TabBar, Editor, Preview, Outline, StatusBar,
-                CommandPalette, SearchPanel, LinkCheckPanel, Settings/History/Shortcuts dialogs
+                CommandPalette, SearchPanel, LinkCheckPanel, Settings/History/Shortcuts dialogs,
+                AI panel and settings, error boundaries
   features/     Behaviour: documents, workspace, commands & shortcuts, formatting, tables, TOC,
-                tasks, templates, import/export, combine, link check, lint, autosave, updates
-  services/     Backend abstraction (Tauri + in-memory demo), Markdown pipeline, front matter,
+                tasks, templates, import/export, combine, site export, link check, lint, autosave,
+                updates, AI assistant
+  services/     Backend interface split by domain, with capabilities (Tauri desktop, in-memory
+                demo; room for a cloud backend), Markdown pipeline, front matter,
                 alerts, HTML export, search, paths, errors
     convert/    Word, PDF, HTML and CSV import; PDF and Word export
-  stores/       Zustand stores: documents, workspace, settings, UI
+  stores/       Zustand stores: documents, workspace, settings, UI, AI
   styles/       App and preview CSS (theme tokens)
   types/        Shared types
 src-tauri/
-  src/          Rust: commands, scope (path checks), fs_ops (safe save, trash), text (encoding),
-                storage (settings, recovery, logs), history, search, watcher, open_paths, updater
+  src/          Rust: commands/ (one module per domain: dialogs, files, workspace, app_data,
+                platform, ai), scope (path checks), fs_ops (safe save, trash, move), text
+                (encoding), storage (settings, recovery, logs), history, search, watcher,
+                open_paths, updater, ai (Claude API, key in the OS credential store)
   capabilities/ Least-privilege permission set
   windows/      NSIS installer hooks (Explorer "Open with Markpion")
 tests/          Vitest unit and component tests

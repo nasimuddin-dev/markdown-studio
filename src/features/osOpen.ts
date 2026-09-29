@@ -48,7 +48,7 @@ export async function installOsOpenHandlers() {
   await handleOpenPaths(await b.takePendingOpens().catch(() => ({ files: [], folders: [] })));
   await b.onOpenPaths((p) => void handleOpenPaths(p));
 
-  if (!b.isNative) {
+  if (!b.capabilities.desktop) {
     window.addEventListener("dragover", (e) => {
       if (e.dataTransfer?.types.includes("Files")) {
         e.preventDefault();

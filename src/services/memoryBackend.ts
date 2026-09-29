@@ -45,7 +45,7 @@ function safeStorage(): Storage | null {
  * UI behaviour can be developed and tested without the Tauri shell.
  */
 export class MemoryBackend implements Backend {
-  readonly isNative = false;
+  readonly capabilities;
   private files = new Map<string, MemFile>();
   private dirs = new Set<string>(["/"]);
   private roots = new Set<string>();
@@ -64,6 +64,7 @@ export class MemoryBackend implements Backend {
     this.storageKey = opts.storageKey ?? null;
     this.promptFn = opts.prompt ?? ((m, d) => window.prompt(m, d));
     this.aiFn = opts.ai;
+    this.capabilities = { desktop: false, trash: false, revealInFolder: false, selfUpdate: false, nativeImport: false, ai: !!opts.ai };
     if (!this.restore()) {
       for (const [path, content] of Object.entries(opts.files ?? {})) this.put(path, content);
     }

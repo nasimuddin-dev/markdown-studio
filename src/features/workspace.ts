@@ -178,7 +178,7 @@ export async function deleteEntry(entry: DirEntry) {
     title: entry.isDir ? "Delete folder" : "Delete file",
     message: `Are you sure you want to delete “${entry.name}”${entry.isDir ? " and everything in it" : ""}?`,
     detail:
-      (backend().isNative ? "It will be moved to the Trash / Recycle Bin." : "This cannot be undone in the browser demo.") +
+      (backend().capabilities.trash ? "It will be moved to the Trash / Recycle Bin." : "This cannot be undone in the browser demo.") +
       (openDirty ? " It has unsaved changes in an open tab." : ""),
     buttons: [
       { id: "cancel", label: "Cancel" },

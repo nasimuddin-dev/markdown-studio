@@ -20,7 +20,7 @@ export function AiSettings() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!settings.aiEnabled) return;
+    if (!settings.aiEnabled || !backend().capabilities.ai) return;
     backend().aiStatus().then(setStatus, () => setStatus(null));
   }, [settings.aiEnabled]);
 
@@ -48,7 +48,10 @@ export function AiSettings() {
         Improve, fix, shorten, summarize, translate or continue text from the AI menu. Text is sent to Anthropic only when you run a command, using your own
         API key.
       </p>
-      {settings.aiEnabled && (
+      {settings.aiEnabled && !backend().capabilities.ai && (
+        <p className="muted small">The AI assistant is available in the Markpion desktop app, which keeps your API key in the system's credential store.</p>
+      )}
+      {settings.aiEnabled && backend().capabilities.ai && (
         <>
           {status?.hasKey ? (
             <p className="small">

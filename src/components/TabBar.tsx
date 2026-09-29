@@ -142,7 +142,7 @@ export function TabBar() {
             "separator",
             { label: "File History…", run: () => useUi.getState().setHistoryDocId(menuDoc.id), disabled: !menuDoc.path },
             { label: "Copy Path", run: () => copyPath(menuDoc.path!), disabled: !menuDoc.path },
-            { label: revealLabel, run: () => revealInFolder(menuDoc.path!), disabled: !menuDoc.path || !backend().isNative },
+            { label: revealLabel, run: () => revealInFolder(menuDoc.path!), disabled: !menuDoc.path || !backend().capabilities.revealInFolder },
           ]}
         />
       )}

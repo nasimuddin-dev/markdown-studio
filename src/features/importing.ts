@@ -48,7 +48,7 @@ function pickBrowserFile(accept: string): Promise<File | null> {
 
 async function chooseSource(kind: ImportKind): Promise<Source | null> {
   const b = backend();
-  if (b.isNative) {
+  if (b.capabilities.nativeImport) {
     const path = await b.pickImportFile(kind);
     if (!path) return null;
     return { name: basename(path), data: base64ToBuffer(await b.readBinaryFile(path)), dir: dirname(path) };

@@ -149,6 +149,10 @@ export function cleanAiAnswer(answer: string, original: string): string {
 
 /** Makes sure the assistant is on, has a key, and the user agreed to send text. */
 async function ensureReady(): Promise<boolean> {
+  if (!backend().capabilities.ai) {
+    notify("info", "The AI assistant is available in the Markpion desktop app.");
+    return false;
+  }
   const settings = useSettings.getState();
   if (!settings.settings.aiEnabled) {
     const choice = await ask({

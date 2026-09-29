@@ -78,7 +78,7 @@ describe("check for updates", () => {
 describe("in-app update (desktop)", () => {
   const nativeBackend = (install: () => Promise<void>) => {
     const b = setupBackend({ "/ws/a.md": "saved" });
-    Object.defineProperty(b, "isNative", { value: true });
+    Object.defineProperty(b, "capabilities", { value: { ...b.capabilities, desktop: true, selfUpdate: true } });
     b.checkAppUpdate = async () => ({ version: "9.0.0", currentVersion: "0.8.0", notes: "## 9.0.0\n\nBetter things", date: null });
     const progress: Array<(d: number, t: number | null) => void> = [];
     b.onUpdateProgress = async (h) => {

@@ -70,7 +70,7 @@ flowchart TB
 
   subgraph RS[Rust core: src-tauri/src/]
     direction TB
-    CMD["commands.rs<br/>(the only entry point)"]
+    CMD["commands/<br/>dialogs, files, workspace,<br/>app_data, platform, ai<br/>(the only entry point)"]
     SC["scope.rs<br/>path validation"]
     FS["fs_ops.rs<br/>list, read, atomic write, trash"]
     ST["storage.rs<br/>settings, recovery, logs"]
@@ -100,7 +100,7 @@ flowchart TB
 | `features/` | Use cases: open, save, export, import, auto save, recovery, commands and shortcuts. |
 | `stores/` | Application state: open documents, workspace, settings, UI state. |
 | `services/` | Pure logic and adapters: the Markdown pipeline, converters, the backend. |
-| Rust `commands.rs` | Validates every request, then calls the filesystem, storage and history modules. |
+| Rust `commands/` | One module per domain (`dialogs`, `files`, `workspace`, `app_data`, `platform`, `ai`), mirroring the frontend's backend interfaces. Validates every request, then calls the filesystem, storage, history and AI modules. |
 
 ## 4. Security boundary
 
@@ -174,7 +174,7 @@ sequenceDiagram
   actor U as User
   participant F as features/documents.ts
   participant B as tauriBackend
-  participant C as commands.rs
+  participant C as commands/files.rs
   participant S as scope.rs
   participant H as history.rs
   participant FS as fs_ops.rs
@@ -276,7 +276,7 @@ flowchart LR
 | --- | --- | --- |
 | Documents and images | Wherever the user keeps them | Safe save (section 6); pasted images go to `assets/` next to the document |
 | Settings | App config folder, `settings.json` | `storage.rs` (written through a temporary file) |
-| Recent files and folders | App config folder, `recent.json` | `commands.rs` |
+| Recent files and folders | App config folder, `recent.json` | `commands/app_data.rs` |
 | Crash recovery | App data folder, `recovery/session.json` | Recovery timer (section 7) |
 | File history | App data folder, `history/` | `history.rs`, before each overwrite |
 | Diagnostic log | App log folder, `markpion.log` (1 MB cap) | `storage.rs` Logger; exportable from Help |
@@ -329,7 +329,49 @@ flowchart LR
 
 The updater's private signing key never enters the repository; it stays in `~/.tauri/` on the release machine.
 
-## 13. Design principles
+## 13. Backend adapters and the road to a cloud version
+
+The UI depends on one interface, `Backend` (`src/services/backend.ts`), split by domain. Each domain can be implemented and replaced on its own, and `capabilities` tells the UI what the current host can do, so features adapt instead of checking "am I the desktop app?".
+
+```mermaid
+flowchart LR
+  UI[React UI<br/>features, stores, components]
+  subgraph IF[Backend interface]
+    direction TB
+    D[DialogsApi]
+    F[FilesApi]
+    W[WorkspaceApi]
+    S[StorageApi]
+    P[PlatformApi]
+    A[AiApi]
+    C[capabilities]
+  end
+  UI --> IF
+  IF --> T["tauriBackend<br/>desktop: Rust commands"]
+  IF --> M["MemoryBackend<br/>browser demo, tests"]
+  IF -.-> CL["cloudBackend (future)<br/>HTTPS API + accounts"]
+  T --> R[(Local disk,<br/>OS credential store)]
+  CL -.-> SV[(Server: documents,<br/>versions, AI proxy)]
+```
+
+| Domain | Desktop today | What a web/cloud version would provide |
+| --- | --- | --- |
+| `DialogsApi` | Native Open/Save pickers that approve paths | In-app pickers over the user's cloud folders |
+| `FilesApi` | Scope-checked disk I/O; saves carry the last-seen modification time | REST calls; the same `expectedMtime` field carries a revision/ETag, so conflict detection works unchanged |
+| `WorkspaceApi` | Folder listing, search (Rust), file watcher | Server-side listing and search; change notifications over a WebSocket |
+| `StorageApi` | Settings, recents, recovery and history in app-data folders | Per-account settings and server-side version history |
+| `PlatformApi` | Reveal in folder, OS "Open with", signed self-update | Mostly absent (`capabilities` switches the UI features off) |
+| `AiApi` | The Rust core calls Anthropic with the user's key from the OS credential store | A server endpoint calls Anthropic with an organisation key, applying quotas and policies |
+
+Design rules that keep this path open:
+
+- **Paths are opaque to the UI.** Features pass the strings the backend returns; path helpers only format them for display and resolve relative Markdown links.
+- **No feature talks to the OS or network directly**; it goes through `Backend`, and asks `capabilities` before offering host-specific actions.
+- **Stores hold state, features hold workflows, services hold pure logic** (Markdown pipeline, converters, parsers). Pure logic is shared by every backend and runs in tests without a host.
+- **Heavy features load on demand** (converters, Mermaid, KaTeX, the AI module), so a web build keeps a small first download.
+- **Per-feature state stays separate** (for example `aiStore`), so new features don't grow one global store.
+
+## 14. Design principles
 
 - **Local first.** Files stay plain Markdown on the user's disk, readable without Markpion. No account, no cloud.
 - **Never lose work.** Atomic saves, conflict detection, file history, crash recovery, and trash instead of permanent deletion. A rendering error is contained to its area (error boundaries), so the rest of the window, including saving, keeps working.

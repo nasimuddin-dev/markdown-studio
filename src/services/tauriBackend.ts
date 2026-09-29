@@ -12,7 +12,7 @@ async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> 
 }
 
 export const tauriBackend: Backend = {
-  isNative: true,
+  capabilities: { desktop: true, trash: true, revealInFolder: true, selfUpdate: true, nativeImport: true, ai: true },
   appInfo: () => call("app_info"),
 
   pickOpenFile: () => call("pick_open_file"),

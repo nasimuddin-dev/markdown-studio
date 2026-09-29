@@ -251,7 +251,7 @@ export function FileExplorer() {
                   { label: "Duplicate", run: () => duplicateFile(menu.entry.path) },
                   "separator",
                 ] as MenuEntry[])),
-            { label: revealLabel, run: () => revealInFolder(menu.entry.path), disabled: !backend().isNative },
+            { label: revealLabel, run: () => revealInFolder(menu.entry.path), disabled: !backend().capabilities.revealInFolder },
             { label: "Copy Path", run: () => copyPath(menu.entry.path) },
             { label: "Copy Relative Path", run: () => copyRelativePath(menu.entry.path) },
             "separator",

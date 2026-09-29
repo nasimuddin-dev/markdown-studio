@@ -30,7 +30,7 @@ export function StatusBar() {
   return (
     <footer className="statusbar" aria-label="Status bar">
       <div className="status-left">
-        {!backend().isNative && <span className="status-item status-demo" title="Running in a browser. Files are stored in this browser only.">Browser demo</span>}
+        {!backend().capabilities.desktop && <span className="status-item status-demo" title="Running in a browser. Files are stored in this browser only.">Browser demo</span>}
         {doc && (
           <span className={`status-item status-state${doc && isDirty(doc) ? " dirty" : ""}`} role="status" aria-live="polite">
             {state}

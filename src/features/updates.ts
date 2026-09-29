@@ -45,7 +45,7 @@ interface Found {
 
 async function findUpdate(): Promise<Found | null> {
   const b = backend();
-  if (b.isNative) {
+  if (b.capabilities.selfUpdate) {
     try {
       const u = await b.checkAppUpdate();
       return u ? { version: u.version, current: u.currentVersion, notes: u.notes ?? "", url: null } : null;
@@ -162,7 +162,7 @@ export async function checkForUpdates({ manual }: { manual: boolean }): Promise<
 
 /** Checks each time the desktop app starts, when enabled in Settings. */
 export function scheduleUpdateCheck() {
-  if (!backend().isNative || !useSettings.getState().settings.checkForUpdates) return;
+  if (!backend().capabilities.selfUpdate || !useSettings.getState().settings.checkForUpdates) return;
   // Let startup (session restore, recovery prompts) finish first.
   setTimeout(() => void checkForUpdates({ manual: false }), 5000);
 }
