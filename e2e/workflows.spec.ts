@@ -380,6 +380,31 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
+test("toolbar table button asks for the table size", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  const toolbar = page.getByRole("toolbar", { name: "Formatting" });
+
+  // Mouse: the grid (4 columns × 3 rows, including the header).
+  await toolbar.getByRole("button", { name: "Insert Table" }).click();
+  const picker = page.getByRole("dialog", { name: "Insert table" });
+  await picker.locator(".table-picker-cell").nth(2 * 8 + 3).click();
+  await expect(picker).toBeHidden();
+  await expect(page.locator(".cm-line").first()).toHaveText("| Column 1 | Column 2 | Column 3 | Column 4 |");
+  await expect(page.locator(".cm-line").filter({ hasText: /^\| Cell/ })).toHaveCount(2);
+
+  // Keyboard: the fields.
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.press("Enter");
+  await toolbar.getByRole("button", { name: "Insert Table" }).click();
+  await expect(picker.getByLabel("Columns")).toBeFocused();
+  await page.keyboard.type("2");
+  await picker.getByLabel("Rows").fill("5");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-line").filter({ hasText: /^\| Cell     \| Cell     \|$/ })).toHaveCount(4);
+});
+
 test("lint quick fixes in the Problems panel", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

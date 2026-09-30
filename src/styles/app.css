@@ -1622,6 +1622,54 @@ select {
   box-shadow: var(--shadow);
 }
 
+/* Toolbar: table size picker */
+.table-picker {
+  position: fixed;
+  z-index: 60;
+  padding: 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: 12px;
+}
+.table-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 16px);
+  gap: 3px;
+  margin-bottom: 10px;
+}
+.table-picker-cell {
+  height: 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.table-picker-cell.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.table-picker-fields {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.table-picker-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.table-picker-fields .text-input {
+  width: 58px;
+}
+@media (forced-colors: active) {
+  .table-picker-cell.on {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
+
 /* Preview code blocks: Copy button */
 .code-block {
   position: relative;

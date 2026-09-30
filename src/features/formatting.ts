@@ -268,10 +268,21 @@ export const insertCodeBlock = insertBlock((selected) => ({
   cursorOffset: 3,
 }));
 
-export const insertTable = insertBlock(() => {
-  const text = "| Column 1 | Column 2 |\n| -------- | -------- |\n| Cell     | Cell     |";
-  return { text, cursorOffset: 2, selectLength: "Column 1".length };
-});
+/** Inserts a table with `columns` columns and `rows` body rows; the first header cell is selected. */
+export function insertTableOf(columns: number, rows: number): StateCommand {
+  return insertBlock(() => {
+    const cols = Array.from({ length: columns }, (_, i) => `Column ${i + 1}`);
+    const row = (cells: string[]) => `| ${cells.join(" | ")} |`;
+    const lines = [
+      row(cols),
+      row(cols.map((c) => "-".repeat(c.length))),
+      ...Array.from({ length: rows }, () => row(cols.map((c) => "Cell".padEnd(c.length)))),
+    ];
+    return { text: lines.join("\n"), cursorOffset: 2, selectLength: "Column 1".length };
+  });
+}
+
+export const insertTable = insertTableOf(2, 1);
 
 export const insertHorizontalRule = insertBlock(() => ({ text: "---", cursorOffset: 4 }));
 

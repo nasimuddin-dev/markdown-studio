@@ -1,6 +1,8 @@
 import { useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { commands, formatShortcut } from "../features/commands";
-import { getEditorView } from "../features/editorBridge";
+import { getEditorView, runOnEditor } from "../features/editorBridge";
+import { insertTableOf } from "../features/formatting";
+import { TablePicker } from "./TablePicker";
 import { formatStateAt, NO_FORMAT, type FormatState } from "../features/formatState";
 import { useDocuments } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
@@ -93,6 +95,7 @@ export function Toolbar() {
   const [focusIndex, setFocusIndex] = useState(0);
   const [aiMenu, setAiMenu] = useState<{ x: number; y: number } | null>(null);
   const [tableMenu, setTableMenu] = useState<{ x: number; y: number } | null>(null);
+  const [tablePicker, setTablePicker] = useState<{ x: number; y: number } | null>(null);
 
   const items = () => [...(bar.current?.querySelectorAll<HTMLElement>("[data-toolbar-item]") ?? [])];
   const onKeyDown = (e: KeyboardEvent) => {
@@ -146,10 +149,16 @@ export function Toolbar() {
                 title={tooltip(b.id)}
                 aria-label={commands[b.id].label.replace(/…$/, "")}
                 aria-pressed={b.pressed ? !!pressed : undefined}
+                aria-haspopup={b.id === "table" ? "dialog" : undefined}
                 tabIndex={tab()}
                 data-toolbar-item
                 onMouseDown={keepFocus}
-                onClick={() => run(b.id)}
+                onClick={(e) => {
+                  if (b.id !== "table") return run(b.id);
+                  // Outside a table, the table button asks for the size first.
+                  const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                  setTablePicker({ x: r.left, y: r.bottom + 2 });
+                }}
               >
                 <Icon name={b.icon} size={16} />
               </button>
@@ -195,6 +204,20 @@ export function Toolbar() {
             <Icon name="sparkle" size={16} /> AI
           </button>
         </div>
+      )}
+      {tablePicker && (
+        <TablePicker
+          x={tablePicker.x}
+          y={tablePicker.y}
+          onClose={() => {
+            setTablePicker(null);
+            getEditorView()?.focus();
+          }}
+          onPick={(columns, rows) => {
+            setTablePicker(null);
+            runOnEditor(insertTableOf(columns, rows));
+          }}
+        />
       )}
       {tableMenu && (
         <ContextMenu
