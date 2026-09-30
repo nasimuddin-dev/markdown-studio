@@ -268,6 +268,15 @@ export const insertCodeBlock = insertBlock((selected) => ({
   cursorOffset: 3,
 }));
 
+/** Replaces each selection (or inserts at each cursor) with text made when the command runs. */
+export function insertText(make: () => string): StateCommand {
+  return ({ state, dispatch }) => {
+    const text = make();
+    dispatch(state.update(state.replaceSelection(text), { scrollIntoView: true, userEvent: "input" }));
+    return true;
+  };
+}
+
 /**
  * Inserts a GitHub alert (callout): `> [!NOTE]` and a quoted line, or the
  * selected text quoted under it. The cursor goes to where the text is typed.

@@ -141,6 +141,13 @@ describe("tasks and footnotes", () => {
   });
 });
 
+describe("insert text", () => {
+  it("replaces the selection or inserts at the cursor", () => {
+    expect(run("Due: |", fmt.insertText(() => "2026-09-30"))).toMatchObject({ doc: "Due: 2026-09-30", cursor: 15 });
+    expect(run("Due: [soon]!", fmt.insertText(() => "today")).doc).toBe("Due: today!");
+  });
+});
+
 describe("callouts", () => {
   it("inserts an alert, with the cursor ready for its text", () => {
     const r = run("|", fmt.insertCallout("NOTE"));

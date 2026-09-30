@@ -23,6 +23,7 @@ import {
   alignColumn, deleteColumn, deleteRow, fixTableAtCursor, moveColumn, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
 } from "./tables";
 import { fixAllProblemsCommand } from "./lintExtension";
+import { fillTemplate } from "./templates";
 import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
 import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
@@ -78,6 +79,9 @@ export const formatCommands: Record<string, Command> = {
   orderedList: formatCommand("orderedList", "Numbered List", fmt.toggleOrderedList, "Mod+Shift+7"),
   taskList: formatCommand("taskList", "Task List", fmt.toggleTaskList, "Mod+Shift+9"),
   quote: formatCommand("quote", "Quote", fmt.toggleQuote, "Mod+Shift+."),
+  // The same formats as templates' {{date}} and {{datetime}}.
+  insertDate: formatCommand("insertDate", "Insert Date", fmt.insertText(() => fillTemplate("{{date}}", "").text)),
+  insertDateTime: formatCommand("insertDateTime", "Insert Date and Time", fmt.insertText(() => fillTemplate("{{datetime}}", "").text)),
   calloutNote: formatCommand("calloutNote", "Insert Callout: Note", fmt.insertCallout("NOTE")),
   calloutTip: formatCommand("calloutTip", "Insert Callout: Tip", fmt.insertCallout("TIP")),
   calloutImportant: formatCommand("calloutImportant", "Insert Callout: Important", fmt.insertCallout("IMPORTANT")),

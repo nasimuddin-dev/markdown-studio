@@ -87,6 +87,10 @@ The list commands work on all selected lines, and applying one again removes it.
 
 It lists the top two heading levels below the title (a single H1 at the top is left out). Run the command again to update it, or leave **Keep the table of contents up to date on save** on in Settings and it updates each time you save. The links use the same anchors as the preview and GitHub.
 
+## Date and time
+
+**Format → Insert Date** inserts today's date (`2026-09-30`), and **Insert Date and Time** adds the time (`2026-09-30 14:05`), in your computer's time zone: the same formats templates use for `{{date}}` and `{{datetime}}`.
+
 ## Templates
 
 **File → New from Template…** starts a new document from a template:
