@@ -90,3 +90,38 @@ describe("markdown lint: files", () => {
     expect(await lintLinks("[a](b.md)", null, async () => false)).toEqual([]);
   });
 });
+
+describe("markdown lint: tables, footnotes and link text", () => {
+  const only = (text: string, rule: string) => lintMarkdown(text).filter((p) => p.rule === rule);
+
+  it("flags table rows that don't match the header, as GFM renders them", () => {
+    const table = "| a | b |\n| - | - |\n| 1 | 2 |\n| 1 | 2 | 3 |\n| 1 |\n| `x|y` | z |\n| `x\\|y` | z |";
+    const problems = only(table, "table-columns");
+    expect(problems.map((p) => table.slice(p.from, p.to))).toEqual(["| 1 | 2 | 3 |", "| 1 |", "| `x|y` | z |"]);
+    expect(problems[0].message).toMatch(/3 cells but the table has 2 columns: the extra cells aren't shown/);
+    // A line right after the table joins it.
+    expect(only("| a |\n| - |\nText right after", "table-columns")[0].message).toMatch(/Add a blank line/);
+    expect(only("| a |\n| - |\n\nText after a blank line", "table-columns")).toEqual([]);
+    expect(only("| a |\n| - |\n## Heading", "table-columns")).toEqual([]);
+    // A header that doesn't match its divider isn't a table.
+    expect(only("| a | b |\n| - |\n", "table-columns")[0].message).toMatch(/header has 2 cells but the divider row has 1/);
+    // Not tables: a setext heading, and tables inside code.
+    expect(only("a | b\n---", "table-columns")).toEqual([]);
+    expect(only("```\n| a | b |\n| - | - |\n| 1 |\n```", "table-columns")).toEqual([]);
+  });
+
+  it("flags footnotes without a definition and unused definitions", () => {
+    const text = "One[^1] two[^Note] three[^missing].\n\n[^1]: First.\n[^note]: Case doesn't matter.\n[^spare]: Unused.";
+    expect(only(text, "footnote").map((p) => p.message)).toEqual([
+      "Footnote [^missing] has no definition, so it's shown as plain text. Add a line “[^missing]: …”.",
+      "Footnote [^spare] is defined but never referenced.",
+    ]);
+    expect(only("`[^x]` in code", "footnote")).toEqual([]);
+  });
+
+  it("flags links without text, but not code or images as text", () => {
+    expect(only("[](https://example.com)", "link-text")).toHaveLength(1);
+    expect(only("[`code`](a.md) [text](a.md) ![alt](i.png) [![x]](b.md)", "link-text")).toEqual([]);
+    expect(only("![`alt`](i.png)", "image-alt")).toEqual([]);
+  });
+});

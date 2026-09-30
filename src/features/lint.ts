@@ -159,8 +159,14 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
       problems.push({ ...at, severity: "warning", rule: "empty-link", message: link.image ? "Image has no source." : "Link has no destination." });
       continue;
     }
-    if (link.image && !link.html && !link.text.trim()) {
+    // The text as written (code spans are blanked in `link.text`): after "[" or "![".
+    const start = link.from + (link.image ? 2 : 1);
+    const written = link.html || link.definition ? "" : text.slice(start, start + link.text.length);
+    if (link.image && !link.html && !written.trim()) {
       problems.push({ ...at, severity: "info", rule: "image-alt", message: "Image has no alt text (describe it for screen readers)." });
+    }
+    if (!link.image && !link.html && !link.definition && !written.trim()) {
+      problems.push({ ...at, severity: "info", rule: "link-text", message: "Link has no text, so screen readers read out its address." });
     }
     if (link.target.startsWith("#")) {
       let id = link.target.slice(1);
@@ -174,7 +180,75 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
       }
     }
   }
+  problems.push(...lintTables(text, starts), ...lintFootnotes(text));
   return problems.sort((a, b) => a.from - b.from);
+}
+
+/** Cells in a table row as GFM counts them: every unescaped `|` separates, even inside code. */
+function countCells(line: string): number {
+  let s = line.trim();
+  if (s.startsWith("|")) s = s.slice(1);
+  if (s.endsWith("|") && !s.endsWith("\\|")) s = s.slice(0, -1);
+  return (s.match(/(?<!\\)\|/g)?.length ?? 0) + 1;
+}
+
+const DELIMITER_ROW = /^ {0,3}\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+/** Lines that start another block, which ends a table. */
+const BLOCK_START = /^ {0,3}(#{1,6}\s|>|`{3,}|~{3,}|[-*+]\s|\d+[.)]\s)/;
+
+/** Tables whose rows don't match the header, or whose header doesn't match the divider row. */
+function lintTables(text: string, starts: number[]): MarkdownProblem[] {
+  const lines = text.split("\n");
+  const masked = maskCode(text).split("\n");
+  const out: MarkdownProblem[] = [];
+  const range = (i: number) => ({ from: starts[i], to: starts[i] + lines[i].length });
+  for (let i = 0; i + 1 < lines.length; i++) {
+    // A divider without "|" under a line with one is a setext heading, not a table.
+    if (!masked[i].includes("|") || !masked[i + 1].includes("|") || !DELIMITER_ROW.test(masked[i + 1])) continue;
+    const columns = countCells(lines[i]);
+    const divider = countCells(lines[i + 1]);
+    if (columns !== divider) {
+      out.push({ ...range(i + 1), severity: "warning", rule: "table-columns", message: `The table header has ${columns} cells but the divider row has ${divider}, so it isn't shown as a table.` });
+      i++;
+      continue;
+    }
+    let j = i + 2;
+    for (; j < lines.length && masked[j].trim() && !BLOCK_START.test(masked[j]); j++) {
+      const cells = countCells(lines[j]);
+      if (!lines[j].includes("|")) {
+        out.push({ ...range(j), severity: "warning", rule: "table-columns", message: "This line becomes a row of the table above. Add a blank line to end the table." });
+      } else if (cells !== columns) {
+        out.push({
+          ...range(j),
+          severity: "warning",
+          rule: "table-columns",
+          message: `This row has ${cells} cell${cells === 1 ? "" : "s"} but the table has ${columns} columns: ${cells > columns ? "the extra cells aren't shown" : "the missing cells are left empty"}. (A | inside a cell needs a backslash: \\|.)`,
+        });
+      }
+    }
+    i = j - 1;
+  }
+  return out;
+}
+
+/** Footnote references without a definition (shown as plain text), and definitions nothing refers to. */
+function lintFootnotes(text: string): MarkdownProblem[] {
+  const masked = maskCode(text);
+  const defined = new Map<string, { from: number; to: number }>();
+  for (const m of masked.matchAll(/^ {0,3}\[\^([^\]\s]+)\]:/gm)) defined.set(m[1].toLowerCase(), { from: m.index!, to: m.index! + m[0].length });
+  const used = new Set<string>();
+  const out: MarkdownProblem[] = [];
+  for (const m of masked.matchAll(/\[\^([^\]\s]+)\](?!:)/g)) {
+    const id = m[1].toLowerCase();
+    used.add(id);
+    if (!defined.has(id)) {
+      out.push({ from: m.index!, to: m.index! + m[0].length, severity: "warning", rule: "footnote", message: `Footnote [^${m[1]}] has no definition, so it's shown as plain text. Add a line “[^${m[1]}]: …”.` });
+    }
+  }
+  for (const [id, at] of defined) {
+    if (!used.has(id)) out.push({ ...at, severity: "info", rule: "footnote", message: `Footnote [^${id}] is defined but never referenced.` });
+  }
+  return out;
 }
 
 /** Local link/image targets worth checking on disk (relative or absolute paths). */
