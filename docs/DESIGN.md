@@ -2,7 +2,7 @@
 
 How Markpion is built: its layers, the security boundary, how documents are opened, edited, previewed and saved, and how the app is released and updated. The diagrams are [Mermaid](https://mermaid.js.org/); they render on GitHub and in Markpion's own preview.
 
-Requirements are in [SRS.md](SRS.md) and their implementation status in [TRACEABILITY.md](TRACEABILITY.md). This document describes the code as of version 0.15.0; when the code and this document disagree, the code is right and this document needs fixing.
+Requirements are in [SRS.md](SRS.md) and their implementation status in [TRACEABILITY.md](TRACEABILITY.md). This document describes the code as of version 0.18.0; when the code and this document disagree, the code is right and this document needs fixing.
 
 ## 1. System context
 
@@ -133,12 +133,14 @@ Other safeguards:
 
 - **Preview:** raw HTML in documents is sanitized (rehype-sanitize) before rendering; math is rendered after sanitizing, so it can't be used to inject markup. The Content Security Policy allows scripts only from the app itself, no plugins or frames, and network requests (`connect-src`) only to the GitHub API; remote images in documents may still load.
 - **Links:** external links open in the system browser, never inside the app window.
+- **Custom CSS** (a setting) is parsed by the browser and rebuilt rule by rule with every selector under `.markdown-body`, so it can style documents but never the app, and a stray brace can't escape that scope. `@import` and unknown at-rules are dropped, and `</` is escaped where it's written into exported HTML.
+- **Git** is read-only: the Rust core runs the user's `git` (`status`, and `show HEAD:./file` for a file already in scope) with optional locks and the fsmonitor hook turned off, a 10-second timeout and no console window. Markpion never commits, pulls or pushes.
 - **Updates:** every installer is verified against the minisign public key built into the app before it runs.
 - **AI assistant:** off by default. The Anthropic API key is kept in the OS credential store and read only by the Rust core, which makes the HTTPS request; the web view sends the instruction and text and gets the answer back, never the key. The document text is wrapped in `<document>` tags and the system prompt tells Claude to treat it as content, not instructions. Answers are shown for review and applied as one undoable edit.
 
 ## 5. Document model and lifecycle
 
-Each open tab is a `Doc` in `documentsStore`: its path (`null` until first saved), the current `content`, the `savedContent` last loaded or saved, the line ending and BOM to write back, the file's modification time, and any external change. A document is **dirty** when `content` differs from `savedContent`.
+Each open tab is a `Doc` in `documentsStore`: its path (`null` until first saved), the current `content`, the `savedContent` last loaded or saved, the line ending and BOM to write back, the file's modification time, any external change, and whether editing is locked (`readOnly`: the file is read-only on disk, or the user turned it on). A document is **dirty** when `content` differs from `savedContent`. A locked document takes changes only from outside the editor (reloads): CodeMirror's `readOnly` stops typing, a change filter stops commands, and the store ignores `setContent`.
 
 ```mermaid
 stateDiagram-v2
@@ -357,8 +359,8 @@ flowchart LR
 | Domain | Desktop today | What a web/cloud version would provide |
 | --- | --- | --- |
 | `DialogsApi` | Native Open/Save pickers that approve paths | In-app pickers over the user's cloud folders |
-| `FilesApi` | Scope-checked disk I/O; saves carry the last-seen modification time | REST calls; the same `expectedMtime` field carries a revision/ETag, so conflict detection works unchanged |
-| `WorkspaceApi` | Folder listing, search (Rust), file watcher | Server-side listing and search; change notifications over a WebSocket |
+| `FilesApi` | Scope-checked disk I/O; reads report read-only files; saves carry the last-seen modification time | REST calls; the same `expectedMtime` field carries a revision/ETag, so conflict detection works unchanged |
+| `WorkspaceApi` | Folder listing, search (Rust, with include/exclude globs), file watcher, read-only Git (status, and a file's committed text for change bars and File History) | Server-side listing and search; change notifications over a WebSocket |
 | `StorageApi` | Settings, recents, recovery and history in app-data folders | Per-account settings and server-side version history |
 | `PlatformApi` | Window title, full screen, the close guard (Save / Don't Save when the window closes), reveal in folder, OS "Open with", signed self-update | The page title, the browser's Fullscreen API and a "leave page?" warning; the rest is absent (`capabilities` switches those UI features off) |
 | `AiApi` | The Rust core calls Anthropic with the user's key from the OS credential store | A server endpoint calls Anthropic with an organisation key, applying quotas and policies |
