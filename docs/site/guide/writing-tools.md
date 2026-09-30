@@ -30,11 +30,15 @@ Select text and apply a format, or apply it with nothing selected to insert the 
 
 Promote and demote work on every selected heading and stay within H1–H6.
 
+### Rename a heading
+
+Put the cursor on a heading and press **F2** (**Format → Rename Heading…**, or right-click it in the Outline). Type the new text and Markpion changes the heading and every `#anchor` link to it in the document, in the same edit (**Ctrl+Z** undoes it). If other Markdown files in the open folder link to the heading (`guide.md#set-up`), it lists how many and offers to update them too; files with unsaved changes are skipped, and each changed file keeps its previous version in File History. When two headings have the same text, their anchors are numbered (`#notes`, `#notes-1`), and links to both are kept pointing at the right one.
+
 ### Number headings
 
 **Format → Number Headings** numbers every heading, as in specifications and policies: `## 1. Introduction`, `### 1.1 Purpose`, `#### 1.1.1 Scope`. A single H1 title at the top of the document isn't numbered. After you add, remove or move sections, run it again to renumber. **Format → Remove Heading Numbers** takes the numbers off again. Both are one edit, so **Ctrl+Z** undoes them, and a [table of contents](#table-of-contents) in the document is updated too.
 
-Only numbers with a dot count as existing numbers (`1.`, `2.3`), so a heading such as "2024 Roadmap" or "10 Tips" keeps its text. Numbering changes the headings' anchors (`#1-introduction` instead of `#introduction`); [Check Links](/guide/checking-documents) finds links elsewhere that need updating.
+Only numbers with a dot count as existing numbers (`1.`, `2.3`), so a heading such as "2024 Roadmap" or "10 Tips" keeps its text. Numbering changes the headings' anchors (`#1-introduction` instead of `#introduction`); [Check Links](/guide/checking-documents) finds links elsewhere that need updating. To change one heading's text, use [Rename Heading](#rename-a-heading), which updates the links for you.
 
 ### Move a section
 

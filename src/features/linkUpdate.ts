@@ -55,18 +55,36 @@ export function rewriteLinks(text: string, oldDocPath: string, newDocPath: strin
 
 /**
  * After `from` was renamed or moved to `to` inside the workspace, finds the
- * links that now point to the wrong place, asks, and rewrites them. Files open
- * with unsaved changes are skipped; each rewritten file keeps its previous
- * version in File History.
+ * links that now point to the wrong place, asks, and rewrites them.
  */
 export async function updateLinksAfterMove(root: string, from: string, to: string): Promise<number> {
-  const b = backend();
   const moved = mover(from, to);
   const movedBack = mover(to, from);
+  return rewriteWorkspaceLinks(
+    root,
+    (text, path) => rewriteLinks(text, movedBack(path), path, moved),
+    (links, files) =>
+      `${links} ${links === 1 ? "link" : "links"} in ${files} ${files === 1 ? "file" : "files"} would no longer point to the right place after moving “${basename(to)}”. Update ${links === 1 ? "it" : "them"}?`,
+  );
+}
+
+/**
+ * Rewrites links in the workspace's Markdown files with `rewrite`, after
+ * asking (`question` gets the number of links and files). Files open with
+ * unsaved changes are skipped; each rewritten file keeps its previous version
+ * in File History, and open tabs are reloaded. Returns the files changed.
+ */
+export async function rewriteWorkspaceLinks(
+  root: string,
+  rewrite: (text: string, path: string) => { text: string; count: number },
+  question: (links: number, files: number) => string,
+  skip?: string,
+): Promise<number> {
+  const b = backend();
   const unsaved = new Set(useDocuments.getState().docs.filter((d) => d.path && isDirty(d)).map((d) => d.path!));
   let paths: string[];
   try {
-    paths = (await b.listWorkspaceFiles(root)).filter(isMarkdownPath);
+    paths = (await b.listWorkspaceFiles(root)).filter((p) => isMarkdownPath(p) && !(skip && samePath(p, skip)));
   } catch {
     return 0;
   }
@@ -80,7 +98,7 @@ export async function updateLinksAfterMove(root: string, from: string, to: strin
     } catch {
       continue;
     }
-    const { text, count } = rewriteLinks(file.content, movedBack(path), path, moved);
+    const { text, count } = rewrite(file.content, path);
     if (!count) continue;
     if (unsaved.has(path)) {
       skipped.push(basename(path));
@@ -95,7 +113,7 @@ export async function updateLinksAfterMove(root: string, from: string, to: strin
   }
   const choice = await ask({
     title: "Update links?",
-    message: `${links} ${links === 1 ? "link" : "links"} in ${planned.length} ${planned.length === 1 ? "file" : "files"} would no longer point to the right place after moving “${basename(to)}”. Update ${links === 1 ? "it" : "them"}?`,
+    message: question(links, planned.length),
     detail:
       (skipped.length ? `Skipped, because they have unsaved changes: ${skipped.join(", ")}. ` : "") + "The previous version of each file is kept in File History.",
     buttons: [

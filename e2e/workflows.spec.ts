@@ -978,3 +978,19 @@ test("Ctrl+click and Alt+Enter follow links in the editor", async ({ page }) => 
   await expect(page.getByRole("tab", { name: /diagrams-and-math\.md/ })).toHaveAttribute("aria-selected", "true");
   await expect(activeLine).toHaveText("## LaTeX math");
 });
+
+test("F2 renames the heading at the cursor and updates links to it", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Title\n\n## Set Up\n\nSee [setup](#set-up).");
+  await page.locator(".cm-line", { hasText: "## Set Up" }).click();
+  await page.keyboard.press("F2");
+  const dialog = page.getByRole("dialog", { name: "Rename Heading" });
+  await expect(dialog.getByRole("textbox")).toHaveValue("Set Up");
+  await dialog.getByRole("textbox").fill("Installation");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-line")).toHaveText(["# Title", "", "## Installation", "", "See [setup](#installation)."]);
+  await expect(page.locator(".cm-lintRange")).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
+});

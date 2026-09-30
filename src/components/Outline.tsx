@@ -7,6 +7,7 @@ import { moveSectionAtLine, moveSectionTo, setDocumentText } from "../features/s
 import { copyText } from "../features/pathActions";
 import { ContextMenu } from "./ContextMenu";
 import { revealLine } from "../features/editorBridge";
+import { renameHeading } from "../features/renameHeading";
 import { Icon } from "./Icon";
 import { mountAllChunks } from "./PreviewChunks";
 
@@ -177,6 +178,7 @@ export function Outline() {
               label: "Copy Markdown Link",
               run: () => copyText(`[${headings[menu.index].text.replace(/([[\]])/g, "\\$1")}](#${slugs[menu.index]})`, "Markdown link"),
             },
+            { label: "Rename Heading…", run: () => void renameHeading(headings[menu.index].line), shortcut: "F2" },
             "separator",
             { label: "Move Section Up", run: () => move(menu.index, -1), shortcut: "Alt+↑" },
             { label: "Move Section Down", run: () => move(menu.index, 1), shortcut: "Alt+↓" },
