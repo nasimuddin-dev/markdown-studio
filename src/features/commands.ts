@@ -25,6 +25,7 @@ import {
 import { fixAllProblemsCommand } from "./lintExtension";
 import { fillTemplate } from "./templates";
 import { convertToInlineLinks, convertToReferenceLinks } from "./referenceLinks";
+import { followLinkAtCursor } from "./followLink";
 import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
 import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
@@ -65,6 +66,7 @@ export const formatCommands: Record<string, Command> = {
   strikethrough: formatCommand("strikethrough", "Strikethrough", fmt.toggleStrikethrough, "Mod+Shift+X"),
   inlineCode: formatCommand("inlineCode", "Inline Code", fmt.toggleInlineCode, "Mod+E"),
   link: formatCommand("link", "Insert Link", fmt.insertLink, "Mod+K"),
+  followLink: formatCommand("followLink", "Open Link at Cursor", followLinkAtCursor, "Alt+Enter"),
   referenceLinks: formatCommand("referenceLinks", "Convert Links to Reference Style", convertToReferenceLinks),
   inlineLinks: formatCommand("inlineLinks", "Convert Links to Inline Style", convertToInlineLinks),
   heading1: formatCommand("heading1", "Heading 1", fmt.setHeading(1), "Mod+Alt+1"),

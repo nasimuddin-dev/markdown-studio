@@ -1,17 +1,15 @@
 import { memo, useEffect, useMemo, useRef, useState, type ComponentProps, type MouseEvent } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
-import { classifyLink, markdownPlugins } from "../services/markdown";
+import { markdownPlugins } from "../services/markdown";
 import { splitFrontMatter } from "../services/frontMatter";
 import { MermaidDiagram } from "./MermaidDiagram";
 import { backend } from "../services";
-import { describeError } from "../services/errors";
-import { isMarkdownPath, resolveRelative } from "../services/paths";
-import { notify } from "../stores/uiStore";
+import { resolveRelative } from "../services/paths";
 import { useDocuments } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
-import { openPath } from "../features/documents";
 import { copyText } from "../features/pathActions";
 import { scrollSync } from "../features/scrollSync";
+import { openLink } from "../features/followLink";
 import { revealLineAt } from "../features/editorBridge";
 import { lineForTop, rehypeSourceLines, topForLine } from "../services/sourceLines";
 import { toggleTaskInDocument } from "../features/tasks";
@@ -278,31 +276,11 @@ function useBulkChangeGeneration(text: string): number {
  * the browser, links to Markdown files open in a tab.
  */
 export async function followPreviewLink(anchor: HTMLAnchorElement, docPath: string | null, container: HTMLElement) {
-  const target = classifyLink(anchor.getAttribute("data-href") ?? anchor.getAttribute("href"));
-  switch (target.type) {
-    case "anchor": {
-      mountAllChunks();
-      const el = container.querySelector(`[id="${CSS.escape(target.id)}"], [id="user-content-${CSS.escape(target.id)}"]`);
-      el?.scrollIntoView({ behavior: "smooth", block: "start" });
-      break;
-    }
-    case "external":
-      try {
-        await backend().openExternal(target.url);
-      } catch (err) {
-        notify("error", describeError(err, "open the link"));
-      }
-      break;
-    case "document": {
-      const resolved = docPath ? resolveRelative(docPath, target.href) : null;
-      if (resolved && isMarkdownPath(resolved)) await openPath(resolved);
-      else notify("info", "Only links to Markdown documents and web pages can be opened from the preview.");
-      break;
-    }
-    case "blocked":
-      notify("warning", "This link type is blocked for your safety.");
-      break;
-  }
+  await openLink(anchor.getAttribute("data-href") ?? anchor.getAttribute("href") ?? "", docPath, (id) => {
+    mountAllChunks();
+    const el = container.querySelector(`[id="${CSS.escape(id)}"], [id="user-content-${CSS.escape(id)}"]`);
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 export function Preview() {

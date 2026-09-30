@@ -20,7 +20,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - **Move Section Up/Down** moves a heading with its text and subsections past its neighbour.
 - Tables: **Format Table** aligns columns (CJK-aware), **Tab** and **Shift+Tab** move between cells (Tab in the last cell adds a row), rows and columns can be inserted or deleted at the cursor, and **Sort Table by Column** sorts rows. You can also paste cells from Excel or Google Sheets as a table, and copy a table as CSV. [Tables](/markdown/tables)
 - A table of contents that stays up to date on save, and templates for new documents (meeting notes, README, blog post, ADR, status report, changelog, journal, plus your own). [Writing tools](/guide/writing-tools)
-- Link autocompletion for workspace files, images, headings, reference labels and footnotes. Paste a URL over selected text to make a link. Convert links between inline and reference style.
+- Link autocompletion for workspace files, images, headings, reference labels and footnotes. Ctrl/Cmd+click (or Alt+Enter) follows a link from the editor. Paste a URL over selected text to make a link. Convert links between inline and reference style.
 - Paste or drop images, or choose one with **Format → Insert Image…**. Images from elsewhere are copied into an `assets/` folder next to the document and linked. [Images](/markdown/images)
 - Rich paste: content copied from web pages or Word is converted to Markdown.
 - Spell checking with the system dictionary, a word count with document and selection statistics, Focus Mode and Full Screen.

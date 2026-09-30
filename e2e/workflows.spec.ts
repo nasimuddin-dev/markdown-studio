@@ -948,3 +948,33 @@ test("converts links to reference style and back from the Format menu", async ({
   await page.keyboard.press(`${mod}+Z`);
   await expect(page.locator(".cm-line").first()).toHaveText("See [one][1] and [two][2].");
 });
+
+test("Ctrl+click and Alt+Enter follow links in the editor", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const editor = page.getByRole("textbox", { name: "Markdown editor" });
+  await editor.click();
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.insertText("\n\nJump [up](#welcome-to-markpion), see [notes][n] or [math](docs/diagrams-and-math.md#latex-math).\n\n[n]: notes/todo.md\n");
+  const activeLine = page.locator(".cm-activeLine");
+  const word = (text: string) => page.locator(".cm-line span", { hasText: new RegExp(`^${text}$`) }).first();
+
+  // Holding the key underlines links.
+  await page.keyboard.down(mod);
+  await expect(page.locator(".cm-editor.cm-follow-links")).toHaveCount(1);
+  await word("up").click();
+  await page.keyboard.up(mod);
+  await expect(activeLine).toHaveText("# Welcome to Markpion");
+  await expect(page.locator(".cm-editor.cm-follow-links")).toHaveCount(0);
+
+  // A reference goes to its definition.
+  await word("notes").click({ modifiers: [mod] });
+  await expect(activeLine).toHaveText("[n]: notes/todo.md");
+
+  // From the keyboard: Alt+Enter opens another document at the heading.
+  await word("math").click();
+  await page.keyboard.press("Alt+Enter");
+  await expect(page.getByRole("tab", { name: /diagrams-and-math\.md/ })).toHaveAttribute("aria-selected", "true");
+  await expect(activeLine).toHaveText("## LaTeX math");
+});

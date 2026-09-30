@@ -769,6 +769,12 @@ select {
 }
 
 /* Formatting toolbar above the editor */
+/* Ctrl/Cmd held over the editor: links can be followed with a click. */
+.cm-follow-links .cm-md-link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .format-toolbar {
   display: flex;
   flex-wrap: wrap;

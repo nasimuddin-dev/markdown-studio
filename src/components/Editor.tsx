@@ -17,6 +17,7 @@ import { useSettings } from "../stores/settingsStore";
 import { useUi } from "../stores/uiStore";
 import type { Settings } from "../types";
 import { editorShowing, openReplacePanel, registerEditorView } from "../features/editorBridge";
+import { followLinks } from "../features/followLink";
 import { editorTopLine, scrollEditorToLine, scrollSync } from "../features/scrollSync";
 import { editorKeymap } from "../features/commands";
 import { minimalChange } from "../features/saveTransforms";
@@ -165,6 +166,7 @@ export function Editor() {
         highlightSelectionMatches(),
         search({ top: true }),
         linkCompletion(),
+        followLinks(),
         pendingPastes,
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         syntaxHighlighting(markdownHighlight),
