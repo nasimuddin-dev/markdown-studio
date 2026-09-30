@@ -5,6 +5,23 @@ import { useDocuments } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
 import { diffLines } from "./diff";
 import { getEditorView } from "./editorBridge";
+import { create } from "zustand";
+
+/** Bumped whenever the committed text in the editor changes, so views of it (the status bar) refresh. */
+export const useGitBaseVersion = create<{ version: number }>(() => ({ version: 0 }));
+
+/** Lines added, changed and deleted since the last commit, from the change regions. */
+export function changeCounts(hunks: Hunk[]): { added: number; changed: number; deleted: number } {
+  let added = 0;
+  let changed = 0;
+  let deleted = 0;
+  for (const h of hunks) {
+    changed += Math.min(h.count, h.old.length);
+    added += Math.max(0, h.count - h.old.length);
+    deleted += Math.max(0, h.old.length - h.count);
+  }
+  return { added, changed, deleted };
+}
 
 /**
  * Change markers in the editor's gutter: lines added, changed or deleted since
@@ -313,4 +330,5 @@ export async function refreshGitBase() {
   const now = getEditorView();
   if (!now || run !== generation || useDocuments.getState().activeId !== activeId) return;
   if (gitBaseOf(now.state) !== base) now.dispatch({ effects: setGitBase.of(base) });
+  useGitBaseVersion.setState((s) => ({ version: s.version + 1 }));
 }

@@ -1,13 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useGit } from "../stores/gitStore";
 import { useDocuments, isDirty } from "../stores/documentsStore";
 import { useUi } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
-import { useState } from "react";
 import { countWords, textStats } from "../services/textStats";
-import { getEditorView } from "../features/editorBridge";
+import { getEditorView, showProblems } from "../features/editorBridge";
+import { changeCounts, gitHunksOf, useGitBaseVersion } from "../features/gitGutter";
+import { commands } from "../features/commands";
 import { backend } from "../services";
-import { showProblems } from "../features/editorBridge";
 
 /** Status bar: encoding, language, line/column and save state (SRS §8). */
 export function StatusBar() {
@@ -34,6 +34,7 @@ export function StatusBar() {
       <div className="status-left">
         {!backend().capabilities.desktop && <span className="status-item status-demo" title="Running in a browser. Files are stored in this browser only.">Browser demo</span>}
         <GitBranch />
+        <FileChanges />
         {doc && (
           <span className={`status-item status-state${doc && isDirty(doc) ? " dirty" : ""}`} role="status" aria-live="polite">
             {state}
@@ -70,6 +71,38 @@ export function StatusBar() {
 }
 
 /** The Git branch of the open folder, with commits ahead of and behind its upstream. */
+/** Changes to the file since the last commit; a click goes to the next one. */
+function FileChanges() {
+  const content = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.content);
+  const baseVersion = useGitBaseVersion((s) => s.version);
+  const counts = useMemo(() => {
+    const view = getEditorView();
+    const hunks = view ? gitHunksOf(view.state) : [];
+    return hunks.length ? changeCounts(hunks) : null;
+  }, [content, baseVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!counts) return null;
+  const parts = [
+    counts.added && `+${counts.added}`,
+    counts.changed && `~${counts.changed}`,
+    counts.deleted && `−${counts.deleted}`,
+  ].filter(Boolean);
+  const describe = [
+    counts.added && `${counts.added} added`,
+    counts.changed && `${counts.changed} changed`,
+    counts.deleted && `${counts.deleted} deleted`,
+  ].filter(Boolean).join(", ");
+  return (
+    <button
+      className="status-item status-button"
+      title={`Lines since the last commit: ${describe}. Go to the next change (Alt+F5)`}
+      aria-label={`Lines since the last commit: ${describe}. Go to the next change.`}
+      onClick={() => void commands.gitNextChange.run()}
+    >
+      {parts.join(" ")}
+    </button>
+  );
+}
+
 function GitBranch() {
   const status = useGit((s) => s.status);
   if (!status) return null;

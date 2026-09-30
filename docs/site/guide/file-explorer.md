@@ -86,7 +86,7 @@ For a file that's committed to Git, the editor shows a thin bar next to the line
 - **Click a bar** (or use **Edit → Show Change Since Last Commit**) to see the committed lines. **Revert Change** puts them back (**Ctrl+Z** undoes it); **Escape** closes the pop-up.
 - **Alt+F5** and **Shift+Alt+F5** move the cursor to the next and previous change. **Edit → Revert Change to Last Commit** reverts the change at the cursor.
 
-The bars update as you type and after you commit (when you come back to the window). Untracked files and documents over 1 MB have no bars. In Windows High Contrast, added lines get a solid bar and changed lines a dashed one.
+The status bar sums up the file's changes (for example `+3 ~1 −2`: added, changed and deleted lines); click it to go to the next change. The bars update as you type and after you commit (when you come back to the window). Untracked files and documents over 1 MB have no bars. In Windows High Contrast, added lines get a solid bar and changed lines a dashed one.
 
 ### Requirements and privacy
 

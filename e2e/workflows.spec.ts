@@ -714,6 +714,8 @@ test("Git change bars: see the committed lines and revert a change", async ({ pa
   await page.keyboard.type("\nA new last line");
   await expect(page.locator(".cm-git-modified")).toHaveCount(1);
   await expect(page.locator(".cm-git-added")).toHaveCount(1);
+  // The status bar sums them up.
+  await expect(page.getByRole("button", { name: /^Lines since the last commit: 1 added, 1 changed/ })).toHaveText("+1 ~1");
 
   // Alt+F5 goes to the next change (wrapping to the first), then the pop-up reverts it.
   await page.keyboard.press("Alt+F5");

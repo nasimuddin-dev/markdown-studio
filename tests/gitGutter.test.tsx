@@ -7,7 +7,7 @@ import { commands } from "../src/features/commands";
 import { openPath } from "../src/features/documents";
 import { getEditorView } from "../src/features/editorBridge";
 import {
-  changeHunks, changeMarkers, gitBaseOf, gitChangeGutter, nextChange, previousChange, refreshGitBase, revertChangeAtCursor, setGitBase,
+  changeCounts, changeHunks, changeMarkers, gitBaseOf, gitChangeGutter, nextChange, previousChange, refreshGitBase, revertChangeAtCursor, setGitBase,
 } from "../src/features/gitGutter";
 import { setBackend } from "../src/services";
 import { MemoryBackend } from "../src/services/memoryBackend";
@@ -44,6 +44,12 @@ describe("Git change markers", () => {
       { start: 2, count: 1, old: ["b", "c"] },
       { start: 4, count: 1, old: [] },
     ]);
+  });
+
+  it("counts added, changed and deleted lines", () => {
+    expect(changeCounts(changeHunks("a\nb\nc\nd", "a\nB\nx\nd\ne")!)).toEqual({ added: 1, changed: 2, deleted: 0 });
+    expect(changeCounts(changeHunks("a\nb\nc\nd", "a\nd")!)).toEqual({ added: 0, changed: 0, deleted: 2 });
+    expect(changeCounts([])).toEqual({ added: 0, changed: 0, deleted: 0 });
   });
 
   it("gives up on texts too different to compare quickly", () => {
