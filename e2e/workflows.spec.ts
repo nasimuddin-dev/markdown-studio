@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import JSZip from "jszip";
 
 const mod = process.platform === "darwin" ? "Meta" : "Control";
 /** Document tabs (the sidebar also has Explorer/Search tabs). */
@@ -1181,4 +1182,19 @@ test("the diagram starters in the Format menu render in the preview", async ({ p
   }
   await expect(page.locator(".preview .mermaid-diagram svg")).toHaveCount(4, { timeout: 20_000 });
   await expect(page.locator(".preview .mermaid-error")).toHaveCount(0);
+});
+
+test("File > Export as Markdown with Images makes a .zip with the pictures", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("menuitem", { name: /Export as Markdown with Images/ }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe("README.zip");
+  const zip = await JSZip.loadAsync(Buffer.concat(await (await file.createReadStream()).toArray()));
+  expect(Object.keys(zip.files).sort()).toEqual(["README.md", "images/", "images/logo.svg"]);
+  expect(await zip.file("README.md")!.async("string")).toContain("![Logo](images/logo.svg)");
+  expect(await zip.file("images/logo.svg")!.async("string")).toContain("<svg");
 });

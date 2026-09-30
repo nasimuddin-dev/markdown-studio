@@ -290,6 +290,12 @@ export const commands: Record<string, Command> = {
   exportHtml: { id: "exportHtml", label: "Export as HTML…", run: async () => (await exporting()).exportActiveAsHtml(), enabled: hasActive },
   exportPdf: { id: "exportPdf", label: "Export as PDF…", run: async () => (await exporting()).exportActiveAsPdf(), enabled: hasActive },
   exportDocx: { id: "exportDocx", label: "Export as Word (.docx)…", run: async () => (await exporting()).exportActiveAsDocx(), enabled: hasActive },
+  exportZip: {
+    id: "exportZip",
+    label: "Export as Markdown with Images (.zip)…",
+    run: async () => (await import("./exportZip")).exportActiveAsZip(),
+    enabled: hasActive,
+  },
   copyHtml: { id: "copyHtml", label: "Copy as HTML", run: async () => (await exporting()).copyActiveAsHtml(), enabled: hasActive },
   copyFormatted: { id: "copyFormatted", label: "Copy as Formatted Text", run: async () => (await exporting()).copyActiveAsFormattedText(), enabled: hasActive },
   printSlides: { id: "printSlides", label: "Print Slides…", run: async () => (await exporting()).printSlides(), enabled: hasActive },

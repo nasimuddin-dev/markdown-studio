@@ -210,6 +210,7 @@ pub async fn export_binary_file(
     let (filter, ext): (&str, &str) = match kind.as_str() {
         "docx" => ("Word document", "docx"),
         "pdf" => ("PDF document", "pdf"),
+        "zip" => ("ZIP archive", "zip"),
         _ => return Err(AppError::InvalidPath("Unsupported export type".into())),
     };
     scope::validate_file_name(&suggested_name)?;

@@ -95,7 +95,7 @@ export interface FilesApi {
    */
   exportFile(suggestedName: string, content: string, kind: ExportKind): Promise<string | null>;
   /** Like exportFile, for binary formats (Word .docx, PDF). */
-  exportBinaryFile(suggestedName: string, dataBase64: string, kind: "docx" | "pdf"): Promise<string | null>;
+  exportBinaryFile(suggestedName: string, dataBase64: string, kind: "docx" | "pdf" | "zip"): Promise<string | null>;
 }
 
 /** Folder-wide operations for the open workspace. */

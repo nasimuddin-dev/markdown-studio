@@ -561,7 +561,7 @@ export class MemoryBackend implements Backend {
     this.lastExport = { name: suggestedName, content: dataBase64 };
     if (typeof URL.createObjectURL !== "function") return suggestedName;
     const bytes = Uint8Array.from(atob(dataBase64), (c) => c.charCodeAt(0));
-    const type = kind === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const type = kind === "pdf" ? "application/pdf" : kind === "zip" ? "application/zip" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([bytes], { type }));
     a.download = suggestedName;
