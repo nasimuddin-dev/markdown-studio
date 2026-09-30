@@ -306,7 +306,7 @@ export const commands: Record<string, Command> = {
 
   undo: { id: "undo", label: "Undo", shortcut: "Mod+Z", run: () => editorCommand("undo"), enabled: hasActive },
   redo: { id: "redo", label: "Redo", shortcut: isMac ? "Mod+Shift+Z" : "Mod+Y", run: () => editorCommand("redo"), enabled: hasActive },
-  find: { id: "find", label: "Find", shortcut: "Mod+F", run: () => editorCommand("find"), enabled: hasActive },
+  find: { id: "find", label: "Find", shortcut: "Mod+F", run: () => (findInPreview() ? useUi.getState().setPreviewFind(true) : editorCommand("find")), enabled: hasActive },
   replace: { id: "replace", label: "Replace", shortcut: isMac ? "Mod+Alt+F" : "Mod+H", run: () => editorCommand("replace"), enabled: hasActive },
   gotoLine: { id: "gotoLine", label: "Go to Line…", shortcut: "Mod+G", run: () => editorCommand("gotoLine"), enabled: hasActive },
   selectAll: { id: "selectAll", label: "Select All", shortcut: "Mod+A", run: () => editorCommand("selectAll"), enabled: hasActive },
@@ -546,6 +546,11 @@ export function eventToShortcut(e: KeyboardEvent): string {
 }
 
 /** Shortcuts handled by the editor itself when it has focus. */
+/** Find searches the preview when it's shown alone or has focus. */
+function findInPreview(): boolean {
+  return useSettings.getState().settings.viewMode === "preview" || !!document.activeElement?.closest(".preview, .preview-find");
+}
+
 const EDITOR_OWNED = new Set(["undo", "redo", "selectAll", "find", "replace", "gotoLine"]);
 
 /** "Ctrl+Tab" on Windows/Linux is "Mod+Tab" after normalization. */

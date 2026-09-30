@@ -14,6 +14,8 @@ import { revealLineAt } from "../features/editorBridge";
 import { lineForTop, rehypeSourceLines, topForLine } from "../services/sourceLines";
 import { toggleTaskInDocument } from "../features/tasks";
 import { mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
+import { PreviewFind } from "./PreviewFind";
+import { useUi } from "../stores/uiStore";
 
 /** The position of a task checkbox among the document's task list items, or -1. */
 function taskIndex(root: HTMLElement, box: HTMLInputElement): number {
@@ -336,9 +338,13 @@ export function Preview() {
     revealLineAt(Number(block.dataset.line), Math.min(top, ref.current.clientHeight - 40));
   };
 
+  const finding = useUi((s) => s.previewFind);
   return (
-    <div className="preview" ref={ref} onClick={onClick} onDoubleClick={onDoubleClick} role="document" aria-label="Markdown preview" tabIndex={0}>
-      {doc ? <DebouncedMarkdown key={doc.id} text={doc.content} docPath={docPath} /> : <article className="markdown-body" />}
-    </div>
+    <>
+      {finding && <PreviewFind container={ref} />}
+      <div className="preview" ref={ref} onClick={onClick} onDoubleClick={onDoubleClick} role="document" aria-label="Markdown preview" tabIndex={0}>
+        {doc ? <DebouncedMarkdown key={doc.id} text={doc.content} docPath={docPath} /> : <article className="markdown-body" />}
+      </div>
+    </>
   );
 }

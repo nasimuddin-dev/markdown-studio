@@ -138,6 +138,14 @@ for (const theme of ["light", "dark"] as const) {
       await expect(page.getByRole("tab", { name: "Links", selected: true })).toBeVisible();
       await audit(page, "link check");
 
+      await page.getByRole("button", { name: "Preview only" }).click();
+      await page.keyboard.press(`${mod}+F`);
+      await page.getByRole("searchbox", { name: "Find in preview" }).fill("markdown");
+      await expect(page.getByRole("search", { name: "Find in preview" }).getByRole("status")).toHaveText(/ of /);
+      await audit(page, "find in preview");
+      await page.keyboard.press("Escape");
+      await page.getByRole("button", { name: "Split view" }).click();
+
       await palette("close tab");
       await expect(page.getByRole("alertdialog").or(page.getByRole("dialog"))).toBeVisible();
       await audit(page, "unsaved changes");

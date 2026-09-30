@@ -1038,3 +1038,27 @@ test("File History marks the words that changed within a line", async ({ page })
   await expect(dialog.locator(".diff-add .diff-word")).toHaveText([" Really."]);
   await expect(dialog.locator(".diff-del")).toContainText("editor with live preview.");
 });
+
+test("Find in the preview when it's shown alone", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.getByRole("button", { name: "Preview only" }).click();
+  await page.keyboard.press(`${mod}+F`);
+  const bar = page.getByRole("search", { name: "Find in preview" });
+  const field = bar.getByRole("searchbox", { name: "Find in preview" });
+  await expect(field).toBeFocused();
+  await field.fill("preview");
+  await expect(bar.getByRole("status")).toHaveText(/^1 of \d+$/);
+  await page.keyboard.press("Enter");
+  await expect(bar.getByRole("status")).toHaveText(/^2 of \d+$/);
+  await page.keyboard.press("Shift+Enter");
+  await expect(bar.getByRole("status")).toHaveText(/^1 of \d+$/);
+  expect(await page.evaluate(() => (CSS as unknown as { highlights: Map<string, unknown> }).highlights.has("preview-find-current"))).toBe(true);
+  await field.fill("no such words");
+  await expect(bar.getByRole("status")).toHaveText("No results");
+  await page.keyboard.press("Escape");
+  await expect(bar).toBeHidden();
+  await expect(page.getByRole("document", { name: "Markdown preview" })).toBeFocused();
+  expect(await page.evaluate(() => (CSS as unknown as { highlights: Map<string, unknown> }).highlights.size)).toBe(0);
+});

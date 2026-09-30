@@ -17,6 +17,10 @@ The search bar has three options:
 
 Press **Esc** to close it.
 
+### Find in the preview
+
+When the preview is shown alone (**View → Preview**), or you clicked into it in split view, **Ctrl+F** searches the rendered text instead: a small bar opens at the top right of the preview, every match is highlighted, and the count shows which one you're on ("2 of 7"). **Enter** / **Shift+Enter** (or the arrows) move between matches, and **Esc** closes the bar. The search ignores case and follows the preview as you type in the editor. It finds up to 1,000 matches. Where the system's web engine can't highlight matches (older macOS and Linux versions), the current match is selected instead when you use the arrows.
+
 ## Replace
 
 Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the replace field. **Replace** replaces the current match, and **Replace All** replaces every match. With **Regex** on, the replacement can use groups such as `$1`. A replacement can be undone with **Ctrl+Z**.

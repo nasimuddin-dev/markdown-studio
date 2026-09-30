@@ -62,6 +62,10 @@ interface UiState {
   searchFocusToken: number;
   /** Incremented to (re)run the workspace link check. */
   linkCheckToken: number;
+  /** The preview's find bar is open; the token changes each time it's asked for (to focus it again). */
+  previewFind: boolean;
+  previewFindToken: number;
+  setPreviewFind(open: boolean): void;
   checkLinks(): void;
   cursor: { line: number; col: number; selected: number };
   setCursor(c: UiState["cursor"]): void;
@@ -106,6 +110,9 @@ export const useUi = create<UiState>((set, get) => ({
   setProblems: (problems) => set({ problems }),
   searchFocusToken: 0,
   linkCheckToken: 0,
+  previewFind: false,
+  previewFindToken: 0,
+  setPreviewFind: (open) => set((s) => ({ previewFind: open, previewFindToken: open ? s.previewFindToken + 1 : s.previewFindToken })),
   cursor: { line: 1, col: 1, selected: 0 },
   setCursor: (cursor) => set({ cursor }),
   setSettingsOpen: (settingsOpen) => set({ settingsOpen }),

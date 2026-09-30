@@ -175,6 +175,7 @@ kbd {
 }
 
 .pane {
+  position: relative;
   height: 100%;
   min-width: 0;
   overflow: hidden;
@@ -966,6 +967,50 @@ select {
 }
 .preview:focus-visible {
   outline-offset: -3px;
+}
+/* Find in the preview: a bar over its top-right corner. */
+.preview-find {
+  position: absolute;
+  top: 8px;
+  right: 18px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+.preview-find input {
+  width: 180px;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+.preview-find-count {
+  min-width: 64px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+.preview-find .flip {
+  transform: rotate(180deg);
+}
+::highlight(preview-find) {
+  background-color: rgba(255, 196, 0, 0.45);
+  color: inherit;
+}
+::highlight(preview-find-current) {
+  background-color: rgba(255, 140, 0, 0.85);
+  color: #000;
 }
 /* Long documents: rendered chunks don't affect layout; pending ones hold their estimated height. */
 .preview-chunk {
