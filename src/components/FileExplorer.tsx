@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
-import { useRecentVersion } from "../features/recent";
+import { forgetRecent, useRecentVersion } from "../features/recent";
 import { useWorkspace } from "../stores/workspaceStore";
 import { useDocuments, isDirty } from "../stores/documentsStore";
 import { basename, dirname, isInside, isMarkdownPath } from "../services/paths";
@@ -409,6 +409,14 @@ function RecentList() {
             >
               <Icon name={r.kind === "file" ? "file" : "folder"} size={15} className={r.kind === "file" ? "tree-file-icon" : "tree-folder-icon"} />
               <span className="tree-label">{basename(r.path)}</span>
+            </button>
+            <button
+              className="icon-button small recent-remove"
+              title="Remove from Recent (the file isn't deleted)"
+              aria-label={`Remove ${basename(r.path)} from Recent`}
+              onClick={() => void forgetRecent(r.path)}
+            >
+              <Icon name="close" size={12} />
             </button>
           </li>
         ))}

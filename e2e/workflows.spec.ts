@@ -1352,3 +1352,15 @@ test("Show in Explorer expands the folders down to the file and selects it", asy
   await expect(row).toBeFocused();
   await expect(row).toHaveClass(/selected/);
 });
+
+test("the Explorer's Recent list can forget an entry", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.getByRole("button", { name: "Close folder" }).click();
+  await page.keyboard.press(`${mod}+W`);
+  const recent = page.getByRole("region", { name: "Recent" });
+  await expect(recent.getByRole("button", { name: "demo", exact: true })).toBeVisible();
+  await recent.getByRole("button", { name: "Remove demo from Recent" }).click();
+  await expect(recent).toHaveCount(0);
+});

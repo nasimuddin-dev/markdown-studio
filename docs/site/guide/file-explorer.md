@@ -14,7 +14,7 @@ The file explorer shows the folder you're working in, your **workspace**. Open i
 
 ### Without a folder
 
-When no folder is open, the Explorer lists your **open files**, and below them your **recent** files and folders that aren't open (click one to open it). Click one to switch to it, press **F2** to rename it, or right-click it for **Rename…**, **Open Containing Folder…**, **Copy Path**, **Reveal in File Explorer** and **Close**. Below the list, **Open Folder** opens a folder; the dialog starts in the current file's folder, so opening the folder your file is in takes one click.
+When no folder is open, the Explorer lists your **open files**, and below them your **recent** files and folders that aren't open (click one to open it, or its **×** to remove it from the list; nothing is deleted). Click one to switch to it, press **F2** to rename it, or right-click it for **Rename…**, **Open Containing Folder…**, **Copy Path**, **Reveal in File Explorer** and **Close**. Below the list, **Open Folder** opens a folder; the dialog starts in the current file's folder, so opening the folder your file is in takes one click.
 
 ## What's shown
 

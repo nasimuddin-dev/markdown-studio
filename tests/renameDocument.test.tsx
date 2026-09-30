@@ -56,9 +56,9 @@ describe("renaming a file opened on its own", () => {
     render(<FileExplorer />);
     await act(async () => void (await openPath("/notes/other.md")));
     const recent = await screen.findByRole("region", { name: "Recent" });
-    expect(within(recent).getByRole("button", { name: /a\.md/ })).toHaveAttribute("title", "/notes/a.md");
-    expect(within(recent).queryByRole("button", { name: /other\.md/ })).toBeNull();
-    await userEvent.click(within(recent).getByRole("button", { name: /a\.md/ }));
+    expect(within(recent).getByRole("button", { name: "a.md" })).toHaveAttribute("title", "/notes/a.md");
+    expect(within(recent).queryByRole("button", { name: "other.md" })).toBeNull();
+    await userEvent.click(within(recent).getByRole("button", { name: "a.md" }));
     await waitFor(() => expect(docs().map((d) => d.name)).toContain("a.md"));
   });
 

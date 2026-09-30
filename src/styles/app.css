@@ -776,6 +776,22 @@ select {
 }
 
 /* Formatting toolbar above the editor */
+/* The Explorer's Recent list: a remove button on hover or keyboard focus. */
+.open-files-list li:has(.recent-remove) {
+  position: relative;
+}
+.recent-remove {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  opacity: 0;
+}
+.open-files-list li:hover .recent-remove,
+.recent-remove:focus-visible {
+  opacity: 1;
+}
+
 /* Outline: collapse a heading's subheadings. */
 .outline-toggle {
   display: inline-flex;
