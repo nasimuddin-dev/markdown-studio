@@ -24,7 +24,7 @@ Import commands are in the **File** menu. Each one converts a file into a new Ma
 
 PDFs store positioned text rather than structure, so Markpion reconstructs the document:
 
-- **Supported:** paragraphs (lines are joined, and hyphenated line breaks are mended), headings (text larger than the body text), and bulleted or numbered items. Repeated headers, footers and page numbers are dropped.
+- **Supported:** paragraphs (lines are joined, and hyphenated line breaks are mended), headings (text larger than the body text), and bulleted or numbered lists, including the Symbol and Wingdings bullets Word uses, bullets without a space after them, and nested lists (from how far each item is indented). Repeated headers, footers and page numbers are dropped.
 - **Limitations:** tables and multi-column layouts may come out as plain paragraphs, and images aren't extracted. **Scanned PDFs** contain only images of text; they can't be imported, because text recognition (OCR) isn't supported, and Markpion tells you so.
 
 ### Web page (.html)

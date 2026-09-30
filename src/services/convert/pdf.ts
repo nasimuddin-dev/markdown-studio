@@ -6,7 +6,8 @@ import type { ConversionResult } from "./docx";
  *   - lines are grouped by baseline; words are spaced by horizontal gaps
  *   - the most common font size is body text; larger lines become headings
  *   - lines close together form paragraphs; hyphenated line breaks are joined
- *   - •/–/1. prefixes become list items
+ *   - bullet glyphs (including Word's Symbol/Wingdings ones), dashes and
+ *     "1." prefixes become list items, nested by indentation
  *   - text repeated at the top/bottom of most pages (headers, footers, page
  *     numbers) is dropped
  * Scanned PDFs (images only) have no text to extract; OCR is not attempted.
@@ -52,7 +53,15 @@ export interface Line {
   pageHeight?: number;
 }
 
-const BULLET = /^[•◦▪▫●○■□‣⁃–—*-]\s+/;
+/**
+ * Bullet glyphs. Besides the Unicode ones, Word writes bullets in the Symbol
+ * and Wingdings fonts, which PDFs often map to the Private Use Area (U+F0B7
+ * is Symbol's "•", U+F0A7 Wingdings' "▪", U+F0D8 "➢", U+F0FC "✓"…).
+ */
+const GLYPHS = "•◦▪▫●○■□‣⁃·∙⦁➢➤►▶▸▹✓✔❖◆◇☐☑";
+/** A glyph bullet (a space after it is optional), or a dash/asterisk followed by a space. */
+const BULLET = new RegExp(`^(?:[${GLYPHS}]\\s*|[–—*-]\\s+)(?=\\S)`);
+const LONE_BULLET = new RegExp(`^[${GLYPHS}–—*-]$`);
 const ORDERED = /^(\d{1,3})[.)]\s+/;
 
 function groupLines(items: Item[], page: number, pageHeight: number): Line[] {
@@ -126,10 +135,17 @@ function bodySize(lines: Line[]): number {
   return best;
 }
 
+/** "bullet" or "ordered" for a top-level list item, "nested" for an indented one, else null. */
+function listKind(block: string): "bullet" | "ordered" | "nested" | null {
+  const m = /^( *)(- |\d+\. )/.exec(block);
+  if (!m) return null;
+  return m[1] ? "nested" : m[2] === "- " ? "bullet" : "ordered";
+}
+
 const escapeStart = (t: string) => t.replace(/^([#>|+=])/, "\\$1");
 
 /** Turns positioned lines into Markdown blocks. */
-function linesToMarkdown(pages: Line[][]): string {
+export function linesToMarkdown(pages: Line[][]): string {
   const lines = pages.flat();
   if (!lines.length) return "";
   const body = bodySize(lines);
@@ -137,6 +153,12 @@ function linesToMarkdown(pages: Line[][]): string {
   let para: string[] = [];
   let prev: Line | null = null;
   let inList = false;
+  /** Left edges of the list levels seen so far, outermost first. */
+  let levels: number[] = [];
+  /** The list marker at each level, for indenting nested items. */
+  const markers: string[] = [];
+  /** A bullet glyph that ended up on a line of its own (a different baseline). */
+  let loneBullet: Line | null = null;
 
   const flush = () => {
     if (para.length) out.push(para.join(" ").replace(/(\w)- (\p{Ll})/gu, "$1$2"));
@@ -148,7 +170,16 @@ function linesToMarkdown(pages: Line[][]): string {
     else para.push(text);
   };
 
-  for (const l of lines) {
+  for (let l of lines) {
+    if (LONE_BULLET.test(l.text)) {
+      loneBullet = l;
+      continue;
+    }
+    if (loneBullet) {
+      // The glyph belongs to the text next to it.
+      if (loneBullet.page === l.page && Math.abs(loneBullet.y - l.y) <= l.size * 1.2 && l.x > loneBullet.x) l = { ...l, text: `• ${l.text}`, x: loneBullet.x };
+      loneBullet = null;
+    }
     const ratio = l.size / body;
     const newPage = prev !== null && prev.page !== l.page;
     const gap = prev && !newPage ? prev.y - l.y : Infinity;
@@ -167,18 +198,34 @@ function linesToMarkdown(pages: Line[][]): string {
       continue;
     }
 
-    const bullet = BULLET.exec(l.text);
+    // Word's second-level bullet is a Courier "o"; only trust it inside a list, indented.
+    const subBullet = inList && levels.length > 0 && l.x > levels[0] + l.size * 0.8 ? /^o\s+(?=\S)/.exec(l.text) : null;
+    const bullet = BULLET.exec(l.text) ?? subBullet;
     const ordered = ORDERED.exec(l.text);
     if (bullet || ordered) {
       flush();
-      if (!inList && out.length && !out[out.length - 1].startsWith("- ") && !/^\d+\. /.test(out[out.length - 1])) out.push("");
+      if (!inList && out.length && !listKind(out[out.length - 1])) out.push("");
+      if (!inList) levels = [];
       inList = true;
-      para = [bullet ? `- ${l.text.slice(bullet[0].length)}` : `${ordered![1]}. ${l.text.slice(ordered![0].length)}`];
+      // Nesting follows the indentation: a new, deeper left edge opens a level.
+      const tolerance = l.size * 0.8;
+      while (levels.length && l.x < levels[levels.length - 1] - tolerance) levels.pop();
+      if (!levels.length || l.x > levels[levels.length - 1] + tolerance) levels.push(l.x);
+      else levels[levels.length - 1] = Math.min(levels[levels.length - 1], l.x);
+      const depth = levels.length - 1;
+      const marker = bullet ? "- " : `${ordered![1]}. `;
+      markers.length = depth;
+      // A nested item is indented by the width of its parents' markers ("- " or "1. ").
+      const indent = " ".repeat(markers.reduce((n, m) => n + m.length, 0));
+      markers.push(marker);
+      para = [indent + marker + l.text.slice((bullet ?? ordered)![0].length)];
       prev = l;
       continue;
     }
 
-    const continues = prev !== null && !newPage && gap <= Math.max(prev.size, l.size) * 1.6;
+    // A list item's wrapped lines start right of its bullet; text back at the bullet's edge ends the list.
+    const leavesList = inList && levels.length > 0 && l.x <= levels[levels.length - 1] + l.size * 0.3;
+    const continues = prev !== null && !newPage && !leavesList && gap <= Math.max(prev.size, l.size) * 1.6;
     if (continues && para.length) {
       join(l.text);
     } else {
@@ -191,12 +238,14 @@ function linesToMarkdown(pages: Line[][]): string {
   flush();
 
   // Blank lines between blocks; items of the same list (bulleted or numbered) stay together.
-  const kind = (b: string) => (b.startsWith("- ") ? "bullet" : /^\d+\. /.test(b) ? "ordered" : null);
+  // Nested items always stay with the list around them.
   const blocks: string[] = [];
   for (const b of out) {
     if (b === "") continue;
-    const prevKind = blocks.length ? kind(blocks[blocks.length - 1].replace(/^\u0000/, "")) : null;
-    blocks.push(kind(b) && kind(b) === prevKind ? `\u0000${b}` : b);
+    const kind = listKind(b);
+    const prevKind = blocks.length ? listKind(blocks[blocks.length - 1].replace(/^\u0000/, "")) : null;
+    const together = kind !== null && prevKind !== null && (kind === prevKind || kind === "nested" || prevKind === "nested");
+    blocks.push(together ? `\u0000${b}` : b);
   }
   return blocks.join("\n\n").replace(/\n\n\u0000/g, "\n") + "\n";
 }
