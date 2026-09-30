@@ -42,13 +42,13 @@ test("create, edit, preview, save, close and reopen a document (§17.2)", async 
   await expect(preview.locator("input[type=checkbox]")).toBeChecked();
   await expect(page.getByRole("tab", { name: /Untitled-1\.md/ })).toContainText("(unsaved)");
 
-  await page.keyboard.press(`${mod}+S`); // demo "Save As" accepts /demo/Untitled-1.md
+  await page.keyboard.press(`${mod}+S`); // demo "Save As" accepts the suggested /demo/E2E Title.md
   await expect(page.getByRole("status").filter({ hasText: "Saved" })).toBeVisible();
-  await expect(page.getByRole("treeitem", { name: /Untitled-1\.md/ })).toBeVisible();
+  await expect(page.getByRole("treeitem", { name: /E2E Title\.md/ })).toBeVisible();
 
   await page.keyboard.press(`${mod}+W`);
   await expect(docTabs(page)).toHaveCount(0);
-  await openFile(page, "Untitled-1.md");
+  await openFile(page, "E2E Title.md");
   await expect(page.locator(".markdown-body h1")).toHaveText("E2E Title");
 });
 

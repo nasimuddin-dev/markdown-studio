@@ -8,6 +8,8 @@ import type { Doc, FileContent } from "../types";
 import { refreshDir } from "./workspace";
 import { useSettings } from "../stores/settingsStore";
 import { applySaveTransforms, defaultLineEnding } from "./saveTransforms";
+import { frontMatterTitle } from "../services/frontMatter";
+import { extractHeadings } from "./outline";
 
 const docs = () => useDocuments.getState();
 const findDoc = (id: string) => docs().docs.find((d) => d.id === id);
@@ -19,6 +21,23 @@ function untitledName(): string {
     const name = `Untitled-${i}.md`;
     if (!used.has(name)) return name;
   }
+}
+
+/**
+ * The name Save As suggests for a document that was never saved: its title
+ * (front matter `title`, else the first H1) without characters that file names
+ * can't contain, or `fallback` (e.g. "Untitled-1.md").
+ */
+export function suggestedFileName(content: string, fallback: string): string {
+  const title = frontMatterTitle(content) ?? extractHeadings(content).find((h) => h.level === 1)?.text ?? "";
+  const clean = title
+    .replace(/[\\/:*?"<>|\u0000-\u001f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[. ]+$/, "")
+    .slice(0, 80)
+    .trim();
+  return clean ? `${clean}.md` : fallback;
 }
 
 function docFromFile(file: FileContent): Doc {
@@ -144,7 +163,7 @@ export async function saveDocument(id: string, opts: SaveOptions = {}): Promise<
   if (isNewPath) {
     const dir = doc.path ? dirname(doc.path) : useWorkspace.getState().root;
     try {
-      path = await backend().pickSavePath(doc.name, dir);
+      path = await backend().pickSavePath(doc.path ? doc.name : suggestedFileName(doc.content, doc.name), dir);
     } catch (e) {
       notify("error", describeError(e, "choose a location"));
       return false;
