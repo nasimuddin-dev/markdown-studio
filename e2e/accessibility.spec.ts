@@ -115,10 +115,17 @@ for (const theme of ["light", "dark"] as const) {
       await expect(page.getByRole("menu")).toBeVisible();
       await audit(page, "explorer context menu");
       await page.keyboard.press("Escape");
+      // At this width some toolbar controls are in the More menu.
+      await page.getByRole("toolbar", { name: "Formatting" }).getByRole("button", { name: "More formatting tools" }).click();
+      await audit(page, "toolbar More menu");
+      await page.keyboard.press("Escape");
+      const size = page.viewportSize()!;
+      await page.setViewportSize({ width: 1800, height: size.height });
       await page.getByRole("toolbar", { name: "Formatting" }).getByRole("button", { name: "Insert Table" }).click();
       await expect(page.getByRole("dialog", { name: "Insert table" })).toBeVisible();
       await audit(page, "table picker");
       await page.keyboard.press("Escape");
+      await page.setViewportSize(size);
       await palette("go to file");
       await page.keyboard.type("guide");
       await audit(page, "go to file");

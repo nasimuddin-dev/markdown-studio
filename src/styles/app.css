@@ -917,23 +917,32 @@ select {
 
 .format-toolbar {
   display: flex;
-  flex-wrap: wrap;
+  /* One row: groups that don't fit move into the More menu. */
+  flex-wrap: nowrap;
   align-items: center;
   gap: 2px 0;
   padding: 3px 6px 3px 0;
-  /* Each group's divider sits 1px left of it; clipping the left edge hides the divider
-     of whichever group starts a row, so dividers only appear between groups. */
+  /* Each group's divider sits 1px left of it; clipping the left edge hides the
+     first group's divider, so dividers only appear between groups. */
   overflow: hidden;
   border-bottom: 1px solid var(--border);
   background: var(--bg-chrome);
 }
 .toolbar-group {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 1px;
   margin-left: -1px;
   padding: 0 6px;
   border-left: 1px solid var(--border);
+}
+.toolbar-group[hidden],
+.format-toolbar [data-slot][hidden] {
+  display: none;
+}
+.toolbar-more {
+  margin-left: auto;
 }
 .toolbar-button {
   display: inline-flex;

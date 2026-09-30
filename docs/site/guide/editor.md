@@ -112,6 +112,7 @@ The toolbar above the editor puts the common commands one click away, like a wor
 
 - Buttons light up for the formatting at the cursor: **Bold** inside `**bold**`, **Bulleted list** in a bulleted list, and so on. The paragraph style list shows the current heading level.
 - Clicking a button keeps your selection and the cursor in the editor. Hover over a button to see its keyboard shortcut.
+- The toolbar always stays on one row. When the editor is too narrow for every button (for example in split view on a smaller screen), the buttons that don't fit move, in order, into the **More** (**⋯**) menu at the right end.
 - From the keyboard, **Tab** into the toolbar and use **←** / **→**, **Home** and **End** to move between its controls.
 - Hide or show it with **View → Formatting Toolbar**. It's hidden in Focus Mode.
 

@@ -384,6 +384,8 @@ test("duplicate a file from the explorer", async ({ page }) => {
 });
 
 test("Fix Table repairs a table typed with mistakes", async ({ page }) => {
+  // Wide enough for every toolbar control in split view (narrower windows move some into More).
+  await page.setViewportSize({ width: 1800, height: 900 });
   await start(page);
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
@@ -549,6 +551,8 @@ test("typing * or ` with text selected wraps it", async ({ page }) => {
 });
 
 test("toolbar table button asks for the table size", async ({ page }) => {
+  // Wide enough for every toolbar control in split view (narrower windows move some into More).
+  await page.setViewportSize({ width: 1800, height: 900 });
   await start(page);
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
@@ -802,6 +806,8 @@ test("custom CSS styles the document, not the app", async ({ page }) => {
 });
 
 test("formatting toolbar reflects and applies formatting", async ({ page }) => {
+  // Wide enough for every toolbar control in split view (narrower windows move some into More).
+  await page.setViewportSize({ width: 1800, height: 900 });
   await start(page);
   await page.keyboard.press(`${mod}+N`);
   const editor = page.getByRole("textbox", { name: "Markdown editor" });
@@ -850,6 +856,44 @@ test("formatting toolbar reflects and applies formatting", async ({ page }) => {
 
   await chooseMenu(page, "View", "Formatting Toolbar");
   await expect(toolbar).toBeHidden();
+});
+
+test("the formatting toolbar stays on one row and moves what doesn't fit into More", async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 800 });
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  const editor = page.getByRole("textbox", { name: "Markdown editor" });
+  await editor.click();
+  const toolbar = page.getByRole("toolbar", { name: "Formatting" });
+  const more = toolbar.getByRole("button", { name: "More formatting tools" });
+  await expect(more).toBeVisible();
+  // One row: every visible control is centred on the same line.
+  const middles = await toolbar.locator("[data-toolbar-item]:visible").evaluateAll((els) =>
+    els.map((e) => {
+      const r = e.getBoundingClientRect();
+      return (r.top + r.bottom) / 2;
+    }),
+  );
+  expect(Math.max(...middles) - Math.min(...middles)).toBeLessThan(2);
+  await expect(toolbar.getByRole("button", { name: "Bold" })).toBeVisible();
+  await expect(toolbar.getByRole("button", { name: /Table of Contents/ })).toBeHidden();
+
+  // The More menu runs the hidden commands.
+  await more.click();
+  await page.getByRole("menuitem", { name: /Horizontal Rule/ }).click();
+  await expect(page.locator(".cm-line").filter({ hasText: "---" })).toHaveCount(1);
+
+  // Keyboard: End reaches the More button; hidden controls are skipped.
+  await toolbar.getByRole("button", { name: "Undo" }).focus();
+  await page.keyboard.press("End");
+  await expect(more).toBeFocused();
+
+  // With room for everything (editor only), there's no More button.
+  await page.keyboard.press(`${mod}+1`);
+  await expect(more).toBeHidden();
+  await expect(toolbar.getByRole("button", { name: /Table of Contents/ })).toBeVisible();
+  await page.keyboard.press(`${mod}+2`);
+  await expect(more).toBeVisible();
 });
 
 test("editor and preview scroll to the same source line; double-click in the preview shows the source", async ({ page }) => {
