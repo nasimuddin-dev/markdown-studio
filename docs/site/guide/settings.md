@@ -42,6 +42,7 @@ The moon button at the top right switches between light and dark quickly. **Ctrl
 | Show Git branch, changed files and changed lines | | On |
 | Insert a final newline on save | | Off |
 | Folder for pasted images | One folder name | assets |
+| Show pictures in the Explorer | | On |
 
 Existing files always keep their own line endings. Untitled documents are never auto-saved. See [Saving, history & recovery](/guide/saving-and-recovery).
 

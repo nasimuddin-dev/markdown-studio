@@ -296,7 +296,7 @@ export class MemoryBackend implements Backend {
     this.persist();
   }
 
-  async listDir(path: string): Promise<DirEntry[]> {
+  async listDir(path: string, options?: { images?: boolean }): Promise<DirEntry[]> {
     const dir = this.check(path);
     if (!this.dirs.has(dir)) throw new AppError("notFound", "Folder not found");
     const entries: DirEntry[] = [];
@@ -306,7 +306,8 @@ export class MemoryBackend implements Backend {
       }
     }
     for (const f of this.files.keys()) {
-      if (dirname(f) === dir && isMarkdownPath(f) && !basename(f).startsWith(".")) {
+      const listed = isMarkdownPath(f) || (!!options?.images && /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i.test(f));
+      if (dirname(f) === dir && listed && !basename(f).startsWith(".")) {
         entries.push({ name: basename(f), path: f, isDir: false });
       }
     }

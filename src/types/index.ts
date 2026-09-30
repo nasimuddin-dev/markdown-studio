@@ -88,6 +88,8 @@ export interface Settings {
   showToolbar: boolean;
   /** Show Git branch and file status (runs `git status` in the open folder). */
   showGitStatus: boolean;
+  /** List pictures in the Explorer, besides Markdown files. */
+  explorerShowImages: boolean;
   syncScroll: boolean;
   renderMath: boolean;
   renderDiagrams: boolean;

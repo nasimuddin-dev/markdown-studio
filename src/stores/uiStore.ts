@@ -56,6 +56,9 @@ interface UiState {
   setHistoryDocId(id: string | null): void;
   /** Compare dialog: the active document and the other file. */
   compare: { docId: string; path: string } | null;
+  /** A picture opened from the Explorer. */
+  imagePreview: string | null;
+  setImagePreview(path: string | null): void;
   setCompare(compare: { docId: string; path: string } | null): void;
   setProblems(p: UiState["problems"]): void;
   /** Incremented to move focus into the search box. */
@@ -106,6 +109,8 @@ export const useUi = create<UiState>((set, get) => ({
   historyDocId: null,
   setHistoryDocId: (historyDocId) => set({ historyDocId }),
   compare: null,
+  imagePreview: null,
+  setImagePreview: (imagePreview) => set({ imagePreview }),
   setCompare: (compare) => set({ compare }),
   setProblems: (problems) => set({ problems }),
   searchFocusToken: 0,

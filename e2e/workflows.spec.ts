@@ -1246,3 +1246,31 @@ test("F2 on a footnote renames its label everywhere", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.locator(".cm-line")).toHaveText(["Claim[^src] and again[^src].", "", "[^src]: Source."]);
 });
+
+test("pictures in the Explorer: preview, insert a link, or drag into the editor", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".tree-row", { hasText: /^assets$/ }).click();
+  const picture = page.locator(".tree-row", { hasText: /^logo\.svg$/ });
+  await expect(picture).toBeVisible();
+  // Opening it shows the picture instead of loading it as text.
+  await page.locator(".cm-content").click();
+  await page.keyboard.press(`${mod}+Home`);
+  await picture.click();
+  const dialog = page.getByRole("dialog", { name: "logo.svg" });
+  await expect(dialog.locator("img")).toBeVisible();
+  await dialog.getByRole("button", { name: "Insert Link in Document" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.locator(".cm-line").first()).toHaveText("![logo](assets/logo.svg)# Welcome to Markpion");
+  await expect(page.getByRole("tab", { name: /logo\.svg/ })).toHaveCount(0);
+  // Dragging it into the editor inserts an image link where it's dropped.
+  const from = (await picture.boundingBox())!;
+  const to = (await page.locator(".cm-line").nth(2).boundingBox())!;
+  await page.mouse.move(from.x + 20, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 60, from.y + 20, { steps: 4 });
+  await page.mouse.move(to.x + 5, to.y + to.height / 2, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.locator(".cm-line").nth(2)).toContainText("![logo](assets/logo.svg)");
+});

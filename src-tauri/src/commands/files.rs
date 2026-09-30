@@ -3,10 +3,12 @@
 #[allow(unused_imports)]
 use super::*;
 
+/// Lists a folder for the Explorer: subfolders and Markdown files, and
+/// pictures too when `images` is set.
 #[tauri::command]
-pub async fn list_dir(state: State<'_, AppState>, path: String) -> AppResult<Vec<DirEntry>> {
+pub async fn list_dir(state: State<'_, AppState>, path: String, images: Option<bool>) -> AppResult<Vec<DirEntry>> {
     let dir = state.track("fs.listDir", state.scope.check(Path::new(&path)))?;
-    state.track("fs.listDir", fs_ops::list_dir(&dir))
+    state.track("fs.listDir", fs_ops::list_dir(&dir, images.unwrap_or(false)))
 }
 
 #[tauri::command]

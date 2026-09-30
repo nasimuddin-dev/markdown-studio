@@ -2,6 +2,7 @@ import { backend } from "../services";
 import { describeError, toAppError } from "../services/errors";
 import { basename, dirname, isInside, isMarkdownPath, join, relativePath } from "../services/paths";
 import { useWorkspace } from "../stores/workspaceStore";
+import { useSettings } from "../stores/settingsStore";
 import { useDocuments } from "../stores/documentsStore";
 import { ask, notify, promptText } from "../stores/uiStore";
 import type { DirEntry } from "../types";
@@ -14,7 +15,7 @@ const ws = () => useWorkspace.getState();
 export async function refreshDir(dir: string) {
   invalidateWorkspaceFiles();
   try {
-    ws().setChildren(dir, await backend().listDir(dir));
+    ws().setChildren(dir, await backend().listDir(dir, { images: useSettings.getState().settings.explorerShowImages }));
   } catch (e) {
     backend().log("warn", "workspace.list", String((e as Error).message ?? e));
     ws().setChildren(dir, []);

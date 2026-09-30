@@ -62,7 +62,7 @@ pub fn mtime(path: &Path) -> AppResult<u64> {
 
 /// Lists folders and Markdown files directly inside `dir` (FR-012). Hidden
 /// entries and common dependency/build folders are skipped.
-pub fn list_dir(dir: &Path) -> AppResult<Vec<DirEntry>> {
+pub fn list_dir(dir: &Path, images: bool) -> AppResult<Vec<DirEntry>> {
     const SKIPPED_DIRS: &[&str] = &["node_modules", "target", "dist", "build"];
     let mut entries = Vec::new();
     for entry in fs::read_dir(dir)? {
@@ -82,7 +82,7 @@ pub fn list_dir(dir: &Path) -> AppResult<Vec<DirEntry>> {
                 continue;
             }
             entries.push(DirEntry { name, path: path_string(&path), is_dir: true });
-        } else if meta.is_file() && is_markdown(&path) {
+        } else if meta.is_file() && (is_markdown(&path) || (images && is_image(&path))) {
             entries.push(DirEntry { name, path: path_string(&path), is_dir: false });
         }
     }
@@ -436,8 +436,11 @@ mod tests {
         fs::write(tmp.path().join("b.md"), "").unwrap();
         fs::write(tmp.path().join("A.markdown"), "").unwrap();
         fs::write(tmp.path().join("image.png"), "").unwrap();
-        let names: Vec<_> = list_dir(tmp.path()).unwrap().into_iter().map(|e| e.name).collect();
+        let names: Vec<_> = list_dir(tmp.path(), false).unwrap().into_iter().map(|e| e.name).collect();
         assert_eq!(names, vec!["docs", "A.markdown", "b.md"]);
+        fs::write(tmp.path().join("notes.txt"), "").unwrap();
+        let with_images: Vec<_> = list_dir(tmp.path(), true).unwrap().into_iter().map(|e| e.name).collect();
+        assert_eq!(with_images, vec!["docs", "A.markdown", "b.md", "image.png"]);
     }
 
     #[test]

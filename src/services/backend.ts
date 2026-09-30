@@ -66,7 +66,8 @@ export interface DialogsApi {
 
 /** Reading and writing documents, folders and assets in approved locations. */
 export interface FilesApi {
-  listDir(path: string): Promise<DirEntry[]>;
+  /** Subfolders and Markdown files; pictures too with `images`. */
+  listDir(path: string, options?: { images?: boolean }): Promise<DirEntry[]>;
   readTextFile(path: string): Promise<FileContent>;
   /** Returns the new modification time (version). */
   writeTextFile(req: WriteRequest): Promise<number>;

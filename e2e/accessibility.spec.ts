@@ -138,6 +138,13 @@ for (const theme of ["light", "dark"] as const) {
       await expect(page.getByRole("tab", { name: "Links", selected: true })).toBeVisible();
       await audit(page, "link check");
 
+      await page.getByRole("tab", { name: "Explorer" }).click();
+      await page.locator(".tree-row", { hasText: /^assets$/ }).click();
+      await page.locator(".tree-row", { hasText: /^logo\.svg$/ }).click();
+      await expect(page.getByRole("dialog", { name: "logo.svg" }).locator("img")).toBeVisible();
+      await audit(page, "picture preview");
+      await page.keyboard.press("Escape");
+
       await page.getByRole("button", { name: "Preview only" }).click();
       await page.keyboard.press(`${mod}+F`);
       await page.getByRole("searchbox", { name: "Find in preview" }).fill("markdown");

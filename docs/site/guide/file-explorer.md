@@ -18,7 +18,7 @@ When no folder is open, the Explorer lists your **open files**, and below them y
 
 ## What's shown
 
-- Folders and Markdown files (`.md` and `.markdown`), sorted with folders first.
+- Folders, Markdown files (`.md` and `.markdown`) and pictures, sorted with folders first. Pictures have a picture icon; clicking one shows it (see **Pictures** below). To list only Markdown files, turn off **Settings → Files → Show pictures in the Explorer**.
 - Hidden folders (starting with `.`) and dependency or build folders such as `node_modules`, `target`, `dist` and `build` are skipped.
 - Folders load when you expand them, so large folders open quickly.
 - The file in the active tab is highlighted.
@@ -33,7 +33,8 @@ When no folder is open, the Explorer lists your **open files**, and below them y
 | Rename | Select an item and press **F2**, or right-click → **Rename…**. Open tabs follow the rename, and links to it can be updated (see below) |
 | Move | Drag a file or folder onto another folder, or onto the empty space below the tree for the top level; **Esc** cancels. From the keyboard: right-click (or **Shift+F10**) → **Move To…** and type the folder, relative to the open folder (`/` for the top level). Nothing is replaced: moving onto a name that already exists is refused. Open tabs follow the move, and links to it can be updated (see below) |
 | Split a document | Select text, such as a whole section, and choose **File → Move Selection to New File…**. The text goes into a new Markdown file in the same folder, named after its first heading, and a link to that file takes its place. **Ctrl+Z** in the document brings the text back (the new file stays) |
-| Link to a file | Drag a file from the Explorer into the editor: a link to it goes where you drop it, relative to the document (`[guide](docs/guide.md)`). The file isn't moved. The document must be saved first, so the link has a place to start from. (The Explorer lists Markdown files; to add a picture, paste or drop it from your file manager, or use **Format → Insert Image…**.) |
+| Link to a file | Drag a file from the Explorer into the editor: a link to it goes where you drop it, relative to the document (`[guide](docs/guide.md)`). A picture gets an image link (`![logo](assets/logo.png)`). The file isn't moved. The document must be saved first, so the link has a place to start from |
+| Pictures | The Explorer lists pictures (PNG, JPEG, GIF, WebP, SVG, BMP, AVIF) as well as Markdown files; turn that off with **Settings → Files → Show pictures in the Explorer**. Click a picture to see it, with **Insert Link in Document** to link it at the cursor; drag it into the editor to link it where you drop it. Rename, move and delete work as for documents, and renaming or moving offers to update the links that show it |
 | Delete | Right-click → **Delete…**. After you confirm, the item goes to the Trash or Recycle Bin, so it can be restored |
 | Refresh | The **Refresh** button |
 | Close the folder | The **×** button at the top of the Explorer, or **File → Close Folder**. The folder leaves the Explorer; nothing is deleted, and open tabs stay open |

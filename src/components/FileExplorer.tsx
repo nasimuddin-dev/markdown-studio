@@ -13,8 +13,9 @@ import {
 import { Icon } from "./Icon";
 import { pathKey, useGit } from "../stores/gitStore";
 import { ContextMenu, type MenuEntry } from "./ContextMenu";
-import { copyPath, copyRelativePath, insertFileLinkAt, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
+import { copyPath, copyRelativePath, insertFileLink, insertFileLinkAt, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
 import { backend } from "../services";
+import { useSettings } from "../stores/settingsStore";
 
 interface ContextMenu {
   x: number;
@@ -25,6 +26,9 @@ interface ContextMenu {
 const GIT_LABELS: Record<string, string> = { M: "modified", A: "added", D: "deleted", R: "renamed", U: "untracked", C: "conflict" };
 
 type DragStart = (e: React.PointerEvent<HTMLElement>, entry: DirEntry) => void;
+
+/** Pictures listed in the Explorer (Settings → Files → Show pictures in the Explorer). */
+const isPicture = (entry: DirEntry) => !entry.isDir && !isMarkdownPath(entry.path);
 
 /** When the last drag ended: the click that ends a drag must not also open or toggle a row. */
 let lastDragEnd = 0;
@@ -47,6 +51,7 @@ function TreeNode({ entry, depth, onContext, onDragStart, dropTarget }: {
     if (Date.now() - lastDragEnd < 300) return;
     useWorkspace.getState().select(entry.path);
     if (entry.isDir) void toggleDir(entry.path);
+    else if (isPicture(entry)) useUi.getState().setImagePreview(entry.path);
     else void openPath(entry.path);
   };
 
@@ -90,7 +95,7 @@ function TreeNode({ entry, depth, onContext, onDragStart, dropTarget }: {
         ) : (
           <span className="tree-chevron-spacer" />
         )}
-        <Icon name={entry.isDir ? (expanded ? "folderOpen" : "folder") : "file"} size={15} className={entry.isDir ? "tree-folder-icon" : "tree-file-icon"} />
+        <Icon name={entry.isDir ? (expanded ? "folderOpen" : "folder") : isPicture(entry) ? "image" : "file"} size={15} className={entry.isDir ? "tree-folder-icon" : "tree-file-icon"} />
         <span className={`tree-label${git && git !== "dir" ? ` git-${git}` : ""}`}>{entry.name}</span>
         {openDoc && isDirty(openDoc) && <span className="dirty-dot" title="Unsaved changes" aria-label="unsaved changes" />}
         {git === "dir" ? (
@@ -106,7 +111,7 @@ function TreeNode({ entry, depth, onContext, onDragStart, dropTarget }: {
           {children === undefined ? (
             <li role="none" className="tree-empty" style={{ paddingLeft: 22 + (depth + 1) * 14 }}>Loading…</li>
           ) : children.length === 0 ? (
-            <li role="none" className="tree-empty" style={{ paddingLeft: 22 + (depth + 1) * 14 }}>No Markdown files</li>
+            <li role="none" className="tree-empty" style={{ paddingLeft: 22 + (depth + 1) * 14 }}>No Markdown files{useSettings.getState().settings.explorerShowImages ? " or pictures" : ""}</li>
           ) : (
             children.map((c) => (
               <TreeNode key={c.path} entry={c} depth={depth + 1} onContext={onContext} onDragStart={onDragStart} dropTarget={dropTarget} />
@@ -282,7 +287,13 @@ export function FileExplorer() {
                   { label: "New Folder…", run: () => createFolderIn(menuDir) },
                   "separator",
                 ] as MenuEntry[])
-              : ([
+              : isPicture(menu.entry)
+                ? ([
+                    { label: "Preview", run: () => useUi.getState().setImagePreview(menu.entry.path) },
+                    { label: "Insert Link in Document", run: () => insertFileLink(menu.entry.path), disabled: !activePath },
+                    "separator",
+                  ] as MenuEntry[])
+                : ([
                   { label: "Open", run: () => openPath(menu.entry.path) },
                   { label: "Duplicate", run: () => duplicateFile(menu.entry.path) },
                   ...(activeDocId && activePath !== menu.entry.path && isMarkdownPath(menu.entry.path)

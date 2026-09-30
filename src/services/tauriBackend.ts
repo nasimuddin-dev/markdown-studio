@@ -47,7 +47,7 @@ export const tauriBackend: Backend = {
   openRecent: (path) => call("open_recent", { path }),
   removeRecent: (path) => call("remove_recent", { path }),
 
-  listDir: (path) => call("list_dir", { path }),
+  listDir: (path, options) => call("list_dir", { path, images: !!options?.images }),
   readTextFile: (path) => call("read_text_file", { path }),
   writeTextFile: (req: WriteRequest) => call("write_text_file", { ...req }),
   fileMtime: (path) => call("file_mtime", { path }),

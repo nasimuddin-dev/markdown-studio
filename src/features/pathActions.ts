@@ -87,8 +87,11 @@ export function fileLinkMarkdown(docPath: string, path: string): string | null {
   return `[${text}](${encodeURI(rel).replace(/\(/g, "%28").replace(/\)/g, "%29")})`;
 }
 
-/** Inserts a link to `path` where it was dropped in the editor (a file dragged from the Explorer). */
-export function insertFileLinkAt(path: string, x: number, y: number) {
+/** Inserts a link to `path` at the cursor. */
+export const insertFileLink = (path: string) => insertFileLinkAt(path, null, null);
+
+/** Inserts a link to `path` where it was dropped in the editor (a file dragged from the Explorer), or at the cursor. */
+export function insertFileLinkAt(path: string, x: number | null, y: number | null) {
   const view = getEditorView();
   const doc = activeDoc();
   if (!view || !doc) return;
@@ -101,7 +104,7 @@ export function insertFileLinkAt(path: string, x: number, y: number) {
     notify("info", "That file can't be reached from this document by a relative link.");
     return;
   }
-  const pos = view.posAtCoords({ x, y }) ?? view.state.selection.main.head;
+  const pos = (x !== null && y !== null ? view.posAtCoords({ x, y }) : null) ?? view.state.selection.main.head;
   view.dispatch({ changes: { from: pos, insert }, selection: { anchor: pos + insert.length }, userEvent: "input.drop" });
   view.focus();
 }
