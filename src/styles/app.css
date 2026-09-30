@@ -2016,6 +2016,19 @@ select {
 .diff-del {
   background: rgba(198, 47, 58, 0.14);
 }
+/* The words that changed within a line. */
+.diff-word {
+  color: inherit;
+  border-radius: 2px;
+}
+.diff-add .diff-word {
+  background: rgba(31, 138, 76, 0.34);
+}
+.diff-del .diff-word {
+  background: rgba(198, 47, 58, 0.32);
+  text-decoration: line-through;
+  text-decoration-color: rgba(198, 47, 58, 0.7);
+}
 .diff-gap {
   padding: 2px 12px;
   color: var(--text-muted);

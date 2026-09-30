@@ -55,7 +55,7 @@ To protect any document from accidental edits, for example a policy you're only 
 
 Every time you save a file, Markpion keeps the **previous version** in its app data folder, not next to your files. The last **30 versions** of each file are kept.
 
-Open **File → File History…** (or right-click a tab → **File History…**) to see the versions with their dates and a line-by-line diff against the current text. **Restore** puts an old version into the editor as a normal edit, so you can undo it or save it.
+Open **File → File History…** (or right-click a tab → **File History…**) to see the versions with their dates and a line-by-line diff against the current text. In a line that changed, the words that differ are marked more strongly (and struck through on the old line), so a one-word edit in a long paragraph is easy to spot. **Restore** puts an old version into the editor as a normal edit, so you can undo it or save it.
 
 While you have unsaved changes, the list starts with **Saved file**, selected first: the diff shows exactly what saving would change, and **Restore** discards your unsaved changes (undo brings them back).
 
@@ -63,7 +63,7 @@ When the file is committed to Git, the list also has **Last commit**: compare th
 
 ## Comparing two documents
 
-**File → Compare with File…** compares the document you're editing with another Markdown file in the open folder: pick the file by typing part of its name. The diff shows the lines only in the other file (**−**) and only in yours (**+**), with unchanged parts collapsed; your unsaved changes count. You can also right-click a file in the Explorer and choose **Compare with Active File**. **Open** opens the other file in a tab.
+**File → Compare with File…** compares the document you're editing with another Markdown file in the open folder: pick the file by typing part of its name. The diff shows the lines only in the other file (**−**) and only in yours (**+**), with unchanged parts collapsed and the changed words within a line marked; your unsaved changes count. You can also right-click a file in the Explorer and choose **Compare with Active File**. **Open** opens the other file in a tab.
 
 ## Crash recovery
 

@@ -13,7 +13,7 @@ import { MemoryBackend } from "../src/services/memoryBackend";
 describe("line diff", () => {
   it("finds added and removed lines", () => {
     const d = diffLines("a\nb\nc\nd", "a\nB\nc\nd\ne")!;
-    expect(d.map((l) => `${l.kind}:${l.text}`)).toEqual(["same:a", "add:B", "del:b", "same:c", "same:d", "add:e"]);
+    expect(d.map((l) => `${l.kind}:${l.text}`)).toEqual(["same:a", "del:b", "add:B", "same:c", "same:d", "add:e"]);
     expect(diffStats(d)).toEqual({ added: 2, removed: 1 });
   });
 

@@ -1022,3 +1022,19 @@ test("Go to Heading in Folder opens another document at the heading", async ({ p
   await expect(page.getByRole("tab", { name: /diagrams-and-math\.md/ })).toHaveAttribute("aria-selected", "true");
   await expect(page.locator(".cm-activeLine")).toHaveText("## LaTeX math");
 });
+
+test("File History marks the words that changed within a line", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-line", { hasText: "Markpion is a" }).click();
+  await page.keyboard.press("End");
+  await page.keyboard.type(" Really.");
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("file history");
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: /History/ });
+  await expect(dialog.locator(".diff-del .diff-word")).toHaveCount(0);
+  await expect(dialog.locator(".diff-add .diff-word")).toHaveText([" Really."]);
+  await expect(dialog.locator(".diff-del")).toContainText("editor with live preview.");
+});

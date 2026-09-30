@@ -52,7 +52,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Rename a file from its tab, or from the Explorer's list of open files when no folder is open. [Tabs](/guide/tabs#tab-context-menu)
 - Compare the document with another file in the folder (File → Compare with File…). [Saving](/guide/saving-and-recovery#comparing-two-documents)
 - Read-only files open locked, with Save As or Edit Anyway; View → Toggle Read-Only protects any document from accidental edits. [Saving](/guide/saving-and-recovery#read-only-files)
-- Local file history: the previous version is kept on every save (30 per file), with a line diff and restore; also your unsaved changes against the saved file, and the last commit for files in Git.
+- Local file history: the previous version is kept on every save (30 per file), with a line diff that marks the changed words, and restore; also your unsaved changes against the saved file, and the last commit for files in Git.
 - Crash recovery for unsaved documents, and session restore of the last folder and files.
 - UTF-8 with or without BOM; LF and CRLF line endings are preserved per file.
 - Save options: trim trailing whitespace, insert a final newline, and choose line endings for new files.

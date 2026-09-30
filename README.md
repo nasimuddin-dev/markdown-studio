@@ -96,9 +96,9 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Copy button on code blocks in the preview (on hover or keyboard focus)
 - Large documents: long previews are built in parts as you scroll to them; live preview pauses above 1 MB of text, with render-on-demand
 - Rename a file from its tab (Rename…) or, with no folder open, from the Explorer's Open Files list (F2), with recent files one click away; Open Folder starts in the file's folder
-- Compare with File… (File menu, or Compare with Active File in the Explorer): a line diff between the document and another file in the folder
+- Compare with File… (File menu, or Compare with Active File in the Explorer): a line diff between the document and another file in the folder, with the changed words within a line marked
 - Read-only files open locked (a bar offers Save As or Edit Anyway; formatting commands can't change them either), and View → Toggle Read-Only protects any document from accidental edits
-- Local file history: the previous version is kept on every save (30 per file, in app data); browse with a line diff and restore (undoable); the saved file is listed while there are unsaved changes (review before saving), and the last commit for files in Git
+- Local file history: the previous version is kept on every save (30 per file, in app data); browse with a line diff (changed words marked) and restore (undoable); the saved file is listed while there are unsaved changes (review before saving), and the last commit for files in Git
 - Safe saves: atomic temp-file writes, conflict detection when a file changed on disk, and actionable errors (permission denied → Save As, disk full, and so on)
 - Live folder watching: the explorer and open files update immediately when other programs change files on disk
 - External change detection: clean tabs reload automatically; dirty tabs get Reload / Compare / Keep Mine
