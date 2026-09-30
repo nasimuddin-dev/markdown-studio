@@ -557,6 +557,8 @@ function lintReferences(text: string): MarkdownProblem[] {
   const defined = new Set(definitions.map((d) => normalizeLabel(d.text)));
   const used = new Set<string>();
   const out: MarkdownProblem[] = [];
+  // Most documents have no references at all: skip the scans then.
+  if (!definitions.length && !masked.includes("][")) return out;
   for (const m of masked.matchAll(/(!?)\[((?:[^[\]\n]|\[[^\]\n]*\])*)\]\[([^\]\n]*)\]/g)) {
     if (masked[m.index! - 1] === "\\") continue;
     const label = (m[3].trim() ? m[3] : m[2]).trim();
@@ -574,6 +576,7 @@ function lintReferences(text: string): MarkdownProblem[] {
       });
     }
   }
+  if (!definitions.length) return out;
   // Shortcut references (`[id]`), and labels inside other links' text.
   for (const m of masked.matchAll(/\[([^[\]\n]+)\](?![(:])/g)) used.add(normalizeLabel(m[1]));
   for (const d of definitions) {
