@@ -20,6 +20,7 @@ import * as fmt from "./formatting";
 import {
   deleteColumn, deleteRow, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
 } from "./tables";
+import { fixAllProblemsCommand } from "./lintExtension";
 import { changeCase, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
 import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
@@ -238,6 +239,7 @@ export const commands: Record<string, Command> = {
   replace: { id: "replace", label: "Replace", shortcut: isMac ? "Mod+Alt+F" : "Mod+H", run: () => editorCommand("replace"), enabled: hasActive },
   gotoLine: { id: "gotoLine", label: "Go to Line…", shortcut: "Mod+G", run: () => editorCommand("gotoLine"), enabled: hasActive },
   selectAll: { id: "selectAll", label: "Select All", shortcut: "Mod+A", run: () => editorCommand("selectAll"), enabled: hasActive },
+  fixAllProblems: formatCommand("fixAllProblems", "Fix All Problems", fixAllProblemsCommand),
   sortLinesAsc: formatCommand("sortLinesAsc", "Sort Lines (A to Z)", sortLines(false)),
   sortLinesDesc: formatCommand("sortLinesDesc", "Sort Lines (Z to A)", sortLines(true)),
   removeDuplicateLines: formatCommand("removeDuplicateLines", "Remove Duplicate Lines", removeDuplicateLines),

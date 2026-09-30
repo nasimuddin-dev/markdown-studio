@@ -32,7 +32,9 @@ export function fixChanges(fix: ProblemFix, from: number, text: string): Array<{
       const start = Math.min(from + at, text.length);
       return { from: start, to: Math.min(start + remove, text.length), insert };
     }
-    const gap = text.endsWith("\n\n") ? "" : text.endsWith("\n") ? "\n" : "\n\n";
+    // Right after another footnote definition, the next one follows on the next line.
+    const lastLine = text.slice(text.lastIndexOf("\n") + 1);
+    const gap = text.endsWith("\n\n") || !text ? "" : text.endsWith("\n") || /^ {0,3}\[\^[^\]]+\]:/.test(lastLine) ? "\n" : "\n\n";
     return { from: text.length, to: text.length, insert: gap + insert };
   });
 }
@@ -222,6 +224,37 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
   }
   problems.push(...lintTables(text, starts), ...lintFootnotes(text));
   return problems.sort((a, b) => a.from - b.from);
+}
+
+/**
+ * Applies every safe quick fix (not guesses such as a suggested anchor),
+ * repeating while fixes reveal new ones (a heading moved up a level can make
+ * the next one skip). Returns the fixed text and how many fixes were applied.
+ */
+export function fixAllProblems(text: string): { text: string; fixed: number } {
+  let fixed = 0;
+  for (let pass = 0; pass < 6; pass++) {
+    const fixes = lintMarkdown(text).filter((p) => p.fix && p.rule !== "broken-anchor");
+    if (!fixes.length) break;
+    // Apply from the end so earlier positions stay valid; skip fixes that would overlap.
+    const changes = fixes.flatMap((p) => fixChanges(p.fix!, p.from, text)).sort((a, b) => b.from - a.from);
+    let last = Infinity;
+    let applied = 0;
+    let atEnd = false;
+    const length = text.length;
+    for (const c of changes) {
+      // One addition at the end per pass keeps several of them in order.
+      const end = c.from === length;
+      if (c.to > last || (end && atEnd)) continue;
+      atEnd ||= end;
+      text = text.slice(0, c.from) + c.insert + text.slice(c.to);
+      last = c.from;
+      applied++;
+    }
+    fixed += applied;
+    if (!applied) break;
+  }
+  return { text, fixed };
 }
 
 /** Edit distance between two strings (insertions, deletions, substitutions). */

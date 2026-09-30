@@ -1,11 +1,12 @@
 import { linter, lintGutter, type Action, type Diagnostic } from "@codemirror/lint";
 import type { EditorView } from "@codemirror/view";
-import type { Extension } from "@codemirror/state";
+import type { Extension, StateCommand } from "@codemirror/state";
 import { backend } from "../services";
 import { toAppError } from "../services/errors";
 import { activeDoc } from "../stores/documentsStore";
-import { useUi } from "../stores/uiStore";
-import { fixChanges, lintLinks, lintMarkdown, type ProblemFix } from "./lint";
+import { notify, useUi } from "../stores/uiStore";
+import { fixAllProblems, fixChanges, lintLinks, lintMarkdown, type ProblemFix } from "./lint";
+import { minimalChange } from "./saveTransforms";
 
 /** A quick fix as a lint action, applied where the problem is now. */
 function fixAction(fix: ProblemFix): Action {
@@ -59,3 +60,17 @@ export function markdownLinter(): Extension {
     lintGutter(),
   ];
 }
+
+/** Command: applies every safe quick fix in the document as one undoable edit. */
+export const fixAllProblemsCommand: StateCommand = ({ state, dispatch }) => {
+  const before = state.doc.toString();
+  const { text, fixed } = fixAllProblems(before);
+  const change = fixed ? minimalChange(before, text) : null;
+  if (!change) {
+    notify("info", "No problems with a quick fix in this document.");
+    return false;
+  }
+  dispatch(state.update({ changes: change, userEvent: "input.fix" }));
+  notify("success", `Fixed ${fixed} problem${fixed === 1 ? "" : "s"}. Undo reverses them.`);
+  return true;
+};

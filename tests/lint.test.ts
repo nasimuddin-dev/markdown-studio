@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeEntities, findAllLinks, fixChanges, findHtmlLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
+import { decodeEntities, findAllLinks, fixAllProblems, fixChanges, findHtmlLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
 
 const rules = (text: string) => lintMarkdown(text).map((p) => p.rule);
 
@@ -133,6 +133,16 @@ describe("markdown lint: tables, footnotes and link text", () => {
     // Extra cells, or a row without a closing "|", need a person to decide.
     expect(only("| a |\n| - |\n| 1 | 2 |", "table-columns")[0].fix).toBeUndefined();
     expect(only("| a | b |\n| - | - |\n| 1", "table-columns")[0].fix).toBeUndefined();
+  });
+
+  it("fixes all safe problems at once, repeating as fixes reveal new ones", () => {
+    const text = "# A\n\n### B\n\n#### C\n\n| a | b |\n| - | - |\n| 1 |\nafter\n\nSee[^x] and[^y] and [c](#b).";
+    const { text: fixed, fixed: count } = fixAllProblems(text);
+    expect(fixed).toBe("# A\n\n## B\n\n### C\n\n| a | b |\n| - | - |\n| 1 |  |\n\nafter\n\nSee[^x] and[^y] and [c](#b).\n\n[^x]: \n[^y]: ");
+    expect(count).toBe(6);
+    expect(lintMarkdown(fixed).filter((p) => p.fix)).toEqual([]);
+    // Anchor suggestions are guesses, left for a person.
+    expect(fixAllProblems("## Setup\n\n[x](#setpu)").fixed).toBe(0);
   });
 
   it("flags footnotes without a definition and unused definitions", () => {
