@@ -1041,6 +1041,10 @@ test("Go to Tag lists the folder's tags and opens the file at the tag", async ({
   await expect(palette.getByRole("option").first()).toContainText("README.md");
   await page.keyboard.press("Enter");
   await expect(page.locator(".cm-activeLine")).toHaveText("Filed under #zebra-notes");
+  // Clicking the tag in the preview opens Go to Tag with it typed in.
+  await page.locator(".preview .md-tag", { hasText: "#zebra-notes" }).click();
+  await expect(page.getByRole("dialog", { name: "Go to tag" }).getByRole("combobox")).toHaveValue("#zebra-notes");
+  await expect(page.getByRole("dialog", { name: "Go to tag" }).getByRole("option")).toHaveCount(1);
 });
 
 test("File History marks the words that changed within a line", async ({ page }) => {

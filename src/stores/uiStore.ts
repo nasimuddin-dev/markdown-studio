@@ -41,7 +41,10 @@ interface UiState {
   openHeadingPicker(): void;
   openFolderHeadingPicker(): void;
   openSnippetPicker(): void;
-  openTagPicker(): void;
+  /** Go to Tag, optionally with a tag typed in (clicking a tag in the preview). */
+  openTagPicker(query?: string): void;
+  /** Text the palette starts with; it reads and clears it when it opens. */
+  paletteQuery: string;
   openComparePicker(): void;
   shortcutsOpen: boolean;
   setShortcutsOpen(open: boolean): void;
@@ -102,7 +105,8 @@ export const useUi = create<UiState>((set, get) => ({
   openHeadingPicker: () => set({ paletteOpen: true, paletteMode: "headings" }),
   openFolderHeadingPicker: () => set({ paletteOpen: true, paletteMode: "folderHeadings" }),
   openSnippetPicker: () => set({ paletteOpen: true, paletteMode: "snippets" }),
-  openTagPicker: () => set({ paletteOpen: true, paletteMode: "tags" }),
+  openTagPicker: (query = "") => set({ paletteOpen: true, paletteMode: "tags", paletteQuery: query }),
+  paletteQuery: "",
   openComparePicker: () => set({ paletteOpen: true, paletteMode: "compare" }),
   shortcutsOpen: false,
   setShortcutsOpen: (shortcutsOpen) => set({ shortcutsOpen }),

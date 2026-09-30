@@ -16,6 +16,7 @@ import { toggleTaskInDocument } from "../features/tasks";
 import { mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
 import { PreviewFind } from "./PreviewFind";
 import { useUi } from "../stores/uiStore";
+import { useWorkspace } from "../stores/workspaceStore";
 import { Icon } from "./Icon";
 
 /** The position of a task checkbox among the document's task list items, or -1. */
@@ -351,6 +352,11 @@ export function Preview() {
     // A local picture (not inside a link) opens at full size.
     if (clicked instanceof HTMLImageElement && clicked.dataset.path && !clicked.closest("a")) {
       useUi.getState().setImagePreview(clicked.dataset.path, false);
+      return;
+    }
+    // A #tag lists where else it's used in the folder.
+    if (clicked.classList.contains("md-tag") && !clicked.closest("a") && useWorkspace.getState().root) {
+      useUi.getState().openTagPicker(clicked.textContent ?? "");
       return;
     }
     const anchor = (e.target as HTMLElement).closest("a");

@@ -65,7 +65,10 @@ export function CommandPalette() {
 }
 
 function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => useUi.getState().paletteQuery);
+  useEffect(() => {
+    if (useUi.getState().paletteQuery) useUi.setState({ paletteQuery: "" });
+  }, []);
   const [active, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLUListElement>(null);

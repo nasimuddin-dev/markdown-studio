@@ -804,6 +804,11 @@ select {
   color: var(--text);
 }
 
+/* A #tag in the preview opens Go to Tag. */
+.preview .md-tag {
+  cursor: pointer;
+}
+
 /* A picture in the preview opens at full size on click. */
 .preview .preview-local-image {
   cursor: zoom-in;

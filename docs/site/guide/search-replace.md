@@ -37,7 +37,7 @@ Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the rep
 
 ## Tags
 
-Write a tag as `#word` in the text (`#draft`, `#project/alpha`), or list tags in the front matter (`tags: [draft, work]`). **Edit → Go to Tag…** lists the tags used across the open folder, one row per file with how many times it's used there. Type part of a tag and press **Enter** to open that file at the first use. Headings, code and links aren't tags, nor is a number like `#1`; tags match whatever their capitalisation. While you type `#` and a letter, the editor suggests the tags already used in the document and the folder, with how many files use each.
+Write a tag as `#word` in the text (`#draft`, `#project/alpha`), or list tags in the front matter (`tags: [draft, work]`). **Edit → Go to Tag…** lists the tags used across the open folder, one row per file with how many times it's used there. Type part of a tag and press **Enter** to open that file at the first use. Clicking a tag in the preview opens the same list for that tag. Headings, code and links aren't tags, nor is a number like `#1`; tags match whatever their capitalisation. While you type `#` and a letter, the editor suggests the tags already used in the document and the folder, with how many files use each.
 
 ## Find in Files
 
