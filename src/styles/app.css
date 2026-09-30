@@ -2296,6 +2296,11 @@ body.dragging-entry * {
   cursor: grabbing !important;
   user-select: none;
 }
+/* Over the editor, the drop inserts a link. */
+body.dragging-into-editor,
+body.dragging-into-editor * {
+  cursor: copy !important;
+}
 
 /* AI assistant */
 .ai-busy {

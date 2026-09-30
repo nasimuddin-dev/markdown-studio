@@ -13,7 +13,7 @@ import {
 import { Icon } from "./Icon";
 import { pathKey, useGit } from "../stores/gitStore";
 import { ContextMenu, type MenuEntry } from "./ContextMenu";
-import { copyPath, copyRelativePath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
+import { copyPath, copyRelativePath, insertFileLinkAt, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
 import { backend } from "../services";
 
 interface ContextMenu {
@@ -138,6 +138,9 @@ export function FileExplorer() {
     const start = { x: e.clientX, y: e.clientY };
     let active = false;
     let target: string | null = null;
+    // A file dropped on the editor is linked there instead of moved.
+    let overEditor = false;
+    const editorAt = (x: number, y: number) => !entry.isDir && !!document.elementFromPoint(x, y)?.closest(".cm-editor");
     const targetAt = (x: number, y: number): string | null => {
       const el = document.elementFromPoint(x, y);
       if (!el || !tree.current?.contains(el)) return null;
@@ -151,21 +154,24 @@ export function FileExplorer() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
       window.removeEventListener("keydown", key, true);
-      document.body.classList.remove("dragging-entry");
+      document.body.classList.remove("dragging-entry", "dragging-into-editor");
       setDropTarget(null);
     };
     const move = (ev: PointerEvent) => {
       if (!active && Math.hypot(ev.clientX - start.x, ev.clientY - start.y) < 5) return;
       if (!active) document.body.classList.add("dragging-entry");
       active = true;
-      target = targetAt(ev.clientX, ev.clientY);
+      overEditor = editorAt(ev.clientX, ev.clientY);
+      document.body.classList.toggle("dragging-into-editor", overEditor);
+      target = overEditor ? null : targetAt(ev.clientX, ev.clientY);
       setDropTarget(target);
     };
-    const up = () => {
+    const up = (ev: PointerEvent) => {
       finish();
       if (!active) return;
       lastDragEnd = Date.now();
-      if (target) void moveEntry(entry, target);
+      if (overEditor) insertFileLinkAt(entry.path, ev.clientX, ev.clientY);
+      else if (target) void moveEntry(entry, target);
     };
     const key = (ev: globalThis.KeyboardEvent) => {
       if (ev.key === "Escape") {

@@ -1076,3 +1076,23 @@ test("View > Fold to Level 2 leaves the top two heading levels showing", async (
   await page.getByRole("menuitem", { name: "Unfold All" }).click();
   await expect(page.locator(".cm-line", { hasText: "### Task list" })).toHaveCount(1);
 });
+
+test("dragging a file from the Explorer into the editor inserts a link to it", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".tree-row", { hasText: /^docs$/ }).click();
+  const source = page.locator(".tree-row", { hasText: /^guide\.md$/ });
+  const target = page.locator(".cm-line", { hasText: /^# Welcome to Markpion$/ });
+  const from = (await source.boundingBox())!;
+  const to = (await target.boundingBox())!;
+  await page.mouse.move(from.x + 20, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 60, from.y + 20, { steps: 4 });
+  await page.mouse.move(to.x + to.width - 20, to.y + to.height / 2, { steps: 8 });
+  await expect(page.locator("body.dragging-into-editor")).toHaveCount(1);
+  await page.mouse.up();
+  await expect(page.locator(".cm-line").first()).toHaveText("# Welcome to Markpion[guide](docs/guide.md)");
+  // The file stayed where it was.
+  await expect(page.locator(".tree-row", { hasText: /^guide\.md$/ })).toBeVisible();
+});

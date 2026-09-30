@@ -1,13 +1,15 @@
 import { backend } from "../services";
 import { describeError } from "../services/errors";
 import { isInside, relativePath } from "../services/paths";
-import { isDirty, useDocuments } from "../stores/documentsStore";
+import { activeDoc, isDirty, useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { notify } from "../stores/uiStore";
 import { isMac } from "./commands";
 import { closeDocument, saveDocument } from "./documents";
 import { openFolderDialog, renameEntry } from "./workspace";
 import { basename, dirname } from "../services/paths";
+import { getEditorView } from "./editorBridge";
+import { relativeImageMarkdown } from "./images";
 
 export const revealLabel = isMac ? "Reveal in Finder" : /Win/i.test(navigator.platform) ? "Reveal in File Explorer" : "Open Containing Folder";
 
@@ -73,3 +75,33 @@ export function closeToTheRight(id: string) {
 }
 
 export const closeSaved = () => closeAll(docs().filter((d) => !isDirty(d)).map((d) => d.id));
+
+const IMAGE_PATH = /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i;
+
+/** Markdown linking to `path` from a document at `docPath` (an image link for pictures), or null when no relative path exists. */
+export function fileLinkMarkdown(docPath: string, path: string): string | null {
+  if (IMAGE_PATH.test(path)) return relativeImageMarkdown(docPath, path);
+  const rel = relativePath(dirname(docPath), path);
+  if (rel === null) return null;
+  const text = basename(path).replace(/\.(md|markdown)$/i, "").replace(/[[\]]/g, "\\$&");
+  return `[${text}](${encodeURI(rel).replace(/\(/g, "%28").replace(/\)/g, "%29")})`;
+}
+
+/** Inserts a link to `path` where it was dropped in the editor (a file dragged from the Explorer). */
+export function insertFileLinkAt(path: string, x: number, y: number) {
+  const view = getEditorView();
+  const doc = activeDoc();
+  if (!view || !doc) return;
+  if (!doc.path) {
+    notify("info", "Save the document first, so the link can point to the file from where the document is.");
+    return;
+  }
+  const insert = fileLinkMarkdown(doc.path, path);
+  if (!insert) {
+    notify("info", "That file can't be reached from this document by a relative link.");
+    return;
+  }
+  const pos = view.posAtCoords({ x, y }) ?? view.state.selection.main.head;
+  view.dispatch({ changes: { from: pos, insert }, selection: { anchor: pos + insert.length }, userEvent: "input.drop" });
+  view.focus();
+}
