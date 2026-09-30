@@ -4,7 +4,7 @@ import { basename, dirname, isInside, isMarkdownPath, join, relativePath } from 
 import { useWorkspace } from "../stores/workspaceStore";
 import { useSettings } from "../stores/settingsStore";
 import { useDocuments } from "../stores/documentsStore";
-import { ask, notify, promptText } from "../stores/uiStore";
+import { ask, notify, promptText, useUi } from "../stores/uiStore";
 import type { DirEntry } from "../types";
 import { onPathDeleted, onPathRenamed, openPath } from "./documents";
 import { invalidateWorkspaceFiles } from "./completion";
@@ -56,6 +56,35 @@ export async function toggleDir(dir: string) {
   const expanded = !ws().expanded[dir];
   ws().setExpanded(dir, expanded);
   if (expanded && !ws().children[dir]) await refreshDir(dir);
+}
+
+/**
+ * Shows a file in the Explorer: its folders are expanded (and listed if
+ * needed), it's selected, scrolled into view and focused. Returns false when
+ * it isn't in the open folder.
+ */
+export async function showInExplorer(path: string): Promise<boolean> {
+  const root = ws().root;
+  if (!root || !isInside(path, root)) return false;
+  useSettings.getState().update({ showExplorer: true });
+  useUi.getState().setSidebarView("explorer");
+  const chain: string[] = [];
+  for (let dir = dirname(path); isInside(dir, root) && dir.length >= root.length; dir = dirname(dir)) {
+    chain.unshift(dir);
+    if (dir === dirname(dir)) break;
+  }
+  for (const dir of chain) {
+    ws().setExpanded(dir, true);
+    if (!ws().children[dir]) await refreshDir(dir);
+  }
+  ws().select(path);
+  // After the tree has rendered the row.
+  requestAnimationFrame(() => {
+    const row = document.querySelector<HTMLElement>(`.tree-row[data-path="${CSS.escape(path)}"]`);
+    row?.scrollIntoView({ block: "nearest" });
+    row?.focus();
+  });
+  return true;
 }
 
 /** Re-lists every loaded folder, e.g. after the window regains focus. */

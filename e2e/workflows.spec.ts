@@ -1337,3 +1337,18 @@ test("File > Close All Tabs asks about unsaved tabs, then closes them all", asyn
   await page.getByRole("button", { name: "Don't Save" }).click();
   await expect(docTabs(page)).toHaveCount(0);
 });
+
+test("Show in Explorer expands the folders down to the file and selects it", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await page.locator(".tree-row", { hasText: /^docs$/ }).click();
+  await page.locator(".tree-row", { hasText: /^guide\.md$/ }).click();
+  // Collapse the folder again, then find the file from its tab.
+  await page.locator(".tree-row", { hasText: /^docs$/ }).click();
+  await expect(page.locator(".tree-row", { hasText: /^guide\.md$/ })).toHaveCount(0);
+  await docTabs(page).filter({ hasText: "guide.md" }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Show in Explorer" }).click();
+  const row = page.locator(".tree-row", { hasText: /^guide\.md$/ });
+  await expect(row).toBeFocused();
+  await expect(row).toHaveClass(/selected/);
+});

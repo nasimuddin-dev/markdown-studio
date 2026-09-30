@@ -7,6 +7,7 @@ import { tabHints } from "../features/tabNames";
 import { ContextMenu } from "./ContextMenu";
 import { closeAllTabs, closeOthers, closeSaved, closeToTheRight, copyPath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
 import { useWorkspace } from "../stores/workspaceStore";
+import { showInExplorer } from "../features/workspace";
 import { isInside } from "../services/paths";
 import { backend } from "../services";
 import { useUi } from "../stores/uiStore";
@@ -159,6 +160,7 @@ export function TabBar() {
             "separator",
             { label: menuDoc.path ? "Rename…" : "Save As…", run: () => renameDocument(menuDoc.id) },
             ...(menuDoc.path && !isInsideWorkspace(menuDoc.path) ? [{ label: "Open Containing Folder…", run: () => openContainingFolder(menuDoc.path!) }] : []),
+            ...(menuDoc.path && isInsideWorkspace(menuDoc.path) ? [{ label: "Show in Explorer", run: () => void showInExplorer(menuDoc.path!) }] : []),
             { label: "File History…", run: () => useUi.getState().setHistoryDocId(menuDoc.id), disabled: !menuDoc.path },
             { label: "Copy Path", run: () => copyPath(menuDoc.path!), disabled: !menuDoc.path },
             { label: revealLabel, run: () => revealInFolder(menuDoc.path!), disabled: !menuDoc.path || !backend().capabilities.revealInFolder },

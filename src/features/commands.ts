@@ -299,6 +299,15 @@ export const commands: Record<string, Command> = {
     run: async () => (await import("./templates")).saveAsTemplate(),
     enabled: hasActive,
   },
+  showInExplorer: {
+    id: "showInExplorer",
+    label: "Show Active File in Explorer",
+    run: async () => {
+      const path = useDocuments.getState().docs.find((d) => d.id === useDocuments.getState().activeId)?.path;
+      if (!path || !(await (await import("./workspace")).showInExplorer(path))) useUi.getState().notify("info", "The active file isn't in the open folder.");
+    },
+    enabled: hasActive,
+  },
   closeAllTabs: { id: "closeAllTabs", label: "Close All Tabs", run: async () => (await import("./pathActions")).closeAllTabs(), enabled: hasActive },
   moveToNewFile: {
     id: "moveToNewFile",

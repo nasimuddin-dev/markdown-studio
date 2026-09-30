@@ -32,7 +32,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.20.0. **Done** means im
 | FR-033 | Done | rehype-highlight (highlight.js common languages) |
 | FR-034 | Done | rehype-raw followed by rehype-sanitize (GitHub schema), plus CSP |
 | FR-035 | Done | Editor / Split / Preview (Ctrl/Cmd+1/2/3, Ctrl/Cmd+\\) |
-| FR-040 | Done | Tabs with drag reordering; files with the same name get the shortest distinguishing folder suffix as a hint ([tabNames.ts](../src/features/tabNames.ts)) |
+| FR-040 | Done | Tabs with drag reordering; Show in Explorer from a tab or the palette (`showInExplorer`); files with the same name get the shortest distinguishing folder suffix as a hint ([tabNames.ts](../src/features/tabNames.ts)) |
 | FR-041 | Done | Accent bar, bold label, `aria-selected` |
 | FR-042 | Done | Save / Don't Save / Cancel on tab close and window close |
 | FR-043 | Done | Ctrl+Tab / Ctrl+Shift+Tab, arrow keys in the tab list; Reopen Closed Tab (Ctrl/Cmd+Shift+T) |
