@@ -171,6 +171,8 @@ describe("markdown lint: tables, footnotes and link text", () => {
 
   it("flags headings without a space and --- that turns a line into a heading", () => {
     expect(applyFix("#Title\n\ntext", "heading-space")).toBe("# Title\n\ntext");
+    // A line of tags isn't a heading.
+    expect(only("#idea\n\n#idea #Work\n\n#project/alpha", "heading-space")).toEqual([]);
     expect(applyFix("  ###Setup steps", "heading-space")).toBe("  ### Setup steps");
     // "#123", "#" alone, code and "# Title" aren't flagged.
     expect(only("#123\n\n#\n\n`#x y`\n\n```\n#no space\n```\n\n# Title", "heading-space")).toEqual([]);
@@ -243,6 +245,13 @@ describe("markdown lint: tables, footnotes and link text", () => {
     expect(fixAllProblems(text).text).toBe("---\ntitle: Notes\ntags:\n  - a\n---\n\n# Notes\n");
     expect(only("---\ntitle: A\n---\n# A", "front-matter")).toEqual([]);
     expect(only("---\n\nA rule, then text.", "front-matter")).toEqual([]);
+  });
+
+  it("flags a tag written in a less common capitalisation and fixes it", () => {
+    const text = "One #idea\n\nTwo #Idea, three #idea `#IDEA`";
+    expect(only(text, "tag-case").map((p) => p.message)).toEqual(["#Idea is written #idea elsewhere in this document. They're the same tag; one spelling keeps lists tidy."]);
+    expect(fixAllProblems(text).text).toBe("One #idea\n\nTwo #idea, three #idea `#IDEA`");
+    expect(only("#idea #other", "tag-case")).toEqual([]);
   });
 
   it("flags a link label defined twice", () => {

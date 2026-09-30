@@ -1,5 +1,7 @@
 import GithubSlugger from "github-slugger";
 import { WIKI_LINK, wikiLinkHref } from "../services/wikiLinks";
+import { splitFrontMatter } from "../services/frontMatter";
+import { INLINE_TAG } from "../services/tags";
 import { extractHeadings } from "./outline";
 import { resolveRelative } from "../services/paths";
 import { fixTable } from "./tables";
@@ -37,6 +39,7 @@ export const LINT_RULES: Record<string, string> = {
   "emphasis-space": "Bold with spaces inside",
   "destination-spaces": "Paths with spaces",
   "front-matter": "Front matter without its closing ---",
+  "tag-case": "A tag written in different capitalisations",
 };
 
 /**
@@ -282,6 +285,7 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
     ...lintListsAndEmphasis(text, starts),
     ...lintSpacesInDestinations(text),
     ...lintFrontMatter(text),
+    ...lintTagCase(text),
   );
   return problems.sort((a, b) => a.from - b.from);
 }
@@ -448,6 +452,12 @@ function lintTables(text: string, starts: number[]): MarkdownProblem[] {
  * under a line of text, which makes that line a heading instead of drawing a
  * horizontal rule (setext headings are rare today, so this is only a hint).
  */
+function isTagLine(line: string): boolean {
+  const words = line.trim().split(/\s+/);
+  if (!words.every((w) => new RegExp(`^${INLINE_TAG.source}$`, "u").test(w))) return false;
+  return words.length > 1 || !/^#\p{Lu}\p{Ll}/u.test(words[0]);
+}
+
 function lintHeadingSyntax(text: string, starts: number[]): MarkdownProblem[] {
   const lines = text.split("\n");
   const masked = maskCode(text).split("\n");
@@ -456,8 +466,9 @@ function lintHeadingSyntax(text: string, starts: number[]): MarkdownProblem[] {
   const frontMatterEnd = lines[0]?.trim() === "---" ? lines.findIndex((l, i) => i > 0 && /^(---|\.\.\.)\s*$/.test(l)) : -1;
   for (let i = frontMatterEnd + 1; i < lines.length; i++) {
     const m = /^( {0,3})(#{1,6})(?=[^\s#])/.exec(masked[i]);
-    // An issue-style reference alone on a line ("#123") is left alone.
-    if (m && !/^#\d+$/.test(masked[i].trim())) {
+    // An issue-style reference alone on a line ("#123") is left alone, and so is a
+    // line of #tags ("#idea #work"), unless it's one capitalised word ("#Title").
+    if (m && !/^#\d+$/.test(masked[i].trim()) && !isTagLine(masked[i])) {
       out.push({
         from: starts[i],
         to: starts[i] + lines[i].length,
@@ -606,6 +617,55 @@ function lintFrontMatter(text: string): MarkdownProblem[] {
       fix: { label: "Close Front Matter", edits: [{ at: end, insert: "\n---" }] },
     },
   ];
+}
+
+/** Inline `#tags` outside front matter, code, links and headings, with the offset of their `#`. */
+export function inlineTags(text: string): Array<{ tag: string; from: number; line: number }> {
+  const fm = splitFrontMatter(text);
+  // Blank the front matter, keeping offsets and line numbers.
+  let masked = maskCode(fm ? fm.raw.replace(/[^\n]/g, " ") + text.slice(fm.raw.length) : text);
+  for (const link of findAllLinks(masked)) masked = masked.slice(0, link.from) + " ".repeat(link.to - link.from) + masked.slice(link.to);
+  const out: Array<{ tag: string; from: number; line: number }> = [];
+  let offset = 0;
+  masked.split("\n").forEach((line, i) => {
+    if (!/^ {0,3}#{1,6}(\s|$)/.test(line)) {
+      for (const m of line.matchAll(INLINE_TAG)) out.push({ tag: m[1], from: offset + m.index, line: i + 1 });
+    }
+    offset += line.length + 1;
+  });
+  return out;
+}
+
+/**
+ * An inline tag written differently from its most common spelling in the
+ * document (`#Idea` next to `#idea`). Tags match either way, but lists show
+ * one spelling; the fix uses the common one.
+ */
+function lintTagCase(text: string): MarkdownProblem[] {
+  if (!text.includes("#")) return [];
+  const tags = inlineTags(text);
+  const spellings = new Map<string, Map<string, number>>();
+  for (const { tag } of tags) {
+    const key = tag.toLowerCase();
+    const counts = spellings.get(key) ?? new Map<string, number>();
+    spellings.set(key, counts.set(tag, (counts.get(tag) ?? 0) + 1));
+  }
+  const out: MarkdownProblem[] = [];
+  for (const t of tags) {
+    const counts = spellings.get(t.tag.toLowerCase())!;
+    if (counts.size < 2) continue;
+    const common = [...counts].reduce((best, c) => (c[1] > best[1] ? c : best))[0];
+    if (t.tag === common) continue;
+    out.push({
+      from: t.from,
+      to: t.from + 1 + t.tag.length,
+      severity: "info",
+      rule: "tag-case",
+      message: `#${t.tag} is written #${common} elsewhere in this document. They're the same tag; one spelling keeps lists tidy.`,
+      fix: { label: `Change to #${common}`, edits: [{ at: 1, remove: t.tag.length, insert: common }] },
+    });
+  }
+  return out;
 }
 
 /** How reference labels match: case-insensitive, with runs of whitespace as one space. */

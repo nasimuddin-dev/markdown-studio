@@ -1,35 +1,17 @@
 import { backend } from "../services";
 import { splitFrontMatter } from "../services/frontMatter";
 import { basename, isInside, isMarkdownPath } from "../services/paths";
-import { INLINE_TAG } from "../services/tags";
 import { activeDoc, useDocuments } from "../stores/documentsStore";
 import { notify, promptText } from "../stores/uiStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { getEditorView } from "./editorBridge";
-import { findAllLinks, maskCode } from "./lint";
+import { inlineTags } from "./lint";
 import type { TextChange } from "./referenceLinks";
 
 /** A tag used in a document: its name (without #) and the line it's on (1-based). */
 export interface TagUse {
   tag: string;
   line: number;
-}
-
-/** Inline `#tags` outside front matter, code, links and headings, with the offset of their `#`. */
-function inlineTags(text: string): Array<{ tag: string; from: number; line: number }> {
-  const fm = splitFrontMatter(text);
-  // Blank the front matter, keeping offsets and line numbers.
-  let masked = maskCode(fm ? fm.raw.replace(/[^\n]/g, " ") + text.slice(fm.raw.length) : text);
-  for (const link of findAllLinks(masked)) masked = masked.slice(0, link.from) + " ".repeat(link.to - link.from) + masked.slice(link.to);
-  const out: Array<{ tag: string; from: number; line: number }> = [];
-  let offset = 0;
-  masked.split("\n").forEach((line, i) => {
-    if (!/^ {0,3}#{1,6}(\s|$)/.test(line)) {
-      for (const m of line.matchAll(INLINE_TAG)) out.push({ tag: m[1], from: offset + m.index, line: i + 1 });
-    }
-    offset += line.length + 1;
-  });
-  return out;
 }
 
 /**
