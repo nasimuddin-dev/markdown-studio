@@ -15,7 +15,7 @@ Import commands are in the **File** menu. Each one converts a file into a new Ma
 
 **File → Import Word Document (.docx)…**
 
-- **Supported:** headings, paragraphs, bold and italic, bulleted and numbered lists, tables, links and images. Images are saved to an `assets/` folder and linked, with the image descriptions from Word as alt text.
+- **Supported:** headings, paragraphs, bold and italic, bulleted and numbered lists, tables, links and images. Images are saved to an `assets/` folder and linked, with the image descriptions from Word as alt text. Links within the document, such as Word's table of contents, become links to the Markdown headings (`#installation`), so they keep working. The same happens for links to headings when importing a web page.
 - **Limitations:** page layout, fonts and colours are not carried over; the result is plain Markdown structure. Only the `.docx` format is supported, not the older `.doc`.
 
 ### PDF
@@ -50,7 +50,7 @@ Export commands are in the **File** menu. You choose where to save the file.
 | Format | Command | What you get |
 | --- | --- | --- |
 | PDF | Export as PDF… | Selectable text, clickable links, heading bookmarks, tables, task checkboxes, images, footnotes in a section at the end, and page numbers |
-| Word | Export as Word (.docx)… | Real Word headings (so Word's navigation pane and table of contents work), numbered, bulleted and task lists, tables, code, links, embedded images, real Word footnotes, and page numbers in the footer |
+| Word | Export as Word (.docx)… | Real Word headings (so Word's navigation pane and table of contents work), numbered, bulleted and task lists, tables, code, links (links to headings in the document, like a table of contents, jump to the heading in Word), embedded images, real Word footnotes, and page numbers in the footer |
 | HTML | Export as HTML… | One standalone, styled `.html` file with images embedded, sanitized like the preview |
 | Clipboard | Copy as Formatted Text | The rendered document as formatted text (headings, lists, tables, links, images), for pasting into Word, Outlook, Gmail or Google Docs. Plain-text editors receive the Markdown |
 | Clipboard | Copy as HTML | The HTML source, for pasting into a CMS or an HTML file |

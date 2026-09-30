@@ -180,3 +180,42 @@ describe("math in Word export", () => {
     expect(xml).toContain("Costs $5 and $10.");
   });
 });
+
+describe("Word export: links within the document", () => {
+  it("makes headings bookmarks and #anchor links internal hyperlinks", async () => {
+    const md = "# Guide\n\n- [Install](#install)\n- [Use it](#use-it)\n- [Missing](#nowhere)\n\n## Install\n\ntext\n\n## Use it\n\ntext";
+    const xml = await documentXml(await markdownToDocx(md));
+    expect(xml.match(/<w:bookmarkStart[^>]*w:name="_h\d+"/g)).toHaveLength(3);
+    expect(xml).toContain('w:anchor="_h2"');
+    expect(xml).toContain('w:anchor="_h3"');
+    // A link to a heading that doesn't exist stays plain text.
+    expect(xml.match(/w:anchor=/g)).toHaveLength(2);
+    expect(xml).toContain("Missing");
+  });
+});
+
+describe("Word import: links within the document", () => {
+  it("turns links to heading bookmarks into Markdown heading anchors (round trip)", async () => {
+    const md = "# Guide\n\n- [Install](#install)\n- [Use it](#use-it)\n\n## Install\n\ntext\n\n## Use it\n\ntext";
+    const bytes = await markdownToDocx(md);
+    const back = await docxToMarkdown(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
+    expect(back.markdown).toContain("[Install](#install)");
+    expect(back.markdown).toContain("[Use it](#use-it)");
+    expect(back.markdown).not.toMatch(/_h\d|<a id/);
+  });
+
+  it("maps Word's own TOC bookmarks", async () => {
+    const { linksToHeadingAnchors } = await import("../src/services/convert/docx");
+    const html = '<p><a href="#_Toc1">Setup and install</a></p><h2><a id="_Toc1"></a>Setup and install</h2><p><a href="#elsewhere">x</a></p>';
+    const out = linksToHeadingAnchors(html);
+    expect(out).toContain('href="#setup-and-install"');
+    expect(out).not.toContain('id="_Toc1"');
+    expect(out).toContain('href="#elsewhere"');
+  });
+
+  it("maps a web page's heading ids when importing HTML", async () => {
+    const { htmlFileToMarkdown } = await import("../src/services/convert/docx");
+    const page = '<p><a href="#sec-2">Jump</a></p><h2 id="sec-2">Getting Started</h2><p>x</p>';
+    expect(htmlFileToMarkdown(page).markdown).toContain("[Jump](#getting-started)");
+  });
+});

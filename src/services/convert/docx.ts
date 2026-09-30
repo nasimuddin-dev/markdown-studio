@@ -1,3 +1,4 @@
+import GithubSlugger from "github-slugger";
 import { htmlToMarkdown } from "./html";
 
 export interface ExtractedImage {
@@ -64,7 +65,37 @@ export async function docxToMarkdown(data: ArrayBuffer, baseName = "image"): Pro
     .filter((m) => m.type === "warning")
     .map((m) => m.message)
     .filter((m, i, all) => all.indexOf(m) === i);
-  return { markdown: htmlToMarkdown(result.value), images, warnings };
+  return { markdown: htmlToMarkdown(linksToHeadingAnchors(result.value)), images, warnings };
+}
+
+/**
+ * Links within a document (a table of contents, cross-references) point at
+ * bookmarks on the headings in Word (`#_Toc123`, `#_h2`) and at heading ids
+ * on web pages (`#section-2`). In Markdown a heading is linked by its anchor
+ * (`#installation`, GitHub style), so each bookmark or id on a heading is
+ * mapped to that heading's anchor and the links are rewritten. Empty
+ * bookmarks on headings are dropped (they'd show as empty HTML anchors).
+ */
+export function linksToHeadingAnchors(html: string): string {
+  if (!html.includes('href="#')) return html;
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const slugger = new GithubSlugger();
+  const anchors = new Map<string, string>();
+  for (const heading of doc.querySelectorAll("h1, h2, h3, h4, h5, h6")) {
+    const slug = slugger.slug(heading.textContent?.trim() ?? "");
+    // A web page's heading id (<h2 id="section-2">) leads to the heading too.
+    if (heading.id) anchors.set(heading.id, slug);
+    for (const a of heading.querySelectorAll("a[id], a[name]")) {
+      const id = a.id || a.getAttribute("name")!;
+      anchors.set(id, slug);
+      if (!a.textContent) a.remove();
+    }
+  }
+  for (const a of doc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')) {
+    const slug = anchors.get(a.getAttribute("href")!.slice(1));
+    if (slug) a.setAttribute("href", `#${slug}`);
+  }
+  return doc.body.innerHTML;
 }
 
 /** Web page (.html) → Markdown. Inline data: images are extracted like .docx images. */
@@ -76,5 +107,5 @@ export function htmlFileToMarkdown(html: string, baseName = "image"): Conversion
     images.push({ name, base64: b64, contentType: type });
     return `${pre}assets/${name}${post}`;
   });
-  return { markdown: htmlToMarkdown(withAssets), images, warnings: [] };
+  return { markdown: htmlToMarkdown(linksToHeadingAnchors(withAssets)), images, warnings: [] };
 }

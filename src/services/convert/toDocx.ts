@@ -1,7 +1,8 @@
+import GithubSlugger from "github-slugger";
 import { ALERT_KINDS, takeMdastAlert } from "../alerts";
 import { stripFrontMatter } from "../frontMatter";
 import {
-  AlignmentType, BorderStyle, Document, ExternalHyperlink, Footer, FootnoteReferenceRun, HeadingLevel, ImageRun, LevelFormat, Packer,
+  AlignmentType, Bookmark, BorderStyle, Document, InternalHyperlink, ExternalHyperlink, Footer, FootnoteReferenceRun, HeadingLevel, ImageRun, LevelFormat, Packer,
   PageNumber, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType,
   type IParagraphOptions, type ParagraphChild,
 } from "docx";
@@ -76,18 +77,47 @@ export function imageSize(bytes: Uint8Array): { width: number; height: number } 
   return null;
 }
 
+function decodeAnchor(anchor: string): string {
+  try {
+    return decodeURIComponent(anchor).toLowerCase();
+  } catch {
+    return anchor.toLowerCase();
+  }
+}
+
 function plainText(node: RootContent | PhrasingContent): string {
   if ("value" in node && typeof node.value === "string") return node.value;
   if ("children" in node) return (node.children as Array<RootContent | PhrasingContent>).map(plainText).join("");
   return "";
 }
 
+/**
+ * Word bookmarks for the headings, in document order, and the heading anchors
+ * (`#setup`, as the preview makes them) that lead to each, so links within
+ * the document (a table of contents) work in Word.
+ */
+function headingBookmarks(tree: Root): { names: string[]; byAnchor: Map<string, string> } {
+  const slugger = new GithubSlugger();
+  const names: string[] = [];
+  const byAnchor = new Map<string, string>();
+  for (const node of tree.children) {
+    if (node.type !== "heading") continue;
+    // Names starting with "_" are hidden bookmarks: links work, Word's Bookmark list stays clean.
+    const name = `_h${names.length + 1}`;
+    names.push(name);
+    byAnchor.set(slugger.slug(plainText(node)), name);
+  }
+  return { names, byAnchor };
+}
+
 class DocxBuilder {
   private listInstance = 0;
+  private headingIndex = 0;
   constructor(
     private loadImage?: DocxImageLoader,
     private footnotes?: Footnotes,
     private renderDiagram?: DiagramRenderer,
+    private bookmarks: { names: string[]; byAnchor: Map<string, string> } = { names: [], byAnchor: new Map() },
   ) {}
 
   private run(text: string, s: Style): TextRun {
@@ -125,8 +155,12 @@ class DocxBuilder {
           out.push(new TextRun({ text: "", break: 1 }));
           break;
         case "link": {
+          const anchor = n.url.startsWith("#") ? this.bookmarks.byAnchor.get(decodeAnchor(n.url.slice(1))) : undefined;
           if (/^(https?:|mailto:)/i.test(n.url)) {
             out.push(new ExternalHyperlink({ link: n.url, children: await this.inline(n.children, { ...s, link: true }) }));
+          } else if (anchor) {
+            // A link to a heading in this document.
+            out.push(new InternalHyperlink({ anchor, children: await this.inline(n.children, { ...s, link: true }) }));
           } else out.push(...(await this.inline(n.children, s)));
           break;
         }
@@ -232,8 +266,11 @@ class DocxBuilder {
   async block(node: RootContent, indentLevel = 0): Promise<Array<Paragraph | Table>> {
     const indent = indentLevel ? { left: 360 * indentLevel } : undefined;
     switch (node.type) {
-      case "heading":
-        return [await this.paragraph(node.children, { heading: HEADINGS[node.depth - 1] })];
+      case "heading": {
+        const name = this.bookmarks.names[this.headingIndex++];
+        const children = await this.inline(node.children);
+        return [new Paragraph({ heading: HEADINGS[node.depth - 1], children: name ? [new Bookmark({ id: name, children })] : children })];
+      }
       case "paragraph":
         return [await this.paragraph(node.children, { indent, spacing: { after: 120 } })];
       case "list": {
@@ -335,7 +372,7 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
   // runSync applies transforms such as emoji shortcodes; parse alone only builds the tree.
   const tree = parser.runSync(parser.parse(stripFrontMatter(markdown))) as Root;
-  const builder = new DocxBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram);
+  const builder = new DocxBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, headingBookmarks(tree));
   const children: Array<Paragraph | Table> = [];
   for (const node of tree.children) children.push(...(await builder.block(node)));
   const footnotes = await builder.footnoteContent();
