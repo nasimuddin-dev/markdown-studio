@@ -113,4 +113,5 @@ Templates can contain placeholders, which are filled in when the document is cre
 | `{{week}}` | The ISO week number |
 | `{{title}}` | The template's name |
 | `{{cursor}}` | Where the cursor is placed |
+
 :::

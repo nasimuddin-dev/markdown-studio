@@ -223,7 +223,7 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
       }
     }
   }
-  problems.push(...lintTables(text, starts), ...lintFootnotes(text), ...lintHeadingSyntax(text, starts));
+  problems.push(...lintTables(text, starts), ...lintFootnotes(text), ...lintHeadingSyntax(text, starts), ...lintListsAndEmphasis(text, starts));
   return problems.sort((a, b) => a.from - b.from);
 }
 
@@ -396,6 +396,57 @@ function lintHeadingSyntax(text: string, starts: number[]): MarkdownProblem[] {
         message: "This --- makes the line above a heading. For a horizontal rule, put a blank line before it.",
         fix: { label: "Make It a Rule", edits: [{ at: 0, insert: "\n" }] },
       });
+    }
+  }
+  return out;
+}
+
+const LIST_ITEM = /^ *([-*+]|\d{1,9}[.)])[ \t]/;
+
+/**
+ * List items without a space after the marker ("-item", "2.item", which are
+ * plain text; only flagged next to a real list item, so "-10°C" is left alone)
+ * and emphasis with spaces inside the markers ("** bold **", which isn't bold).
+ */
+function lintListsAndEmphasis(text: string, starts: number[]): MarkdownProblem[] {
+  const lines = text.split("\n");
+  const masked = maskCode(text).split("\n");
+  const out: MarkdownProblem[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const m = /^( *)([-*+]|\d{1,9}[.)])(?=[^\s\d*+.)-])/.exec(masked[i]);
+    // "*Note:* text" is emphasis, not a list marker.
+    const emphasis = m?.[2] === "*" && masked[i].indexOf("*", m[1].length + 1) > 0;
+    if (m && !emphasis && (LIST_ITEM.test(masked[i - 1] ?? "") || LIST_ITEM.test(masked[i + 1] ?? ""))) {
+      out.push({
+        from: starts[i],
+        to: starts[i] + lines[i].length,
+        severity: "warning",
+        rule: "list-space",
+        message: `This isn't a list item: "${m[2]}" needs a space after it.`,
+        fix: { label: "Add Space", edits: [{ at: m[1].length + m[2].length, insert: " " }] },
+      });
+    }
+    // "** bold**", "__ bold __": pair the markers left to right, as Markdown does, and check the
+    // text between each pair (in the original line, so code inside bold counts as text).
+    for (const marker of ["**", "__"]) {
+      // An odd number of backslashes before a marker escapes it (`\**` is text, `\\**` is a marker).
+      const escaped = (index: number) => (/\\*$/.exec(masked[i].slice(0, index))![0].length % 2) === 1;
+      const at = [...masked[i].matchAll(marker === "**" ? /(?<!\*)\*\*(?!\*)/g : /(?<![_\w])__(?!_)|(?<!_)__(?![_\w])/g)]
+        .map((x) => x.index!)
+        .filter((index) => !escaped(index));
+      for (let k = 0; k + 1 < at.length; k += 2) {
+        const inner = lines[i].slice(at[k] + 2, at[k + 1]);
+        if (!inner.trim() || inner === inner.trim()) continue;
+        const from = starts[i] + at[k];
+        out.push({
+          from,
+          to: from + inner.length + 4,
+          severity: "warning",
+          rule: "emphasis-space",
+          message: `Spaces just inside "${marker}" stop it from being bold.`,
+          fix: { label: "Remove Spaces", edits: [{ at: 0, remove: inner.length + 4, insert: marker + inner.trim() + marker }] },
+        });
+      }
     }
   }
   return out;

@@ -151,6 +151,21 @@ describe("markdown lint: tables, footnotes and link text", () => {
     expect(only("---\ntitle: x\n---\n# Doc", "setext-heading")).toEqual([]);
   });
 
+  it("flags list items without a space and emphasis with spaces inside", () => {
+    expect(applyFix("- one\n-two\n- three", "list-space")).toBe("- one\n- two\n- three");
+    expect(applyFix("1. one\n2.two", "list-space")).toBe("1. one\n2. two");
+    // Not flagged away from a list, for numbers, rules, bold or emphasis at the line start.
+    expect(only("-10°C outside\n\n- a\n- b\n3.14 is pi\n\n- a\n**bold** start\n- b\n*Note:* x\n---", "list-space")).toEqual([]);
+
+    expect(applyFix("This is ** bold** text", "emphasis-space")).toBe("This is **bold** text");
+    expect(applyFix("Also __ strong __ here", "emphasis-space")).toBe("Also __strong__ here");
+    // An escaped backslash before ** keeps it a marker; an escaped ** is text.
+    expect(only("**Ctrl+\\\\** then **Cmd+\\\\**", "emphasis-space")).toEqual([]);
+    expect(only("\\** not bold \\** here", "emphasis-space")).toEqual([]);
+    // Text between two bold spans, code inside bold, arithmetic, snake_case, emphasis and code aren't flagged.
+    expect(only("**Ctrl+Z** and **Ctrl+Y**, **Use `x`** now, 2 * 3 * 4, a_b_c, *fine* and `** x **`, snake__case__name", "emphasis-space")).toEqual([]);
+  });
+
   it("fixes all safe problems at once, repeating as fixes reveal new ones", () => {
     const text = "# A\n\n### B\n\n#### C\n\n| a | b |\n| - | - |\n| 1 |\nafter\n\nSee[^x] and[^y] and [c](#b).";
     const { text: fixed, fixed: count } = fixAllProblems(text);
