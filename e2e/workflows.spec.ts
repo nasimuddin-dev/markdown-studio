@@ -1062,3 +1062,17 @@ test("Find in the preview when it's shown alone", async ({ page }) => {
   await expect(page.getByRole("document", { name: "Markdown preview" })).toBeFocused();
   expect(await page.evaluate(() => (CSS as unknown as { highlights: Map<string, unknown> }).highlights.size)).toBe(0);
 });
+
+test("View > Fold to Level 2 leaves the top two heading levels showing", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Fold to Level 2" }).click();
+  await expect(page.locator(".cm-line", { hasText: "## GitHub Flavored Markdown" })).toBeVisible();
+  await expect(page.locator(".cm-line", { hasText: "### Task list" })).toHaveCount(0);
+  await expect(page.locator(".cm-foldPlaceholder").first()).toBeVisible();
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Unfold All" }).click();
+  await expect(page.locator(".cm-line", { hasText: "### Task list" })).toHaveCount(1);
+});

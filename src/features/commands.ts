@@ -27,6 +27,7 @@ import { fillTemplate } from "./templates";
 import { convertToInlineLinks, convertToReferenceLinks } from "./referenceLinks";
 import { followLinkAtCursor } from "./followLink";
 import { renameHeading } from "./renameHeading";
+import { foldToLevel } from "./foldLevel";
 import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
 import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
@@ -321,6 +322,9 @@ export const commands: Record<string, Command> = {
   // CodeMirror also binds these to Ctrl+Alt+[ and Ctrl+Alt+] inside the editor.
   foldAll: { id: "foldAll", label: "Fold All", run: () => editorCommand("foldAll"), enabled: hasActive },
   unfoldAll: { id: "unfoldAll", label: "Unfold All", run: () => editorCommand("unfoldAll"), enabled: hasActive },
+  foldLevel1: formatCommand("foldLevel1", "Fold to Level 1", foldToLevel(1)),
+  foldLevel2: formatCommand("foldLevel2", "Fold to Level 2", foldToLevel(2)),
+  foldLevel3: formatCommand("foldLevel3", "Fold to Level 3", foldToLevel(3)),
 
   toggleView: {
     id: "toggleView",

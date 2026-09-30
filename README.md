@@ -65,7 +65,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Ctrl/Cmd+click a link in the editor (or Alt+Enter, Open Link at Cursor) to follow it: web pages open in the browser, `#heading` links and reference links (to their definition) move the cursor, and Markdown files open in a tab at the heading after `#` (the preview's links do that too)
 - Paste a URL while text is selected to turn the selection into a link: `[selected text](url)`
 - Format → Convert Links to Reference Style (`[text][1]` with numbered definitions at the end, shared for equal addresses and titles, existing definitions reused) and Convert Links to Inline Style (removes definitions left unused), for the selection or the whole document
-- CodeMirror 6 editor with Markdown syntax highlighting, code-block languages, undo/redo, multi-cursor, code folding (View → Fold All / Unfold All), find & replace (case-sensitive, regex, whole word) and go to line
+- CodeMirror 6 editor with Markdown syntax highlighting, code-block languages, undo/redo, multi-cursor, code folding (View → Fold All / Unfold All, Fold to Level 1/2/3), find & replace (case-sensitive, regex, whole word) and go to line
 - Import Word (.docx), PDF and web pages (.html) as Markdown (headings, lists, tables, links, images saved to assets/), and paste rich text from browsers or Word as Markdown
 - CSV/TSV tools: import a .csv or .tsv file as an aligned Markdown table, paste cells copied from Excel or Google Sheets as a table, and Copy Table as CSV for spreadsheets
 - Convert Folder to Markdown (File menu): converts every Word, PDF, HTML and CSV/TSV file in the open folder to a .md file beside it in one step; files that already have a Markdown version are skipped

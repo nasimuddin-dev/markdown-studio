@@ -19,7 +19,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.20.0. **Done** means im
 | FR-016 | Done | Rename from context menu or F2; open tabs follow the rename. Also Duplicate (first free "name copy.md", never overwrites) |
 | FR-017 | Done | Delete with confirmation; moves to the OS Trash (`trash` crate) |
 | FR-018 | Done | mtime conflict check on save, plus polling and focus checks with Reload / Compare / Keep Mine |
-| FR-020 | Done | CodeMirror Markdown language with nested code-block languages; folding (View → Fold All / Unfold All); formatting commands ([formatting.ts](../src/features/formatting.ts)), including heading promote/demote |
+| FR-020 | Done | CodeMirror Markdown language with nested code-block languages; folding (View → Fold All / Unfold All, Fold to Level 1–3: `features/foldLevel.ts`); formatting commands ([formatting.ts](../src/features/formatting.ts)), including heading promote/demote |
 | FR-021 | Done | Per-tab undo history (state preserved across tab switches) |
 | FR-022 | Done | CodeMirror default keymap and native clipboard |
 | FR-023 | Done | Ln/Col in the status bar; Go to Line (Ctrl/Cmd+G) |
