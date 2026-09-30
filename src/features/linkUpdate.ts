@@ -27,7 +27,8 @@ const escapeTarget = (path: string) => path.replace(/[%\s()<>]/g, (c) => "%" + c
  * Rewrites the relative links, images and reference definitions of a document that was at `oldDocPath`
  * and is now at `newDocPath`, given where every path moved (`moved`). Only
  * links that would otherwise point somewhere else change; `#anchors`, `?query`
- * parts, a leading `./` and `<…>` brackets are kept.
+ * parts, a leading `./` and `<…>` brackets are kept. Absolute paths change
+ * only when the file they name moved, and stay absolute.
  */
 export function rewriteLinks(text: string, oldDocPath: string, newDocPath: string, moved: (path: string) => string): { text: string; count: number } {
   const edits: Array<{ from: number; to: number; insert: string }> = [];
@@ -45,17 +46,24 @@ export function rewriteLinks(text: string, oldDocPath: string, newDocPath: strin
       edits.push({ from: link.targetFrom, to: link.targetFrom + written.length, insert });
       continue;
     }
-    if (!path || /^([a-zA-Z]:)?[\\/]/.test(link.target)) continue; // absolute paths are left alone
+    if (!path) continue;
     const target = moved(path);
+    const start = link.targetFrom;
+    const bracketed = text[start - 1] === "<";
+    const cut = link.target.search(/[?#]/);
+    const suffix = cut < 0 ? "" : link.target.slice(cut);
+    if (/^([a-zA-Z]:)?[\\/]/.test(link.target)) {
+      // An absolute path follows the file it names, written with the same slashes.
+      if (samePath(target, path)) continue;
+      const written = target.replace(/[\\/]/g, link.target.includes("\\") ? "\\" : "/");
+      edits.push({ from: start, to: start + (link.sourceLength ?? link.target.length), insert: (bracketed ? written : escapeTarget(written)) + suffix });
+      continue;
+    }
     const now = resolveRelative(newDocPath, link.target);
     if (now && samePath(now, target)) continue;
     const rel = relativePath(dirname(newDocPath), target);
     if (rel === null) continue;
-    const cut = link.target.search(/[?#]/);
-    const suffix = cut < 0 ? "" : link.target.slice(cut);
     const prefix = link.target.startsWith("./") && !rel.startsWith("..") ? "./" : "";
-    const start = link.targetFrom;
-    const bracketed = text[start - 1] === "<";
     let insert = prefix + (bracketed ? rel : escapeTarget(rel)) + suffix;
     // An HTML attribute written with entities keeps them.
     if (link.sourceLength !== undefined) insert = insert.replace(/&/g, "&amp;").replace(/"/g, "&quot;");

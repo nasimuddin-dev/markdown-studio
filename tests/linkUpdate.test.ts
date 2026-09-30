@@ -33,6 +33,16 @@ describe("rewriteLinks", () => {
     expect(out).toBe("See [guide](./docs/guide.md#setup), ![logo](img/logo.png) and [b](<docs/guide.md>).\n\n`[code](guide.md)`");
   });
 
+  it("updates absolute paths to a moved file, keeping their slashes, and leaves other absolute paths alone", () => {
+    const text = "[a](/ws/guide.md#setup) [b](/elsewhere/x.md) [c](C:\\ws\\guide.md) [d](<C:/ws/guide.md>)";
+    const { text: out, count } = rewriteLinks(text, "/ws/index.md", "/ws/index.md", moved("/ws/guide.md", "/ws/docs/my guide.md"));
+    expect(count).toBe(1);
+    expect(out).toBe("[a](/ws/docs/my%20guide.md#setup) [b](/elsewhere/x.md) [c](C:\\ws\\guide.md) [d](<C:/ws/guide.md>)");
+    const win = (p: string) => (p.toLowerCase().startsWith("c:\\ws\\guide.md") || p.toLowerCase().startsWith("c:/ws/guide.md") ? "C:\\ws\\docs\\guide.md" : p);
+    const onWindows = rewriteLinks("[c](C:\\ws\\guide.md) [d](<C:/ws/guide.md>)", "C:\\ws\\index.md", "C:\\ws\\index.md", win);
+    expect(onWindows.text).toBe("[c](C:\\ws\\docs\\guide.md) [d](<C:/ws/docs/guide.md>)");
+  });
+
   it("fixes a moved document's own links to files that stayed", () => {
     const text = "[home](index.md) [sibling](../other/x.md) [web](https://example.com) [top](#top)";
     const { text: out, count } = rewriteLinks(text, "/ws/a/page.md", "/ws/b/c/page.md", moved("/ws/a/page.md", "/ws/b/c/page.md"));

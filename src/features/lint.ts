@@ -727,7 +727,8 @@ function lintReferences(text: string): MarkdownProblem[] {
 /** Local link/image targets worth checking on disk (relative or absolute paths). */
 export function localTargets(links: LinkRef[], docPath: string) {
   return links
-    .filter((l) => l.target && !l.target.startsWith("#") && !/^[a-z][a-z0-9+.-]*:/i.test(l.target))
+    // A drive letter (C:/notes/a.md) is a path, not a URL scheme.
+    .filter((l) => l.target && !l.target.startsWith("#") && (!/^[a-z][a-z0-9+.-]*:/i.test(l.target) || /^[a-zA-Z]:[\\/]/.test(l.target)))
     .map((l) => ({ link: l, path: resolveRelative(docPath, l.target) }));
 }
 
