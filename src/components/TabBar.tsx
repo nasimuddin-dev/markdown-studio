@@ -5,7 +5,7 @@ import { commands, formatShortcut } from "../features/commands";
 import { Icon } from "./Icon";
 import { tabHints } from "../features/tabNames";
 import { ContextMenu } from "./ContextMenu";
-import { closeAllTabs, closeOthers, closeSaved, closeToTheRight, copyPath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
+import { closeAllTabs, closeOthers, closeSaved, closeToTheRight, copyPath, copyRelativePath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
 import { useWorkspace } from "../stores/workspaceStore";
 import { showInExplorer } from "../features/workspace";
 import { isInside } from "../services/paths";
@@ -163,6 +163,7 @@ export function TabBar() {
             ...(menuDoc.path && isInsideWorkspace(menuDoc.path) ? [{ label: "Show in Explorer", run: () => void showInExplorer(menuDoc.path!) }] : []),
             { label: "File History…", run: () => useUi.getState().setHistoryDocId(menuDoc.id), disabled: !menuDoc.path },
             { label: "Copy Path", run: () => copyPath(menuDoc.path!), disabled: !menuDoc.path },
+            ...(menuDoc.path && isInsideWorkspace(menuDoc.path) ? [{ label: "Copy Relative Path", run: () => copyRelativePath(menuDoc.path!) }] : []),
             { label: revealLabel, run: () => revealInFolder(menuDoc.path!), disabled: !menuDoc.path || !backend().capabilities.revealInFolder },
           ]}
         />
