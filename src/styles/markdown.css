@@ -296,6 +296,15 @@
   flex: 1;
 }
 
+/* Inline #tags */
+.markdown-body .md-tag {
+  padding: 0 0.35em;
+  border-radius: 0.6em;
+  background: color-mix(in srgb, var(--alert-note) 12%, transparent);
+  color: var(--alert-note);
+  white-space: nowrap;
+}
+
 /* GitHub alerts: > [!NOTE], [!TIP], [!IMPORTANT], [!WARNING], [!CAUTION] */
 .markdown-body {
   --alert-note: #0969da;

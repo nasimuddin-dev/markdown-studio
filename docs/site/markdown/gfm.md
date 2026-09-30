@@ -30,7 +30,7 @@ Markpion also supports, and GitHub renders too:
 - [LaTeX math](/markdown/math) with `$…$` and `$$…$$`.
 - [YAML front matter](/markdown/extras#front-matter) at the top of a file, shown as a table.
 
-And, unlike GitHub, [wiki links](/markdown/extras#wiki-links) such as `[[Setup Guide]]`.
+And, unlike GitHub, [wiki links](/markdown/extras#wiki-links) such as `[[Setup Guide]]` and [tags](/markdown/extras#tags) such as `#draft`.
 
 ## Differences from GitHub
 

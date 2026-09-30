@@ -81,3 +81,9 @@ Markpion understands the double-bracket links of wikis and note-taking apps:
 The page is a path relative to the document, and `.md` is added when it has no extension. Type `[[` to pick a document of the open folder from a list (and `#` after the page, or `[[#`, to pick one of its headings), and **Ctrl+click** (**Cmd+click**) a wiki link in the editor to open it. The preview, HTML, PDF and Word exports show wiki links as ordinary links.
 
 Wiki links aren't part of GitHub Flavored Markdown, so GitHub and other Markdown apps show them as plain text. Missing pages and headings are reported like other broken links, and wiki links count in **Links to this document**. Renaming or moving a file in Markpion updates the wiki links to it, as it does for Markdown links, keeping their style (`[[docs/guide]]` stays without `.md`), heading and text.
+
+## Tags
+
+Write `#` and a word anywhere in the text to tag a document: `#draft`, `#project/alpha`. You can also list tags in the front matter (`tags: [draft, work]`). A tag needs at least one letter (`#1` isn't a tag), and `#` at the start of a heading, in code or in a link isn't one either.
+
+The preview and HTML exports show inline tags as small highlighted labels; PDF and Word exports show them as plain text. **Edit → Go to Tag…** lists the tags of the open folder; see [Tags](/guide/search-replace#tags). Other Markdown apps show tags as plain text.

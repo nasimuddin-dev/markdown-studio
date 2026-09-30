@@ -77,3 +77,15 @@ describe("tag completion", () => {
     expect(await complete("#12")).toBeNull();
   });
 });
+
+describe("tags in the preview and HTML export", () => {
+  it("wraps inline tags in span.md-tag, outside links, code and headings", async () => {
+    const { renderHtml } = await import("../src/services/exportHtml");
+    const html = await renderHtml("# Title #nope\n\nSee #idea and (#work/sub), [#link](x.md), `#code`, #12, a#b.\n");
+    expect(html).toContain('<span class="md-tag">#idea</span>');
+    expect(html).toContain('(<span class="md-tag">#work/sub</span>)');
+    expect(html.match(/md-tag/g)).toHaveLength(2);
+    expect(html).toContain("<h1");
+    expect(html).toContain("Title #nope</h1>");
+  });
+});

@@ -1,6 +1,7 @@
 import { backend } from "../services";
 import { splitFrontMatter } from "../services/frontMatter";
 import { isMarkdownPath } from "../services/paths";
+import { INLINE_TAG } from "../services/tags";
 import { useDocuments } from "../stores/documentsStore";
 import { findAllLinks, maskCode } from "./lint";
 
@@ -10,12 +11,9 @@ export interface TagUse {
   line: number;
 }
 
-/** An inline tag: `#word` after a space or at a line start, with at least one letter (not `#1`, not a heading). */
-const INLINE_TAG = /(?<=^|[\s(])#([\p{L}\p{N}_/-]*\p{L}[\p{L}\p{N}_/-]*)/gu;
-
 /**
- * The tags of a document: \`tags\` (or \`tag\`) in the front matter, as a list
- * or comma-separated, and inline \`#tags\` outside code, links and headings.
+ * The tags of a document: `tags` (or `tag`) in the front matter, as a list
+ * or comma-separated, and inline `#tags` outside code, links and headings.
  */
 export function extractTags(text: string): TagUse[] {
   const out: TagUse[] = [];

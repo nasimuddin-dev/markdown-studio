@@ -8,6 +8,7 @@ import rehypeSlug from "rehype-slug";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { remarkWikiLinks } from "./wikiLinks";
+import { rehypeTags } from "./tags";
 import type { Options } from "react-markdown";
 
 /**
@@ -62,8 +63,8 @@ export function markdownPlugins(features: MarkdownFeatures = { math: true }) {
   // GitHub emoji shortcodes (:tada:) become emoji, as on GitHub.
   // Wiki links ([[Page]]) become links to Page.md next to the document.
   const remarkPlugins: NonNullable<Options["remarkPlugins"]> = [remarkGfm, remarkGemoji, remarkWikiLinks];
-  // GitHub alerts (> [!NOTE]) are styled after sanitizing; they only add fixed class names.
-  const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [rehypeRawWhenNeeded, [rehypeSanitize, sanitizeSchema], rehypeAlerts];
+  // GitHub alerts (> [!NOTE]) and #tags are styled after sanitizing; they only add fixed class names.
+  const rehypePlugins: NonNullable<Options["rehypePlugins"]> = [rehypeRawWhenNeeded, [rehypeSanitize, sanitizeSchema], rehypeAlerts, rehypeTags];
   if (features.math) {
     remarkPlugins.push([remarkMath, { singleDollarTextMath: true }]);
     rehypePlugins.push([rehypeKatex, { output: "mathml", throwOnError: false, strict: "ignore", trust: false }]);
