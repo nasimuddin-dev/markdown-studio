@@ -100,6 +100,30 @@ export const removeLink: StateCommand = ({ state, dispatch }) => {
   return true;
 };
 
+/**
+ * Insert Front Matter: a YAML block at the top with the title (the first
+ * heading, else `fallbackTitle`), today's date and empty tags, the title
+ * selected. A document that has front matter gets the cursor at its end instead.
+ */
+export function insertFrontMatter(fallbackTitle: string, now = new Date()): StateCommand {
+  return ({ state, dispatch }) => {
+    const text = state.doc.toString();
+    const existing = /^---\r?\n[\s\S]*?\n(---|\.\.\.)[ \t]*(\r?\n|$)/.exec(text);
+    if (existing) {
+      const end = existing[0].length - existing[2].length - existing[1].length - 1;
+      dispatch(state.update({ selection: { anchor: Math.max(0, end) }, scrollIntoView: true }));
+      return true;
+    }
+    const heading = /^#{1,6}[ \t]+(.+?)[ \t#]*$/m.exec(text)?.[1] ?? fallbackTitle;
+    const title = /[:#'"[\]{}]|^\s|\s$/.test(heading) ? JSON.stringify(heading) : heading;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const block = `---\ntitle: ${title}\ndate: ${date}\ntags: []\n---\n${text ? "\n" : ""}`;
+    dispatch(state.update({ changes: { from: 0, insert: block }, selection: { anchor: 11, head: 11 + title.length }, scrollIntoView: true, userEvent: "input.format" }));
+    return true;
+  };
+}
+
 /** Distinct lines touched by the selection, in document order. */
 function selectedLines(state: EditorState) {
   const seen = new Set<number>();

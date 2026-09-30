@@ -61,6 +61,22 @@ describe("links", () => {
   });
 });
 
+describe("front matter", () => {
+  const now = new Date(2026, 8, 30);
+  it("adds a block with the first heading as title, today's date and tags, the title selected", () => {
+    expect(run("# Release: 1.0\n\nText|", fmt.insertFrontMatter("file", now))).toMatchObject({
+      doc: '---\ntitle: "Release: 1.0"\ndate: 2026-09-30\ntags: []\n---\n\n# Release: 1.0\n\nText',
+      selected: '"Release: 1.0"',
+    });
+    expect(run("|", fmt.insertFrontMatter("notes", now))).toMatchObject({ doc: "---\ntitle: notes\ndate: 2026-09-30\ntags: []\n---\n", selected: "notes" });
+  });
+  it("moves to the end of existing front matter instead", () => {
+    const r = run("---\ntitle: A\n---\n\nText|", fmt.insertFrontMatter("x", now));
+    expect(r.doc).toBe("---\ntitle: A\n---\n\nText");
+    expect(r.cursor).toBe("---\ntitle: A".length);
+  });
+});
+
 describe("math and diagrams", () => {
   it("wraps inline math and builds a math block around the selection", () => {
     expect(run("area [a^2] here", fmt.toggleInlineMath)).toMatchObject({ doc: "area $a^2$ here", selected: "a^2" });
