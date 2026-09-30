@@ -77,7 +77,7 @@ Markpion can read and write only inside folders and files you've opened yourself
 
 The **File** menu and the welcome screen list recently opened files and folders. By default, the next start reopens your last folder and files; turn this off with **Settings → Startup → Reopen last folder and files**.
 
-To tidy the list, point at an entry on the welcome screen and click its **×**, or clear the whole list with **Clear** (on the welcome screen) or **File → Clear Recent**. Only the list changes; the files and folders stay where they are.
+To tidy the list, point at an entry on the welcome screen and click its **×**, or clear the whole list with **Clear** (on the welcome screen) or **File → Open Recent → Clear Recent**. Only the list changes; the files and folders stay where they are.
 
 ## Explorer and Outline size
 
@@ -91,8 +91,8 @@ When the open folder is in a Git repository, the Explorer marks changed files wi
 
 For a file that's committed to Git, the editor shows a thin bar next to the lines you've changed since the last commit, as code editors do: **green** for added lines, **amber** for changed lines, and a small **red** triangle where lines were deleted. Hover over a bar to see what it means.
 
-- **Click a bar** (or use **Edit → Show Change Since Last Commit**) to see the committed lines. **Revert Change** puts them back (**Ctrl+Z** undoes it); **Escape** closes the pop-up.
-- **Alt+F5** and **Shift+Alt+F5** move the cursor to the next and previous change. **Edit → Revert Change to Last Commit** reverts the change at the cursor.
+- **Click a bar** (or use **Edit → Git Changes → Show Change Since Last Commit**) to see the committed lines. **Revert Change** puts them back (**Ctrl+Z** undoes it); **Escape** closes the pop-up.
+- **Alt+F5** and **Shift+Alt+F5** move the cursor to the next and previous change. **Edit → Git Changes → Revert Change to Last Commit** reverts the change at the cursor.
 
 The status bar sums up the file's changes (for example `+3 ~1 −2`: added, changed and deleted lines); click it to go to the next change. The bars update as you type and after you commit (when you come back to the window). Untracked files and documents over 1 MB have no bars. In Windows High Contrast, added lines get a solid bar and changed lines a dashed one.
 

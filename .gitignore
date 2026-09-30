@@ -16,3 +16,6 @@ release-assets/
 # Documentation website build output
 website/.vitepress/dist/
 website/.vitepress/cache/
+
+# UI audit screenshots (npx playwright test -c e2e-shots/playwright.config.ts)
+e2e-shots/out/

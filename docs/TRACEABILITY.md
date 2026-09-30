@@ -19,7 +19,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.22.0. **Done** means im
 | FR-016 | Done | Rename from context menu or F2; open tabs follow the rename. Also Duplicate (first free "name copy.md", never overwrites) |
 | FR-017 | Done | Delete with confirmation; moves to the OS Trash (`trash` crate) |
 | FR-018 | Done | mtime conflict check on save, plus polling and focus checks with Reload / Compare / Keep Mine |
-| FR-020 | Done | CodeMirror Markdown language with nested code-block languages; folding (View → Fold All / Unfold All, Fold to Level 1–3: `features/foldLevel.ts`); formatting commands ([formatting.ts](../src/features/formatting.ts)), including heading promote/demote |
+| FR-020 | Done | CodeMirror Markdown language with nested code-block languages; folding (View → Fold → Fold All / Unfold All, Fold to Level 1–3: `features/foldLevel.ts`); formatting commands ([formatting.ts](../src/features/formatting.ts)), including heading promote/demote |
 | FR-021 | Done | Per-tab undo history (state preserved across tab switches) |
 | FR-022 | Done | CodeMirror default keymap and native clipboard |
 | FR-023 | Done | Ln/Col in the status bar; Go to Line (Ctrl/Cmd+G) |
@@ -73,6 +73,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.22.0. **Done** means im
 
 | Feature | Where | SRS reference |
 | --- | --- | --- |
+| Menus from one model: submenus (one level, keyboard: →/← open and close), check marks for on/off commands (`Command.checked`), the same menus in the macOS menu bar, and each command's menu location in the command palette; tests keep every menu short and every item pointing at a real command | `src/features/menus.ts`, `src/components/MenuBar.tsx`, `src/features/nativeMenu.ts`, `src-tauri/src/menu.rs`, `tests/menus.test.tsx` | NFR usability, §12 UI |
 | Upgrade from Markdown Studio (the old name): settings, recent files, recovery and history are copied from the old `com.markdownstudio.app` folder on first start, and the Windows installer silently removes the old install and recreates the Start menu and desktop shortcuts it took with it (once; installs already updated to 0.14.0 are repaired by the next update) | `src-tauri/src/storage.rs` (`migrate_legacy_dir`), `src-tauri/windows/hooks.nsh` (`NSIS_HOOK_PREINSTALL`, `MS_RESTORE_SHORTCUTS`) | §13 upgrade, FR-062 |
 | Custom CSS for documents: applied to the preview, print, slides, HTML and HTML-site export; parsed by the browser and rebuilt with every selector under `.markdown-body` (stray braces can't escape; `@import` and unknown at-rules dropped; `</` escaped in exports); managed settings can preset or lock it | `services/customCss.ts`, `components/CustomDocumentCss.tsx`, `services/exportHtml.ts` | §10 customization, §11 security |
 | Export and import settings and shortcuts as `markpion-settings.json` (validated; session and AI consent excluded; managed settings kept) | `features/settingsTransfer.ts`, `SettingsDialog.tsx`, Rust `export_file`/`pick_import_file` json kind | FR-060 settings |

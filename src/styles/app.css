@@ -336,12 +336,42 @@ kbd {
 }
 .menu-item-label {
   display: flex;
+  flex: 1;
   align-items: center;
   gap: 6px;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+/* A fixed column for check marks and icons keeps every label aligned. */
+.menu-list .menu-item {
+  gap: 8px;
+  padding-left: 6px;
+}
+.menu-item-check {
+  display: inline-flex;
+  flex: none;
+  width: 16px;
+  justify-content: center;
+}
+.menu-item-shortcut:not(:empty) {
+  margin-left: 16px;
+}
+.menu-item-arrow {
+  flex: none;
+  margin-right: -4px;
+  opacity: 0.7;
+}
+/* A submenu's row stays highlighted while the submenu is open. */
+.menu-item.open:not(:hover):not(:focus-visible) {
+  background: var(--bg-hover);
+}
+.menu-list.menu-flyout {
+  position: fixed;
+  top: auto;
+  left: auto;
+  z-index: 60;
 }
 .menu-item-hint {
   color: var(--text-muted);

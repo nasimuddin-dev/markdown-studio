@@ -13,14 +13,14 @@ Import commands are in the **File** menu. Each one converts a file into a new Ma
 
 ### Word (.docx)
 
-**File → Import Word Document (.docx)…**
+**File → Import → Word Document (.docx)…**
 
 - **Supported:** headings, paragraphs, bold and italic, bulleted and numbered lists, tables, links and images. Images are saved to an `assets/` folder and linked, with the image descriptions from Word as alt text. Links within the document, such as Word's table of contents, become links to the Markdown headings (`#installation`), so they keep working. The same happens for links to headings when importing a web page.
 - **Limitations:** page layout, fonts and colours are not carried over; the result is plain Markdown structure. Only the `.docx` format is supported, not the older `.doc`.
 
 ### PDF
 
-**File → Import PDF (.pdf)…**
+**File → Import → PDF (.pdf)…**
 
 PDFs store positioned text rather than structure, so Markpion reconstructs the document:
 
@@ -29,11 +29,11 @@ PDFs store positioned text rather than structure, so Markpion reconstructs the d
 
 ### Web page (.html)
 
-**File → Import Web Page (.html)…** converts a saved HTML page to GitHub Flavored Markdown. Headings, lists, links, images, code and tables are kept. Scripts, styles and other non-content elements are dropped.
+**File → Import → Web Page (.html)…** converts a saved HTML page to GitHub Flavored Markdown. Headings, lists, links, images, code and tables are kept. Scripts, styles and other non-content elements are dropped.
 
 ### CSV and TSV
 
-**File → Import CSV as Table…** turns a `.csv` or `.tsv` file into an aligned Markdown table. The reverse, **Copy Table as CSV**, copies the table at the cursor for pasting into a spreadsheet. Cells copied from Excel or Google Sheets can be pasted straight into the editor as a table.
+**File → Import → CSV as Table…** turns a `.csv` or `.tsv` file into an aligned Markdown table. The reverse, **Copy Table as CSV**, copies the table at the cursor for pasting into a spreadsheet. Cells copied from Excel or Google Sheets can be pasted straight into the editor as a table.
 
 ### Paste as Markdown
 
@@ -41,7 +41,7 @@ Content copied from a web page or Word is converted to Markdown when you paste i
 
 ### A whole folder
 
-**File → Convert Folder to Markdown…** converts every Word, PDF, HTML and CSV/TSV file in the open folder (including subfolders) to a `.md` file beside it. Files that already have a Markdown version are skipped, and the originals are not changed.
+**File → Import → Convert Folder to Markdown…** converts every Word, PDF, HTML and CSV/TSV file in the open folder (including subfolders) to a `.md` file beside it. Files that already have a Markdown version are skipped, and the originals are not changed.
 
 ## Export
 
@@ -76,14 +76,14 @@ The document's front matter isn't exported; its `title` becomes the exported doc
 
 ### A whole folder as one document
 
-- **File → Export Folder as One PDF…** and **Export Folder as One Word Document…** combine every Markdown file in the open folder into one document and export it in one step.
-- **File → Combine Folder into One Document…** writes the combined Markdown to `<Folder> (combined).md` and opens it, so you can review or edit it before exporting.
+- **File → Export → Export Folder as One PDF…** and **Export Folder as One Word Document…** combine every Markdown file in the open folder into one document and export it in one step.
+- **File → Export → Combine Folder into One Document…** writes the combined Markdown to `<Folder> (combined).md` and opens it, so you can review or edit it before exporting.
 
 Either way, files are combined in folder order (a `README` or `index` first, then natural order, folder by folder), with a table of contents. Headings move down a level under the folder's title, links between the files become links within the document, and image paths are adjusted. Unsaved changes in open tabs are included.
 
 ### A whole folder as an HTML site
 
-**File → Export Folder as HTML Site…** turns every Markdown file in the open folder into its own HTML page, for a shared drive, an intranet or a static web server:
+**File → Export → Export Folder as HTML Site…** turns every Markdown file in the open folder into its own HTML page, for a shared drive, an intranet or a static web server:
 
 - Choose an empty folder, or a new one, to export into. The folder structure is mirrored (`guide/setup.md` becomes `guide/setup.html`).
 - Links between your documents point to their HTML pages, headings keep their anchors, and images are embedded in the pages, so the site needs no other files.

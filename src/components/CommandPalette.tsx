@@ -3,6 +3,10 @@ import { useUi } from "../stores/uiStore";
 import { useDocuments } from "../stores/documentsStore";
 import { commands, formatShortcut } from "../features/commands";
 import { fuzzyFilter } from "../features/fuzzy";
+import { commandLocations } from "../features/menus";
+
+/** Where each command is in the menus ("Format › Heading"), shown beside it. */
+const locations = commandLocations();
 import { insertSnippet, listSnippets, listTemplates, newFromTemplate, type Template } from "../features/templates";
 import { useWorkspace } from "../stores/workspaceStore";
 import { backend } from "../services";
@@ -153,7 +157,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         id: `cmd:${c.id}`,
         label: c.label.replace(/…$/, ""),
         shortcut: c.shortcut,
-        hint: recent.includes(c.id) ? "Recently used" : undefined,
+        hint: recent.includes(c.id) ? "Recently used" : locations.get(c.id),
         run: c.run,
       }))
       // Recently used commands first (newest first); the rest keep their order. With a query, matching decides.

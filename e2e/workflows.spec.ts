@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import JSZip from "jszip";
+import { chooseMenu } from "./menu";
 
 const mod = process.platform === "darwin" ? "Meta" : "Control";
 /** Document tabs (the sidebar also has Explorer/Search tabs). */
@@ -714,8 +715,7 @@ test("present a document as slides", async ({ page }) => {
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
   await page.keyboard.insertText("# Welcome\n\nFirst slide\n\n---\n\n## Agenda\n\n- one\n- two\n\n---\n\nThanks, see [the site](https://example.com)\n");
-  await page.getByRole("menuitem", { name: "View" }).or(page.getByRole("button", { name: "View" })).first().click();
-  await page.getByRole("menuitem", { name: "Present as Slides" }).click();
+  await chooseMenu(page, "View", "Slides", "Present as Slides");
   const show = page.getByRole("dialog", { name: "Slide show" });
   await expect(show.getByRole("heading", { name: "Welcome" })).toBeVisible();
   await expect(show).toContainText("Slide 1 of 3");
@@ -772,8 +772,7 @@ test("Git change bars: see the committed lines and revert a change", async ({ pa
 
   // Alt+F5 goes to the next change (wrapping to the first), then the pop-up reverts it.
   await page.keyboard.press("Alt+F5");
-  await page.getByRole("button", { name: "Edit", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Show Change Since Last Commit" }).click();
+  await chooseMenu(page, "Edit", "Git Changes", "Show Change Since Last Commit");
   const peek = page.getByRole("dialog", { name: "Change since the last commit" });
   await expect(peek.locator("pre")).toHaveText(original!);
   await expect(peek.getByRole("button", { name: "Revert Change" })).toBeFocused();
@@ -849,8 +848,7 @@ test("formatting toolbar reflects and applies formatting", async ({ page }) => {
   await page.keyboard.press("End");
   await expect(toolbar.getByRole("button", { name: /Table of Contents/ })).toBeFocused();
 
-  await page.getByRole("button", { name: "View", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Toggle Formatting Toolbar" }).click();
+  await chooseMenu(page, "View", "Formatting Toolbar");
   await expect(toolbar).toBeHidden();
 });
 
@@ -938,14 +936,11 @@ test("converts links to reference style and back from the Format menu", async ({
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
   await page.keyboard.insertText("See [one](a.md) and [two](https://example.com).");
-  const format = async (item: string) => {
-    await page.getByRole("button", { name: "Format", exact: true }).click();
-    await page.getByRole("menuitem", { name: item }).click();
-  };
-  await format("Convert Links to Reference Style");
+  const format = (item: string) => chooseMenu(page, "Format", "Link Style", item);
+  await format("Reference Links");
   await expect(page.locator(".cm-content")).toHaveText("See [one][1] and [two][2].[1]: a.md[2]: https://example.com");
   await expect(page.locator(".markdown-body a")).toHaveCount(2);
-  await format("Convert Links to Inline Style");
+  await format("Inline Links");
   await expect(page.locator(".cm-line")).toHaveText(["See [one](a.md) and [two](https://example.com).", ""]);
   await page.keyboard.press(`${mod}+Z`);
   await expect(page.locator(".cm-line").first()).toHaveText("See [one][1] and [two][2].");
@@ -1131,13 +1126,11 @@ test("View > Fold to Level 2 leaves the top two heading levels showing", async (
   await start(page);
   await openDemoFolder(page);
   await openFile(page, "README.md");
-  await page.getByRole("button", { name: "View", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Fold to Level 2" }).click();
+  await chooseMenu(page, "View", "Fold", "Fold to Level 2");
   await expect(page.locator(".cm-line", { hasText: "## GitHub Flavored Markdown" })).toBeVisible();
   await expect(page.locator(".cm-line", { hasText: "### Task list" })).toHaveCount(0);
   await expect(page.locator(".cm-foldPlaceholder").first()).toBeVisible();
-  await page.getByRole("button", { name: "View", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Unfold All" }).click();
+  await chooseMenu(page, "View", "Fold", "Unfold All");
   await expect(page.locator(".cm-line", { hasText: "### Task list" })).toHaveCount(1);
 });
 
@@ -1167,8 +1160,7 @@ test("View > Toggle Dim Other Paragraphs dims all but the paragraph being writte
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
   await page.keyboard.insertText("First paragraph.\n\nSecond one,\nstill second.\n\nThird.");
   const toggle = async () => {
-    await page.getByRole("button", { name: "View", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Toggle Dim Other Paragraphs" }).click();
+    await chooseMenu(page, "View", "Editor", "Dim Other Paragraphs");
   };
   await toggle();
   await page.locator(".cm-line", { hasText: "still second." }).click();
@@ -1238,10 +1230,9 @@ test("the diagram starters in the Format menu render in the preview", async ({ p
   await start(page);
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
-  for (const item of ["Insert Flowchart (Mermaid)", "Insert Sequence Diagram (Mermaid)", "Insert Gantt Chart (Mermaid)", "Insert Pie Chart (Mermaid)"]) {
+  for (const item of ["Flowchart", "Sequence Diagram", "Gantt Chart", "Pie Chart"]) {
     await page.keyboard.press(`${mod}+End`);
-    await page.getByRole("button", { name: "Format", exact: true }).click();
-    await page.getByRole("menuitem", { name: item }).click();
+    await chooseMenu(page, "Format", "Diagram", item);
   }
   await expect(page.locator(".preview .mermaid-diagram svg")).toHaveCount(4, { timeout: 20_000 });
   await expect(page.locator(".preview .mermaid-error")).toHaveCount(0);
@@ -1252,8 +1243,7 @@ test("File > Export as Markdown with Images makes a .zip with the pictures", asy
   await openDemoFolder(page);
   await openFile(page, "README.md");
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "File", exact: true }).click();
-  await page.getByRole("menuitem", { name: /Export as Markdown with Images/ }).click();
+  await chooseMenu(page, "File", "Export", "Markdown with Images (.zip)…");
   const file = await download;
   expect(file.suggestedFilename()).toBe("README.zip");
   const zip = await JSZip.loadAsync(Buffer.concat(await (await file.createReadStream()).toArray()));
@@ -1287,8 +1277,7 @@ test("Copy as Plain Text copies the selection without Markdown syntax", async ({
   await page.keyboard.insertText("# Title\n\nSome **bold** and [a link](x.md).\n\nNot copied.");
   await page.keyboard.press(`${mod}+Home`);
   for (let i = 0; i < 3; i++) await page.keyboard.press("Shift+ArrowDown");
-  await page.getByRole("button", { name: "File", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Copy as Plain Text" }).click();
+  await chooseMenu(page, "File", "Copy As", "Plain Text");
   await expect(page.getByText("Selection copied as plain text.")).toBeVisible();
   // The Windows clipboard uses CRLF line breaks.
   expect((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, "\n")).toBe("Title\n\nSome bold and a link.\n");
@@ -1512,8 +1501,7 @@ test("Format > Insert Snippet inserts a snippet at the cursor", async ({ page })
   await start(page);
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
-  await page.getByRole("button", { name: "Format", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Insert Snippet…" }).click();
+  await chooseMenu(page, "Format", "Insert", "Snippet…");
   const palette = page.getByRole("dialog", { name: "Insert snippet" });
   await palette.getByRole("combobox").fill("task list");
   await page.keyboard.press("Enter");

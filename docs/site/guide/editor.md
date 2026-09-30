@@ -29,9 +29,9 @@ Drag the dividers between panels to resize them. The sizes are remembered.
 - **F6** moves the keyboard focus to the next pane (sidebar, editor, preview) and **Shift+F6** to the previous one, so you can reach the Explorer, the text and the preview without the mouse.
 - **Focus Mode** (**Ctrl+Shift+Enter**) hides everything except the editor and preview. Press **Esc** or the same shortcut to leave.
 - **Line length** (Settings → Editor): on a wide screen, long lines are hard to follow. Choose about 72, 80, 100 or 120 characters and the text (with its line numbers) stays that wide, centered in the editor; with **Wrap long lines** on, lines wrap there. A narrow editor, as in split view, still uses its full width.
-- **Typewriter scrolling** (**View → Toggle Typewriter Scrolling**, or in Settings → Editor) keeps the line you're typing in the middle of the editor, so your eyes stay in one place. It pairs well with Focus Mode.
+- **Typewriter scrolling** (**View → Editor → Typewriter Scrolling**, or in Settings → Editor) keeps the line you're typing in the middle of the editor, so your eyes stay in one place. It pairs well with Focus Mode.
 - **Close brackets and backticks automatically** (Settings → Editor, off by default): typing `(`, `[`, `{` or `` ` `` adds the closing one after the cursor, and typing the closing one steps over it. Quotes aren't paired, because apostrophes are common in text.
-- **Dim other paragraphs** (**View → Toggle Dim Other Paragraphs**, or in Settings → Editor) fades every paragraph except the one the cursor is in, so the sentence you're writing stands out. A paragraph here is a run of lines without a blank line between them.
+- **Dim other paragraphs** (**View → Editor → Dim Other Paragraphs**, or in Settings → Editor) fades every paragraph except the one the cursor is in, so the sentence you're writing stands out. A paragraph here is a run of lines without a blank line between them.
 - **Full Screen** (**F11**) fills the screen.
 
 ## Syntax highlighting
@@ -40,10 +40,10 @@ Markdown syntax is highlighted as you type: headings, emphasis, links, lists, qu
 
 ## Line numbers, wrapping and folding
 
-- Line numbers are shown in the gutter. Turn them off with **View → Toggle Line Numbers** or in [Settings](/guide/settings).
-- Long lines wrap by default; **View → Toggle Word Wrap** (**Alt+Z**) or the **Wrap long lines** setting switches to horizontal scrolling.
+- Line numbers are shown in the gutter. Turn them off with **View → Editor → Line Numbers** or in [Settings](/guide/settings).
+- Long lines wrap by default; **View → Editor → Word Wrap** (**Alt+Z**) or the **Wrap long lines** setting switches to horizontal scrolling.
 - Click the arrow next to a heading, list or code block in the gutter to fold it. **Ctrl+Shift+[** folds and **Ctrl+Shift+]** unfolds at the cursor (on macOS, **Cmd+Option+[** and **Cmd+Option+]**).
-- **View → Fold All** collapses every section to its heading, for an overview of a long document, and **View → Unfold All** opens them again. In the editor, **Ctrl+Alt+[** and **Ctrl+Alt+]** do the same. **View → Fold to Level 1**, **2** or **3** folds every section at that heading level and deeper, so the document reads like its table of contents down to that level (for example, Level 2 leaves the `#` and `##` headings showing, with each `##` section closed).
+- **View → Fold → Fold All** collapses every section to its heading, for an overview of a long document, and **Unfold All** opens them again. In the editor, **Ctrl+Alt+[** and **Ctrl+Alt+]** do the same. **View → Fold → Fold to Level 1**, **2** or **3** folds every section at that heading level and deeper, so the document reads like its table of contents down to that level (for example, Level 2 leaves the `#` and `##` headings showing, with each `##` section closed).
 
 ## Moving around
 
@@ -70,7 +70,7 @@ Markdown syntax is highlighted as you type: headings, emphasis, links, lists, qu
 | Delete line | Ctrl+Shift+K |
 | Indent / outdent | Tab / Shift+Tab, or Ctrl+] / Ctrl+[ |
 
-The **Edit** menu (and the command palette) also has:
+The **Edit** menu (and the command palette) also has the following. Longer menus group related commands in submenus (**Go To**, **Git Changes**, **Lines**, **Change Case**): point at one, or press **→**, to open it.
 
 - **Sort Lines (A to Z)** and **(Z to A)**: numbers sort naturally, so 2 comes before 10.
 - **Remove Duplicate Lines**: keeps the first of each repeated line; blank lines stay.
@@ -113,7 +113,7 @@ The toolbar above the editor puts the common commands one click away, like a wor
 - Buttons light up for the formatting at the cursor: **Bold** inside `**bold**`, **Bulleted list** in a bulleted list, and so on. The paragraph style list shows the current heading level.
 - Clicking a button keeps your selection and the cursor in the editor. Hover over a button to see its keyboard shortcut.
 - From the keyboard, **Tab** into the toolbar and use **←** / **→**, **Home** and **End** to move between its controls.
-- Hide or show it with **View → Toggle Formatting Toolbar**. It's hidden in Focus Mode.
+- Hide or show it with **View → Formatting Toolbar**. It's hidden in Focus Mode.
 
 ## Spelling and statistics
 

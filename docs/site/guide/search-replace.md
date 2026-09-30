@@ -31,13 +31,13 @@ Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the rep
 
 ## Go to heading
 
-**Edit → Go to Heading…** (**Ctrl+Alt+H**, **Cmd+Option+H** on macOS) lists the document's headings, indented by level. Type part of a heading to filter the list, then press **Enter** to jump to it in the editor and the preview. It's handy in long documents when the Outline is hidden.
+**Edit → Go To → Heading…** (**Ctrl+Alt+H**, **Cmd+Option+H** on macOS) lists the document's headings, indented by level. Type part of a heading to filter the list, then press **Enter** to jump to it in the editor and the preview. It's handy in long documents when the Outline is hidden.
 
-**Edit → Go to Heading in Folder…** (**Ctrl+Shift+Alt+H**, **Cmd+Shift+Option+H** on macOS) does the same across every Markdown file of the open folder: each heading shows its file, and **Enter** opens that file at the heading. Open documents are searched as they are in their tab, including unsaved changes.
+**Edit → Go To → Heading in Folder…** (**Ctrl+Shift+Alt+H**, **Cmd+Shift+Option+H** on macOS) does the same across every Markdown file of the open folder: each heading shows its file, and **Enter** opens that file at the heading. Open documents are searched as they are in their tab, including unsaved changes.
 
 ## Tags
 
-Write a tag as `#word` in the text (`#draft`, `#project/alpha`), or list tags in the front matter (`tags: [draft, work]`). **Edit → Go to Tag…** lists the tags used across the open folder, one row per file with how many times it's used there. Type part of a tag and press **Enter** to open that file at the first use. Clicking a tag in the preview opens the same list for that tag.
+Write a tag as `#word` in the text (`#draft`, `#project/alpha`), or list tags in the front matter (`tags: [draft, work]`). **Edit → Go To → Tag…** lists the tags used across the open folder, one row per file with how many times it's used there. Type part of a tag and press **Enter** to open that file at the first use. Clicking a tag in the preview opens the same list for that tag.
 
 The **Tags** tab in the sidebar lists every tag of the folder, the most used first, with the number of files using it. Click a tag to see its files, and a file to open it at the tag (hover it to see how many times it's used there). The list updates when you save a document; press the refresh button after changing files outside Markpion.
 
@@ -86,4 +86,4 @@ What happens:
 
 ## Command palette
 
-To find a **command** rather than text, open the command palette with **Ctrl+Shift+P** or **F1** and type part of its name, for example "table" or "export". Before you type, the commands you used most recently are at the top. To open a **file** by name, use **Go to File** (**Ctrl+Alt+O**); see [File explorer](/guide/file-explorer#go-to-file).
+To find a **command** rather than text, open the command palette with **Ctrl+Shift+P** or **F1** and type part of its name, for example "table" or "export". Before you type, the commands you used most recently are at the top. Each command also shows where it is in the menus (for example *Format › Heading*), so you can find it there next time. To open a **file** by name, use **Go to File** (**Ctrl+Alt+O**); see [File explorer](/guide/file-explorer#go-to-file).

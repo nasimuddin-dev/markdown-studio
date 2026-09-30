@@ -56,7 +56,7 @@ All of them are in the **Table** menu, the toolbar's **Table tools** and the com
 ## Tables from spreadsheets and CSV
 
 - **Paste** cells copied from Excel or Google Sheets into the editor; they become a Markdown table.
-- **File → Import CSV as Table…** converts a `.csv` or `.tsv` file into a table.
+- **File → Import → CSV as Table…** (also in the Table menu) converts a `.csv` or `.tsv` file into a table.
 
 ## Editing tips
 

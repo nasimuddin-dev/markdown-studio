@@ -19,6 +19,10 @@ pub enum MenuEntry {
         accelerator: Option<String>,
     },
     Separator,
+    Submenu {
+        label: String,
+        items: Vec<MenuEntry>,
+    },
 }
 
 #[derive(Debug, Deserialize)]
@@ -39,11 +43,19 @@ fn predefined<R: Runtime>(app: &AppHandle<R>, id: &str) -> tauri::Result<Option<
 }
 
 fn submenu<R: Runtime>(app: &AppHandle<R>, spec: &MenuSpec) -> tauri::Result<Submenu<R>> {
-    let mut builder = SubmenuBuilder::new(app, &spec.label);
-    let is_edit = spec.label == "Edit";
-    for entry in &spec.items {
+    build_submenu(app, &spec.label, &spec.items, spec.label == "Edit")
+}
+
+/// Builds a menu and, recursively, its submenus.
+fn build_submenu<R: Runtime>(app: &AppHandle<R>, label: &str, items: &[MenuEntry], is_edit: bool) -> tauri::Result<Submenu<R>> {
+    let mut builder = SubmenuBuilder::new(app, label);
+    for entry in items {
         match entry {
             MenuEntry::Separator => builder = builder.separator(),
+            MenuEntry::Submenu { label, items } => {
+                let child = build_submenu(app, label, items, false)?;
+                builder = builder.item(&child);
+            }
             MenuEntry::Command { id, label, accelerator } => {
                 if let Some(item) = predefined(app, id)? {
                     builder = builder.item(&item);
@@ -107,11 +119,13 @@ mod tests {
         let json = r#"[{"label":"File","items":[
             {"type":"command","id":"save","label":"Save","accelerator":"CmdOrCtrl+S"},
             {"type":"separator"},
-            {"type":"command","id":"closeTab","label":"Close Tab"}]}]"#;
+            {"type":"command","id":"closeTab","label":"Close Tab"},
+            {"type":"submenu","label":"Export","items":[{"type":"command","id":"exportPdf","label":"PDF…"}]}]}]"#;
         let menus: Vec<MenuSpec> = serde_json::from_str(json).unwrap();
         assert_eq!(menus[0].label, "File");
         assert!(matches!(&menus[0].items[0], MenuEntry::Command { id, accelerator: Some(a), .. } if id == "save" && a == "CmdOrCtrl+S"));
         assert!(matches!(menus[0].items[1], MenuEntry::Separator));
         assert!(matches!(&menus[0].items[2], MenuEntry::Command { accelerator: None, .. }));
+        assert!(matches!(&menus[0].items[3], MenuEntry::Submenu { label, items } if label == "Export" && items.len() == 1));
     }
 }

@@ -49,7 +49,7 @@ A file that's read-only on disk (the read-only attribute, or no write permission
 - **Save As…** saves a copy you can edit.
 - **Edit Anyway** unlocks editing. Saving over the file still fails until its read-only flag is removed, and then offers **Save As** instead.
 
-To protect any document from accidental edits, for example a policy you're only reading, use **View → Toggle Read-Only**; **Allow Editing** in the bar (or the same command) unlocks it. Reloading a file from disk locks it again if it's still read-only.
+To protect any document from accidental edits, for example a policy you're only reading, use **View → Editor → Read-Only**; **Allow Editing** in the bar (or the same command) unlocks it. Reloading a file from disk locks it again if it's still read-only.
 
 ## File history
 

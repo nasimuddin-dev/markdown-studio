@@ -134,10 +134,16 @@ export interface StorageApi {
   readHistory(path: string, id: number): Promise<string>;
 }
 
-/** One menu of a native menu bar: command ids and labels, and separators. */
+/** An item of a native menu: a command (by id), a separator or a submenu. */
+export type NativeMenuItem =
+  | { type: "command"; id: string; label: string }
+  | { type: "separator" }
+  | { type: "submenu"; label: string; items: NativeMenuItem[] };
+
+/** One menu of a native menu bar. */
 export interface NativeMenu {
   label: string;
-  items: Array<{ type: "command"; id: string; label: string } | { type: "separator" }>;
+  items: NativeMenuItem[];
 }
 
 /** The app itself and the operating system around it. */

@@ -33,7 +33,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - [Mermaid diagrams](/markdown/mermaid) and [LaTeX math](/markdown/math).
 - [YAML front matter, GitHub alerts and footnotes](/markdown/extras).
 - Long documents: the preview builds the part you are looking at first. Above 1 MB of text, the live preview pauses and renders on demand, so typing stays fast.
-- Present a document as slides (View → Present as Slides), split at `---` lines or at headings, with speaker notes. [Preview](/guide/preview#presenting-as-slides)
+- Present a document as slides (View → Slides → Present as Slides), split at `---` lines or at headings, with speaker notes. [Preview](/guide/preview#presenting-as-slides)
 
 ## Files and workspaces
 
@@ -42,6 +42,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Tabs with unsaved-change markers, reordering, context actions (Close Others, Close to the Right, Close Saved), and Reopen Closed Tab. [Tabs](/guide/tabs)
 - Find and replace in the document (case, whole word, regex), find in the rendered preview, and Find in Files and Replace in Files across the folder, optionally limited to some files or folders (unsaved files are skipped; previous versions go to File History). [Search & replace](/guide/search-replace)
 - A document outline (drag to reorder sections, copy a link to a heading), Rename Heading (F2) that updates the links to it, snippets, a daily note, a command palette, Go to Heading (jump to a heading by typing part of it, in the document or in the whole folder), Go to Tag and Rename Tag (`#tags` across the folder), Go to File (open any file in the folder by typing part of its name), a filter box in the Explorer, and recent files and folders.
+- Menus grouped into short submenus (Open Recent, Import, Export, Heading, Insert, Fold…), with check marks for settings that are on (Word Wrap, Line Numbers, the view mode) and full keyboard control. The command palette shows where each command is in the menus. [Search & replace](/guide/search-replace#command-palette)
 - Live folder watching: the explorer and open files update when other programs change files on disk.
 - Opens files from your operating system: double-click, "Open with", or drag and drop onto the window. On Windows, the right-click menu has **Open with Markpion**.
 
@@ -51,7 +52,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Optional auto save after a delay or when switching tabs or windows.
 - Rename a file from its tab, or from the Explorer's list of open files when no folder is open. [Tabs](/guide/tabs#tab-context-menu)
 - Compare the document with another file in the folder (File → Compare with File…). [Saving](/guide/saving-and-recovery#comparing-two-documents)
-- Read-only files open locked, with Save As or Edit Anyway; View → Toggle Read-Only protects any document from accidental edits. [Saving](/guide/saving-and-recovery#read-only-files)
+- Read-only files open locked, with Save As or Edit Anyway; View → Editor → Read-Only protects any document from accidental edits. [Saving](/guide/saving-and-recovery#read-only-files)
 - Local file history: the previous version is kept on every save (30 per file), with a line diff that marks the changed words, and restore; also your unsaved changes against the saved file, and the last commit for files in Git.
 - Crash recovery for unsaved documents, and session restore of the last folder and files.
 - UTF-8 with or without BOM; LF and CRLF line endings are preserved per file.

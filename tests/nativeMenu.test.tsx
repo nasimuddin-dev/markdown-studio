@@ -8,29 +8,33 @@ import { useUi } from "../src/stores/uiStore";
 import { setupBackend } from "./helpers";
 
 describe("native menu bar", () => {
-  it("sends command items by id and label, one separator between groups, recent files left out", () => {
-    const sep = { type: "separator" };
+  it("sends commands by id with menu labels, keeps submenus, drops recent files and empty submenus", () => {
+    const sep = { type: "separator" } as const;
     const menus = nativeMenus([
       {
-        label: "File",
+        label: "Table",
         items: [
           sep,
-          { type: "command", command: commands.newFile },
+          { type: "command", id: "newFile" },
           sep,
-          { type: "recent" },
+          { type: "submenu", label: "Open Recent", items: [{ type: "recent" }, sep] },
           sep,
-          { type: "command", command: commands.save, label: "Save Now" },
+          { type: "command", id: "save", label: "Save Now" },
+          { type: "command", id: "tableRowAbove" },
+          { type: "submenu", label: "Export", items: [{ type: "command", id: "exportPdf", label: "PDF…" }, sep] },
           sep,
         ],
       },
     ]);
     expect(menus).toEqual([
       {
-        label: "File",
+        label: "Table",
         items: [
           { type: "command", id: "newFile", label: "New File" },
           { type: "separator" },
           { type: "command", id: "save", label: "Save Now" },
+          { type: "command", id: "tableRowAbove", label: "Insert Row Above" },
+          { type: "submenu", label: "Export", items: [{ type: "command", id: "exportPdf", label: "PDF…" }] },
         ],
       },
     ]);
@@ -64,6 +68,14 @@ describe("native menu bar", () => {
     render(<MenuBar />);
     await waitFor(() => expect(screen.queryByRole("navigation", { name: "Application menu" })).toBeNull());
     expect(sent.map((m) => m.label)).toContain("Edit");
+    const file = sent.find((m) => m.label === "File")!;
+    expect(file.items.some((i) => i.type === "submenu" && i.label === "Export")).toBe(true);
+    // Open Recent only holds the recent list (in-app) and Clear Recent.
+    expect(file.items.find((i) => i.type === "submenu" && i.label === "Open Recent")).toEqual({
+      type: "submenu",
+      label: "Open Recent",
+      items: [{ type: "command", id: "clearRecent", label: "Clear Recent" }],
+    });
     const run = vi.spyOn(commands.toggleTheme, "run").mockImplementation(() => {});
     act(() => choose?.("toggleTheme"));
     expect(run).toHaveBeenCalledTimes(1);

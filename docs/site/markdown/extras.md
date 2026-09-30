@@ -27,7 +27,7 @@ date: 2026-09-25
 
 ## Alerts
 
-Alerts are GitHub's highlighted callouts. **Format → Insert Callout: Note** (or Tip, Important, Warning, Caution) inserts one, quoting the selected text under it. Or start a quote with one of five markers:
+Alerts are GitHub's highlighted callouts. **Format → Callout → Note** (or Tip, Important, Warning, Caution) inserts one, quoting the selected text under it. Or start a quote with one of five markers:
 
 ```markdown
 > [!NOTE]
@@ -58,7 +58,7 @@ Markpion stores files locally.[^1]
 [^1]: Nothing is uploaded unless you share the file yourself.
 ```
 
-**Format → Insert Footnote** (**Ctrl+Alt+R**, **Cmd+Option+R** on macOS) inserts the next free number at the cursor, adds the definition at the end of the document, and moves the cursor there so you can type the note.
+**Format → Insert → Footnote** (**Ctrl+Alt+R**, **Cmd+Option+R** on macOS) inserts the next free number at the cursor, adds the definition at the end of the document, and moves the cursor there so you can type the note.
 
 Notes are numbered in the order they're first referenced, whatever their labels, and definitions that are never referenced are left out. In the exports:
 
@@ -86,4 +86,4 @@ Wiki links aren't part of GitHub Flavored Markdown, so GitHub and other Markdown
 
 Write `#` and a word anywhere in the text to tag a document: `#draft`, `#project/alpha`. You can also list tags in the front matter (`tags: [draft, work]`). A tag needs at least one letter (`#1` isn't a tag), and `#` at the start of a heading, in code or in a link isn't one either.
 
-The preview and HTML exports show inline tags as small highlighted labels (click one in the preview to list where else it's used); PDF and Word exports colour them blue. **Edit → Go to Tag…** lists the tags of the open folder; see [Tags](/guide/search-replace#tags). Other Markdown apps show tags as plain text.
+The preview and HTML exports show inline tags as small highlighted labels (click one in the preview to list where else it's used); PDF and Word exports colour them blue. **Edit → Go To → Tag…** lists the tags of the open folder; see [Tags](/guide/search-replace#tags). Other Markdown apps show tags as plain text.

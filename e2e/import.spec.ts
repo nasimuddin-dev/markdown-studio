@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { fileURLToPath } from "node:url";
+import { chooseMenu } from "./menu";
 
 const fixture = (name: string) => fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url));
 
@@ -18,9 +19,8 @@ async function start(page: Page) {
 
 test("imports a Word document as Markdown with its images", async ({ page }) => {
   await start(page);
-  await page.getByRole("button", { name: "File", exact: true }).click();
   const chooser = page.waitForEvent("filechooser");
-  await page.getByRole("menuitem", { name: /Import Word Document/ }).click();
+  await chooseMenu(page, "File", "Import", "Word Document (.docx)…");
   await (await chooser).setFiles(fixture("report.docx"));
 
   // Saved as /demo/report.md (the demo's Save As prompt accepts the default).
@@ -40,9 +40,8 @@ test("imports a Word document as Markdown with its images", async ({ page }) => 
 
 test("imports a PDF as Markdown with headings and lists", async ({ page }) => {
   await start(page);
-  await page.getByRole("button", { name: "File", exact: true }).click();
   const chooser = page.waitForEvent("filechooser");
-  await page.getByRole("menuitem", { name: /Import PDF/ }).click();
+  await chooseMenu(page, "File", "Import", "PDF (.pdf)…");
   await (await chooser).setFiles(fixture("report.pdf"));
 
   await expect(page.getByRole("tab", { name: /report\.md/ })).toHaveAttribute("aria-selected", "true", { timeout: 15_000 });

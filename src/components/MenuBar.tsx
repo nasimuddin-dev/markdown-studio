@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { commands, formatShortcut, type Command } from "../features/commands";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { commands, formatShortcut } from "../features/commands";
+import { MENUS, menuLabel, type MenuItem } from "../features/menus";
 import { openRecentFile } from "../features/documents";
 import { openRecentFolder } from "../features/workspace";
 import { backend } from "../services";
@@ -8,95 +9,196 @@ import { useSettings } from "../stores/settingsStore";
 import type { RecentEntry, ViewMode } from "../types";
 import { Icon } from "./Icon";
 
-type Item = { type: "command"; command: Command; label?: string } | { type: "separator" } | { type: "recent"; entry: RecentEntry };
+/** Menu items of this list only (not those of an open submenu inside it). */
+const ownItems = (list: HTMLElement | null) =>
+  [...(list?.querySelectorAll<HTMLButtonElement>(":scope > [role^=menuitem]:not([disabled]), :scope > .menu-sub > [role^=menuitem]:not([disabled])") ?? [])];
 
-const c = (id: keyof typeof commands): Item => ({ type: "command", command: commands[id] });
-/** A Table menu item, without the "Table: " prefix the command palette needs. */
-const t = (id: keyof typeof commands): Item => ({ type: "command", command: commands[id], label: commands[id].label.replace(/^Table: /, "") });
-const sep: Item = { type: "separator" };
+/** Hovering a submenu row opens it after a short pause, so a diagonal move toward it doesn't switch rows. */
+const HOVER_DELAY = 120;
 
-const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
-  {
-    label: "File",
-    items: (recent) => [
-      c("newFile"), c("newFromTemplate"), c("todaysNote"), c("newFileInWorkspace"), sep, c("openFile"), c("openFolder"), c("goToFile"),
-      ...(recent.length ? [sep, ...recent.slice(0, 10).map((entry): Item => ({ type: "recent", entry })), c("clearRecent")] : []),
-      sep, c("save"), c("saveAs"), c("saveAll"), c("renameFile"), c("moveToNewFile"), c("saveAsTemplate"), c("fileHistory"), c("compareWithFile"), sep, c("importDocx"), c("importPdf"), c("importHtml"), c("importCsv"), c("convertFolder"), c("combineFolder"), sep, c("exportPdf"), c("exportDocx"), c("exportHtml"), c("exportZip"), c("copyFormatted"), c("copyPlainText"), c("copyHtml"), c("print"), c("exportFolderPdf"), c("exportFolderDocx"), c("exportFolderHtml"), sep, c("closeTab"), c("closeAllTabs"), c("reopenClosedTab"), c("closeFolder"), sep, c("settings"),
-    ],
-  },
-  {
-    label: "Edit",
-    items: () => [c("undo"), c("redo"), sep, c("find"), c("replace"), c("gotoLine"), c("goToHeading"), c("goToFolderHeading"), c("goToTag"), c("renameTag"), c("findInFiles"), c("checkLinks"), c("nextProblem"), c("previousProblem"), c("fixAllProblems"), sep, c("gitNextChange"), c("gitPreviousChange"), c("gitShowChange"), c("gitRevertChange"), sep, c("selectAll"), c("selectSection"), sep, c("sortLinesAsc"), c("sortLinesDesc"), c("removeDuplicateLines"), c("joinLines"), c("upperCase"), c("lowerCase"), c("titleCase")],
-  },
-  {
-    label: "Format",
-    items: () => [
-      c("bold"), c("italic"), c("strikethrough"), c("inlineCode"), c("link"), c("removeLink"), c("insertImage"), c("referenceLinks"), c("inlineLinks"), sep,
-      c("heading1"), c("heading2"), c("heading3"), c("heading4"), c("heading5"), c("heading6"), c("paragraph"), c("promoteHeading"), c("demoteHeading"), c("renameHeading"), c("numberHeadings"), c("removeHeadingNumbers"), c("moveSectionUp"), c("moveSectionDown"), sep,
-      c("bulletList"), c("orderedList"), c("taskList"), c("toggleTaskCheck"), c("quote"), c("calloutNote"), c("calloutTip"), c("calloutImportant"), c("calloutWarning"), c("calloutCaution"), sep,
-      c("codeBlock"), c("mathBlock"), c("inlineMath"), c("diagramFlowchart"), c("diagramSequence"), c("diagramGantt"), c("diagramPie"), c("horizontalRule"), c("footnote"), c("toggleComment"), c("insertDate"), c("insertDateTime"), c("insertSnippet"), c("frontMatter"), sep, c("toc"),
-    ],
-  },
-  {
-    label: "Table",
-    items: () => [
-      t("table"), t("fixTable"), t("convertToTable"), t("formatTable"), sep,
-      t("tableRowAbove"), t("tableRowBelow"), t("tableDeleteRow"), sep,
-      t("tableColumnLeft"), t("tableColumnRight"), t("tableDeleteColumn"), t("tableMoveColumnLeft"), t("tableMoveColumnRight"), sep,
-      t("tableAlignLeft"), t("tableAlignCenter"), t("tableAlignRight"), sep,
-      t("sortTableAsc"), t("sortTableDesc"), sep, t("importCsv"), t("copyTableCsv"),
-    ],
-  },
-  {
-    label: "View",
-    items: () => [
-      c("viewEditor"), c("viewSplit"), c("viewPreview"), c("toggleView"), sep, c("commandPalette"), sep, c("toggleExplorer"), c("toggleOutline"), c("toggleToolbar"), c("toggleWordWrap"), c("toggleLineNumbers"), c("toggleTypewriter"), c("toggleDimParagraphs"), c("toggleTheme"), sep, c("foldAll"), c("unfoldAll"), c("foldLevel1"), c("foldLevel2"), c("foldLevel3"), sep, c("focusMode"), c("fullScreen"), c("presentSlides"), c("printSlides"), c("toggleReadOnly"),
-      sep, c("zoomIn"), c("zoomOut"), c("zoomReset"), sep, c("nextTab"), c("prevTab"),
-    ],
-  },
-  {
-    label: "AI",
-    items: () => [c("aiImprove"), c("aiFixGrammar"), c("aiShorter"), sep, c("aiSummarize"), c("aiContinue"), c("aiTranslate"), sep, c("aiWrite"), c("aiAsk")],
-  },
-  { label: "Help", items: () => [c("shortcuts"), c("commandPalette"), sep, c("exportLogs"), c("checkUpdates"), c("about")] },
-];
-
-function Menu({ label, items, open, onOpen, onClose }: {
+interface ListProps {
+  /** Top-level menu name, for labels like "Table: …". */
+  menu: string;
+  items: MenuItem[];
+  recent: RecentEntry[];
+  /** Closes every menu, then runs the choice. */
+  onRun(fn: () => unknown): void;
+  /** Escape / ArrowLeft in a submenu: close it and return focus to its row. */
+  onBack?(): void;
+  /** Submenus open beside this row. */
+  anchor?: DOMRect;
+  focusFirst: boolean;
   label: string;
-  items: Item[];
-  open: boolean;
-  onOpen(): void;
-  onClose(focusButton?: boolean): void;
-}) {
-  const btn = useRef<HTMLButtonElement>(null);
+}
+
+function MenuList({ menu, items, recent, onRun, onBack, anchor, focusFirst, label }: ListProps) {
   const list = useRef<HTMLDivElement>(null);
+  const [openSub, setOpenSub] = useState<{ index: number; rect: DOMRect; focus: boolean } | null>(null);
+  const [pos, setPos] = useState<CSSProperties | undefined>(anchor ? { visibility: "hidden" } : undefined);
+  const hover = useRef<number | undefined>(undefined);
+
+  // Submenus are fixed-position flyouts beside their row, flipped to stay on screen.
+  useLayoutEffect(() => {
+    if (!anchor || !list.current) return;
+    const { width, height } = list.current.getBoundingClientRect();
+    let left = anchor.right - 2;
+    if (left + width > window.innerWidth - 4) left = Math.max(4, anchor.left - width + 2);
+    const top = Math.max(4, Math.min(anchor.top - 5, window.innerHeight - height - 4));
+    setPos({ left, top });
+  }, [anchor]);
 
   useEffect(() => {
-    if (open) list.current?.querySelector<HTMLButtonElement>("[role=menuitem]:not([disabled])")?.focus();
-  }, [open]);
+    if (focusFirst) ownItems(list.current)[0]?.focus();
+  }, [focusFirst]);
+  useEffect(() => () => window.clearTimeout(hover.current), []);
+
+  const openSubmenu = (index: number, row: HTMLElement, focus: boolean) => {
+    window.clearTimeout(hover.current);
+    setOpenSub({ index, rect: row.getBoundingClientRect(), focus });
+  };
+  const hoverRow = (index: number, row: HTMLElement | null) => {
+    window.clearTimeout(hover.current);
+    hover.current = window.setTimeout(() => {
+      if (row && items[index]?.type === "submenu") openSubmenu(index, row, false);
+      else setOpenSub(null);
+    }, HOVER_DELAY);
+  };
 
   const onKey = (e: KeyboardEvent) => {
-    const els = [...(list.current?.querySelectorAll<HTMLButtonElement>("[role=menuitem]:not([disabled])") ?? [])];
+    const els = ownItems(list.current);
     const idx = els.indexOf(document.activeElement as HTMLButtonElement);
+    if (idx < 0) return; // the key belongs to an open submenu
+    const current = els[idx];
     if (e.key === "ArrowDown") els[(idx + 1) % els.length]?.focus();
     else if (e.key === "ArrowUp") els[(idx - 1 + els.length) % els.length]?.focus();
     else if (e.key === "Home") els[0]?.focus();
     else if (e.key === "End") els[els.length - 1]?.focus();
-    else if (e.key === "Escape") onClose(true);
+    else if (e.key === "ArrowRight" && current.dataset.submenu) openSubmenu(Number(current.dataset.submenu), current, true);
+    else if ((e.key === "ArrowLeft" || e.key === "Escape") && onBack) onBack();
     else return;
     e.preventDefault();
     e.stopPropagation();
   };
 
-  const run = (fn: () => unknown) => {
-    onClose();
-    void fn();
+  const closeSub = (index: number) => {
+    setOpenSub(null);
+    (list.current?.querySelector(`[data-submenu="${index}"]`) as HTMLElement | null)?.focus();
   };
 
+  // The recent-files placeholder expands to one row per entry.
+  type Row = {
+    i: number;
+    item: Exclude<MenuItem, { type: "recent" }> | { type: "recentEntry"; entry: RecentEntry } | { type: "noRecent" };
+  };
+  const rows = items.flatMap((item, i): Row[] => {
+    if (item.type !== "recent") return [{ item, i }];
+    return recent.length ? recent.map((entry) => ({ item: { type: "recentEntry", entry }, i })) : [{ item: { type: "noRecent" }, i }];
+  });
+
+  return (
+    <div
+      className={`menu-list${anchor ? " menu-flyout" : ""}`}
+      role="menu"
+      aria-label={label}
+      ref={list}
+      style={pos}
+      onKeyDown={onKey}
+    >
+      {rows.map(({ item, i }, key) => {
+        if (item.type === "separator") return <div key={key} className="menu-separator" role="separator" />;
+        if (item.type === "noRecent") {
+          return (
+            <button key={key} role="menuitem" className="menu-item" disabled onPointerEnter={() => hoverRow(i, null)}>
+              <span className="menu-item-check" />
+              <span className="menu-item-label">No recent files</span>
+            </button>
+          );
+        }
+        if (item.type === "recentEntry") {
+          const { entry } = item;
+          return (
+            <button
+              key={entry.path}
+              role="menuitem"
+              className="menu-item"
+              title={entry.path}
+              onPointerEnter={() => hoverRow(i, null)}
+              onClick={() => onRun(() => (entry.kind === "file" ? openRecentFile(entry.path) : openRecentFolder(entry.path)))}
+            >
+              <span className="menu-item-check"><Icon name={entry.kind === "file" ? "file" : "folder"} size={14} /></span>
+              <span className="menu-item-label">
+                {basename(entry.path)}
+                <span className="menu-item-hint">{displayPath(entry.path, 36)}</span>
+              </span>
+            </button>
+          );
+        }
+        if (item.type === "submenu") {
+          const open = openSub?.index === i;
+          return (
+            <div key={key} className="menu-sub">
+              <button
+                role="menuitem"
+                className={`menu-item${open ? " open" : ""}`}
+                aria-haspopup="menu"
+                aria-expanded={open}
+                data-submenu={i}
+                onPointerEnter={(e) => hoverRow(i, e.currentTarget)}
+                onClick={(e) => (open ? setOpenSub(null) : openSubmenu(i, e.currentTarget, false))}
+              >
+                <span className="menu-item-check" />
+                <span className="menu-item-label">{item.label}</span>
+                <Icon name="chevronRight" size={14} className="menu-item-arrow" />
+              </button>
+              {open && openSub && (
+                <MenuList
+                  menu={menu}
+                  items={item.items}
+                  recent={recent}
+                  onRun={onRun}
+                  onBack={() => closeSub(i)}
+                  anchor={openSub.rect}
+                  focusFirst={openSub.focus}
+                  label={item.label}
+                />
+              )}
+            </div>
+          );
+        }
+        const command = commands[item.id];
+        const disabled = command.enabled ? !command.enabled() : false;
+        const checked = command.checked?.();
+        return (
+          <button
+            key={key}
+            role={checked === undefined ? "menuitem" : "menuitemcheckbox"}
+            aria-checked={checked}
+            className="menu-item"
+            disabled={disabled}
+            onPointerEnter={() => hoverRow(i, null)}
+            onClick={() => onRun(command.run)}
+          >
+            <span className="menu-item-check">{checked && <Icon name="check" size={14} />}</span>
+            <span className="menu-item-label">{menuLabel(item, menu)}</span>
+            <kbd className="menu-item-shortcut">{formatShortcut(command.shortcut)}</kbd>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function Menu({ label, items, recent, open, onOpen, onClose }: {
+  label: string;
+  items: MenuItem[];
+  recent: RecentEntry[];
+  open: boolean;
+  onOpen(): void;
+  onClose(focusButton?: boolean): void;
+}) {
   return (
     <div className="menu">
       <button
-        ref={btn}
         className={`menu-button${open ? " open" : ""}`}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -111,35 +213,25 @@ function Menu({ label, items, open, onOpen, onClose }: {
         {label}
       </button>
       {open && (
-        <div className="menu-list" role="menu" aria-label={label} ref={list} onKeyDown={onKey}>
-          {items.map((item, i) => {
-            if (item.type === "separator") return <div key={i} className="menu-separator" role="separator" />;
-            if (item.type === "recent") {
-              const { entry } = item;
-              return (
-                <button
-                  key={entry.path}
-                  role="menuitem"
-                  className="menu-item"
-                  title={entry.path}
-                  onClick={() => run(() => (entry.kind === "file" ? openRecentFile(entry.path) : openRecentFolder(entry.path)))}
-                >
-                  <span className="menu-item-label">
-                    <Icon name={entry.kind === "file" ? "file" : "folder"} size={14} /> {basename(entry.path)}
-                    <span className="menu-item-hint">{displayPath(entry.path, 36)}</span>
-                  </span>
-                </button>
-              );
+        <div
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              onClose(true);
             }
-            const { command } = item;
-            const disabled = command.enabled ? !command.enabled() : false;
-            return (
-              <button key={command.id} role="menuitem" className="menu-item" disabled={disabled} onClick={() => run(command.run)}>
-                <span className="menu-item-label">{item.label ?? command.label}</span>
-                <kbd className="menu-item-shortcut">{formatShortcut(command.shortcut)}</kbd>
-              </button>
-            );
-          })}
+          }}
+        >
+          <MenuList
+            menu={label}
+            items={items}
+            recent={recent}
+            label={label}
+            focusFirst
+            onRun={(fn) => {
+              onClose();
+              void fn();
+            }}
+          />
         </div>
       )}
     </div>
@@ -167,7 +259,7 @@ export function MenuBar() {
     void (async () => {
       const { nativeMenus, runMenuCommand } = await import("../features/nativeMenu");
       const installed = await backend()
-        .setNativeMenu(nativeMenus(MENUS.map((m) => ({ label: m.label, items: m.items([]) }))))
+        .setNativeMenu(nativeMenus(MENUS))
         .catch(() => false);
       if (!installed || cancelled) return;
       unlisten = await backend().onMenuCommand(runMenuCommand);
@@ -182,7 +274,7 @@ export function MenuBar() {
 
   useEffect(() => {
     if (openIdx === null) return;
-    if (openIdx === 0) backend().listRecent().then(setRecent).catch(() => setRecent([]));
+    if (MENUS[openIdx].label === "File") backend().listRecent().then(setRecent).catch(() => setRecent([]));
     const onDown = (e: PointerEvent) => {
       if (!bar.current?.contains(e.target as Node)) setOpenIdx(null);
     };
@@ -205,7 +297,8 @@ export function MenuBar() {
           <Menu
             key={m.label}
             label={m.label}
-            items={m.items(recent)}
+            items={m.items}
+            recent={recent}
             open={openIdx === i}
             onOpen={() => setOpenIdx(i)}
             onClose={(focusButton) => {

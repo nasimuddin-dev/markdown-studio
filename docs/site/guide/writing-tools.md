@@ -34,13 +34,13 @@ Promote and demote work on every selected heading and stay within H1–H6.
 
 ### Rename a heading
 
-Put the cursor on a heading and press **F2** (**Format → Rename Heading…**, or right-click it in the Outline). Type the new text and Markpion changes the heading and every `#anchor` link to it in the document (and wiki links such as `[[#Old name]]`), in the same edit (**Ctrl+Z** undoes it). If other Markdown files in the open folder link to the heading (`guide.md#set-up`), it lists how many and offers to update them too; files with unsaved changes are skipped, and each changed file keeps its previous version in File History. When two headings have the same text, their anchors are numbered (`#notes`, `#notes-1`), and links to both are kept pointing at the right one. On a `#tag`, **F2** renames the tag instead; see [Tags](/guide/search-replace#tags).
+Put the cursor on a heading and press **F2** (**Format → Heading → Rename Heading…**, or right-click it in the Outline). Type the new text and Markpion changes the heading and every `#anchor` link to it in the document (and wiki links such as `[[#Old name]]`), in the same edit (**Ctrl+Z** undoes it). If other Markdown files in the open folder link to the heading (`guide.md#set-up`), it lists how many and offers to update them too; files with unsaved changes are skipped, and each changed file keeps its previous version in File History. When two headings have the same text, their anchors are numbered (`#notes`, `#notes-1`), and links to both are kept pointing at the right one. On a `#tag`, **F2** renames the tag instead; see [Tags](/guide/search-replace#tags).
 
 **F2** also renames labels: on a footnote such as `[^1]`, every reference to it and its definition get the new label; on a link reference such as `[text][guide]`, `[guide][]` or a `[guide]: …` definition, every link using that label and the definition change together (`[guide][]` becomes `[guide][manual]`, so its text stays).
 
 ### Number headings
 
-**Format → Number Headings** numbers every heading, as in specifications and policies: `## 1. Introduction`, `### 1.1 Purpose`, `#### 1.1.1 Scope`. A single H1 title at the top of the document isn't numbered. After you add, remove or move sections, run it again to renumber. **Format → Remove Heading Numbers** takes the numbers off again. Both are one edit, so **Ctrl+Z** undoes them, and a [table of contents](#table-of-contents) in the document is updated too.
+**Format → Heading → Number Headings** numbers every heading, as in specifications and policies: `## 1. Introduction`, `### 1.1 Purpose`, `#### 1.1.1 Scope`. A single H1 title at the top of the document isn't numbered. After you add, remove or move sections, run it again to renumber. **Format → Remove Heading Numbers** takes the numbers off again. Both are one edit, so **Ctrl+Z** undoes them, and a [table of contents](#table-of-contents) in the document is updated too.
 
 Only numbers with a dot count as existing numbers (`1.`, `2.3`), so a heading such as "2024 Roadmap" or "10 Tips" keeps its text. Numbering changes the headings' anchors (`#1-introduction` instead of `#introduction`); [Check Links](/guide/checking-documents) finds links elsewhere that need updating. To change one heading's text, use [Rename Heading](#rename-a-heading), which updates the links for you.
 
@@ -50,7 +50,7 @@ Only numbers with a dot count as existing numbers (`1.`, `2.3`), so a heading su
 
 ### Move a section
 
-**Format → Move Section Up** and **Move Section Down** move the section at the cursor (its heading, its text and all its subsections) above the previous section or below the next one at the same level. Sections don't leave their parent: a `###` under one `##` never jumps into another. Lines inside code blocks that start with `#` are not treated as headings.
+**Format → Heading → Move Section Up** and **Move Section Down** move the section at the cursor (its heading, its text and all its subsections) above the previous section or below the next one at the same level. Sections don't leave their parent: a `###` under one `##` never jumps into another. Lines inside code blocks that start with `#` are not treated as headings.
 
 You can also move sections from the **Outline**:
 
@@ -89,7 +89,7 @@ The list commands work on all selected lines, and applying one again removes it.
 - **Paste a URL over a selection** to turn the selected text into a link.
 - **Peek at a linked document:** hover over a link to another Markdown document (including a wiki link) and the start of it appears, or the start of the section when the link names a heading.
 - **See a picture without the preview:** hover over an image link (`![alt](path)`, a `[id]: picture.png` definition or an `<img>` tag) in the editor and the picture appears above it. Local pictures need the document to be saved, so their path can be found.
-- **Format → Convert Links to Reference Style** turns inline links and images such as `[text](address "title")` into `[text][1]`, with a numbered `[1]: address "title"` line at the end of the document, so paragraphs with long addresses stay readable. Links to the same address (and title) share one definition, and existing definitions are reused. **Convert Links to Inline Style** does the opposite for `[text][label]`, `[label][]` and `[label]` references, and removes the definitions nothing uses anymore. Both work on the selection, or the whole document when nothing is selected, and **Ctrl+Z** undoes them in one step. Links in code are left alone.
+- **Format → Link Style → Reference Links** turns inline links and images such as `[text](address "title")` into `[text][1]`, with a numbered `[1]: address "title"` line at the end of the document, so paragraphs with long addresses stay readable. Links to the same address (and title) share one definition, and existing definitions are reused. **Format → Link Style → Inline Links** does the opposite for `[text][label]`, `[label][]` and `[label]` references, and removes the definitions nothing uses anymore. Both work on the selection, or the whole document when nothing is selected, and **Ctrl+Z** undoes them in one step. Links in code are left alone.
 - **Link to a heading:** right-click it in the Outline and choose **Copy Link to Heading** or **Copy Markdown Link**, or run **Copy Link to Current Heading** from the command palette to copy the `#anchor` of the section the cursor is in.
 - The [link check](/guide/checking-documents) finds links that point nowhere.
 
@@ -108,11 +108,11 @@ It lists the top two heading levels below the title (a single H1 at the top is l
 
 ## Date and time
 
-**Format → Insert Date** inserts today's date (`2026-09-30`), and **Insert Date and Time** adds the time (`2026-09-30 14:05`), in your computer's time zone: the same formats templates use for `{{date}}` and `{{datetime}}`.
+**Format → Insert → Date** inserts today's date (`2026-09-30`), and **Date and Time** adds the time (`2026-09-30 14:05`), in your computer's time zone: the same formats templates use for `{{date}}` and `{{datetime}}`.
 
 ## Front matter
 
-**Format → Insert Front Matter** adds a front matter block at the top of the document with a `title` (its first heading, else the file name), today's `date` and empty `tags`, with the title selected so you can change it. If the document already has front matter, the cursor moves to its end instead. See [Front matter](/markdown/extras#front-matter).
+**Format → Insert → Front Matter** adds a front matter block at the top of the document with a `title` (its first heading, else the file name), today's `date` and empty `tags`, with the title selected so you can change it. If the document already has front matter, the cursor moves to its end instead. See [Front matter](/markdown/extras#front-matter).
 
 ## Today's note
 
@@ -120,7 +120,7 @@ It lists the top two heading levels below the title (a single H1 at the top is l
 
 ## Snippets
 
-**Format → Insert Snippet…** inserts a piece of text at the cursor: a collapsible section (`<details>`), a keyboard key (`<kbd>`) or a task list, plus any Markdown file in a folder named `snippets` at the top of your open workspace. Snippets can use the same placeholders as templates (below), such as `{{date}}`, and `{{cursor}}` marks where the cursor goes. The selected text, if any, is replaced.
+**Format → Insert → Snippet…** inserts a piece of text at the cursor: a collapsible section (`<details>`), a keyboard key (`<kbd>`) or a task list, plus any Markdown file in a folder named `snippets` at the top of your open workspace. Snippets can use the same placeholders as templates (below), such as `{{date}}`, and `{{cursor}}` marks where the cursor goes. The selected text, if any, is replaced.
 
 ## Templates
 

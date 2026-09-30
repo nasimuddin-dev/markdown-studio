@@ -44,12 +44,12 @@ Above **1 MB** of text, the live preview pauses so typing stays fast. A bar at t
 
 ## Presenting as slides
 
-**View → Present as Slides** (also in the command palette) shows the current document as slides that fill the window. Press **F11** first for full screen.
+**View → Slides → Present as Slides** (also in the command palette) shows the current document as slides that fill the window. Press **F11** first for full screen.
 
 - Put a line with just `---` between slides, with a blank line before it (a `---` directly under a line of text makes that line a heading instead). A document without any `---` gets a slide for each `#` and `##` heading.
 - **→**, **↓**, **Space** or **Page Down**, or a click on the slide, go to the next slide; **←**, **↑**, **Shift+Space** or **Page Up** go back; **Home** and **End** go to the first and last slide.
 - **Esc** ends the show.
-- **Print Slides** (View menu) prints each slide on its own landscape page with page numbers, without the speaker notes; choose **Save as PDF** in the print dialog for a PDF of the slides.
+- **Print Slides** (View → Slides) prints each slide on its own landscape page with page numbers, without the speaker notes; choose **Save as PDF** in the print dialog for a PDF of the slides.
 - **Speaker notes:** on a slide, a line starting with `Note:` begins notes the audience doesn't see. Press **N** (or **Notes** in the bar) to show them below the slide, for example on a screen only you can see.
 - Slides show everything the preview does: images, tables, code, formulas and diagrams. Links open in your browser. Front matter isn't shown.
 

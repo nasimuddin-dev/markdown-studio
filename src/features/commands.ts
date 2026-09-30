@@ -47,6 +47,8 @@ export interface Command {
   shortcut?: string;
   run(): void | Promise<void>;
   enabled?(): boolean;
+  /** For on/off and choice commands: whether it's on now (menus show a check mark). */
+  checked?(): boolean;
   /** Set for editor commands; they are also bound inside CodeMirror's keymap. */
   editor?: StateCommand;
 }
@@ -465,13 +467,14 @@ export const commands: Record<string, Command> = {
       update({ viewMode: VIEW_ORDER[(VIEW_ORDER.indexOf(settings.viewMode) + 1) % VIEW_ORDER.length] });
     },
   },
-  viewEditor: { id: "viewEditor", label: "Editor Only", shortcut: "Mod+1", run: () => useSettings.getState().update({ viewMode: "editor" }) },
-  viewSplit: { id: "viewSplit", label: "Split View", shortcut: "Mod+2", run: () => useSettings.getState().update({ viewMode: "split" }) },
-  viewPreview: { id: "viewPreview", label: "Preview Only", shortcut: "Mod+3", run: () => useSettings.getState().update({ viewMode: "preview" }) },
+  viewEditor: { id: "viewEditor", label: "Editor Only", shortcut: "Mod+1", run: () => useSettings.getState().update({ viewMode: "editor" }), checked: () => useSettings.getState().settings.viewMode === "editor" },
+  viewSplit: { id: "viewSplit", label: "Split View", shortcut: "Mod+2", run: () => useSettings.getState().update({ viewMode: "split" }), checked: () => useSettings.getState().settings.viewMode === "split" },
+  viewPreview: { id: "viewPreview", label: "Preview Only", shortcut: "Mod+3", run: () => useSettings.getState().update({ viewMode: "preview" }), checked: () => useSettings.getState().settings.viewMode === "preview" },
   toggleExplorer: {
     id: "toggleExplorer",
     label: "Toggle File Explorer",
     shortcut: "Mod+Shift+E",
+    checked: () => useSettings.getState().settings.showExplorer,
     run: () => {
       const { settings, update } = useSettings.getState();
       const ui = useUi.getState();
@@ -504,6 +507,7 @@ export const commands: Record<string, Command> = {
     id: "toggleOutline",
     label: "Toggle Outline",
     shortcut: "Mod+Shift+L",
+    checked: () => useSettings.getState().settings.showOutline && useSettings.getState().settings.showExplorer,
     run: () => {
       const { settings, update } = useSettings.getState();
       update({ showOutline: !settings.showOutline, showExplorer: true });
@@ -512,6 +516,7 @@ export const commands: Record<string, Command> = {
   toggleTheme: {
     id: "toggleTheme",
     label: "Toggle Dark Theme",
+    checked: () => typeof document !== "undefined" && document.documentElement.dataset.theme === "dark",
     run: () => {
       const { update } = useSettings.getState();
       const dark = document.documentElement.dataset.theme === "dark";
@@ -531,6 +536,7 @@ export const commands: Record<string, Command> = {
   toggleWordWrap: {
     id: "toggleWordWrap",
     label: "Toggle Word Wrap",
+    checked: () => useSettings.getState().settings.lineWrapping,
     shortcut: "Alt+Z",
     run: () => {
       const { settings, update } = useSettings.getState();
@@ -540,6 +546,7 @@ export const commands: Record<string, Command> = {
   toggleTypewriter: {
     id: "toggleTypewriter",
     label: "Toggle Typewriter Scrolling",
+    checked: () => useSettings.getState().settings.typewriterScrolling,
     run: () => {
       const { settings, update } = useSettings.getState();
       update({ typewriterScrolling: !settings.typewriterScrolling });
@@ -548,6 +555,7 @@ export const commands: Record<string, Command> = {
   toggleDimParagraphs: {
     id: "toggleDimParagraphs",
     label: "Toggle Dim Other Paragraphs",
+    checked: () => useSettings.getState().settings.dimOtherParagraphs,
     run: () => {
       const { settings, update } = useSettings.getState();
       update({ dimOtherParagraphs: !settings.dimOtherParagraphs });
@@ -556,6 +564,7 @@ export const commands: Record<string, Command> = {
   toggleLineNumbers: {
     id: "toggleLineNumbers",
     label: "Toggle Line Numbers",
+    checked: () => useSettings.getState().settings.lineNumbers,
     run: () => {
       const { settings, update } = useSettings.getState();
       update({ lineNumbers: !settings.lineNumbers });
@@ -564,6 +573,7 @@ export const commands: Record<string, Command> = {
   toggleToolbar: {
     id: "toggleToolbar",
     label: "Toggle Formatting Toolbar",
+    checked: () => useSettings.getState().settings.showToolbar,
     run: () => {
       const { settings, update } = useSettings.getState();
       update({ showToolbar: !settings.showToolbar });
@@ -572,6 +582,7 @@ export const commands: Record<string, Command> = {
   toggleReadOnly: {
     id: "toggleReadOnly",
     label: "Toggle Read-Only",
+    checked: () => !!activeDoc()?.readOnly,
     run: () => {
       const doc = activeDoc();
       if (doc) setReadOnly(doc.id, !doc.readOnly);
@@ -587,6 +598,7 @@ export const commands: Record<string, Command> = {
   focusMode: {
     id: "focusMode",
     label: "Toggle Focus Mode",
+    checked: () => useUi.getState().focusMode,
     shortcut: "Mod+Shift+Enter",
     run: () => {
       const ui = useUi.getState();
