@@ -3,8 +3,8 @@ import { syntaxTree } from "@codemirror/language";
 import type { EditorState, Extension } from "@codemirror/state";
 import GithubSlugger from "github-slugger";
 import { backend } from "../services";
-import { basename, dirname, isMarkdownPath, relativePath } from "../services/paths";
-import { activeDoc } from "../stores/documentsStore";
+import { basename, dirname, isMarkdownPath, relativePath, resolveRelative } from "../services/paths";
+import { activeDoc, useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { findLinkDefinitions, maskCode } from "./lint";
 import { extractHeadings } from "./outline";
@@ -68,6 +68,17 @@ export async function linkCompletionSource(ctx: CompletionContext): Promise<Comp
     return { from, options: headingCompletions(ctx.state.doc.toString()), validFor: /^#[^)\s]*$/ };
   }
   const doc = activeDoc();
+  // `other.md#`: that document's headings.
+  const hash = typed.indexOf("#");
+  if (hash > 0) {
+    const target = doc?.path ? resolveRelative(doc.path, typed.slice(0, hash)) : null;
+    if (!target || !isMarkdownPath(target)) return null;
+    const open = useDocuments.getState().docs.find((d) => d.path === target);
+    const text = open ? open.content : await backend().readTextFile(target).then((f) => f.content, () => null);
+    if (ctx.aborted || text === null) return null;
+    const options = headingCompletions(text);
+    return options.length ? { from: from + hash, options, validFor: /^#[^)\s]*$/ } : null;
+  }
   const root = useWorkspace.getState().root;
   if (!doc?.path || !root) return null;
   const files = await workspaceFiles(root);

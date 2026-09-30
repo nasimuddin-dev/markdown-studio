@@ -48,6 +48,17 @@ describe("link completion source", () => {
     expect(await complete("# Top\n[t](#")).toEqual({ from: 10, labels: ["#top"] });
     expect(await complete("plain text")).toBeNull();
   });
+
+  it("completes another document's headings after ](file.md#", async () => {
+    invalidateWorkspaceFiles();
+    setupBackend({ "/ws/a.md": "", "/ws/docs/guide.md": "# Guide\n\n## Set Up\n", "/ws/pics/p.png": "x" });
+    await setWorkspace("/ws");
+    await openPath("/ws/a.md");
+    expect(await complete("[s](docs/guide.md#")).toEqual({ from: 17, labels: ["#guide", "#set-up"] });
+    expect(await complete("[s](docs/guide.md#se")).toEqual({ from: 17, labels: ["#guide", "#set-up"] });
+    expect(await complete("[s](pics/p.png#")).toBeNull();
+    expect(await complete("[s](missing.md#")).toBeNull();
+  });
 });
 
 describe("emoji shortcode completion", () => {
