@@ -216,3 +216,13 @@ describe("emoji shortcodes in PDF export", () => {
     expect((await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown).toContain(":rocket:");
   }, 30_000);
 });
+
+describe("PDF export: links within the document", () => {
+  it("makes #anchor links jump to the heading", async () => {
+    const bytes = await markdownToPdf("# Guide\n\n- [Install](#install)\n- [Missing](#nowhere)\n\n## Install\n\ntext");
+    const raw = Buffer.from(bytes).toString("latin1");
+    // One internal link (to an existing heading), and the heading is a named destination.
+    expect(raw.match(/\/GoTo/g)).toHaveLength(1);
+    expect(raw).toContain("h-install");
+  });
+});

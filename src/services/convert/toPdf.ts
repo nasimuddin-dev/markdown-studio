@@ -1,3 +1,4 @@
+import GithubSlugger from "github-slugger";
 import { collectFootnotes, type Footnotes } from "./footnotes";
 import { mathTextRuns } from "./mathText";
 import { ALERT_KINDS, takeMdastAlert } from "../alerts";
@@ -22,6 +23,14 @@ import { PAGE_POINTS } from "./pageSize";
 type Inline = string | { text: Inline | Inline[]; [k: string]: unknown };
 
 const SIDE_MARGIN = 40; // points
+
+function decodeAnchor(anchor: string): string {
+  try {
+    return decodeURIComponent(anchor).toLowerCase();
+  } catch {
+    return anchor.toLowerCase();
+  }
+}
 
 function plain(node: RootContent | PhrasingContent): string {
   if ("value" in node && typeof node.value === "string") return node.value;
@@ -48,9 +57,24 @@ export function pdfExportUnsupportedText(markdown: string): string[] {
   return [...found];
 }
 
+/** The anchor of every heading (as the preview makes them), in document order, including nested ones. */
+function headingAnchors(tree: Root): Set<string> {
+  const slugger = new GithubSlugger();
+  const anchors = new Set<string>();
+  const walk = (node: { type: string; children?: unknown[] }) => {
+    if (node.type === "heading") anchors.add(slugger.slug(plain(node as RootContent)));
+    for (const child of (node.children ?? []) as Array<{ type: string; children?: unknown[] }>) walk(child);
+  };
+  walk(tree);
+  return anchors;
+}
+
 class PdfBuilder {
   private headingIds: Array<{ depth: number; id: string }> = [];
-  private count = 0;
+  /** Gives headings the same anchors as the preview, so `#anchor` links can jump to them. */
+  private slugger = new GithubSlugger();
+  /** Anchors of the document's headings, for links within the document. */
+  anchors = new Set<string>();
   constructor(
     private loadImage?: DocxImageLoader,
     private footnotes?: Footnotes,
@@ -84,7 +108,10 @@ class PdfBuilder {
           break;
         case "link":
           if (/^(https?:|mailto:)/i.test(n.url)) out.push(...(await this.inline(n.children, { ...style, link: n.url, style: "link" })));
-          else out.push(...(await this.inline(n.children, style)));
+          else if (n.url.startsWith("#") && this.anchors.has(decodeAnchor(n.url.slice(1)))) {
+            // A link to a heading in this document (a table of contents) jumps to it.
+            out.push(...(await this.inline(n.children, { ...style, linkToDestination: `h-${decodeAnchor(n.url.slice(1))}`, style: "link" })));
+          } else out.push(...(await this.inline(n.children, style)));
           break;
         case "image":
           out.push({ text: n.alt ? `[${n.alt}]` : "[image]", italics: true, color: "#666666" });
@@ -181,7 +208,7 @@ class PdfBuilder {
   async block(node: RootContent): Promise<Content[]> {
     switch (node.type) {
       case "heading": {
-        const id = `h${++this.count}`;
+        const id = `h-${this.slugger.slug(plain(node))}`;
         while (this.headingIds.length && this.headingIds[this.headingIds.length - 1].depth >= node.depth) this.headingIds.pop();
         const parent = this.headingIds[this.headingIds.length - 1]?.id;
         this.headingIds.push({ depth: node.depth, id });
@@ -309,6 +336,7 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
   const tree = parser.parse(stripFrontMatter(markdown)) as Root;
   const page = PAGE_POINTS[opts.pageSize ?? "a4"];
   const builder = new PdfBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, opts.renderMath, page.width - 2 * SIDE_MARGIN);
+  builder.anchors = headingAnchors(tree);
   const content: Content[] = [];
   for (const node of tree.children) content.push(...(await builder.block(node)));
   content.push(...(await builder.footnoteSection()));

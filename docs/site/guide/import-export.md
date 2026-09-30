@@ -65,6 +65,7 @@ The document's front matter isn't exported; its `title` becomes the exported doc
 | | HTML export | Print / Save as PDF | PDF export | Word export |
 | --- | --- | --- | --- | --- |
 | Mermaid diagrams | Rendered | Rendered | Drawn as a picture | Drawn as a picture |
+| Links to headings (a table of contents) | Jump to the heading | Jump to the heading | Jump to the heading | Jump to the heading |
 | LaTeX math | Rendered | Rendered | Display formulas as pictures on Windows; inline formulas as text | Word equations (see [Math](/markdown/math#export)) |
 | Footnotes | Linked section at the end | Linked section at the end | Section at the end | Word footnotes |
 | Chinese, Japanese, Korean, Arabic, emoji | Yes | Yes | Not in the built-in font | Yes |
