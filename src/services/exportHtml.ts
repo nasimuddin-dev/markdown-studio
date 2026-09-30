@@ -100,6 +100,19 @@ export function documentTitle(markdown: string, fallbackName: string) {
   return (h1?.[1] ?? fallbackName.replace(/\.(md|markdown)$/i, "")).trim();
 }
 
+/** A CSS string literal. */
+const cssString = (text: string) => `"${text.replace(/[\\"]/g, (c) => `\\${c}`).replace(/[\r\n]+/g, " ")}"`;
+
+/**
+ * Page style for printing: the document's title at the top of each page and
+ * "page / pages" at the bottom (CSS page margin boxes, supported by Chromium
+ * and so by Windows; other engines print without them).
+ */
+export function printPageStyle(title: string): string {
+  const box = "font: 9pt system-ui, sans-serif; color: #5c6575;";
+  return `@page { margin: 18mm 16mm; @top-center { content: ${cssString(title)}; ${box} } @bottom-center { content: counter(page) " / " counter(pages); ${box} } }`;
+}
+
 /** Builds a standalone, styled HTML document (no scripts, strict CSP). */
 export async function buildHtmlDocument(opts: {
   markdown: string;
@@ -126,7 +139,8 @@ export async function buildHtmlDocument(opts: {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: https: http:; style-src 'unsafe-inline'">
 <meta name="generator" content="Markpion">
 ${metaTags}<title>${title}</title>
-<style>${EXPORT_TOKENS}
+<style>${printPageStyle(documentTitle(opts.markdown, opts.name))}
+${EXPORT_TOKENS}
 ${markdownCss}${opts.css ? `\n/* Custom CSS */\n${opts.css.replace(/<\//g, "<\\/")}` : ""}</style>
 </head>
 <body>

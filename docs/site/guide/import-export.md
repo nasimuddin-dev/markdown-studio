@@ -51,7 +51,7 @@ Export commands are in the **File** menu. You choose where to save the file.
 | --- | --- | --- |
 | PDF | Export as PDF… | Selectable text, clickable links, heading bookmarks, tables, task checkboxes, images, footnotes in a section at the end, and page numbers |
 | Word | Export as Word (.docx)… | Real Word headings (so Word's navigation pane and table of contents work), numbered, bulleted and task lists, tables, code, links (links to headings in the document, like a table of contents, jump to the heading in Word), embedded images, real Word footnotes, and page numbers in the footer |
-| HTML | Export as HTML… | One standalone, styled `.html` file with images embedded, sanitized like the preview |
+| HTML | Export as HTML… | One standalone, styled `.html` file with images embedded, sanitized like the preview; printed from Chrome or Edge, its pages get the title and page numbers too |
 | Clipboard | Copy as Formatted Text | The rendered document as formatted text (headings, lists, tables, links, images), for pasting into Word, Outlook, Gmail or Google Docs. Plain-text editors receive the Markdown |
 | Clipboard | Copy as HTML | The HTML source, for pasting into a CMS or an HTML file |
 | Printer or PDF | Print / Save as PDF… (Ctrl+P) | The preview, printed with your system's print dialog. On Windows each page gets the document's title at the top and "page / pages" at the bottom (macOS and Linux print without them) |

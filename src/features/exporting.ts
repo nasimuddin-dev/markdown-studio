@@ -1,7 +1,7 @@
 import { backend } from "../services";
 import { describeError } from "../services/errors";
 import { scopeCustomCss } from "../services/customCss";
-import { buildHtmlDocument, exportFileName, renderHtml } from "../services/exportHtml";
+import { buildHtmlDocument, exportFileName, printPageStyle, renderHtml } from "../services/exportHtml";
 import { activeDoc } from "../stores/documentsStore";
 import { notify } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
@@ -210,19 +210,6 @@ export async function copyActiveAsHtml() {
   } catch (e) {
     notify("error", describeError(e, "copy the HTML"));
   }
-}
-
-/** A CSS string literal. */
-const cssString = (text: string) => `"${text.replace(/[\\"]/g, (c) => `\\${c}`).replace(/[\r\n]+/g, " ")}"`;
-
-/**
- * Page style for printing: the document's title at the top of each page and
- * "page / pages" at the bottom (CSS page margin boxes, supported by Chromium
- * and so by Windows; other engines print without them).
- */
-export function printPageStyle(title: string): string {
-  const box = "font: 9pt system-ui, sans-serif; color: #5c6575;";
-  return `@page { margin: 18mm 16mm; @top-center { content: ${cssString(title)}; ${box} } @bottom-center { content: counter(page) " / " counter(pages); ${box} } }`;
 }
 
 /**
