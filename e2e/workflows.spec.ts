@@ -442,6 +442,18 @@ test("F8 and Shift+F8 move between problems", async ({ page }) => {
   await expect(position).toContainText("Ln 5,");
 });
 
+test("long menus fit a short window and scroll", async ({ page }) => {
+  await page.setViewportSize({ width: 1000, height: 560 });
+  await start(page);
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  const menu = page.getByRole("menu");
+  const box = (await menu.boundingBox())!;
+  expect(box.y + box.height).toBeLessThanOrEqual(560);
+  // The last item is reachable (scrolled into view) and works.
+  await page.getByRole("menuitem", { name: "Settings…" }).click();
+  await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
+});
+
 test("speaker notes are hidden from slides and shown with N", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

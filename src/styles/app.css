@@ -284,6 +284,10 @@ kbd {
   left: 0;
   min-width: 240px;
   max-width: 380px;
+  /* Long menus scroll instead of running off the bottom of a short window. */
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 5px;
   background: var(--bg);
   border: 1px solid var(--border-strong);
