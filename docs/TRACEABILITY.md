@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-Status of each [SRS](SRS.md) requirement as of version 0.16.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
+Status of each [SRS](SRS.md) requirement as of version 0.17.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
 
 ## Functional requirements
 
@@ -113,11 +113,11 @@ Status of each [SRS](SRS.md) requirement as of version 0.16.0. **Done** means im
 
 ## Test coverage
 
-| Level | Where | Count (0.16.0) |
+| Level | Where | Count (0.17.0) |
 | --- | --- | --- |
-| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 328 tests in 51 files |
-| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 35 tests |
-| Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 35 tests (plus 1 ignored live API test) |
+| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 358 tests in 57 files |
+| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 41 tests |
+| Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 39 tests (plus 1 ignored live API test) |
 
 ## Known gaps and next improvements
 

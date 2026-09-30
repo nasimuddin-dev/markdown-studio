@@ -1,2 +1,2 @@
-de5c2de96dc9c69fc73658cac139b1ca97b1da801892b1cb70f658d81009d788  Markpion-0.16.0-windows-x64-setup.exe
-e2548948dd975ae519355a316ae43df3b3d595fcb66d1dcd49adabee29d9fee5  Markpion-0.16.0-windows-x64-offline-setup.exe
+ed78546a70269a5249b3c2dc4458587db768c1d8a7bf50ac1f2ac6999794f6a0  Markpion-0.17.0-windows-x64-setup.exe
+5acbad4235bf93f3b54562c39a6f43c4a2bee86edb0b6e854f50b551f60ff90e  Markpion-0.17.0-windows-x64-offline-setup.exe

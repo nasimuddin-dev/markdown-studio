@@ -464,3 +464,27 @@ Built in the development loop (the user asked for a release every 5 hours, then 
 - A redirect repository for the old website address (nasimuddin-dev.github.io/markdown-studio)?
 - Rename the local folder `D:\Development\markdown-studio` to `markpion`?
 - Keep the bundle identifier `com.markpion.app` (Tauri warns about `.app` on macOS)?
+
+## 2026-09-29 (evening): 0.17.0, toolbar, slides, Git status, user-reported fixes
+
+The user asked for one release and then to keep looping; during the loop they reported three problems and asked for a toolbar. 0.17.0 was released early (before the 5-hour mark) to deliver the fixes.
+
+- **User-reported:** file dialogs opening behind the window (6ab3393: every dialog now has the main window as parent; **unverified live**, the user's Markpion was running, so the debug build couldn't be tested without closing it); PDF import bullets (94ae7fb: Word's Symbol-font U+F0B7 bullets weren't recognised; checked against the user's resume, not committed); no way to close a folder from the Explorer, Outline not resizable, no way to clear recent files (c97b267).
+- **User idea, implemented:** formatting toolbar (3a47ed0), pressed state from the syntax tree, WAI-ARIA toolbar keyboard pattern.
+- **Features:** reference-style (503525b) and HTML (c999bbb) links in link checks/updates; chunked preview for long documents (dd45b90, measured 800 KB 5.2 → 3.5 s; CSS content-visibility measured and not kept); Insert Image (04dbb8b); Present as Slides (dd4f74a); read-only Git status (c97b267, fsmonitor disabled); paste position fix (a3fff12).
+
+**Version:** 0.17.0. **Tests:** Vitest 358 (57 files), Playwright 41, Rust 39 (+1 ignored), website check (50 pages). All passing.
+
+**Unverified:** the dialog-parent fix on the user's PC; Git status on macOS/Linux; slides and chunked preview on WebKit (macOS).
+
+**Next up:**
+
+1. Confirm the dialog fix after the user updates to 0.17.0.
+2. Toolbar: more paragraph styles (Heading 4–6) and a table menu.
+3. Tauri-driver e2e against the native build.
+
+**Questions for the user:**
+
+- Local LLMs (SRS §19, for example Ollama) alongside Claude: wanted?
+- A redirect repository for the old website address?
+- Rename the local folder to `markpion`?

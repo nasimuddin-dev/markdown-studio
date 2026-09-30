@@ -7,6 +7,31 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.17.0
+
+Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.17.0)
+
+### Added
+
+- **Formatting toolbar** above the editor, like a word processor's: undo and redo, paragraph style (normal text, headings), bold, italic, strikethrough, code, lists, quote, link, image, table, code block, horizontal rule, footnote, table of contents, and an AI menu when the assistant is on. Buttons light up for the formatting at the cursor. Hide it with View → Toggle Formatting Toolbar.
+- **Present as Slides** (View menu): the document as full-window slides, split at `---` lines or at headings, with keyboard navigation.
+- **Git status:** the Explorer marks changed files (M, A, D, R, U, C) and the status bar shows the branch. Read-only; needs Git; can be turned off in Settings → Files.
+- **Insert Image…** (Format menu) picks an image file and links it.
+- **Close Folder** button in the Explorer: the folder leaves the Explorer, nothing is deleted.
+- **Resizable Outline:** drag the line between the Explorer and the Outline.
+- **Clear Recent:** remove single entries from the recent list on the welcome screen, or clear it all (also File → Clear Recent).
+- **Link updates, checks and lint** now also cover reference-style links (`[id]: path`) and HTML `<a href>` / `<img src>`.
+
+### Changed
+
+- Long documents appear in the preview faster: only the part near what you're looking at is built at first (a pasted 800 KB document: about 5.2 → 3.5 seconds).
+
+### Fixed
+
+- Windows: the Save As, Open and Export dialogs could open behind the Markpion window (for example when exporting a PDF).
+- PDF import: bullet points from Word documents became one run-on paragraph; they are now Markdown lists, including nested ones.
+- Text typed straight after pasting rich text or spreadsheet cells could end up before the pasted content.
+
 ## v0.16.0
 
 Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.16.0)
