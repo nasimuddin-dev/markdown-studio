@@ -1,0 +1,108 @@
+/* Present as Slides. */
+
+/* View → Present as Slides */
+.slideshow {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-slides);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  outline: none;
+}
+.slideshow .slide {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 6vh 6vw;
+  overflow: auto;
+  font-size: clamp(18px, 2.2vw, 36px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* A slide taller than the screen scrolls from its top instead of being cut off. */
+  justify-content: safe center;
+}
+.slideshow .slide > :first-child {
+  margin-top: 0;
+}
+.slideshow .slide h1 {
+  font-size: 2.2em;
+  border-bottom: none;
+}
+.slideshow .slide h2 {
+  font-size: 1.6em;
+  border-bottom: none;
+}
+.slide-notes {
+  max-height: 28vh;
+  overflow: auto;
+  padding: 10px 6vw;
+  border-top: 1px solid var(--border);
+  background: var(--bg-chrome);
+  font-size: 15px;
+}
+.slide-notes .markdown-body,
+.slide-notes > p {
+  margin: 0;
+}
+.slideshow-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media print {
+  body.printing {
+    overflow: visible;
+    background: #fff;
+  }
+  body.printing #root {
+    display: none;
+  }
+  body.printing #print-root {
+    display: block;
+  }
+  body.printing #print-root .markdown-body {
+    max-width: none;
+    padding: 0;
+    color: #1d2330;
+    --text: #1d2330;
+    --text-muted: #5c6575;
+    --border: #d9dde3;
+    --border-strong: #c3c9d2;
+    --bg-code: #f4f5f7;
+    --accent: #2f5bea;
+  }
+  #print-root pre,
+  #print-root table,
+  #print-root img,
+  #print-root blockquote {
+    break-inside: avoid;
+  }
+  #print-root h1,
+  #print-root h2,
+  #print-root h3 {
+    break-after: avoid;
+  }
+  /* View → Print Slides: a slide per landscape page, content centred. */
+  #print-root .print-slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 170mm;
+    padding: 0 10mm;
+    font-size: 18pt;
+    break-after: page;
+    color: #1d2330;
+  }
+  #print-root .print-slide:last-child {
+    break-after: auto;
+  }
+}

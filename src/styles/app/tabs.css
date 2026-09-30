@@ -1,0 +1,125 @@
+/* Document tabs. */
+
+/* ------------------------------------------------------------ tabs */
+
+.tabbar {
+  display: flex;
+  align-items: stretch;
+  height: 36px;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  /* No scrollbar inside the 36px bar: the wheel scrolls the tabs, and the active tab is kept in view. */
+  scrollbar-width: none;
+  min-width: 0;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 90px;
+  max-width: 220px;
+  padding: 0 6px 0 12px;
+  border-right: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: default;
+  user-select: none;
+  position: relative;
+}
+.tab:hover {
+  background: var(--bg-hover);
+}
+.tab.active {
+  background: var(--bg);
+  color: var(--text);
+}
+.tab.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--accent);
+}
+.tab-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  outline-offset: -2px;
+}
+.tab.dirty .tab-label {
+  font-style: italic;
+}
+.tab.warn .tab-icon {
+  color: var(--danger);
+}
+.tab-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tab-hint {
+  margin-left: 6px;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.tab-close {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: inherit;
+  flex: none;
+}
+.tab-close > * {
+  grid-area: 1 / 1;
+}
+.tab-close:hover {
+  background: var(--bg-hover);
+}
+.tab-close-icon {
+  visibility: hidden;
+}
+.tab:hover .tab-close-icon,
+.tab.active .tab-close-icon {
+  visibility: visible;
+}
+.tab-dirty-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dirty);
+  visibility: hidden;
+}
+.tab.dirty .tab-dirty-dot {
+  visibility: visible;
+}
+.tab.dirty:hover .tab-dirty-dot,
+.tab.dirty.active .tab-dirty-dot {
+  visibility: hidden;
+}
+
+.new-tab {
+  align-self: center;
+  margin: 0 4px;
+}

@@ -1,0 +1,223 @@
+/* File explorer, recent list and Git status. */
+
+/* Git status in the Explorer */
+.git-badge {
+  margin-left: auto;
+  padding-left: 6px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.git-dir-dot {
+  margin-left: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--git-modified);
+}
+.git-M, .git-R { color: var(--git-modified); }
+.git-A, .git-U { color: var(--git-added); }
+.git-D, .git-C { color: var(--danger); }
+.resize-handle.horizontal {
+  width: auto;
+  height: 1px;
+}
+.resize-handle.horizontal::after {
+  inset: -3px 0;
+}
+.sidebar-split {
+  flex: 1;
+  min-height: 0;
+}
+.sidebar-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sidebar-pane > .explorer,
+.sidebar-pane > .outline {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.sidebar-pane > .outline {
+  border-top: none;
+}
+.resize-handle:hover,
+.resize-handle[data-separator="active"],
+.resize-handle:focus-visible {
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* ------------------------------------------------------------ explorer */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-sidebar);
+  /* Lets the tabs switch to icons when the sidebar is narrow (see .sidebar-tab-label). */
+  container-type: inline-size;
+}
+
+.explorer {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 60%;
+  min-height: 80px;
+  background: var(--bg-sidebar);
+  user-select: none;
+}
+
+.explorer-filter {
+  margin: 0 10px 6px;
+  flex: none;
+}
+.explorer-filter-results {
+  overflow: auto;
+}
+.explorer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 34px;
+  padding: 0 6px 0 12px;
+  flex: none;
+}
+.explorer-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.explorer-actions {
+  display: flex;
+}
+
+.explorer-empty {
+  padding: 16px;
+  color: var(--text-muted);
+}
+.explorer-empty .button {
+  margin: 0 8px 8px 0;
+}
+.open-files-title {
+  margin: 8px 12px 4px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.open-files-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.open-files-list .tree-row {
+  width: 100%;
+  padding-left: 12px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+.open-files-list .tree-row:hover {
+  background: var(--bg-hover);
+}
+.open-files-list .tree-row.active {
+  background: var(--bg-active);
+}
+
+.tree,
+.tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tree {
+  flex: 1;
+  overflow: auto;
+  padding-bottom: 12px;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding-right: 8px;
+  cursor: default;
+  white-space: nowrap;
+}
+.tree-row:hover {
+  background: var(--bg-hover);
+}
+.tree-row.selected {
+  background: var(--bg-active);
+}
+.tree-row.active .tree-label {
+  font-weight: 600;
+}
+.tree-chevron {
+  color: var(--text-muted);
+}
+.tree-chevron-spacer {
+  width: 14px;
+  flex: none;
+}
+.tree-folder-icon {
+  color: var(--hl-meta);
+}
+.tree-file-icon {
+  color: var(--accent);
+}
+.tree-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tree-empty {
+  padding: 5px 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+.dirty-dot {
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--dirty);
+  flex: none;
+}
+
+/* The Explorer's Recent list: a remove button on hover or keyboard focus. */
+.open-files-list li:has(.recent-remove) {
+  position: relative;
+}
+.recent-remove {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  opacity: 0;
+}
+.open-files-list li:hover .recent-remove,
+.recent-remove:focus-visible {
+  opacity: 1;
+}
+
+/* Moving files in the explorer by dragging. */
+.tree-row.drop-target,
+.tree.drop-root {
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
+}
+body.dragging-entry,
+body.dragging-entry * {
+  cursor: grabbing !important;
+  user-select: none;
+}

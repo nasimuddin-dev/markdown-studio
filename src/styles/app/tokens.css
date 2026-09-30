@@ -1,0 +1,136 @@
+/* Design tokens: colours, syntax highlighting, type, spacing, radii, shadows, layers and motion. */
+
+:root {
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Code", "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Type scale for the app's chrome (documents use the editor and preview sizes). */
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 14px;
+  --text-xl: 16px;
+  --text-2xl: 18px;
+  --text-3xl: 24px;
+
+  /* Corner radii */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+
+  /* Elevation (--shadow, set per theme below, is the large one for menus and dialogs) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.14);
+
+  /* Overlays and highlights (translucent, so they work in both themes) */
+  --backdrop: rgba(10, 14, 22, 0.42);
+  --backdrop-light: rgba(10, 14, 22, 0.25);
+  --on-danger: #fff;
+  --diff-added-chip: rgba(31, 138, 76, 0.18);
+  --diff-removed-chip: rgba(198, 47, 58, 0.16);
+  --diff-added: rgba(31, 138, 76, 0.16);
+  --diff-removed: rgba(198, 47, 58, 0.14);
+  --diff-added-word: rgba(31, 138, 76, 0.34);
+  --diff-removed-word: rgba(198, 47, 58, 0.32);
+  --diff-removed-strike: rgba(198, 47, 58, 0.7);
+  --editor-selection: rgba(47, 91, 234, 0.28);
+  --selection-match: rgba(233, 196, 106, 0.35);
+  --search-match: rgba(233, 196, 106, 0.45);
+  --search-match-current: rgba(47, 91, 234, 0.35);
+  --find-match: rgba(255, 196, 0, 0.45);
+  --find-match-current: rgba(255, 140, 0, 0.85);
+  --find-match-current-text: #000;
+  --mark-bg: #f5d77e;
+  --mark-text: #1d2330;
+
+  /* Stacking layers, lowest first. Values under 10 are local to a component. */
+  --z-dropdown: 50;
+  --z-popover: 60;
+  --z-modal: 100;
+  --z-palette: 150;
+  --z-toast: 200;
+  --z-slides: 200;
+
+  --bg: #ffffff;
+  --bg-sidebar: #f6f7f9;
+  --bg-chrome: #eef0f3;
+  --bg-hover: #e4e7ec;
+  --bg-active: #dde4f5;
+  --bg-input: #ffffff;
+  --bg-code: #f4f5f7;
+  --border: #d9dde3;
+  --border-strong: #c3c9d2;
+  --text: #1d2330;
+  --text-muted: #5c6575;
+  --accent: #2f5bea;
+  --accent-text: #ffffff;
+  --accent-soft: rgba(47, 91, 234, 0.12);
+  --focus: #2f5bea;
+  --danger: #c62f3a;
+  --git-modified: #9a6700;
+  --git-added: #1a7f37;
+  --warning-bg: #fff6dc;
+  --warning-border: #e9c46a;
+  --success: #1f8a4c;
+  --dirty: #a35200;
+  --shadow: 0 8px 28px rgba(15, 23, 42, 0.18);
+
+  --hl-heading: #1a3fbf;
+  --hl-link: #2f5bea;
+  --hl-code: #b0306a;
+  --hl-quote: #5c6575;
+  --hl-meta: #8a6100;
+  --hl-keyword: #a626a4;
+  --hl-string: #2e7d32;
+  --hl-number: #b35b00;
+  --hl-comment: #6e7781;
+  --hl-function: #1f5fbf;
+  --hl-type: #9a4a00;
+  --hl-property: #0b6f86;
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #1b1e24;
+  --bg-sidebar: #20242b;
+  --bg-chrome: #181a1f;
+  --bg-hover: #2c313a;
+  --bg-active: #2d3a5c;
+  --bg-input: #15171b;
+  --bg-code: #262a32;
+  --border: #33383f;
+  --border-strong: #454b55;
+  --text: #dfe3ea;
+  --text-muted: #9aa3b2;
+  --accent: #6b8cff;
+  --accent-text: #0e1320;
+  --accent-soft: rgba(107, 140, 255, 0.16);
+  --focus: #8aa4ff;
+  --danger: #ff6b76;
+  --git-modified: #d29922;
+  --git-added: #3fb950;
+  --warning-bg: #3a3017;
+  --warning-border: #8a6d1f;
+  --success: #4cc17d;
+  --dirty: #f0a43a;
+  --shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+
+  --hl-heading: #8fb0ff;
+  --hl-link: #7fa2ff;
+  --hl-code: #f28fb6;
+  --hl-quote: #9aa3b2;
+  --hl-meta: #e3b55b;
+  --hl-keyword: #d49bf5;
+  --hl-string: #9bd88a;
+  --hl-number: #f0a86b;
+  --hl-comment: #7d8696;
+  --hl-function: #7fb6ff;
+  --hl-type: #f0c46b;
+  --hl-property: #6fd3e6;
+
+  color-scheme: dark;
+}

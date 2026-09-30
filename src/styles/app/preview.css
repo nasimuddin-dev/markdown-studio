@@ -1,0 +1,161 @@
+/* Preview pane. */
+
+/* A #tag in the preview opens Go to Tag. */
+.preview .md-tag {
+  cursor: pointer;
+}
+
+/* A picture in the preview opens at full size on click. */
+.preview .preview-local-image {
+  cursor: zoom-in;
+}
+
+/* A picture opened from the Explorer. */
+.image-preview-modal {
+  width: min(760px, 92vw);
+}
+.image-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-code);
+}
+.image-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+}
+
+/* ------------------------------------------------------------ preview */
+
+.preview {
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+  background: var(--bg);
+}
+.preview:focus-visible {
+  outline-offset: -3px;
+}
+
+/* The link icon that copies a heading's #anchor (preview only, not slides). */
+.preview .markdown-body :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+}
+.heading-anchor {
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  display: flex;
+  padding: 2px;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  opacity: 0;
+  cursor: pointer;
+}
+.preview .markdown-body :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor {
+  opacity: 1;
+}
+.heading-anchor:hover {
+  color: var(--accent);
+}
+.slideshow .heading-anchor {
+  display: none;
+}
+
+/* Find in the preview: a bar over its top-right corner. */
+.preview-find {
+  position: absolute;
+  top: 8px;
+  right: 18px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  box-shadow: var(--shadow-md);
+}
+.preview-find input {
+  width: 180px;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-md);
+}
+.preview-find-count {
+  min-width: 64px;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  white-space: nowrap;
+}
+.preview-find .flip {
+  transform: rotate(180deg);
+}
+::highlight(preview-find) {
+  background-color: var(--find-match);
+  color: inherit;
+}
+::highlight(preview-find-current) {
+  background-color: var(--find-match-current);
+  color: var(--find-match-current-text);
+}
+
+/* Long documents: rendered chunks don't affect layout; pending ones hold their estimated height. */
+.preview-chunk {
+  display: contents;
+}
+.preview-chunk.pending {
+  display: block;
+}
+.markdown-body > .preview-chunk:first-child > :first-child {
+  margin-top: 0;
+}
+
+/* Preview code blocks: Copy button */
+.code-block {
+  position: relative;
+}
+.code-copy {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: 12px var(--font-ui);
+  opacity: 0;
+  cursor: pointer;
+}
+.code-block:hover .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+
+/* YAML front matter shown above the preview */
+.markdown-body table.front-matter {
+  margin: 0 0 16px;
+  font-size: 0.9em;
+}
+.markdown-body table.front-matter th {
+  text-align: left;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.markdown-body table.front-matter td {
+  white-space: pre-wrap;
+}

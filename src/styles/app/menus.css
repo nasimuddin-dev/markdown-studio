@@ -1,0 +1,189 @@
+/* Menu bar, menus, submenus and context menus. */
+
+/* ------------------------------------------------------------ menubar */
+
+.menubar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 6px;
+  background: var(--bg-chrome);
+  border-bottom: 1px solid var(--border);
+  flex: none;
+  user-select: none;
+}
+
+.menus {
+  display: flex;
+  gap: 2px;
+}
+
+.menu {
+  position: relative;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  padding: 5px 10px;
+  border-radius: var(--radius-md);
+  cursor: default;
+}
+.menu-button:hover,
+.menu-button.open {
+  background: var(--bg-hover);
+}
+
+.menu-list,
+.context-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 240px;
+  max-width: 380px;
+  /* Long menus scroll instead of running off the bottom of a short window. */
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 5px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  z-index: var(--z-dropdown);
+}
+
+.context-menu {
+  position: fixed;
+  top: auto;
+  min-width: 180px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 6px 10px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: default;
+}
+.menu-item:hover:not(:disabled),
+.menu-item:focus-visible {
+  background: var(--accent);
+  color: var(--accent-text);
+  outline: none;
+}
+.menu-item:hover:not(:disabled) kbd,
+.menu-item:focus-visible kbd,
+.menu-item:hover .menu-item-hint,
+.menu-item:focus-visible .menu-item-hint {
+  color: inherit;
+}
+.menu-item:disabled {
+  opacity: 0.45;
+}
+.menu-item.danger {
+  color: var(--danger);
+}
+.menu-item-label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* A fixed column for check marks and icons keeps every label aligned. */
+.menu-list .menu-item {
+  gap: 8px;
+  padding-left: 6px;
+}
+.menu-item-check {
+  display: inline-flex;
+  flex: none;
+  width: 16px;
+  justify-content: center;
+}
+.menu-item-shortcut:not(:empty) {
+  margin-left: 16px;
+}
+.menu-item-arrow {
+  flex: none;
+  margin-right: -4px;
+  opacity: 0.7;
+}
+
+/* A submenu's row stays highlighted while the submenu is open. */
+.menu-item.open:not(:hover):not(:focus-visible) {
+  background: var(--bg-hover);
+}
+.menu-list.menu-flyout {
+  position: fixed;
+  top: auto;
+  left: auto;
+  z-index: var(--z-popover);
+}
+.menu-item-hint {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.menu-separator {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--border);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.segmented {
+  display: flex;
+  background: var(--bg-hover);
+  border-radius: var(--radius-md);
+  padding: 2px;
+}
+.segmented .icon-button {
+  height: 24px;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  min-width: 28px;
+  padding: 0 6px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: default;
+}
+.icon-button:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.icon-button.active {
+  background: var(--bg);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--border);
+}
+.icon-button.small {
+  height: 24px;
+  min-width: 24px;
+  padding: 0 4px;
+}

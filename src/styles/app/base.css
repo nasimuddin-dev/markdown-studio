@@ -1,0 +1,134 @@
+/* Base elements: page, focus ring, keyboard keys, icons, buttons and inputs. */
+
+/* Base elements */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+.small {
+  font-size: 0.9em;
+}
+
+kbd {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.icon {
+  flex: none;
+}
+
+/* ------------------------------------------------------------ buttons & inputs */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  cursor: default;
+  white-space: nowrap;
+}
+.button:hover {
+  background: var(--bg-hover);
+}
+.button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.button.primary:hover {
+  filter: brightness(1.08);
+}
+.button.primary kbd {
+  color: inherit;
+}
+.button.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.button.danger:hover {
+  background: var(--danger);
+  color: var(--on-danger);
+}
+
+.text-input,
+select {
+  width: 100%;
+  padding: 6px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+}
+.code-input {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  resize: vertical;
+}
+
+.link-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  text-align: left;
+  color: var(--accent);
+  cursor: pointer;
+}
+.link-button:hover {
+  background: var(--bg-hover);
+}
+.link-button .muted {
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}

@@ -1,0 +1,403 @@
+/* Editor, formatting toolbar, find panels, lint and hover cards. */
+
+/* ------------------------------------------------------------ banner */
+
+.banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--warning-bg);
+  border-bottom: 1px solid var(--warning-border);
+  flex: none;
+}
+.banner.info {
+  background: var(--bg-chrome);
+  border-bottom-color: var(--border);
+}
+.banner-text {
+  flex: 1;
+  min-width: 200px;
+}
+.banner .button {
+  padding: 3px 10px;
+}
+
+/* ------------------------------------------------------------ editor */
+
+.editor-host {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.editor-column {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Formatting toolbar above the editor */
+
+/* Hovering a link to another document shows the start of it. */
+.cm-link-preview {
+  max-width: 360px;
+  padding: 8px 10px;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  white-space: pre-line;
+  color: var(--text);
+}
+
+/* Hovering an image link in the editor shows the picture. */
+.cm-image-preview {
+  padding: 6px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.cm-image-preview img {
+  display: block;
+  max-width: 260px;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* Ctrl/Cmd held over the editor: links can be followed with a click. */
+.cm-follow-links .cm-md-link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.search-results.incoming-links {
+  flex: none;
+  max-height: 40%;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.incoming-file {
+  font-weight: 600;
+}
+.incoming-none {
+  margin: 2px 0 6px 34px;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.format-toolbar {
+  display: flex;
+  /* One row: groups that don't fit move into the More menu. */
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px 0;
+  padding: 3px 6px 3px 0;
+  /* Each group's divider sits 1px left of it; clipping the left edge hides the
+     first group's divider, so dividers only appear between groups. */
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-chrome);
+}
+.toolbar-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1px;
+  margin-left: -1px;
+  padding: 0 6px;
+  border-left: 1px solid var(--border);
+}
+.toolbar-group[hidden],
+.format-toolbar [data-slot][hidden] {
+  display: none;
+}
+.toolbar-more {
+  margin-left: auto;
+}
+.toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.toolbar-button:hover {
+  background: var(--bg-hover);
+}
+.toolbar-button.pressed {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.toolbar-button:focus-visible,
+.toolbar-select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.toolbar-text {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.toolbar-select {
+  height: 26px;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+.editor-host .cm-editor {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+.editor-host .cm-editor.cm-focused {
+  outline: none;
+}
+.editor-host .cm-scroller {
+  line-height: 1.6;
+}
+.editor-host .cm-content {
+  padding: 16px 0 40vh;
+  caret-color: var(--text);
+}
+.editor-host .cm-line {
+  padding: 0 20px 0 12px;
+}
+.editor-host .cm-gutters {
+  background: var(--bg);
+  border-right: none;
+  color: var(--text-muted);
+}
+.editor-host .cm-activeLine {
+  background: var(--accent-soft);
+}
+.editor-host .cm-activeLineGutter {
+  background: transparent;
+  color: var(--text);
+}
+.editor-host .cm-cursor {
+  border-left-color: var(--text);
+}
+.editor-host .cm-selectionBackground,
+.editor-host .cm-editor.cm-focused .cm-selectionBackground,
+.editor-host .cm-content ::selection {
+  background: var(--editor-selection) !important;
+}
+.editor-host .cm-selectionMatch {
+  background: var(--selection-match);
+}
+.editor-host .cm-searchMatch {
+  background: var(--search-match);
+  outline: 1px solid var(--warning-border);
+}
+.editor-host .cm-searchMatch-selected {
+  background: var(--search-match-current);
+}
+.editor-host .cm-placeholder {
+  color: var(--text-muted);
+}
+
+/* Search / replace / go-to-line panels (FR-050..052) */
+.editor-host .cm-panels {
+  background: var(--bg-chrome);
+  color: var(--text);
+  border-color: var(--border);
+}
+.editor-host .cm-panel.cm-search {
+  padding: 8px 32px 8px 10px;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.editor-host .cm-panel input[type="checkbox"] {
+  accent-color: var(--accent);
+  margin: 0 4px 0 0;
+  vertical-align: -2px;
+}
+.editor-host .cm-panel.cm-search label {
+  margin-left: 10px;
+  white-space: nowrap;
+}
+.editor-host .cm-panel.cm-search .cm-button,
+.editor-host .cm-panel.cm-search .cm-textfield {
+  margin: 2px 4px 2px 0;
+}
+.editor-host .cm-button:hover {
+  background: var(--bg-hover);
+}
+.editor-host .cm-textfield {
+  padding: 4px 7px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  font-size: var(--text-sm);
+}
+.editor-host .cm-button {
+  padding: 3px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  background-image: none;
+  font-size: var(--text-sm);
+}
+.editor-host .cm-button:active {
+  background: var(--bg-hover);
+}
+.editor-host .cm-panel button[name="close"] {
+  font-size: var(--text-2xl);
+  color: var(--text-muted);
+  right: 8px;
+  top: 6px;
+}
+
+/* ------------------------------------------------------------ lint */
+
+.status-button {
+  background: none;
+  border: none;
+  padding: 0 4px;
+  color: inherit;
+  font-size: inherit;
+  border-radius: var(--radius-sm);
+}
+.status-button:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.editor-host .cm-lintRange-warning {
+  background-image: none;
+  text-decoration: underline wavy var(--dirty);
+  text-underline-offset: 3px;
+}
+.editor-host .cm-lintRange-info {
+  background-image: none;
+  text-decoration: underline dotted var(--accent);
+  text-underline-offset: 3px;
+}
+.editor-host .cm-lintRange-error {
+  background-image: none;
+  text-decoration: underline wavy var(--danger);
+  text-underline-offset: 3px;
+}
+.editor-host .cm-tooltip-lint,
+.editor-host .cm-panel.cm-panel-lint {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  background: var(--bg);
+  color: var(--text);
+}
+.editor-host .cm-panel.cm-panel-lint ul [aria-selected] {
+  background: var(--accent-soft);
+}
+
+/* CodeMirror's focused selection uses the system highlight colour (4.49:1 on Windows); use the theme's accent. */
+.editor-host .cm-panel.cm-panel-lint ul:focus [aria-selected] {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* The rule name: full opacity and a readable size (CodeMirror fades it to 70% at 70% size). */
+.editor-host .cm-panel.cm-panel-lint .cm-diagnosticSource {
+  opacity: 1;
+  font-size: var(--text-xs);
+}
+.editor-host .cm-panel.cm-panel-lint ul:not(:focus) .cm-diagnosticSource,
+.editor-host .cm-panel.cm-panel-lint ul:focus li:not([aria-selected]) .cm-diagnosticSource {
+  color: var(--text-muted);
+}
+.editor-host .cm-tooltip {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+/* Toolbar: table size picker */
+.table-picker {
+  position: fixed;
+  z-index: var(--z-popover);
+  padding: 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: var(--text-sm);
+}
+.table-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 16px);
+  gap: 3px;
+  margin-bottom: 10px;
+}
+.table-picker-cell {
+  height: 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+}
+.table-picker-cell.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.table-picker-fields {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.table-picker-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.table-picker-fields .text-input {
+  width: 58px;
+}
+@media (forced-colors: active) {
+  .table-picker-cell.on {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
+
+/* Git: the committed lines behind a change bar */
+.editor-host .cm-git-peek {
+  max-width: min(560px, 80vw);
+  padding: 8px 10px;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.editor-host .cm-git-peek-old {
+  max-height: 200px;
+  overflow: auto;
+  margin: 6px 0 8px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--danger);
+  background: var(--bg-code);
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+}
+.editor-host .cm-git-peek-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+/* Over the editor, the drop inserts a link. */
+body.dragging-into-editor,
+body.dragging-into-editor * {
+  cursor: copy !important;
+}

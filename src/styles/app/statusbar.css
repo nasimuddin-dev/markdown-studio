@@ -1,0 +1,72 @@
+/* Status bar and its popovers. */
+
+/* ------------------------------------------------------------ status bar */
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  padding: 0 10px;
+  background: var(--bg-chrome);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  flex: none;
+  user-select: none;
+}
+.status-left,
+.status-right {
+  display: flex;
+  gap: 16px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* In a narrow window, the details that rarely change make room for the rest. */
+@media (max-width: 900px) {
+  .status-low {
+    display: none;
+  }
+}
+.status-state.dirty {
+  color: var(--dirty);
+  font-weight: 600;
+}
+.status-demo {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ status popover */
+
+.status-popover-anchor {
+  position: relative;
+}
+.status-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  z-index: var(--z-popover);
+  padding: 8px 12px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+.status-popover table {
+  border-collapse: collapse;
+}
+.status-popover th,
+.status-popover td {
+  padding: 2px 8px;
+  text-align: right;
+}
+.status-popover th[scope="row"] {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-muted);
+}

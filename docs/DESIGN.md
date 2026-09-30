@@ -383,3 +383,4 @@ Design rules that keep this path open:
 - **One pipeline.** Preview and HTML export share the Markdown pipeline; exports convert the syntax tree to each format's native structures.
 - **Fast start.** Heavy features load on first use.
 - **Testable without the desktop shell.** The `Backend` interface lets the whole UI run in a browser, which is how the end-to-end and accessibility tests run.
+- **One design system.** The UI's colours, type sizes, corner radii, shadows and layers are tokens (`src/styles/app/tokens.css`, with a dark value for every theme colour); each UI area has its own stylesheet, and a test rejects literal values and repeated selectors. Menus, the macOS menu bar and the command palette share one menu model (`features/menus.ts`).
