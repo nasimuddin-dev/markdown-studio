@@ -35,10 +35,11 @@ interface UiState {
   aboutOpen: boolean;
   paletteOpen: boolean;
   /** What the palette lists: commands and tabs, or document templates. */
-  paletteMode: "commands" | "templates" | "files" | "headings" | "compare";
+  paletteMode: "commands" | "templates" | "files" | "headings" | "folderHeadings" | "compare";
   openTemplatePicker(): void;
   openFilePicker(): void;
   openHeadingPicker(): void;
+  openFolderHeadingPicker(): void;
   openComparePicker(): void;
   shortcutsOpen: boolean;
   setShortcutsOpen(open: boolean): void;
@@ -88,6 +89,7 @@ export const useUi = create<UiState>((set, get) => ({
   openTemplatePicker: () => set({ paletteOpen: true, paletteMode: "templates" }),
   openFilePicker: () => set({ paletteOpen: true, paletteMode: "files" }),
   openHeadingPicker: () => set({ paletteOpen: true, paletteMode: "headings" }),
+  openFolderHeadingPicker: () => set({ paletteOpen: true, paletteMode: "folderHeadings" }),
   openComparePicker: () => set({ paletteOpen: true, paletteMode: "compare" }),
   shortcutsOpen: false,
   setShortcutsOpen: (shortcutsOpen) => set({ shortcutsOpen }),

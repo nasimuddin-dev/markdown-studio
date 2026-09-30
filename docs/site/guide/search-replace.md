@@ -29,6 +29,8 @@ Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the rep
 
 **Edit → Go to Heading…** (**Ctrl+Alt+H**, **Cmd+Option+H** on macOS) lists the document's headings, indented by level. Type part of a heading to filter the list, then press **Enter** to jump to it in the editor and the preview. It's handy in long documents when the Outline is hidden.
 
+**Edit → Go to Heading in Folder…** (**Ctrl+Shift+Alt+H**, **Cmd+Shift+Option+H** on macOS) does the same across every Markdown file of the open folder: each heading shows its file, and **Enter** opens that file at the heading. Open documents are searched as they are in their tab, including unsaved changes.
+
 ## Find in Files
 
 **Find in Files** (**Ctrl+Shift+F**, or the **Search** tab in the sidebar) searches every Markdown file in the open folder.

@@ -8,11 +8,13 @@ import { useWorkspace } from "../stores/workspaceStore";
 import { backend } from "../services";
 import { isMarkdownPath } from "../services/paths";
 import { openPath } from "../features/documents";
+import { requestReveal } from "../features/editorBridge";
+import { collectFolderHeadings, type FolderHeading } from "../features/workspace";
 import { recentCommands, rememberCommand } from "../features/recentCommands";
 import { extractHeadings } from "../features/outline";
 import { goToHeading } from "./Outline";
 
-type PaletteMode = "commands" | "templates" | "files" | "headings" | "compare";
+type PaletteMode = "commands" | "templates" | "files" | "headings" | "folderHeadings" | "compare";
 
 const LABELS: Record<PaletteMode, { dialog: string; placeholder: string; list: string; empty: string }> = {
   commands: { dialog: "Command palette", placeholder: "Type a command or tab name…", list: "Commands", empty: "No matching commands" },
@@ -20,6 +22,7 @@ const LABELS: Record<PaletteMode, { dialog: string; placeholder: string; list: s
   files: { dialog: "Go to file", placeholder: "Type part of a file name or path…", list: "Files", empty: "No matching files" },
   compare: { dialog: "Compare with file", placeholder: "Choose a file to compare with…", list: "Files", empty: "No matching files" },
   headings: { dialog: "Go to heading", placeholder: "Type part of a heading…", list: "Headings", empty: "No matching headings" },
+  folderHeadings: { dialog: "Go to heading in folder", placeholder: "Type part of a heading in any document…", list: "Headings", empty: "No matching headings" },
 };
 
 /** Position in the recently used list (unlisted commands after all of them). */
@@ -66,6 +69,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
   const docs = useDocuments((s) => s.docs);
   const [templates, setTemplates] = useState<Template[] | null>(null);
   const [files, setFiles] = useState<string[] | null>(null);
+  const [folderHeadings, setFolderHeadings] = useState<FolderHeading[] | null>(null);
   const root = useWorkspace((s) => s.root);
   useEffect(() => {
     if (mode === "templates") void listTemplates().then(setTemplates);
@@ -74,6 +78,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         .listWorkspaceFiles(root)
         .then((all) => setFiles(all.filter(isMarkdownPath)), () => setFiles([]));
     }
+    if (mode === "folderHeadings" && root) void collectFolderHeadings(root).then(setFolderHeadings);
   }, [mode, root]);
 
   const items = useMemo<PaletteItem[]>(() => {
@@ -88,6 +93,14 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         hint: `H${h.level} · line ${h.line}`,
         indent: h.level - 1,
         run: () => goToHeading(h, index),
+      }));
+    }
+    if (mode === "folderHeadings") {
+      return (folderHeadings ?? []).map(({ path, heading }, index) => ({
+        id: `folder-heading:${index}`,
+        label: heading.text,
+        hint: `${relativePath(path, root ?? "")} · H${heading.level}`,
+        run: () => void openPath(path).then((id) => id && requestReveal(id, heading.line, 0, 0)),
       }));
     }
     if (mode === "compare") {
@@ -130,9 +143,9 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
       run: () => useDocuments.getState().setActive(d.id),
     }));
     return [...cmdItems, ...tabItems];
-  }, [docs, mode, templates, files, root]);
+  }, [docs, mode, templates, files, folderHeadings, root]);
 
-  const results = useMemo(() => fuzzyFilter(items, query, (i) => i.label).slice(0, mode === "headings" ? 1000 : 50), [items, query, mode]);
+  const results = useMemo(() => fuzzyFilter(items, query, (i) => i.label).slice(0, mode === "headings" ? 1000 : mode === "folderHeadings" ? 200 : 50), [items, query, mode]);
 
   useEffect(() => {
     input.current?.focus();
@@ -179,7 +192,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
           }}
         />
         <ul className="palette-list" id="palette-list" role="listbox" ref={list} aria-label={LABELS[mode].list}>
-          {results.length === 0 && (mode === "commands" || mode === "headings" || (mode === "templates" ? templates !== null : files !== null)) && (
+          {results.length === 0 && (mode === "commands" || mode === "headings" || (mode === "templates" ? templates !== null : mode === "folderHeadings" ? folderHeadings !== null : files !== null)) && (
             <li className="palette-empty">{LABELS[mode].empty}</li>
           )}
           {results.map(({ item, match }, i) => (

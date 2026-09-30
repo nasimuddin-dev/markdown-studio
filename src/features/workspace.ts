@@ -1,12 +1,13 @@
 import { backend } from "../services";
 import { describeError, toAppError } from "../services/errors";
-import { basename, dirname, isInside, join, relativePath } from "../services/paths";
+import { basename, dirname, isInside, isMarkdownPath, join, relativePath } from "../services/paths";
 import { useWorkspace } from "../stores/workspaceStore";
 import { useDocuments } from "../stores/documentsStore";
 import { ask, notify, promptText } from "../stores/uiStore";
 import type { DirEntry } from "../types";
 import { onPathDeleted, onPathRenamed, openPath } from "./documents";
 import { invalidateWorkspaceFiles } from "./completion";
+import { extractHeadings, type Heading } from "./outline";
 
 const ws = () => useWorkspace.getState();
 
@@ -252,4 +253,26 @@ export async function duplicateFile(path: string): Promise<string | null> {
     notify("error", describeError(e, `duplicate “${basename(path)}”`));
     return null;
   }
+}
+
+export interface FolderHeading {
+  path: string;
+  heading: Heading;
+}
+
+/**
+ * Every heading of every Markdown file in the folder, in folder order (open
+ * documents as they are in their tab, unsaved changes included).
+ */
+export async function collectFolderHeadings(root: string): Promise<FolderHeading[]> {
+  const b = backend();
+  let paths: string[];
+  try {
+    paths = (await b.listWorkspaceFiles(root)).filter(isMarkdownPath);
+  } catch {
+    return [];
+  }
+  const open = new Map(useDocuments.getState().docs.filter((d) => d.path).map((d) => [d.path!, d.content]));
+  const texts = await Promise.all(paths.map((path) => (open.has(path) ? Promise.resolve(open.get(path)!) : b.readTextFile(path).then((f) => f.content, () => ""))));
+  return paths.flatMap((path, i) => extractHeadings(texts[i]).map((heading) => ({ path, heading })));
 }

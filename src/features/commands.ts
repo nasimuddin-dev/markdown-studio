@@ -183,6 +183,13 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().openHeadingPicker(),
     enabled: hasActive,
   },
+  goToFolderHeading: {
+    id: "goToFolderHeading",
+    label: "Go to Heading in Folder…",
+    shortcut: "Mod+Shift+Alt+H",
+    run: () => useUi.getState().openFolderHeadingPicker(),
+    enabled: () => !!useWorkspace.getState().root,
+  },
   clearRecent: {
     id: "clearRecent",
     label: "Clear Recent",

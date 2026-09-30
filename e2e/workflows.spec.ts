@@ -1009,3 +1009,16 @@ test("the Links tab lists the files that link to the open document", async ({ pa
   await expect(incoming.getByRole("button", { name: /Links to guide\.md/ })).toBeVisible();
   await expect(incoming.getByRole("button", { name: /README\.md guide/ })).toBeVisible();
 });
+
+test("Go to Heading in Folder opens another document at the heading", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.keyboard.press(`${mod}+Shift+Alt+H`);
+  const palette = page.getByRole("dialog", { name: "Go to heading in folder" });
+  await palette.getByRole("combobox").fill("latex");
+  await expect(palette.getByRole("option").first()).toContainText("docs/diagrams-and-math.md");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("tab", { name: /diagrams-and-math\.md/ })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator(".cm-activeLine")).toHaveText("## LaTeX math");
+});
