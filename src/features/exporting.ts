@@ -220,26 +220,52 @@ export async function copyActiveAsHtml() {
 export async function printActive() {
   const doc = activeDoc();
   if (!doc) return;
-  let container: HTMLElement | null = null;
-  let pageStyle: HTMLStyleElement | null = null;
   try {
     const html = await renderHtml(doc.content, doc.path, loadImage, features());
-    container = document.createElement("div");
-    container.id = "print-root";
-    container.innerHTML = `<article class="markdown-body">${html}</article>`;
-    document.body.appendChild(container);
     const { documentTitle } = await import("../services/exportHtml");
-    pageStyle = document.createElement("style");
-    pageStyle.dataset.print = "";
-    pageStyle.textContent = printPageStyle(documentTitle(doc.content, doc.name));
-    document.head.appendChild(pageStyle);
-    document.body.classList.add("printing");
-    const cleanup = () => {
-      document.body.classList.remove("printing");
-      container?.remove();
-      pageStyle?.remove();
-      window.removeEventListener("afterprint", cleanup);
-    };
+    await printHtml(`<article class="markdown-body">${html}</article>`, printPageStyle(documentTitle(doc.content, doc.name)));
+  } catch (e) {
+    notify("error", describeError(e, "print the document"));
+  }
+}
+
+/**
+ * View → Print Slides: each slide (without its speaker notes) on its own
+ * landscape page, numbered, for handouts or a PDF of the slides.
+ */
+export async function printSlides() {
+  const doc = activeDoc();
+  if (!doc) return;
+  try {
+    const { splitNotes, splitSlides } = await import("./slides");
+    const pages = await Promise.all(
+      splitSlides(doc.content).map(async (slide) => `<section class="markdown-body print-slide">${await renderHtml(splitNotes(slide).body, doc.path, loadImage, features())}</section>`),
+    );
+    const box = "font: 9pt system-ui, sans-serif; color: #5c6575;";
+    await printHtml(pages.join(""), `@page { size: A4 landscape; margin: 14mm; @bottom-center { content: counter(page) " / " counter(pages); ${box} } }`);
+  } catch (e) {
+    notify("error", describeError(e, "print the slides"));
+  }
+}
+
+/** Prints the given HTML with the page style, through a print-only container (so it works in every view mode). */
+async function printHtml(html: string, pageCss: string) {
+  const container = document.createElement("div");
+  container.id = "print-root";
+  container.innerHTML = html;
+  document.body.appendChild(container);
+  const pageStyle = document.createElement("style");
+  pageStyle.dataset.print = "";
+  pageStyle.textContent = pageCss;
+  document.head.appendChild(pageStyle);
+  document.body.classList.add("printing");
+  const cleanup = () => {
+    document.body.classList.remove("printing");
+    container.remove();
+    pageStyle.remove();
+    window.removeEventListener("afterprint", cleanup);
+  };
+  try {
     window.addEventListener("afterprint", cleanup);
     // Give images a moment to decode before the print snapshot.
     await new Promise((r) => setTimeout(r, 50));
@@ -247,9 +273,7 @@ export async function printActive() {
     // Some webviews don't fire afterprint; clean up after the dialog returns.
     setTimeout(cleanup, 1000);
   } catch (e) {
-    document.body.classList.remove("printing");
-    container?.remove();
-    pageStyle?.remove();
-    notify("error", describeError(e, "print the document"));
+    cleanup();
+    throw e;
   }
 }

@@ -1573,6 +1573,20 @@ select {
   #print-root h3 {
     break-after: avoid;
   }
+  /* View → Print Slides: a slide per landscape page, content centred. */
+  #print-root .print-slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 170mm;
+    padding: 0 10mm;
+    font-size: 18pt;
+    break-after: page;
+    color: #1d2330;
+  }
+  #print-root .print-slide:last-child {
+    break-after: auto;
+  }
 }
 
 /* ------------------------------------------------------------ sidebar tabs & search */

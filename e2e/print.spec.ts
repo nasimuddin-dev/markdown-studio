@@ -31,3 +31,32 @@ test("printing adds the document title and page numbers to each page", async ({ 
   for (const text of pages) expect(text).toContain("Quarterly Report");
   expect(pages[1]).toContain(`2 / ${doc.numPages}`);
 });
+
+test("Print Slides puts each slide on its own landscape page, without speaker notes", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.clear();
+    window.print = () => {};
+  });
+  await page.goto("/");
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# One\n\nFirst slide.\n\nNote: secret words\n\n---\n\n# Two\n\n---\n\n# Three\n");
+  await page.clock.install();
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("print slides");
+  await page.keyboard.press("Enter");
+  await page.clock.runFor(200);
+  await expect(page.locator("#print-root .print-slide")).toHaveCount(3);
+
+  const pdf = await page.pdf({ preferCSSPageSize: true });
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(pdf) }).promise;
+  expect(doc.numPages).toBe(3);
+  const first = await doc.getPage(1);
+  const [, , width, height] = first.view;
+  expect(width).toBeGreaterThan(height);
+  const text = (await first.getTextContent()).items.map((item) => ("str" in item ? item.str : "")).join(" ");
+  expect(text).toContain("First slide.");
+  expect(text).not.toContain("secret words");
+  expect(text).toContain("1 / 3");
+});
