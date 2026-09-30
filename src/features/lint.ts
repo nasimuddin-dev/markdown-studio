@@ -1,6 +1,7 @@
 import GithubSlugger from "github-slugger";
 import { extractHeadings } from "./outline";
 import { resolveRelative } from "../services/paths";
+import { fixTable } from "./tables";
 
 export type Severity = "error" | "warning" | "info";
 
@@ -299,13 +300,34 @@ function lintTables(text: string, starts: number[]): MarkdownProblem[] {
   const masked = maskCode(text).split("\n");
   const out: MarkdownProblem[] = [];
   const range = (i: number) => ({ from: starts[i], to: starts[i] + lines[i].length });
+  // The table starting at line `first`: its following lines that contain "|".
+  const tableEnd = (first: number) => {
+    let k = first + 1;
+    while (k < lines.length && masked[k].includes("|") && masked[k].trim() && !BLOCK_START.test(masked[k])) k++;
+    return k;
+  };
+  // Fix Table for a problem at `problemFrom`: replaces the whole table (edits are relative to the problem).
+  const fixWholeTable = (first: number, problemFrom: number): ProblemFix | undefined => {
+    const end = tableEnd(first);
+    const fixed = fixTable(lines.slice(first, end));
+    if (!fixed) return undefined;
+    const from = starts[first];
+    const to = starts[end - 1] + lines[end - 1].length;
+    return { label: "Fix Table", edits: [{ at: from - problemFrom, remove: to - from, insert: fixed.join("\n") }] };
+  };
   for (let i = 0; i + 1 < lines.length; i++) {
     // A divider without "|" under a line with one is a setext heading, not a table.
     if (!masked[i].includes("|") || !masked[i + 1].includes("|") || !DELIMITER_ROW.test(masked[i + 1])) continue;
     const columns = countCells(lines[i]);
     const divider = countCells(lines[i + 1]);
     if (columns !== divider) {
-      out.push({ ...range(i + 1), severity: "warning", rule: "table-columns", message: `The table header has ${columns} cells but the divider row has ${divider}, so it isn't shown as a table.` });
+      out.push({
+        ...range(i + 1),
+        severity: "warning",
+        rule: "table-columns",
+        message: `The table header has ${columns} cells but the divider row has ${divider}, so it isn't shown as a table.`,
+        fix: fixWholeTable(i, starts[i + 1]),
+      });
       i++;
       continue;
     }
@@ -326,10 +348,12 @@ function lintTables(text: string, starts: number[]): MarkdownProblem[] {
           severity: "warning",
           rule: "table-columns",
           message: `This row has ${cells} cell${cells === 1 ? "" : "s"} but the table has ${columns} columns: ${cells > columns ? "the extra cells aren't shown" : "the missing cells are left empty"}. (A | inside a cell needs a backslash: \\|.)`,
-          // Missing cells can be added after a closing "|"; extra ones need a person to decide.
-          ...(cells < columns && lines[j].trimEnd().endsWith("|") && {
-            fix: { label: "Add Empty Cells", edits: [{ at: lines[j].trimEnd().length, insert: "  |".repeat(columns - cells) }] },
-          }),
+          // Missing cells can be added after a closing "|"; otherwise Fix Table repairs the whole table
+          // (extra cells are kept: the header gains columns).
+          fix:
+            cells < columns && lines[j].trimEnd().endsWith("|")
+              ? { label: "Add Empty Cells", edits: [{ at: lines[j].trimEnd().length, insert: "  |".repeat(columns - cells) }] }
+              : fixWholeTable(i, starts[j]),
         });
       }
     }

@@ -130,9 +130,12 @@ describe("markdown lint: tables, footnotes and link text", () => {
     expect(applyFix(typo, "broken-anchor")).toBe("## Installation\n\n## Usage\n\nSee [install](#installation).");
     // No suggestion when nothing is close.
     expect(only("## Usage\n\n[x](#something-else)", "broken-anchor")[0].fix).toBeUndefined();
-    // Extra cells, or a row without a closing "|", need a person to decide.
-    expect(only("| a |\n| - |\n| 1 | 2 |", "table-columns")[0].fix).toBeUndefined();
-    expect(only("| a | b |\n| - | - |\n| 1", "table-columns")[0].fix).toBeUndefined();
+    // Extra cells, a row without a closing "|", or a header that doesn't match its divider: Fix Table repairs the whole table.
+    expect(applyFix("Intro\n\n| a |\n| - |\n| 1 | 2 |\n\nAfter", "table-columns")).toBe("Intro\n\n| a   | Column 2 |\n| --- | -------- |\n| 1   | 2        |\n\nAfter");
+    expect(applyFix("| a | b |\n| - | - |\n| 1", "table-columns")).toBe("| a   | b   |\n| --- | --- |\n| 1   |     |");
+    const mismatch = "| a | b |\n| - |\n| 1 | 2 |";
+    expect(only(mismatch, "table-columns")[0].fix?.label).toBe("Fix Table");
+    expect(only(applyFix(mismatch, "table-columns"), "table-columns")).toEqual([]);
   });
 
   it("fixes all safe problems at once, repeating as fixes reveal new ones", () => {
