@@ -46,7 +46,7 @@ Only numbers with a dot count as existing numbers (`1.`, `2.3`), so a heading su
 
 ### Select a section
 
-**Edit → Select Section** selects the section at the cursor: its heading, its text and its subsections. Run it again to select the section it belongs to, and so on up to the top-level section. It's a quick way to copy, cut or replace a whole section.
+**Edit → Select Section** (or right-click a heading in the Outline → **Select Section**) selects the section at the cursor: its heading, its text and its subsections. Run it again to select the section it belongs to, and so on up to the top-level section. It's a quick way to copy, cut or replace a whole section.
 
 ### Move a section
 

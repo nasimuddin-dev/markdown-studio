@@ -1417,3 +1417,16 @@ test("a word count goal shows its progress in the status bar", async ({ page }) 
   await page.keyboard.press("Enter");
   await expect(count).toHaveText(/^\d+ words$/);
 });
+
+test("Select Section from the Outline selects the heading's whole section", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.getByRole("region", { name: "Outline" }).getByRole("button", { name: /Task list/ }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Select Section" }).click();
+  await expect(page.locator(".status-right")).toContainText(/selected/);
+  const selected = await page.evaluate(() => window.getSelection()?.toString() ?? "");
+  expect(selected.startsWith("### Task list")).toBe(true);
+  expect(selected).toContain("Save it with");
+  expect(selected).not.toContain("### Code");
+});

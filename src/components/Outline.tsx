@@ -3,10 +3,10 @@ import { useDocuments } from "../stores/documentsStore";
 import { useUi } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
 import { currentHeadingIndex, extractHeadings, headingSlugs, type Heading } from "../features/outline";
-import { moveSectionAtLine, moveSectionTo, setDocumentText } from "../features/sections";
+import { moveSectionAtLine, moveSectionTo, selectSection, setDocumentText } from "../features/sections";
 import { copyText } from "../features/pathActions";
 import { ContextMenu } from "./ContextMenu";
-import { revealLine } from "../features/editorBridge";
+import { revealLine, runOnEditor } from "../features/editorBridge";
 import { renameHeading } from "../features/renameHeading";
 import { Icon } from "./Icon";
 import { mountAllChunks } from "./PreviewChunks";
@@ -224,6 +224,13 @@ export function Outline() {
               run: () => copyText(`[${headings[menu.index].text.replace(/([[\]])/g, "\\$1")}](#${slugs[menu.index]})`, "Markdown link"),
             },
             { label: "Rename Heading…", run: () => void renameHeading(headings[menu.index].line), shortcut: "F2" },
+            {
+              label: "Select Section",
+              run: () => {
+                revealLine(headings[menu.index].line);
+                runOnEditor(selectSection);
+              },
+            },
             "separator",
             { label: "Move Section Up", run: () => move(menu.index, -1), shortcut: "Alt+↑" },
             { label: "Move Section Down", run: () => move(menu.index, 1), shortcut: "Alt+↓" },

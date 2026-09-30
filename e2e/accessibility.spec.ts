@@ -95,6 +95,8 @@ for (const theme of ["light", "dark"] as const) {
     });
 
     test("menus, panels and dialogs", async ({ page }) => {
+      // Many audits in one run; slow when the whole suite runs at once.
+      test.setTimeout(180_000);
       const palette = async (command: string) => {
         await page.keyboard.press(`${mod}+Shift+P`);
         await page.keyboard.type(command);
