@@ -10,6 +10,7 @@ import {
 } from "./documents";
 import { closeWorkspace, createFileIn, openFolderDialog } from "./workspace";
 import { editorCommand, getEditorView, runOnEditor } from "./editorBridge";
+import { currentHeadingIndex, extractHeadings, headingSlugs } from "./outline";
 import { nextDiagnostic, previousDiagnostic } from "@codemirror/lint";
 import type { EditorView } from "@codemirror/view";
 // Export/print pull in the unified pipeline; load them on first use.
@@ -305,6 +306,23 @@ export const commands: Record<string, Command> = {
     run: async () => {
       const path = useDocuments.getState().docs.find((d) => d.id === useDocuments.getState().activeId)?.path;
       if (!path || !(await (await import("./workspace")).showInExplorer(path))) useUi.getState().notify("info", "The active file isn't in the open folder.");
+    },
+    enabled: hasActive,
+  },
+  copyHeadingLink: {
+    id: "copyHeadingLink",
+    label: "Copy Link to Current Heading",
+    run: async () => {
+      const view = getEditorView();
+      const text = view?.state.doc.toString() ?? activeDoc()?.content ?? "";
+      const headings = extractHeadings(text);
+      const i = currentHeadingIndex(headings, view ? view.state.doc.lineAt(view.state.selection.main.head).number : 1);
+      if (i < 0) {
+        useUi.getState().notify("info", "The cursor isn't under a heading.");
+        return;
+      }
+      const { copyText } = await import("./pathActions");
+      await copyText(`#${headingSlugs(headings)[i]}`, "Link");
     },
     enabled: hasActive,
   },

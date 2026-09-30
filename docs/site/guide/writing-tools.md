@@ -89,7 +89,7 @@ The list commands work on all selected lines, and applying one again removes it.
 - **Paste a URL over a selection** to turn the selected text into a link.
 - **See a picture without the preview:** hover over an image link (`![alt](path)`, a `[id]: picture.png` definition or an `<img>` tag) in the editor and the picture appears above it. Local pictures need the document to be saved, so their path can be found.
 - **Format → Convert Links to Reference Style** turns inline links and images such as `[text](address "title")` into `[text][1]`, with a numbered `[1]: address "title"` line at the end of the document, so paragraphs with long addresses stay readable. Links to the same address (and title) share one definition, and existing definitions are reused. **Convert Links to Inline Style** does the opposite for `[text][label]`, `[label][]` and `[label]` references, and removes the definitions nothing uses anymore. Both work on the selection, or the whole document when nothing is selected, and **Ctrl+Z** undoes them in one step. Links in code are left alone.
-- **Link to a heading:** right-click it in the Outline and choose **Copy Link to Heading** or **Copy Markdown Link**.
+- **Link to a heading:** right-click it in the Outline and choose **Copy Link to Heading** or **Copy Markdown Link**, or run **Copy Link to Current Heading** from the command palette to copy the `#anchor` of the section the cursor is in.
 - The [link check](/guide/checking-documents) finds links that point nowhere.
 
 ## Table of contents

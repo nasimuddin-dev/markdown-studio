@@ -1364,3 +1364,16 @@ test("the Explorer's Recent list can forget an entry", async ({ page }) => {
   await recent.getByRole("button", { name: "Remove demo from Recent" }).click();
   await expect(recent).toHaveCount(0);
 });
+
+test("Copy Link to Current Heading copies the section's #anchor", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Doc\n\n## Getting Started!\n\nSome text here.");
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("copy link to current heading");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Link copied.")).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("#getting-started");
+});
