@@ -93,6 +93,13 @@ describe("markdown lint: files", () => {
 
 describe("markdown lint: tables, footnotes and link text", () => {
   const only = (text: string, rule: string) => lintMarkdown(text).filter((p) => p.rule === rule);
+  /** Applies the first quick fix offered for `rule`. */
+  const applyFix = (text: string, rule: string) => {
+    const p = only(text, rule).find((x) => x.fix)!;
+    let out = text;
+    for (const c of [...fixChanges(p.fix!, p.from, text)].reverse()) out = out.slice(0, c.from) + c.insert + out.slice(c.to);
+    return out;
+  };
 
   it("flags table rows that don't match the header, as GFM renders them", () => {
     const table = "| a | b |\n| - | - |\n| 1 | 2 |\n| 1 | 2 | 3 |\n| 1 |\n| `x|y` | z |\n| `x\\|y` | z |";
@@ -111,12 +118,6 @@ describe("markdown lint: tables, footnotes and link text", () => {
   });
 
   it("offers quick fixes that resolve the problem", () => {
-    const applyFix = (text: string, rule: string) => {
-      const p = only(text, rule).find((x) => x.fix)!;
-      let out = text;
-      for (const c of [...fixChanges(p.fix!, p.from, text)].reverse()) out = out.slice(0, c.from) + c.insert + out.slice(c.to);
-      return out;
-    };
     expect(applyFix("| a | b |\n| - | - |\nText", "table-columns")).toBe("| a | b |\n| - | - |\n\nText");
     const padded = applyFix("| a | b | c |\n| - | - | - |\n| 1 |", "table-columns");
     expect(padded).toBe("| a | b | c |\n| - | - | - |\n| 1 |  |  |");
@@ -136,6 +137,18 @@ describe("markdown lint: tables, footnotes and link text", () => {
     const mismatch = "| a | b |\n| - |\n| 1 | 2 |";
     expect(only(mismatch, "table-columns")[0].fix?.label).toBe("Fix Table");
     expect(only(applyFix(mismatch, "table-columns"), "table-columns")).toEqual([]);
+  });
+
+  it("flags headings without a space and --- that turns a line into a heading", () => {
+    expect(applyFix("#Title\n\ntext", "heading-space")).toBe("# Title\n\ntext");
+    expect(applyFix("  ###Setup steps", "heading-space")).toBe("  ### Setup steps");
+    // "#123", "#" alone, code and "# Title" aren't flagged.
+    expect(only("#123\n\n#\n\n`#x y`\n\n```\n#no space\n```\n\n# Title", "heading-space")).toEqual([]);
+
+    expect(applyFix("Some text\n---\nmore", "setext-heading")).toBe("Some text\n\n---\nmore");
+    // Not after a blank line, a list, a table, another rule, or the front matter's closing line.
+    expect(only("text\n\n---\n\n- item\n---\n\n| a |\n---\n\n***\n---", "setext-heading")).toEqual([]);
+    expect(only("---\ntitle: x\n---\n# Doc", "setext-heading")).toEqual([]);
   });
 
   it("fixes all safe problems at once, repeating as fixes reveal new ones", () => {

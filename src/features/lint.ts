@@ -223,7 +223,7 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
       }
     }
   }
-  problems.push(...lintTables(text, starts), ...lintFootnotes(text));
+  problems.push(...lintTables(text, starts), ...lintFootnotes(text), ...lintHeadingSyntax(text, starts));
   return problems.sort((a, b) => a.from - b.from);
 }
 
@@ -358,6 +358,45 @@ function lintTables(text: string, starts: number[]): MarkdownProblem[] {
       }
     }
     i = j - 1;
+  }
+  return out;
+}
+
+/**
+ * Heading mistakes: `#Title` (no space, so it's plain text) and `---` right
+ * under a line of text, which makes that line a heading instead of drawing a
+ * horizontal rule (setext headings are rare today, so this is only a hint).
+ */
+function lintHeadingSyntax(text: string, starts: number[]): MarkdownProblem[] {
+  const lines = text.split("\n");
+  const masked = maskCode(text).split("\n");
+  const out: MarkdownProblem[] = [];
+  // Skip YAML front matter: its closing --- sits under text on purpose.
+  const frontMatterEnd = lines[0]?.trim() === "---" ? lines.findIndex((l, i) => i > 0 && /^(---|\.\.\.)\s*$/.test(l)) : -1;
+  for (let i = frontMatterEnd + 1; i < lines.length; i++) {
+    const m = /^( {0,3})(#{1,6})(?=[^\s#])/.exec(masked[i]);
+    // An issue-style reference alone on a line ("#123") is left alone.
+    if (m && !/^#\d+$/.test(masked[i].trim())) {
+      out.push({
+        from: starts[i],
+        to: starts[i] + lines[i].length,
+        severity: "warning",
+        rule: "heading-space",
+        message: `This isn't a heading: "${m[2]}" needs a space after it.`,
+        fix: { label: "Add Space", edits: [{ at: m[1].length + m[2].length, insert: " " }] },
+      });
+    }
+    const above = masked[i - 1];
+    if (i > 0 && /^ {0,3}-{3,}\s*$/.test(masked[i]) && above?.trim() && !/^ {0,3}([-*+]|\d+[.)])\s|^ {0,3}(#|>|\||`{3}|~{3})/.test(above) && !/^ {0,3}(-{3,}|\*{3,}|_{3,})\s*$/.test(above)) {
+      out.push({
+        from: starts[i],
+        to: starts[i] + lines[i].length,
+        severity: "info",
+        rule: "setext-heading",
+        message: "This --- makes the line above a heading. For a horizontal rule, put a blank line before it.",
+        fix: { label: "Make It a Rule", edits: [{ at: 0, insert: "\n" }] },
+      });
+    }
   }
   return out;
 }
