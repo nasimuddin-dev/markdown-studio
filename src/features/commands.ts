@@ -296,6 +296,18 @@ export const commands: Record<string, Command> = {
     run: async () => (await import("./extractFile")).moveSelectionToNewFile(),
     enabled: hasActive,
   },
+  lineEndingsLf: {
+    id: "lineEndingsLf",
+    label: "Change Line Endings to LF",
+    run: async () => (await import("./lineEndings")).setLineEnding("lf"),
+    enabled: hasActive,
+  },
+  lineEndingsCrlf: {
+    id: "lineEndingsCrlf",
+    label: "Change Line Endings to CRLF",
+    run: async () => (await import("./lineEndings")).setLineEnding("crlf"),
+    enabled: hasActive,
+  },
   exportZip: {
     id: "exportZip",
     label: "Export as Markdown with Images (.zip)…",

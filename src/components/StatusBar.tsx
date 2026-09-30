@@ -64,7 +64,14 @@ export function StatusBar() {
           <TaskProgress content={doc.content} />
           <WordCount words={words} content={doc.content} />
           {autoSave !== "off" && doc.path && <span className="status-item" title="Auto save is on">Auto save</span>}
-          <span className="status-item status-low" title="Line endings are preserved when saving">{doc.lineEnding.toUpperCase()}</span>
+          <button
+            className="status-item status-button status-low"
+            title={`Line endings: ${doc.lineEnding.toUpperCase()} (kept when saving). Change to ${doc.lineEnding === "lf" ? "CRLF" : "LF"}`}
+            aria-label={`Line endings ${doc.lineEnding.toUpperCase()}. Change to ${doc.lineEnding === "lf" ? "CRLF" : "LF"}.`}
+            onClick={() => void commands[doc.lineEnding === "lf" ? "lineEndingsCrlf" : "lineEndingsLf"].run()}
+          >
+            {doc.lineEnding.toUpperCase()}
+          </button>
           <span className="status-item status-low" title="Text encoding">{doc.bom ? "UTF-8 with BOM" : "UTF-8"}</span>
           <span className="status-item status-low">Markdown</span>
         </div>
