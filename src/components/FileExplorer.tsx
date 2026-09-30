@@ -1,19 +1,19 @@
-import { useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useRecentVersion } from "../features/recent";
 import { useWorkspace } from "../stores/workspaceStore";
 import { useDocuments, isDirty } from "../stores/documentsStore";
 import { basename, dirname, isInside, isMarkdownPath } from "../services/paths";
 import { useUi } from "../stores/uiStore";
-import type { DirEntry } from "../types";
-import { openPath } from "../features/documents";
+import type { DirEntry, RecentEntry } from "../types";
+import { closeDocument, openPath, openRecentFile } from "../features/documents";
 import {
-  closeWorkspace, createFileIn, createFolderIn, deleteEntry, duplicateFile, moveEntry, moveEntryTo, openFolderDialog, refreshWorkspace, renameEntry,
+  closeWorkspace, createFileIn, createFolderIn, deleteEntry, duplicateFile, moveEntry, moveEntryTo, openFolderDialog, openRecentFolder, refreshWorkspace, renameEntry,
   toggleDir,
 } from "../features/workspace";
 import { Icon } from "./Icon";
 import { pathKey, useGit } from "../stores/gitStore";
 import { ContextMenu, type MenuEntry } from "./ContextMenu";
 import { copyPath, copyRelativePath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
-import { closeDocument } from "../features/documents";
 import { backend } from "../services";
 
 interface ContextMenu {
@@ -205,6 +205,7 @@ export function FileExplorer() {
           <span className="explorer-title">Explorer</span>
         </div>
         <OpenFiles />
+        <RecentList />
         <div className="explorer-empty">
           <p>No folder is open.</p>
           {/* One button: with a file open, the folder dialog starts in that file's folder. */}
@@ -359,6 +360,42 @@ function OpenFiles() {
           ]}
         />
       )}
+    </section>
+  );
+}
+
+/**
+ * Without an open folder, recent files and folders that aren't open, so a
+ * file worked on alone is one click away (like the welcome screen's list).
+ */
+function RecentList() {
+  const docs = useDocuments((s) => s.docs);
+  const version = useRecentVersion((s) => s.version);
+  const [recent, setRecent] = useState<RecentEntry[]>([]);
+  // Reload when documents open or close (opening adds to the list) or the list changes.
+  useEffect(() => {
+    backend().listRecent().then(setRecent).catch(() => {});
+  }, [docs.length, version]);
+  const open = new Set(docs.map((d) => d.path));
+  const items = recent.filter((r) => !open.has(r.path)).slice(0, 6);
+  if (!items.length) return null;
+  return (
+    <section className="open-files" aria-label="Recent">
+      <h3 className="open-files-title">Recent</h3>
+      <ul className="open-files-list">
+        {items.map((r) => (
+          <li key={r.path}>
+            <button
+              className="tree-row"
+              title={r.path}
+              onClick={() => void (r.kind === "file" ? openRecentFile(r.path) : openRecentFolder(r.path))}
+            >
+              <Icon name={r.kind === "file" ? "file" : "folder"} size={15} className={r.kind === "file" ? "tree-file-icon" : "tree-folder-icon"} />
+              <span className="tree-label">{basename(r.path)}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

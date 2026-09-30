@@ -93,7 +93,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Edit menu line tools: Sort Lines (natural order), Remove Duplicate Lines, Join Lines, and Uppercase / Lowercase / Title Case
 - Copy button on code blocks in the preview (on hover or keyboard focus)
 - Large documents: long previews are built in parts as you scroll to them; live preview pauses above 1 MB of text, with render-on-demand
-- Rename a file from its tab (Rename…) or, with no folder open, from the Explorer's Open Files list (F2); Open Folder starts in the file's folder
+- Rename a file from its tab (Rename…) or, with no folder open, from the Explorer's Open Files list (F2), with recent files one click away; Open Folder starts in the file's folder
 - Compare with File… (File menu, or Compare with Active File in the Explorer): a line diff between the document and another file in the folder
 - Read-only files open locked (a bar offers Save As or Edit Anyway; formatting commands can't change them either), and View → Toggle Read-Only protects any document from accidental edits
 - Local file history: the previous version is kept on every save (30 per file, in app data); browse with a line diff and restore (undoable); the saved file is listed while there are unsaved changes (review before saving), and the last commit for files in Git

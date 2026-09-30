@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FileExplorer } from "../src/components/FileExplorer";
 import { DialogHost } from "../src/components/Dialogs";
@@ -42,6 +42,24 @@ describe("renaming a file opened on its own", () => {
     await expect(b.readTextFile("/notes/other.md")).rejects.toMatchObject({ kind: "outOfScope" });
     // The recent list follows the new name.
     expect((await b.listRecent()).map((r) => r.path)).toEqual(["/notes/renamed.md"]);
+  });
+
+  it("lists recent files that aren't open under Recent", async () => {
+    setupBackend();
+    const answers = ["/notes/a.md", "/notes/other.md"];
+    const b = new MemoryBackend({ files: { "/notes/a.md": "# A", "/notes/other.md": "x" }, prompt: () => answers.shift() ?? null });
+    setBackend(b);
+    await act(async () => {
+      await b.pickOpenFile();
+      await b.pickOpenFile();
+    });
+    render(<FileExplorer />);
+    await act(async () => void (await openPath("/notes/other.md")));
+    const recent = await screen.findByRole("region", { name: "Recent" });
+    expect(within(recent).getByRole("button", { name: /a\.md/ })).toHaveAttribute("title", "/notes/a.md");
+    expect(within(recent).queryByRole("button", { name: /other\.md/ })).toBeNull();
+    await userEvent.click(within(recent).getByRole("button", { name: /a\.md/ }));
+    await waitFor(() => expect(docs().map((d) => d.name)).toContain("a.md"));
   });
 
   it("renames the active file from File → Rename File…", async () => {
