@@ -92,6 +92,8 @@ export interface Settings {
   renderMath: boolean;
   renderDiagrams: boolean;
   lintMarkdown: boolean;
+  /** Lint checks (rule ids) turned off with "Don't Show This Check". */
+  lintDisabledRules: string[];
   spellCheck: boolean;
   pasteRichTextAsMarkdown: boolean;
   updateTocOnSave: boolean;

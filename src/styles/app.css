@@ -1118,6 +1118,26 @@ select {
 .settings-modal {
   width: min(780px, 100%);
 }
+.hidden-checks ul {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.hidden-checks li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.hidden-checks .button {
+  padding: 2px 9px;
+  font-size: 12px;
+}
 .settings-layout {
   display: grid;
   grid-template-columns: 150px 1fr;

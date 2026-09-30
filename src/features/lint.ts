@@ -16,6 +16,26 @@ export interface MarkdownProblem {
   fix?: ProblemFix;
 }
 
+/** Every check, by rule id, with the name shown when it's turned off. */
+export const LINT_RULES: Record<string, string> = {
+  "broken-link": "Links to missing files",
+  "missing-image": "Missing images",
+  "broken-anchor": "Links to missing headings",
+  "empty-link": "Links without a destination",
+  "duplicate-heading": "Duplicate headings",
+  "multiple-h1": "More than one top-level heading",
+  "heading-increment": "Skipped heading levels",
+  "image-alt": "Images without alt text",
+  "link-text": "Links without text",
+  "table-columns": "Table rows that don't match the header",
+  footnote: "Footnotes without a definition, or unused",
+  "heading-space": "# without a space",
+  "setext-heading": "--- under a line of text",
+  "list-space": "List items without a space",
+  "emphasis-space": "Bold with spaces inside",
+  "destination-spaces": "Paths with spaces",
+};
+
 /**
  * Edits that fix a problem. `at` is relative to the problem's start (so the fix
  * still applies after edits elsewhere), or "end" for the end of the document.
@@ -238,10 +258,10 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
  * repeating while fixes reveal new ones (a heading moved up a level can make
  * the next one skip). Returns the fixed text and how many fixes were applied.
  */
-export function fixAllProblems(text: string): { text: string; fixed: number } {
+export function fixAllProblems(text: string, skip: ReadonlySet<string> = new Set()): { text: string; fixed: number } {
   let fixed = 0;
   for (let pass = 0; pass < 6; pass++) {
-    const fixes = lintMarkdown(text).filter((p) => p.fix && p.rule !== "broken-anchor");
+    const fixes = lintMarkdown(text).filter((p) => p.fix && p.rule !== "broken-anchor" && !skip.has(p.rule));
     if (!fixes.length) break;
     // Apply from the end so earlier positions stay valid; skip fixes that would overlap.
     const changes = fixes.flatMap((p) => fixChanges(p.fix!, p.from, text)).sort((a, b) => b.from - a.from);

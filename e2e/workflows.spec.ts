@@ -404,6 +404,26 @@ test("Fix Table repairs a table typed with mistakes", async ({ page }) => {
   await expect(page.locator(".markdown-body table")).toHaveCount(2);
 });
 
+test("a lint check can be turned off from the Problems panel and back on in Settings", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# A\n\n#### Deep\n");
+  const problems = page.getByRole("button", { name: /Show problems/ });
+  await expect(problems).toHaveAccessibleName(/0 warnings, 1 suggestions/);
+  await problems.click();
+  // Keyboard: with the Problems list focused, the underlined access key runs the action.
+  await expect(page.locator(".cm-panel-lint ul")).toBeFocused();
+  await page.keyboard.press("d");
+  await expect(page.getByText(/“Skipped heading levels” won't be shown/)).toBeVisible();
+  await expect(problems).toHaveAccessibleName(/0 warnings, 0 suggestions/);
+
+  await page.keyboard.press(`${mod}+,`);
+  await page.getByRole("button", { name: "Show again: Skipped heading levels" }).click();
+  await page.keyboard.press("Escape");
+  await expect(problems).toHaveAccessibleName(/0 warnings, 1 suggestions/);
+});
+
 test("F8 and Shift+F8 move between problems", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);
@@ -506,10 +526,10 @@ test("lint quick fixes in the Problems panel", async ({ page }) => {
   await page.keyboard.insertText("| a | b |\n| - | - |\nText right after\n\nSee[^1].");
   await page.getByRole("button", { name: /Show problems/ }).click();
   const panel = page.locator(".cm-panel-lint");
-  await panel.getByRole("button", { name: "Add Blank Line" }).click();
+  await panel.locator('[data-action="Add Blank Line"]').click();
   await expect(page.locator(".cm-line").nth(3)).toHaveText("Text right after");
   await page.getByRole("button", { name: /Show problems/ }).click();
-  await panel.getByRole("button", { name: "Add Definition" }).click();
+  await panel.locator('[data-action="Add Definition"]').click();
   await expect(page.locator(".cm-line").last()).toHaveText("[^1]: ");
   await expect(page.getByRole("button", { name: /^0 warnings/ })).toBeVisible();
 });

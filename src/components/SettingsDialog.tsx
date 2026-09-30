@@ -1,5 +1,6 @@
 import { AiSettings } from "./AiSettings";
 import { SettingsLayout } from "./SettingsLayout";
+import { LINT_RULES } from "../features/lint";
 import { useEffect, useState } from "react";
 import { useUi } from "../stores/uiStore";
 import { DEFAULT_SETTINGS, useSettings } from "../stores/settingsStore";
@@ -62,7 +63,27 @@ export function SettingsDialog() {
           <label className="check"><input type="checkbox" checked={settings.lineWrapping} disabled={isLocked("lineWrapping")} onChange={(e) => update({ lineWrapping: e.target.checked })} /> Wrap long lines</label>
           <label className="check"><input type="checkbox" checked={settings.pasteRichTextAsMarkdown} disabled={isLocked("pasteRichTextAsMarkdown")} onChange={(e) => update({ pasteRichTextAsMarkdown: e.target.checked })} /> Convert pasted web/Word content to Markdown (Ctrl+Shift+V pastes plain text)</label>
           <label className="check"><input type="checkbox" checked={settings.spellCheck} disabled={isLocked("spellCheck")} onChange={(e) => update({ spellCheck: e.target.checked })} /> Check spelling (uses the system dictionary)</label>
-          <label className="check"><input type="checkbox" checked={settings.lintMarkdown} disabled={isLocked("lintMarkdown")} onChange={(e) => update({ lintMarkdown: e.target.checked })} /> Check Markdown for problems (broken links, headings, alt text)</label>
+          <label className="check"><input type="checkbox" checked={settings.lintMarkdown} disabled={isLocked("lintMarkdown")} onChange={(e) => update({ lintMarkdown: e.target.checked })} /> Check Markdown for problems (broken links, headings, tables, alt text)</label>
+          {settings.lintDisabledRules.length > 0 && (
+            <div className="hidden-checks">
+              <p className="muted small" id="hidden-checks-label">Checks you turned off:</p>
+              <ul aria-labelledby="hidden-checks-label">
+                {settings.lintDisabledRules.map((rule) => (
+                  <li key={rule}>
+                    <span>{LINT_RULES[rule] ?? rule}</span>
+                    <button
+                      className="button"
+                      disabled={isLocked("lintDisabledRules")}
+                      aria-label={`Show again: ${LINT_RULES[rule] ?? rule}`}
+                      onClick={() => update({ lintDisabledRules: settings.lintDisabledRules.filter((r) => r !== rule) })}
+                    >
+                      Show Again
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <label htmlFor="setting-tabSize">Tab size</label>
           <select {...field("tabSize")} onChange={(e) => update({ tabSize: Number(e.target.value) })}>
             {[2, 4, 8].map((n) => <option key={n} value={n}>{n} spaces</option>)}
