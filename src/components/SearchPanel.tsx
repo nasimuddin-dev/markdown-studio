@@ -146,14 +146,6 @@ export function SearchPanel() {
           </button>
         </div>
       </div>
-      {showFilters && (
-        <div className="search-filters" id="search-filters">
-          <label htmlFor="search-include">Files to include</label>
-          <input id="search-include" className="text-input" placeholder="e.g. docs, *.md, guide/**" value={include} onChange={(e) => setInclude(e.target.value)} spellCheck={false} />
-          <label htmlFor="search-exclude">Files to exclude</label>
-          <input id="search-exclude" className="text-input" placeholder="e.g. drafts, archive/**" value={exclude} onChange={(e) => setExclude(e.target.value)} spellCheck={false} />
-        </div>
-      )}
       <div className="search-box replace-box">
         <input
           className="text-input"
@@ -176,6 +168,14 @@ export function SearchPanel() {
           Replace All
         </button>
       </div>
+      {showFilters && (
+        <div className="search-filters" id="search-filters">
+          <label htmlFor="search-include">Files to include</label>
+          <input id="search-include" className="text-input" placeholder="e.g. docs, *.md, guide/**" value={include} onChange={(e) => setInclude(e.target.value)} spellCheck={false} />
+          <label htmlFor="search-exclude">Files to exclude</label>
+          <input id="search-exclude" className="text-input" placeholder="e.g. drafts, archive/**" value={exclude} onChange={(e) => setExclude(e.target.value)} spellCheck={false} />
+        </div>
+      )}
       <div className="search-summary" role="status" aria-live="polite">
         {error
           ? <span className="search-error">{error}</span>

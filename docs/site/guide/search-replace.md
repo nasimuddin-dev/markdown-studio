@@ -43,7 +43,7 @@ Find in Files needs an open folder.
 
 ### Files to include and exclude
 
-Click **…** (**File filters**) next to the search options to limit the search to some files. Both fields take patterns separated by commas:
+Click **…** (**File filters**) next to the search options to limit the search to some files; the two fields appear below **Replace with**. Both fields take patterns separated by commas:
 
 | Pattern | Matches |
 | --- | --- |
