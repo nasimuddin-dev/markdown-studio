@@ -158,6 +158,30 @@ export const fixTableAtCursor: StateCommand = ({ state, dispatch }) => {
   return true;
 };
 
+/**
+ * Formats every valid table in a document (outside fenced code), as Format
+ * Table does; anything that isn't a valid table is left as it is.
+ */
+export function formatAllTables(text: string): string {
+  const lines = text.split("\n");
+  let fence: string | null = null;
+  for (let i = 0; i < lines.length; i++) {
+    const f = /^ {0,3}(`{3,}|~{3,})/.exec(lines[i]);
+    if (f) {
+      if (!fence) fence = f[1];
+      else if (f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
+      continue;
+    }
+    if (fence || !isTableLine(lines[i])) continue;
+    let end = i;
+    while (end + 1 < lines.length && isTableLine(lines[end + 1]) && !/^ {0,3}(`{3,}|~{3,})/.test(lines[end + 1])) end++;
+    const formatted = formatTable(lines.slice(i, end + 1));
+    if (formatted) lines.splice(i, end + 1 - i, ...formatted);
+    i = end;
+  }
+  return lines.join("\n");
+}
+
 /** Line range (1-based, inclusive) of the table around `line`, if any. */
 export function tableAround(state: EditorState, lineNo: number): { first: number; last: number } | null {
   const doc = state.doc;

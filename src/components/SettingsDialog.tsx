@@ -119,6 +119,7 @@ export function SettingsDialog() {
           )}
           <p className="muted small">Untitled documents are never auto-saved. Recovery snapshots are kept either way.</p>
           <label className="check"><input type="checkbox" checked={settings.trimTrailingWhitespace} disabled={isLocked("trimTrailingWhitespace")} onChange={(e) => update({ trimTrailingWhitespace: e.target.checked })} /> Trim trailing whitespace on save (keeps Markdown line breaks)</label>
+          <label className="check"><input type="checkbox" checked={settings.formatTablesOnSave} disabled={isLocked("formatTablesOnSave")} onChange={(e) => update({ formatTablesOnSave: e.target.checked })} /> Align tables on save</label>
           <label className="check"><input type="checkbox" checked={settings.updateTocOnSave} disabled={isLocked("updateTocOnSave")} onChange={(e) => update({ updateTocOnSave: e.target.checked })} /> Keep the table of contents up to date on save</label>
           <label className="check"><input type="checkbox" checked={settings.explorerShowImages} disabled={isLocked("explorerShowImages")} onChange={(e) => { update({ explorerShowImages: e.target.checked }); void refreshWorkspace(); }} /> Show pictures in the Explorer</label>
           <label className="check"><input type="checkbox" checked={settings.showGitStatus} disabled={isLocked("showGitStatus")} onChange={(e) => update({ showGitStatus: e.target.checked })} /> Show Git branch, changed files and changed lines (runs Git, read-only)</label>

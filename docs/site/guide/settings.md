@@ -38,6 +38,7 @@ The moon button at the top right switches between light and dark quickly. **Ctrl
 | Auto save delay | 0.5, 1, 3, 10 or 30 seconds | 1 second |
 | Line endings for new files | LF (Unix, macOS), CRLF (Windows), Match operating system | LF |
 | Trim trailing whitespace on save | | Off |
+| Align tables on save | | Off |
 | Keep the table of contents up to date on save | | On |
 | Show Git branch, changed files and changed lines | | On |
 | Insert a final newline on save | | Off |

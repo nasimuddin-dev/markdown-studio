@@ -33,6 +33,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autoSave: "off",
   autoSaveDelayMs: 1000,
   trimTrailingWhitespace: false,
+  formatTablesOnSave: false,
   insertFinalNewline: false,
   newFileLineEnding: "lf",
   exportPageSize: "auto",
@@ -117,6 +118,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     autoSave: s.autoSave === "afterDelay" || s.autoSave === "onFocusChange" || s.autoSave === "off" ? s.autoSave : d.autoSave,
     autoSaveDelayMs: clamp(s.autoSaveDelayMs, 200, 60000, d.autoSaveDelayMs),
     trimTrailingWhitespace: bool(s.trimTrailingWhitespace, d.trimTrailingWhitespace),
+    formatTablesOnSave: bool(s.formatTablesOnSave, d.formatTablesOnSave),
     insertFinalNewline: bool(s.insertFinalNewline, d.insertFinalNewline),
     newFileLineEnding:
       s.newFileLineEnding === "auto" || s.newFileLineEnding === "lf" || s.newFileLineEnding === "crlf"

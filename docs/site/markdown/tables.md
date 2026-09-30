@@ -16,7 +16,7 @@ A table has a header row, a delimiter row of dashes, and body rows. Cells are se
 | Kiwi  | 2   |       |
 ```
 
-The outer pipes are optional, and the columns don't have to line up; **Format Table** lines them up for you.
+The outer pipes are optional, and the columns don't have to line up; **Format Table** lines them up for you. To line up every table whenever you save, turn on **Settings → Files → Align tables on save**.
 
 ## Alignment
 

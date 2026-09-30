@@ -110,6 +110,8 @@ export interface Settings {
   autoSave: AutoSaveMode;
   autoSaveDelayMs: number;
   trimTrailingWhitespace: boolean;
+  /** Align every table when saving (as Format Table does). */
+  formatTablesOnSave: boolean;
   insertFinalNewline: boolean;
   newFileLineEnding: "auto" | LineEnding;
   /** Paper size for PDF and Word export; "auto" follows the system region. */
