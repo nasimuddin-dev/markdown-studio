@@ -1198,3 +1198,20 @@ test("File > Export as Markdown with Images makes a .zip with the pictures", asy
   expect(await zip.file("README.md")!.async("string")).toContain("![Logo](images/logo.svg)");
   expect(await zip.file("images/logo.svg")!.async("string")).toContain("<svg");
 });
+
+test("Move Selection to New File creates the file and links to it", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-line", { hasText: /^### Task list$/ }).click();
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Shift+ArrowDown");
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("move selection to new file");
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Move to New File" });
+  await expect(dialog.getByRole("textbox")).toHaveValue("Task list.md");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-line", { hasText: "[Task list](Task%20list.md)" })).toHaveCount(1);
+  await expect(page.getByRole("treeitem", { name: /Task list\.md/ })).toBeVisible();
+});
