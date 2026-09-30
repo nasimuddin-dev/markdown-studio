@@ -25,6 +25,7 @@ Choose **Editor Only** (**Ctrl+1**), **Split View** (**Ctrl+2**) or **Preview On
 
 - **Links:** web links (`http`, `https`, `mailto`) open in your browser. `#heading` links scroll to the heading. Links to other Markdown files open them in a new tab. Other link types are blocked for safety.
 - **Task checkboxes:** click a checkbox (or focus it and press **Space**) to check or uncheck the task in the source. It's a normal edit, so **Ctrl+Z** undoes it.
+- **Code blocks:** hover over a code block (or **Tab** to it) and click **Copy** to put its code on the clipboard.
 - **Images:** local images are loaded relative to the document. They only show once the document is saved, because a relative path needs a location. See [Images](/markdown/images).
 
 ## Safe HTML

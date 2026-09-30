@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type ComponentProps, type MouseEvent } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import { classifyLink, markdownPlugins } from "../services/markdown";
 import { splitFrontMatter } from "../services/frontMatter";
@@ -10,6 +10,7 @@ import { notify } from "../stores/uiStore";
 import { useDocuments } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
 import { openPath } from "../features/documents";
+import { copyText } from "../features/pathActions";
 import { scrollSync } from "../features/scrollSync";
 import { toggleTaskInDocument } from "../features/tasks";
 import { mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
@@ -89,6 +90,25 @@ function mermaidSource(node: unknown): string | null {
   return (code.children ?? []).map((c) => c.value ?? "").join("");
 }
 
+/** A code block with a Copy button (shown on hover or keyboard focus). */
+function CodeBlock(props: ComponentProps<"pre">) {
+  const pre = useRef<HTMLPreElement>(null);
+  return (
+    <div className="code-block">
+      <pre ref={pre} {...props} />
+      <button
+        type="button"
+        className="code-copy"
+        title="Copy code"
+        aria-label="Copy code"
+        onClick={() => void copyText(pre.current?.textContent?.replace(/\n$/, "") ?? "", "Code")}
+      >
+        Copy
+      </button>
+    </div>
+  );
+}
+
 /** Document metadata (YAML front matter), shown like GitHub does: a key/value table. */
 function FrontMatterTable({ entries }: { entries: Array<[string, string]> }) {
   return (
@@ -117,7 +137,7 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text
     () => ({
       pre: ({ node, children, ...rest }) => {
         const source = renderDiagrams ? mermaidSource(node) : null;
-        return source !== null ? <MermaidDiagram code={source} /> : <pre {...rest}>{children}</pre>;
+        return source !== null ? <MermaidDiagram code={source} /> : <CodeBlock {...rest}>{children}</CodeBlock>;
       },
       img: ({ src, alt, title }) => (
         <LocalImage src={typeof src === "string" ? src : undefined} alt={alt} title={title} docPath={docPath} />

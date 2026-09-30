@@ -28,7 +28,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 ## Preview
 
 - A live GitHub-style preview with a configurable update delay, synced scrolling, and editor-only, split and preview-only views. [Preview guide](/guide/preview)
-- GitHub Flavored Markdown: tables, task lists, strikethrough, autolinks, emoji shortcodes (`:tada:`), and fenced code with syntax highlighting. [GFM](/markdown/gfm)
+- GitHub Flavored Markdown: tables, task lists, strikethrough, autolinks, emoji shortcodes (`:tada:`), and fenced code with syntax highlighting and a Copy button in the preview. [GFM](/markdown/gfm)
 - Clickable task checkboxes that update the source.
 - [Mermaid diagrams](/markdown/mermaid) and [LaTeX math](/markdown/math).
 - [YAML front matter, GitHub alerts and footnotes](/markdown/extras).

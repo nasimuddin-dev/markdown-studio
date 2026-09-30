@@ -380,6 +380,21 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
+test("code blocks in the preview have a Copy button", async ({ page }) => {
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("Intro\n\n```js\nconst answer = 42;\nconsole.log(answer);\n```\n");
+  const block = page.locator(".markdown-body .code-block");
+  await block.hover();
+  await block.getByRole("button", { name: "Copy code" }).click();
+  await expect(page.getByText("Code copied.")).toBeVisible();
+  // The system clipboard may use CRLF line endings.
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied.replace(/\r\n/g, "\n")).toBe("const answer = 42;\nconsole.log(answer);");
+});
+
 test("copy as formatted text puts HTML and Markdown on the clipboard", async ({ page }) => {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await start(page);

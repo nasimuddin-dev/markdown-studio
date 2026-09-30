@@ -1618,6 +1618,28 @@ select {
   box-shadow: var(--shadow);
 }
 
+/* Preview code blocks: Copy button */
+.code-block {
+  position: relative;
+}
+.code-copy {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text);
+  font: 12px var(--font-ui);
+  opacity: 0;
+  cursor: pointer;
+}
+.code-block:hover .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+
 /* Git: the committed lines behind a change bar */
 .editor-host .cm-git-peek {
   max-width: min(560px, 80vw);
