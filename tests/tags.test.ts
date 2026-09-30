@@ -1,4 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { EditorState } from "@codemirror/state";
+import { CompletionContext } from "@codemirror/autocomplete";
+import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
+import { ensureSyntaxTree } from "@codemirror/language";
+import { invalidateWorkspaceFiles, tagCompletionSource } from "../src/features/completion";
+import { setWorkspace } from "../src/features/workspace";
 import { collectFolderTags, extractTags } from "../src/features/tags";
 import { setupBackend } from "./helpers";
 
@@ -35,5 +41,39 @@ describe("collectFolderTags", () => {
       { path: "/ws/b.md", line: 2, count: 1 },
     ]);
     expect(tags.get("work")).toEqual([{ path: "/ws/a.md", line: 3, count: 1 }]);
+  });
+});
+
+describe("tag completion", () => {
+  const complete = async (doc: string) => {
+    const state = EditorState.create({ doc, extensions: [markdown({ base: markdownLanguage })] });
+    ensureSyntaxTree(state, state.doc.length, 5000);
+    const r = await tagCompletionSource(new CompletionContext(state, doc.length, false));
+    return r && { from: r.from, options: r.options.map((o) => [o.label, o.detail]) };
+  };
+
+  it("offers the folder's tags and this document's, with how many files use each", async () => {
+    setupBackend({ "/ws/a.md": "#idea #Work", "/ws/b.md": "---\ntags: [idea]\n---\n" });
+    await setWorkspace("/ws");
+    invalidateWorkspaceFiles();
+    expect(await complete("#local here\n\nSee #i")).toEqual({
+      from: 17,
+      options: [
+        ["#idea", "2 files"],
+        ["#work", "1 file"],
+        ["#local", "this document"],
+      ],
+    });
+  });
+
+  it("stays out of headings, code, link anchors and numbers", async () => {
+    setupBackend({ "/ws/a.md": "#idea" });
+    await setWorkspace("/ws");
+    invalidateWorkspaceFiles();
+    expect(await complete("# i")).toBeNull();
+    expect(await complete("`#i")).toBeNull();
+    expect(await complete("[x](#i")).toBeNull();
+    expect(await complete("a#i")).toBeNull();
+    expect(await complete("#12")).toBeNull();
   });
 });
