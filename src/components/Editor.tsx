@@ -18,6 +18,7 @@ import { useUi } from "../stores/uiStore";
 import type { Settings } from "../types";
 import { editorShowing, openReplacePanel, registerEditorView } from "../features/editorBridge";
 import { followLinks } from "../features/followLink";
+import { imageHover } from "../features/imageHover";
 import { paragraphFocus } from "../features/paragraphFocus";
 import { editorTopLine, scrollEditorToLine, scrollSync } from "../features/scrollSync";
 import { editorKeymap } from "../features/commands";
@@ -173,6 +174,7 @@ export function Editor() {
         search({ top: true }),
         linkCompletion(),
         followLinks(),
+        imageHover(),
         pendingPastes,
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         syntaxHighlighting(markdownHighlight),

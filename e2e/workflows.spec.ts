@@ -1115,3 +1115,16 @@ test("View > Toggle Dim Other Paragraphs dims all but the paragraph being writte
   await toggle();
   await expect(page.locator(".cm-line.cm-dimmed")).toHaveCount(0);
 });
+
+test("hovering an image link in the editor shows the picture", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-content").click();
+  await page.keyboard.press(`${mod}+End`);
+  const line = page.locator(".cm-line", { hasText: "![Logo](assets/logo.svg)" });
+  await line.scrollIntoViewIfNeeded();
+  await line.hover({ position: { x: 30, y: 8 } });
+  await expect(page.locator(".cm-image-preview img")).toBeVisible();
+  expect(await page.locator(".cm-image-preview img").evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+});
