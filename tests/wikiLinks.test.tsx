@@ -10,6 +10,9 @@ import { invalidateWorkspaceFiles, wikiLinkCompletionSource } from "../src/featu
 import { openPath } from "../src/features/documents";
 import { setWorkspace } from "../src/features/workspace";
 import { setupBackend } from "./helpers";
+import { checkWorkspaceLinks } from "../src/features/linkCheck";
+import { lintLinks } from "../src/features/lint";
+import { rewriteLinks } from "../src/features/linkUpdate";
 
 const render = (md: string) => {
   const { remarkPlugins, rehypePlugins } = markdownPlugins({ math: false });
@@ -34,7 +37,20 @@ describe("wiki links", () => {
 
   it("can be followed from the editor", () => {
     const text = "Go to [[Setup Guide#Install]] now";
-    expect(linkAt(text, text.indexOf("Setup") + 1)).toEqual({ kind: "href", href: "Setup%20Guide.md#install" });
+    expect(linkAt(text, text.indexOf("Setup") + 1)).toEqual({ kind: "href", href: "Setup Guide.md#install" });
+  });
+
+  it("are checked like other links, and counted as links to the page", async () => {
+    setupBackend({ "/ws/a.md": "[[b]] [[b#B]] [[missing]] [[b#nope]]\n", "/ws/b.md": "# B\n" });
+    const report = await checkWorkspaceLinks("/ws");
+    expect(report.files[0].problems.map((p) => p.message)).toEqual(["Linked file not found: missing.md", "No heading matches “#nope” in b.md."]);
+    expect(report.incoming.filter((l) => l.to === "/ws/b.md")).toHaveLength(3);
+    const problems = await lintLinks("[[missing]]", "/ws/a.md", async () => false);
+    expect(problems.map((p) => [p.message, !!p.fix])).toEqual([["Linked file not found: missing.md", false]]);
+  });
+
+  it("aren't rewritten by the link updates after a rename (their text isn't a path)", () => {
+    expect(rewriteLinks("[[b]] and [x](b.md)", "/ws/a.md", "/ws/a.md", (p) => (p === "/ws/b.md" ? "/ws/c.md" : p)).text).toBe("[[b]] and [x](c.md)");
   });
 
   it("complete with the folder's documents after [[", async () => {

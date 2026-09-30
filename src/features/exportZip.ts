@@ -28,7 +28,7 @@ export function planZipImages(text: string, docPath: string): { text: string; im
   const taken = new Set<string>();
   const edits: Array<{ from: number; to: number; insert: string }> = [];
   for (const { link, path } of localTargets(findAllLinks(text), docPath)) {
-    if (!path || !(link.image || IMAGE.test(path))) continue;
+    if (!path || link.wiki || !(link.image || IMAGE.test(path))) continue;
     let name = byPath.get(path);
     if (!name) {
       const file = basename(path);

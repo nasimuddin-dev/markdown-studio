@@ -1,4 +1,5 @@
 import GithubSlugger from "github-slugger";
+import { WIKI_LINK, wikiLinkHref } from "../services/wikiLinks";
 import { extractHeadings } from "./outline";
 import { resolveRelative } from "../services/paths";
 import { fixTable } from "./tables";
@@ -76,8 +77,10 @@ export interface LinkRef {
   definition?: boolean;
   /** True for an HTML `<a href>` or `<img src>`. */
   html?: boolean;
-  /** Length of the destination in the text when it differs from `target` (HTML entities decoded). */
+  /** Length of the destination in the text when it differs from `target` (HTML entities decoded, or a wiki link's page). */
   sourceLength?: number;
+  /** A wiki link (`[[Page]]`): `target` is the file it resolves to, not text that can be edited in place. */
+  wiki?: boolean;
 }
 
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
@@ -167,8 +170,23 @@ export function findHtmlLinks(text: string): LinkRef[] {
 }
 
 /** Every link destination in the text: inline links and images, reference definitions and HTML links and images. */
+/** Wiki links (`[[Page]]`), outside code, with the file they resolve to as target. */
+export function findWikiLinks(text: string): LinkRef[] {
+  const out: LinkRef[] = [];
+  for (const m of maskCode(text).matchAll(WIKI_LINK)) {
+    let target: string;
+    try {
+      target = decodeURI(wikiLinkHref(m[1]));
+    } catch {
+      continue;
+    }
+    out.push({ from: m.index!, to: m.index! + m[0].length, image: false, text: (m[2] ?? m[1]).trim(), target, targetFrom: m.index! + 2, sourceLength: m[1].length, wiki: true });
+  }
+  return out;
+}
+
 export function findAllLinks(text: string): LinkRef[] {
-  return [...findLinks(text), ...findLinkDefinitions(text), ...findHtmlLinks(text)].sort((a, b) => a.from - b.from);
+  return [...findLinks(text), ...findLinkDefinitions(text), ...findHtmlLinks(text), ...findWikiLinks(text)].sort((a, b) => a.from - b.from);
 }
 
 function lineStarts(text: string) {

@@ -32,6 +32,7 @@ const escapeTarget = (path: string) => path.replace(/[%\s()<>]/g, (c) => "%" + c
 export function rewriteLinks(text: string, oldDocPath: string, newDocPath: string, moved: (path: string) => string): { text: string; count: number } {
   const edits: Array<{ from: number; to: number; insert: string }> = [];
   for (const { link, path } of localTargets(findAllLinks(text), oldDocPath)) {
+    if (link.wiki) continue;
     if (!path || /^([a-zA-Z]:)?[\\/]/.test(link.target)) continue; // absolute paths are left alone
     const target = moved(path);
     const now = resolveRelative(newDocPath, link.target);
