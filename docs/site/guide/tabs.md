@@ -35,7 +35,7 @@ A dot on a tab marks unsaved changes, its name is shown in italics, and the tab'
 
 Right-click a tab for:
 
-- **Close**, **Close Others**, **Close to the Right** and **Close Saved**
+- **Close**, **Close Others**, **Close to the Right**, **Close Saved** and **Close All** (also **File → Close All Tabs**; each tab with unsaved changes asks first)
 - **Rename…**: renames the file on disk, even when no folder is open (a document that was never saved offers **Save As…** instead). The new name stays in the same folder, an existing file is never replaced, and the Recent list follows the new name.
 - **Open Containing Folder…** (for a file outside the open folder): opens the folder dialog in the file's folder, so you can open it in the Explorer
 - **File History…** (see [Saving & recovery](/guide/saving-and-recovery#file-history))

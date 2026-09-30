@@ -5,7 +5,7 @@ import { commands, formatShortcut } from "../features/commands";
 import { Icon } from "./Icon";
 import { tabHints } from "../features/tabNames";
 import { ContextMenu } from "./ContextMenu";
-import { closeOthers, closeSaved, closeToTheRight, copyPath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
+import { closeAllTabs, closeOthers, closeSaved, closeToTheRight, copyPath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
 import { useWorkspace } from "../stores/workspaceStore";
 import { isInside } from "../services/paths";
 import { backend } from "../services";
@@ -155,6 +155,7 @@ export function TabBar() {
             { label: "Close Others", run: () => closeOthers(menuDoc.id), disabled: docs.length < 2 },
             { label: "Close to the Right", run: () => closeToTheRight(menuDoc.id), disabled: docs[docs.length - 1]?.id === menuDoc.id },
             { label: "Close Saved", run: () => closeSaved() },
+            { label: "Close All", run: () => closeAllTabs() },
             "separator",
             { label: menuDoc.path ? "Rename…" : "Save As…", run: () => renameDocument(menuDoc.id) },
             ...(menuDoc.path && !isInsideWorkspace(menuDoc.path) ? [{ label: "Open Containing Folder…", run: () => openContainingFolder(menuDoc.path!) }] : []),

@@ -299,6 +299,7 @@ export const commands: Record<string, Command> = {
     run: async () => (await import("./templates")).saveAsTemplate(),
     enabled: hasActive,
   },
+  closeAllTabs: { id: "closeAllTabs", label: "Close All Tabs", run: async () => (await import("./pathActions")).closeAllTabs(), enabled: hasActive },
   moveToNewFile: {
     id: "moveToNewFile",
     label: "Move Selection to New File…",

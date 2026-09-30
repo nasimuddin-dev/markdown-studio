@@ -1324,3 +1324,16 @@ test("clicking a picture in the preview opens it at full size", async ({ page })
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
 });
+
+test("File > Close All Tabs asks about unsaved tabs, then closes them all", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("draft");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Close All Tabs" }).click();
+  await page.getByRole("button", { name: "Don't Save" }).click();
+  await expect(docTabs(page)).toHaveCount(0);
+});

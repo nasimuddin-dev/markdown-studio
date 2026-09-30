@@ -76,6 +76,9 @@ export function closeToTheRight(id: string) {
 
 export const closeSaved = () => closeAll(docs().filter((d) => !isDirty(d)).map((d) => d.id));
 
+/** Closes every tab, asking about each one with unsaved changes. */
+export const closeAllTabs = () => closeAll(docs().map((d) => d.id));
+
 const IMAGE_PATH = /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i;
 
 /** Markdown linking to `path` from a document at `docPath` (an image link for pictures), or null when no relative path exists. */
