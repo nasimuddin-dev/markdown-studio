@@ -69,7 +69,8 @@ describe("renaming a file opened on its own", () => {
     const row = screen.getByRole("button", { name: /a\.md/ });
     expect(list).toContainElement(row);
     expect(row).toHaveAttribute("aria-current", "true");
-    expect(screen.getByRole("button", { name: "Open “notes”" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Open Folder" })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Open Folder" })).toHaveAttribute("title", "Choose a folder (starts in notes)");
 
     answerPrompt("b.md");
     row.focus();

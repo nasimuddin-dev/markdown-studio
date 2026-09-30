@@ -207,14 +207,14 @@ export function FileExplorer() {
         <OpenFiles />
         <div className="explorer-empty">
           <p>No folder is open.</p>
-          <button className="button primary" onClick={() => void openFolderDialog()}>
+          {/* One button: with a file open, the folder dialog starts in that file's folder. */}
+          <button
+            className="button primary"
+            onClick={() => void openFolderDialog(activePath ? dirname(activePath) : undefined)}
+            title={activePath ? `Choose a folder (starts in ${basename(dirname(activePath))})` : "Choose a folder"}
+          >
             <Icon name="folderOpen" /> Open Folder
           </button>
-          {activePath && (
-            <button className="button" onClick={() => void openContainingFolder(activePath)} title={dirname(activePath)}>
-              <Icon name="folder" /> Open “{basename(dirname(activePath))}”
-            </button>
-          )}
         </div>
       </aside>
     );
