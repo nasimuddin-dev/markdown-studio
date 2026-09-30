@@ -23,7 +23,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Link autocompletion for workspace files, images, headings (also in other documents: `](guide.md#`), reference labels and footnotes. Ctrl/Cmd+click (or Alt+Enter) follows a link from the editor, and hovering an image link shows the picture. Paste a URL over selected text to make a link. Convert links between inline and reference style.
 - Paste or drop images, or choose one with **Format → Insert Image…**. Images from elsewhere are copied into an `assets/` folder next to the document and linked. [Images](/markdown/images)
 - Rich paste: content copied from web pages or Word is converted to Markdown.
-- Spell checking with the system dictionary, a word count with document and selection statistics, a line length setting that keeps the text a readable width, dimming of all but the paragraph being written, Focus Mode and Full Screen.
+- Spell checking with the system dictionary, a word count with document and selection statistics, task progress in the status bar, a line length setting that keeps the text a readable width, dimming of all but the paragraph being written, Focus Mode and Full Screen.
 
 ## Preview
 

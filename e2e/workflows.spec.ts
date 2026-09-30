@@ -1128,3 +1128,16 @@ test("hovering an image link in the editor shows the picture", async ({ page }) 
   await expect(page.locator(".cm-image-preview img")).toBeVisible();
   expect(await page.locator(".cm-image-preview img").evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
 });
+
+test("the status bar shows task progress and goes to the next open task", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Plan\n\n- [x] done\n- [ ] first open\n- [ ] second open\n");
+  const progress = page.getByRole("button", { name: /1 of 3 tasks done/ });
+  await expect(progress).toHaveText("1/3 tasks");
+  await progress.click();
+  await expect(page.locator(".cm-activeLine")).toHaveText("- [ ] first open");
+  await progress.click();
+  await expect(page.locator(".cm-activeLine")).toHaveText("- [ ] second open");
+});

@@ -8,6 +8,8 @@ import { getEditorView, showProblems } from "../features/editorBridge";
 import { changeCounts, gitHunksOf, useGitBaseVersion } from "../features/gitGutter";
 import { commands } from "../features/commands";
 import { backend } from "../services";
+import { EditorView } from "@codemirror/view";
+import { nextOpenTask, taskCounts } from "../features/taskCount";
 
 /** Status bar: encoding, language, line/column and save state (SRS §8). */
 export function StatusBar() {
@@ -59,11 +61,12 @@ export function StatusBar() {
               {cursor.selected > 0 && ` (${cursor.selected} selected)`}
             </span>
           )}
+          <TaskProgress content={doc.content} />
           <WordCount words={words} content={doc.content} />
           {autoSave !== "off" && doc.path && <span className="status-item" title="Auto save is on">Auto save</span>}
-          <span className="status-item" title="Line endings are preserved when saving">{doc.lineEnding.toUpperCase()}</span>
-          <span className="status-item" title="Text encoding">{doc.bom ? "UTF-8 with BOM" : "UTF-8"}</span>
-          <span className="status-item">Markdown</span>
+          <span className="status-item status-low" title="Line endings are preserved when saving">{doc.lineEnding.toUpperCase()}</span>
+          <span className="status-item status-low" title="Text encoding">{doc.bom ? "UTF-8 with BOM" : "UTF-8"}</span>
+          <span className="status-item status-low">Markdown</span>
         </div>
       )}
     </footer>
@@ -117,6 +120,33 @@ function GitBranch() {
       ⎇ {name}
       {sync}
     </span>
+  );
+}
+
+/** Task list progress ("3/7 tasks"); a click goes to the next open task. */
+function TaskProgress({ content }: { content: string }) {
+  const counts = useMemo(() => taskCounts(content), [content]);
+  if (!counts.total) return null;
+  const summary = `${counts.done} of ${counts.total} tasks done`;
+  const goToNext = () => {
+    const view = getEditorView();
+    if (!view) return;
+    const line = nextOpenTask(counts.open, view.state.doc.lineAt(view.state.selection.main.head).number);
+    if (line === null) return;
+    const pos = view.state.doc.line(Math.min(line, view.state.doc.lines)).from;
+    view.dispatch({ selection: { anchor: pos }, effects: EditorView.scrollIntoView(pos, { y: "center" }) });
+    view.focus();
+  };
+  return (
+    <button
+      className="status-item status-button"
+      title={counts.open.length ? `${summary}. Go to the next open task` : summary}
+      aria-label={counts.open.length ? `${summary}. Go to the next open task.` : summary}
+      onClick={goToNext}
+      disabled={!counts.open.length}
+    >
+      {counts.done}/{counts.total} tasks
+    </button>
   );
 }
 

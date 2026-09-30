@@ -113,6 +113,7 @@ The toolbar above the editor puts the common commands one click away, like a wor
 
 - Spelling is checked with your operating system's dictionary, and misspelled words are underlined. Turn it off in Settings.
 - The status bar shows the word count. Click it to see words, characters, lines, paragraphs and reading time for the document, and for the selection if there is one.
+- In a document with task lists, the status bar also shows how many tasks are done (`2/5 tasks`). Click it to go to the next open task. In a narrow window, the line ending, encoding and "Markdown" labels are hidden to make room.
 
 ## Saving
 

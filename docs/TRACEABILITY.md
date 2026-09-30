@@ -23,7 +23,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.20.0. **Done** means im
 | FR-021 | Done | Per-tab undo history (state preserved across tab switches) |
 | FR-022 | Done | CodeMirror default keymap and native clipboard |
 | FR-023 | Done | Ln/Col in the status bar; Go to Line (Ctrl/Cmd+G) |
-| FR-024 | Done | Tab dot and "(unsaved)" label, window title marker, status bar text |
+| FR-024 | Done | Tab dot and "(unsaved)" label, window title marker, status bar text. The status bar also shows task progress ([taskCount.ts](../src/features/taskCount.ts): a line scan, so the Markdown parser stays out of the startup bundle) and hides line ending, encoding and language below 900 px |
 | FR-025 | Done | Font size, font family, line numbers, wrapping, tab size |
 | FR-026 | Done | UTF-8 with BOM preservation; invalid UTF-8 refused rather than corrupted |
 | FR-030 | Done | react-markdown preview |

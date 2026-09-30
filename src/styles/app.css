@@ -1063,6 +1063,12 @@ select {
   min-width: 0;
   white-space: nowrap;
 }
+/* In a narrow window, the details that rarely change make room for the rest. */
+@media (max-width: 900px) {
+  .status-low {
+    display: none;
+  }
+}
 .status-state.dirty {
   color: var(--dirty);
   font-weight: 600;
