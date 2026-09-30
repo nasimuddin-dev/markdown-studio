@@ -60,6 +60,15 @@ Markdown syntax is highlighted as you type: headings, emphasis, links, lists, qu
 | Delete line | Ctrl+Shift+K |
 | Indent / outdent | Tab / Shift+Tab, or Ctrl+] / Ctrl+[ |
 
+The **Edit** menu (and the command palette) also has:
+
+- **Sort Lines (A to Z)** and **(Z to A)**: numbers sort naturally, so 2 comes before 10.
+- **Remove Duplicate Lines**: keeps the first of each repeated line; blank lines stay.
+- **Join Lines**: joins the selected lines, or the current line and the next one, with single spaces.
+- **Transform to Uppercase**, **Lowercase** and **Title Case**: for each selection, or the word at the cursor.
+
+Sorting and removing duplicates work on the selected lines, or on the whole document when nothing is selected. Each is one edit that **Ctrl+Z** undoes.
+
 When you press **Enter** inside a list or quote, the next line continues it.
 
 ## Undo and redo

@@ -24,7 +24,7 @@ const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
   },
   {
     label: "Edit",
-    items: () => [c("undo"), c("redo"), sep, c("find"), c("replace"), c("gotoLine"), c("goToHeading"), c("findInFiles"), c("checkLinks"), sep, c("gitNextChange"), c("gitPreviousChange"), c("gitShowChange"), c("gitRevertChange"), sep, c("selectAll")],
+    items: () => [c("undo"), c("redo"), sep, c("find"), c("replace"), c("gotoLine"), c("goToHeading"), c("findInFiles"), c("checkLinks"), sep, c("gitNextChange"), c("gitPreviousChange"), c("gitShowChange"), c("gitRevertChange"), sep, c("selectAll"), sep, c("sortLinesAsc"), c("sortLinesDesc"), c("removeDuplicateLines"), c("joinLines"), c("upperCase"), c("lowerCase"), c("titleCase")],
   },
   {
     label: "Format",
