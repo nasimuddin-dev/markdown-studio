@@ -6,7 +6,7 @@ import { basename, isInside, isMarkdownPath } from "../services/paths";
 import { openPath, saveAll } from "../features/documents";
 import { openFolderDialog } from "../features/workspace";
 import { requestReveal } from "../features/editorBridge";
-import { checkWorkspaceLinks, type LinkProblem, type LinkReport } from "../features/linkCheck";
+import { checkWorkspaceLinks, documentNames, findMentions, type LinkProblem, type LinkReport, type Mention } from "../features/linkCheck";
 import { useDocuments } from "../stores/documentsStore";
 import { Icon } from "./Icon";
 
@@ -21,7 +21,21 @@ export function LinkCheckPanel() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const active = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.path ?? null);
   const [incomingOpen, setIncomingOpen] = useState(true);
+  const [mentions, setMentions] = useState<Mention[] | null>(null);
+  const [mentionsOpen, setMentionsOpen] = useState(true);
   const run = useRef(0);
+
+  // Unlinked mentions of the open document, found again after each check.
+  useEffect(() => {
+    setMentions(null);
+    if (!root || !active || !isMarkdownPath(active) || !isInside(active, root) || !report) return;
+    let cancelled = false;
+    const text = useDocuments.getState().docs.find((d) => d.path === active)?.content ?? "";
+    void findMentions(root, active, documentNames(active, text)).then((found) => !cancelled && setMentions(found));
+    return () => {
+      cancelled = true;
+    };
+  }, [root, active, report]);
 
   const check = useCallback(async () => {
     if (!root) return;
@@ -104,6 +118,33 @@ export function LinkCheckPanel() {
                 <p className="incoming-none">No other file in the folder links here.</p>
               ))}
           </li>
+          {mentions && (
+            <li>
+              <button className="search-file" aria-expanded={mentionsOpen} onClick={() => setMentionsOpen(!mentionsOpen)} title="Places that name this document without linking to it">
+                <Icon name={mentionsOpen ? "chevronDown" : "chevronRight"} size={14} />
+                <Icon name="search" size={14} className="tree-file-icon" />
+                <span className="search-file-name">Mentions without a link</span>
+                <span className="badge">{mentions.length}</span>
+              </button>
+              {mentionsOpen &&
+                (mentions.length ? (
+                  <ul>
+                    {mentions.map((m, i) => (
+                      <li key={i}>
+                        <button className="search-match link-problem" title={`${m.path}, line ${m.line}`} onClick={() => void open(m.path, m)}>
+                          <span>
+                            <span className="incoming-file">{basename(m.path)}</span> {m.context}
+                          </span>
+                          <span className="link-problem-line">{m.line}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="incoming-none">No other file names it without a link.</p>
+                ))}
+            </li>
+          )}
         </ul>
       )}
       <div className="search-summary" role="status" aria-live="polite">

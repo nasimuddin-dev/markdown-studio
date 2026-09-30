@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkWorkspaceLinks, documentAnchors } from "../src/features/linkCheck";
+import { checkWorkspaceLinks, documentAnchors, documentNames, findMentions } from "../src/features/linkCheck";
 import { setupBackend } from "./helpers";
 
 describe("workspace link check", () => {
@@ -52,6 +52,18 @@ describe("workspace link check", () => {
     setupBackend({ "/ws/a.md": "# A\n\n[b](b.md)\n", "/ws/b.md": "# B\n" });
     const report = await checkWorkspaceLinks("/ws");
     expect(report).toMatchObject({ files: [], filesChecked: 2, linksChecked: 1 });
+  });
+
+  it("finds unlinked mentions of a document by its file name and title", async () => {
+    setupBackend({
+      "/ws/Release Plan.md": "---\ntitle: Q4 Roadmap\n---\n# Plan\n",
+      "/ws/a.md": "See the release plan for dates.\nThe Q4 roadmap is linked: [Q4 Roadmap](Release%20Plan.md).\n`release plan` in code, and releaseplan.\n",
+      "/ws/b.md": "Nothing here. Q4 Roadmaps are plural.\n",
+    });
+    expect(documentNames("/ws/Release Plan.md", "---\ntitle: Q4 Roadmap\n---\n# Plan\n")).toEqual(["Release Plan", "Q4 Roadmap"]);
+    const found = await findMentions("/ws", "/ws/Release Plan.md", ["Release Plan", "Q4 Roadmap"]);
+    expect(found.map((m) => `${m.path}:${m.line}:${m.column}`)).toEqual(["/ws/a.md:1:8"]);
+    expect(found[0].context).toBe("See the release plan for dates.");
   });
 
   it("names the file a misspelled link probably meant", async () => {

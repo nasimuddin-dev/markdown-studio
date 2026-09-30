@@ -2,7 +2,8 @@ import GithubSlugger from "github-slugger";
 import { backend } from "../services";
 import { basename, dirname, isInside, isMarkdownPath } from "../services/paths";
 import { extractHeadings } from "./outline";
-import { closestFileName, findAllLinks, lintMarkdown, localTargets, type Severity } from "./lint";
+import { frontMatterTitle } from "../services/frontMatter";
+import { closestFileName, findAllLinks, maskCode, lintMarkdown, localTargets, type Severity } from "./lint";
 
 export interface LinkProblem {
   line: number;
@@ -31,6 +32,60 @@ export interface LinkReport {
   incoming: IncomingLink[];
   filesChecked: number;
   linksChecked: number;
+}
+
+/** A place that names a document without linking to it. */
+export interface Mention {
+  path: string;
+  line: number;
+  column: number;
+  length: number;
+  /** The line, trimmed, for the list. */
+  context: string;
+}
+
+/** What a document is called: its file name without .md, and its title (front matter, else first H1), 3+ characters. */
+export function documentNames(docPath: string, text: string): string[] {
+  const stem = docPath.split(/[\\/]/).pop()!.replace(/\.(md|markdown)$/i, "");
+  const title = frontMatterTitle(text) ?? extractHeadings(text).find((h) => h.level === 1)?.text ?? "";
+  return [...new Set([stem, title].map((n) => n.trim()).filter((n) => n.length >= 3))];
+}
+
+/**
+ * Unlinked mentions: whole-word, case-insensitive occurrences of `names` in the
+ * folder's other Markdown files, outside code and links. At most `limit`.
+ */
+export async function findMentions(root: string, docPath: string, names: string[], limit = 200): Promise<Mention[]> {
+  if (!names.length) return [];
+  const b = backend();
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${names.map(escape).join("|")})(?![\\p{L}\\p{N}_])`, "giu");
+  const out: Mention[] = [];
+  const paths = (await b.listWorkspaceFiles(root).catch(() => [] as string[])).filter((p) => isMarkdownPath(p) && !(isInside(p, docPath) && isInside(docPath, p)));
+  for (const path of paths) {
+    const text = await b.readTextFile(path).then((f) => f.content, () => null);
+    if (text === null) continue;
+    // Code and links (whatever they point to) don't count as mentions.
+    let masked = maskCode(text);
+    const links = findAllLinks(text);
+    for (const link of links) masked = masked.slice(0, link.from) + " ".repeat(link.to - link.from) + masked.slice(link.to);
+    // A line that already links to the document doesn't need its mentions listed.
+    const linkedLines = new Set(
+      localTargets(links, path)
+        .filter(({ path: target }) => target && isInside(target, docPath) && isInside(docPath, target))
+        .map(({ link }) => text.slice(0, link.from).split("\n").length - 1),
+    );
+    const lines = masked.split("\n");
+    const original = text.split("\n");
+    for (const [i, line] of lines.entries()) {
+      if (linkedLines.has(i)) continue;
+      for (const m of line.matchAll(pattern)) {
+        out.push({ path, line: i + 1, column: m.index!, length: m[0].length, context: original[i].trim().slice(0, 120) });
+        if (out.length >= limit) return out;
+      }
+    }
+  }
+  return out;
 }
 
 /** Heading ids (GitHub-style slugs) and explicit HTML anchors of a document. */
