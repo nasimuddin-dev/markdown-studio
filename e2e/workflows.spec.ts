@@ -1471,3 +1471,16 @@ test("wiki links in the preview open the page", async ({ page }) => {
   await link.click();
   await expect(page.getByRole("tab", { name: /guide\.md/ })).toHaveAttribute("aria-selected", "true");
 });
+
+test("hovering a link to another document shows the start of it", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-content").click();
+  await page.keyboard.press(`${mod}+End`);
+  const line = page.locator(".cm-line", { hasText: "[guide](docs/guide.md)" });
+  await line.scrollIntoViewIfNeeded();
+  const box = (await line.locator("span", { hasText: "docs/guide.md" }).first().boundingBox())!;
+  await page.mouse.move(box.x + 10, box.y + box.height / 2);
+  await expect(page.locator(".cm-link-preview")).toContainText("Guide");
+});

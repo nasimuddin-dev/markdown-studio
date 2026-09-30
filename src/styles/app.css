@@ -829,6 +829,17 @@ select {
   object-fit: contain;
 }
 
+/* Hovering a link to another document shows the start of it. */
+.cm-link-preview {
+  max-width: 360px;
+  padding: 8px 10px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.45;
+  white-space: pre-line;
+  color: var(--text);
+}
+
 /* Hovering an image link in the editor shows the picture. */
 .cm-image-preview {
   padding: 6px;

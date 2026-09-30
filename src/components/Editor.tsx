@@ -20,6 +20,7 @@ import type { Settings } from "../types";
 import { editorShowing, openReplacePanel, registerEditorView } from "../features/editorBridge";
 import { followLinks } from "../features/followLink";
 import { imageHover } from "../features/imageHover";
+import { linkHover } from "../features/linkHover";
 import { paragraphFocus } from "../features/paragraphFocus";
 import { editorTopLine, scrollEditorToLine, scrollSync } from "../features/scrollSync";
 import { editorKeymap } from "../features/commands";
@@ -187,6 +188,7 @@ export function Editor() {
         linkCompletion(),
         followLinks(),
         imageHover(),
+        linkHover(),
         pendingPastes,
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         syntaxHighlighting(markdownHighlight),
