@@ -212,6 +212,19 @@ export async function copyActiveAsHtml() {
   }
 }
 
+/** A CSS string literal. */
+const cssString = (text: string) => `"${text.replace(/[\\"]/g, (c) => `\\${c}`).replace(/[\r\n]+/g, " ")}"`;
+
+/**
+ * Page style for printing: the document's title at the top of each page and
+ * "page / pages" at the bottom (CSS page margin boxes, supported by Chromium
+ * and so by Windows; other engines print without them).
+ */
+export function printPageStyle(title: string): string {
+  const box = "font: 9pt system-ui, sans-serif; color: #5c6575;";
+  return `@page { margin: 18mm 16mm; @top-center { content: ${cssString(title)}; ${box} } @bottom-center { content: counter(page) " / " counter(pages); ${box} } }`;
+}
+
 /**
  * Prints the active document (and "Save as PDF" through the system print
  * dialog). The rendered document is placed in a print-only container so it
@@ -221,16 +234,23 @@ export async function printActive() {
   const doc = activeDoc();
   if (!doc) return;
   let container: HTMLElement | null = null;
+  let pageStyle: HTMLStyleElement | null = null;
   try {
     const html = await renderHtml(doc.content, doc.path, loadImage, features());
     container = document.createElement("div");
     container.id = "print-root";
     container.innerHTML = `<article class="markdown-body">${html}</article>`;
     document.body.appendChild(container);
+    const { documentTitle } = await import("../services/exportHtml");
+    pageStyle = document.createElement("style");
+    pageStyle.dataset.print = "";
+    pageStyle.textContent = printPageStyle(documentTitle(doc.content, doc.name));
+    document.head.appendChild(pageStyle);
     document.body.classList.add("printing");
     const cleanup = () => {
       document.body.classList.remove("printing");
       container?.remove();
+      pageStyle?.remove();
       window.removeEventListener("afterprint", cleanup);
     };
     window.addEventListener("afterprint", cleanup);
@@ -242,6 +262,7 @@ export async function printActive() {
   } catch (e) {
     document.body.classList.remove("printing");
     container?.remove();
+    pageStyle?.remove();
     notify("error", describeError(e, "print the document"));
   }
 }

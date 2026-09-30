@@ -54,7 +54,7 @@ Export commands are in the **File** menu. You choose where to save the file.
 | HTML | Export as HTML… | One standalone, styled `.html` file with images embedded, sanitized like the preview |
 | Clipboard | Copy as Formatted Text | The rendered document as formatted text (headings, lists, tables, links, images), for pasting into Word, Outlook, Gmail or Google Docs. Plain-text editors receive the Markdown |
 | Clipboard | Copy as HTML | The HTML source, for pasting into a CMS or an HTML file |
-| Printer or PDF | Print / Save as PDF… (Ctrl+P) | The preview, printed with your system's print dialog |
+| Printer or PDF | Print / Save as PDF… (Ctrl+P) | The preview, printed with your system's print dialog. On Windows each page gets the document's title at the top and "page / pages" at the bottom (macOS and Linux print without them) |
 
 PDF and Word exports use A4 or Letter paper: automatically from your system's region, or the size you choose in [Settings → Export](/guide/settings#export).
 
