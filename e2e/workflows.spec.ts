@@ -851,3 +851,55 @@ test("formatting toolbar reflects and applies formatting", async ({ page }) => {
   await page.getByRole("menuitem", { name: "Toggle Formatting Toolbar" }).click();
   await expect(toolbar).toBeHidden();
 });
+
+test("editor and preview scroll to the same source line; double-click in the preview shows the source", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  // Paragraphs of many short source lines: tall in the editor, short in the preview, so proportional scrolling would drift.
+  const sections = Array.from({ length: 40 }, (_, i) => `## Section ${i}\n\n` + Array.from({ length: 15 }, (_, j) => `Section ${i} line ${j}`).join("\n"));
+  await page.keyboard.insertText(sections.join("\n\n") + "\n");
+  const preview = page.locator(".preview");
+  await expect(preview.locator("h2")).toHaveCount(40);
+
+  /** Scrolls `pane` so `target` is at its top. */
+  const scrollToTop = (pane: string, target: string) =>
+    page.evaluate(
+      ([pane, target]) => {
+        const el = document.querySelector<HTMLElement>(pane)!;
+        const found = [...el.querySelectorAll<HTMLElement>(target.split("|")[0])].find((e) => e.textContent === target.split("|")[1])!;
+        el.scrollTop += found.getBoundingClientRect().top - el.getBoundingClientRect().top;
+      },
+      [pane, target],
+    );
+  /** How far `target` is below the top of `pane`. */
+  const offset = (pane: string, target: string) =>
+    page.evaluate(
+      ([pane, target]) => {
+        const el = document.querySelector<HTMLElement>(pane)!;
+        const found = [...el.querySelectorAll<HTMLElement>(target.split("|")[0])].find((e) => e.textContent === target.split("|")[1]);
+        return found ? found.getBoundingClientRect().top - el.getBoundingClientRect().top : null;
+      },
+      [pane, target],
+    );
+
+  // Editor → preview: the heading at the top of the editor is at the top of the preview.
+  await page.locator(".cm-scroller").evaluate((el) => (el.scrollTop = el.scrollHeight / 2));
+  await page.waitForTimeout(300);
+  await scrollToTop(".cm-scroller", ".cm-line|## Section 20");
+  await expect.poll(async () => Math.abs((await offset(".preview", "h2|Section 20")) ?? 999)).toBeLessThan(4);
+
+  // Preview → editor.
+  await page.waitForTimeout(300);
+  await scrollToTop(".preview", "h2|Section 30");
+  await expect.poll(async () => Math.abs((await offset(".cm-scroller", ".cm-line|## Section 30")) ?? 999)).toBeLessThan(4);
+
+  // Double-clicking a paragraph puts the cursor on its first source line, at the same height.
+  await page.waitForTimeout(300);
+  const paragraph = preview.locator("p", { hasText: "Section 31 line 0" });
+  await paragraph.dblclick({ position: { x: 5, y: 5 } });
+  await expect(page.locator(".cm-activeLine")).toHaveText("Section 31 line 0");
+  await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
+  const [inPreview, inEditor] = [await offset(".preview", "p|" + (await paragraph.textContent())), await offset(".cm-scroller", ".cm-line|Section 31 line 0")];
+  expect(Math.abs(inPreview! - inEditor!)).toBeLessThan(30);
+});

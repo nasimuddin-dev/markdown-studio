@@ -12,6 +12,8 @@ import { useSettings } from "../stores/settingsStore";
 import { openPath } from "../features/documents";
 import { copyText } from "../features/pathActions";
 import { scrollSync } from "../features/scrollSync";
+import { revealLineAt } from "../features/editorBridge";
+import { lineForTop, rehypeSourceLines, topForLine } from "../services/sourceLines";
 import { toggleTaskInDocument } from "../features/tasks";
 import { mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
 
@@ -91,10 +93,10 @@ function mermaidSource(node: unknown): string | null {
 }
 
 /** A code block with a Copy button (shown on hover or keyboard focus). */
-function CodeBlock(props: ComponentProps<"pre">) {
+function CodeBlock({ line, ...props }: ComponentProps<"pre"> & { line?: string }) {
   const pre = useRef<HTMLPreElement>(null);
   return (
-    <div className="code-block">
+    <div className="code-block" data-line={line}>
       <pre ref={pre} {...props} />
       <button
         type="button"
@@ -130,14 +132,24 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text
   const renderDiagrams = useSettings((s) => s.settings.renderDiagrams);
   const plugins = useMemo(() => {
     const base = markdownPlugins({ math: renderMath });
-    return { ...base, rehypePlugins: [...base.rehypePlugins, rehypeChunks] };
+    return { ...base, rehypePlugins: [...base.rehypePlugins, rehypeSourceLines, rehypeChunks] };
   }, [renderMath]);
   const frontMatter = useMemo(() => splitFrontMatter(text), [text]);
   const components = useMemo<Components>(
     () => ({
       pre: ({ node, children, ...rest }) => {
         const source = renderDiagrams ? mermaidSource(node) : null;
-        return source !== null ? <MermaidDiagram code={source} /> : <CodeBlock {...rest}>{children}</CodeBlock>;
+        // The source line goes on the outermost element, like other top-level blocks.
+        const { "data-line": line, ...props } = rest as typeof rest & { "data-line"?: string };
+        return source !== null ? (
+          <div data-line={line}>
+            <MermaidDiagram code={source} />
+          </div>
+        ) : (
+          <CodeBlock line={line} {...props}>
+            {children}
+          </CodeBlock>
+        );
       },
       img: ({ src, alt, title }) => (
         <LocalImage src={typeof src === "string" ? src : undefined} alt={alt} title={title} docPath={docPath} />
@@ -160,7 +172,12 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text
         const chunk = node?.properties?.dataChunk;
         if (typeof chunk !== "string") return <section {...rest}>{children}</section>;
         return (
-          <PreviewChunk index={chunk} height={String(node!.properties.dataHeight)} tasksBefore={String(node!.properties.dataTasksBefore)}>
+          <PreviewChunk
+            index={chunk}
+            height={String(node!.properties.dataHeight)}
+            tasksBefore={String(node!.properties.dataTasksBefore)}
+            line={node!.properties.dataLine === undefined ? undefined : String(node!.properties.dataLine)}
+          >
             {children}
           </PreviewChunk>
         );
@@ -209,10 +226,34 @@ function DebouncedMarkdown({ text, docPath }: { text: string; docPath: string | 
     );
   }
   return (
-    <article className="markdown-body" key={generation}>
+    <article className="markdown-body" key={generation} data-lines={lineCount(debounced)}>
       <MarkdownView text={debounced} docPath={docPath} />
     </article>
   );
+}
+
+function lineCount(text: string): number {
+  let n = 1;
+  for (let i = text.indexOf("\n"); i >= 0; i = text.indexOf("\n", i + 1)) n++;
+  return n;
+}
+
+/**
+ * The preview's top-level blocks as scroll anchors (source line and top in
+ * pixels within the scrolled content), ending with the end of the document;
+ * null when there are none (an empty or paused preview).
+ */
+function previewBlocks(el: HTMLElement) {
+  const article = el.querySelector<HTMLElement>(":scope > article[data-lines]");
+  if (!article) return null;
+  const blocks = article.querySelectorAll<HTMLElement>(":scope > [data-line], :scope > .preview-chunk > [data-line], :scope > .preview-chunk[data-line]");
+  if (!blocks.length) return null;
+  const base = el.getBoundingClientRect().top - el.scrollTop;
+  const end = { line: Number(article.dataset.lines) + 1, top: el.scrollHeight };
+  return {
+    count: blocks.length + 1,
+    anchor: (i: number) => (i < blocks.length ? { line: Number(blocks[i].dataset.line), top: blocks[i].getBoundingClientRect().top - base } : end),
+  };
 }
 
 /** A jump in length this big (a paste, a reload) re-creates the preview instead of updating it. */
@@ -274,11 +315,15 @@ export function Preview() {
     if (!el) return;
     const onScroll = () => {
       const max = el.scrollHeight - el.clientHeight;
-      scrollSync.emit("preview", max > 0 ? el.scrollTop / max : 0);
+      const blocks = previewBlocks(el);
+      scrollSync.emit("preview", { ratio: max > 0 ? el.scrollTop / max : 0, line: blocks && lineForTop(blocks.count, blocks.anchor, el.scrollTop) });
     };
     el.addEventListener("scroll", onScroll, { passive: true });
-    const off = scrollSync.on("editor", (ratio) => {
-      el.scrollTop = ratio * (el.scrollHeight - el.clientHeight);
+    const off = scrollSync.on("editor", ({ ratio, line }) => {
+      const max = el.scrollHeight - el.clientHeight;
+      // The very top and bottom stay aligned; in between, the same source line goes to the top.
+      const blocks = line !== null && ratio > 0 && ratio < 1 ? previewBlocks(el) : null;
+      el.scrollTop = (blocks && line !== null ? topForLine(blocks.count, blocks.anchor, line) : null) ?? ratio * max;
     });
     return () => {
       el.removeEventListener("scroll", onScroll);
@@ -302,8 +347,19 @@ export function Preview() {
     await followPreviewLink(anchor, docPath, ref.current);
   };
 
+  /** In split view, a double-click shows the block's source in the editor, at the same height. */
+  const onDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (useSettings.getState().settings.viewMode !== "split" || !ref.current) return;
+    const block = (e.target as HTMLElement).closest<HTMLElement>("[data-line]");
+    if (!block || !ref.current.contains(block) || (e.target as HTMLElement).closest("a, button, input")) return;
+    const top = block.getBoundingClientRect().top - ref.current.getBoundingClientRect().top;
+    // The preview stays where it is while the editor scrolls to the line.
+    scrollSync.hold("preview");
+    revealLineAt(Number(block.dataset.line), Math.min(top, ref.current.clientHeight - 40));
+  };
+
   return (
-    <div className="preview" ref={ref} onClick={onClick} role="document" aria-label="Markdown preview" tabIndex={0}>
+    <div className="preview" ref={ref} onClick={onClick} onDoubleClick={onDoubleClick} role="document" aria-label="Markdown preview" tabIndex={0}>
       {doc ? <DebouncedMarkdown key={doc.id} text={doc.content} docPath={docPath} /> : <article className="markdown-body" />}
     </div>
   );

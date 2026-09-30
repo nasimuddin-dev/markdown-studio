@@ -82,7 +82,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - YAML front matter (`---` metadata at the top, as used by Jekyll, Hugo and Obsidian) is shown as a tidy metadata table in the preview, left out of HTML, PDF and Word exports, and its `title` names exported documents
 - GitHub alerts (Format → Insert Callout): `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` render as coloured callouts with icons in the preview and HTML export, and as labelled callouts in PDF and Word
 - New from Template (File menu): meeting notes, README, blog post, decision record (ADR), weekly status report, changelog and daily journal, with `{{date}}`, `{{time}}`, `{{week}}` and `{{cursor}}` placeholders. Markdown files in a `templates/` folder of the open workspace appear as templates too
-- Editor-only, split and preview-only views, resizable panels and synced scrolling
+- Editor-only, split and preview-only views, resizable panels and scrolling synced by source line (the preview's blocks carry their line); double-click in the preview to put the cursor on that block's source
 - Present as Slides (View menu): the document as full-window slides, split at `---` lines (or at `#`/`##` headings), with keyboard navigation and speaker notes (text after a `Note:` line, shown with N); View → Print Slides prints a slide per landscape page
 - Light, dark and system themes; configurable font, font size, line numbers, wrapping and tab size
 - Optional auto save (after a delay, or on tab/window focus change) that never overwrites external changes

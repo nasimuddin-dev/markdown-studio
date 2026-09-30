@@ -31,6 +31,15 @@ export function revealLine(line: number) {
   view.focus();
 }
 
+/** Moves the cursor to the start of a line, scrolled `top` pixels below the top of the editor. */
+export function revealLineAt(line: number, top: number) {
+  if (!view) return;
+  const doc = view.state.doc;
+  const pos = doc.line(Math.max(1, Math.min(line, doc.lines))).from;
+  view.dispatch({ selection: { anchor: pos }, effects: EditorView.scrollIntoView(pos, { y: "start", yMargin: Math.max(0, top) }) });
+  view.focus();
+}
+
 /** A selection to apply once a given document is shown in the editor. */
 let pendingReveal: { docId: string; line: number; column: number; length: number } | null = null;
 let currentDocId: string | null = null;

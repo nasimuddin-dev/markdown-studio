@@ -17,7 +17,7 @@ import { useSettings } from "../stores/settingsStore";
 import { useUi } from "../stores/uiStore";
 import type { Settings } from "../types";
 import { editorShowing, openReplacePanel, registerEditorView } from "../features/editorBridge";
-import { scrollSync } from "../features/scrollSync";
+import { editorTopLine, scrollEditorToLine, scrollSync } from "../features/scrollSync";
 import { editorKeymap } from "../features/commands";
 import { minimalChange } from "../features/saveTransforms";
 import { moveTableCell } from "../features/tables";
@@ -251,12 +251,17 @@ export function Editor() {
     const onScroll = () => {
       const el = view.scrollDOM;
       const max = el.scrollHeight - el.clientHeight;
-      scrollSync.emit("editor", max > 0 ? el.scrollTop / max : 0);
+      scrollSync.emit("editor", { ratio: max > 0 ? el.scrollTop / max : 0, line: editorTopLine(view) });
     };
     view.scrollDOM.addEventListener("scroll", onScroll, { passive: true });
-    const off = scrollSync.on("preview", (ratio) => {
+    const off = scrollSync.on("preview", ({ ratio, line }) => {
       const el = view.scrollDOM;
-      el.scrollTop = ratio * (el.scrollHeight - el.clientHeight);
+      // The very top and bottom stay aligned; in between, the same source line goes to the top.
+      if (line === null || ratio <= 0 || ratio >= 1) {
+        el.scrollTop = ratio * (el.scrollHeight - el.clientHeight);
+        return;
+      }
+      scrollEditorToLine(view, line);
     });
     // Forget editor state for closed tabs.
     const unsub = useDocuments.subscribe((s) => {

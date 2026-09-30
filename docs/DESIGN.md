@@ -225,7 +225,7 @@ A normal close with unsaved documents asks Save / Don't Save / Cancel first, so 
 
 ## 8. Preview pipeline
 
-The same unified pipeline (`services/markdown.ts`) feeds the live preview and the HTML export, so they look the same. The preview updates after a short pause in typing (a setting), and pauses for documents over 1 MB until the user asks it to render. For long documents a last rehype step (preview only) groups the top-level blocks into chunks; a chunk is a sized placeholder until it scrolls near the viewport, so only the visible part of the page is built (`components/PreviewChunks.tsx`).
+The same unified pipeline (`services/markdown.ts`) feeds the live preview and the HTML export, so they look the same. The preview updates after a short pause in typing (a setting), and pauses for documents over 1 MB until the user asks it to render. For long documents a last rehype step (preview only) groups the top-level blocks into chunks; a chunk is a sized placeholder until it scrolls near the viewport, so only the visible part of the page is built (`components/PreviewChunks.tsx`). Before that, a preview-only step marks each top-level block with the source line it starts on (`data-line`, `services/sourceLines.ts`); split-view scrolling syncs by interpolating between those lines rather than by scroll proportion, and a double-click in the preview uses them to find the source.
 
 ```mermaid
 flowchart LR

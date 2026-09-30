@@ -53,7 +53,10 @@ export function rehypeChunks() {
       const chunk: Element = {
         type: "element",
         tagName: "section",
-        properties: { dataChunk: String(chunks.length), dataHeight: String(estimateHeight(source.slice(first, last), count)), dataTasksBefore: String(tasksBefore) },
+        properties: {
+          dataChunk: String(chunks.length),
+          dataLine: current.find((c): c is Element => c.type === "element" && c.properties.dataLine !== undefined)?.properties.dataLine,
+          dataHeight: String(estimateHeight(source.slice(first, last), count)), dataTasksBefore: String(tasksBefore) },
         children: current,
       };
       tasksBefore += countTasks(chunk);
@@ -85,7 +88,7 @@ export function mountAllChunks() {
 }
 
 /** One chunk: a sized placeholder until it nears the visible area. */
-export function PreviewChunk({ index, height, tasksBefore, children }: { index: string; height: string; tasksBefore: string; children: ReactNode }) {
+export function PreviewChunk({ index, height, tasksBefore, line, children }: { index: string; height: string; tasksBefore: string; line?: string; children: ReactNode }) {
   // The first chunk is at the top, where the preview opens.
   const [mounted, setMounted] = useState(index === "0");
   const ref = useRef<HTMLDivElement>(null);
@@ -110,6 +113,6 @@ export function PreviewChunk({ index, height, tasksBefore, children }: { index: 
       {children}
     </div>
   ) : (
-    <div ref={ref} className="preview-chunk pending" style={{ height: `${height}px` }} aria-hidden="true" />
+    <div ref={ref} className="preview-chunk pending" data-line={line} style={{ height: `${height}px` }} aria-hidden="true" />
   );
 }
