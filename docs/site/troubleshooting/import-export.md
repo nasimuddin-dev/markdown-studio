@@ -19,7 +19,7 @@ description: Fix Markpion import and export problems, including scanned PDFs, lo
 
 **Possible cause:** PDFs store positioned text, not structure. Markpion infers headings from font size and lists from bullets or numbers, which doesn't always match the original.
 
-**Solution:** fix the structure in the editor, for example with **Ctrl+Alt+1**–**3** for headings and **Ctrl+Shift+8** for lists. If you have the original Word file, import that instead: `.docx` keeps headings, lists and tables reliably.
+**Solution:** fix the structure in the editor, for example with **Ctrl+Alt+1**–**6** for headings and **Ctrl+Shift+8** for lists. If you have the original Word file, import that instead: `.docx` keeps headings, lists and tables reliably.
 
 ## "Some characters need a different PDF method"
 

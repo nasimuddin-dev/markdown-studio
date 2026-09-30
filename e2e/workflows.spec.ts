@@ -547,6 +547,16 @@ test("formatting toolbar reflects and applies formatting", async ({ page }) => {
   await toolbar.getByRole("combobox", { name: "Paragraph style" }).selectOption("Heading 2");
   await expect(page.locator(".cm-line").filter({ hasText: "## *plain line*" })).toHaveCount(1);
   await expect(toolbar.getByRole("combobox", { name: "Paragraph style" })).toHaveValue("heading2");
+  await toolbar.getByRole("combobox", { name: "Paragraph style" }).selectOption("Heading 5");
+  await expect(page.locator(".cm-line").filter({ hasText: "##### *plain line*" })).toHaveCount(1);
+  await expect(toolbar.getByRole("combobox", { name: "Paragraph style" })).toHaveValue("heading5");
+
+  // Inside a table, the table button opens the table tools.
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.insertText("\n\n| A | B |\n| - | - |\n| 1 | 2 |");
+  await toolbar.getByRole("button", { name: "Table tools" }).click();
+  await page.getByRole("menuitem", { name: "Insert Row Below" }).click();
+  await expect(page.locator(".cm-line").filter({ hasText: /^\|\s*\|\s*\|$/ })).toHaveCount(1);
 
   // One tab stop; arrow keys move between the controls.
   await toolbar.getByRole("button", { name: "Undo" }).focus();

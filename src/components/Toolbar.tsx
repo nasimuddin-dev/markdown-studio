@@ -44,6 +44,16 @@ const HEADINGS = [
   { level: 1, label: "Heading 1", command: "heading1" },
   { level: 2, label: "Heading 2", command: "heading2" },
   { level: 3, label: "Heading 3", command: "heading3" },
+  { level: 4, label: "Heading 4", command: "heading4" },
+  { level: 5, label: "Heading 5", command: "heading5" },
+  { level: 6, label: "Heading 6", command: "heading6" },
+];
+
+/** Shown by the table button when the cursor is already in a table. */
+const TABLE_ACTIONS = [
+  "tableRowAbove", "tableRowBelow", "tableColumnLeft", "tableColumnRight", "separator",
+  "tableDeleteRow", "tableDeleteColumn", "separator",
+  "formatTable", "sortTableAsc", "sortTableDesc", "copyTableCsv",
 ];
 
 const AI_ACTIONS = ["aiImprove", "aiFixGrammar", "aiShorter", "aiSummarize", "aiContinue", "aiTranslate", "separator", "aiWrite", "aiAsk"];
@@ -57,6 +67,13 @@ const tooltip = (id: string) => {
 const run = (id: string) => {
   void commands[id]?.run();
 };
+
+const menuItems = (ids: string[]) =>
+  ids.map((id): MenuEntry =>
+    id === "separator"
+      ? "separator"
+      : { label: commands[id].label.replace(/^(AI|Table): /, ""), shortcut: formatShortcut(commands[id].shortcut) || undefined, run: () => run(id) },
+  );
 
 /**
  * Formatting toolbar above the editor. Buttons show the formatting at the
@@ -75,6 +92,7 @@ export function Toolbar() {
   const bar = useRef<HTMLDivElement>(null);
   const [focusIndex, setFocusIndex] = useState(0);
   const [aiMenu, setAiMenu] = useState<{ x: number; y: number } | null>(null);
+  const [tableMenu, setTableMenu] = useState<{ x: number; y: number } | null>(null);
 
   const items = () => [...(bar.current?.querySelectorAll<HTMLElement>("[data-toolbar-item]") ?? [])];
   const onKeyDown = (e: KeyboardEvent) => {
@@ -100,6 +118,27 @@ export function Toolbar() {
         <div className="toolbar-group" key={g}>
           {group.map((b) => {
             const pressed = b.pressed?.(format);
+            // Inside a table the table button opens the table tools instead of inserting another table.
+            if (b.id === "table" && format.table)
+              return (
+                <button
+                  key={b.id}
+                  className="toolbar-button pressed"
+                  title="Table tools"
+                  aria-label="Table tools"
+                  aria-haspopup="menu"
+                  aria-expanded={!!tableMenu}
+                  tabIndex={tab()}
+                  data-toolbar-item
+                  onMouseDown={keepFocus}
+                  onClick={(e) => {
+                    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                    setTableMenu({ x: r.left, y: r.bottom + 2 });
+                  }}
+                >
+                  <Icon name={b.icon} size={16} />
+                </button>
+              );
             return (
               <button
                 key={b.id}
@@ -121,7 +160,7 @@ export function Toolbar() {
               className="toolbar-select"
               aria-label="Paragraph style"
               title="Paragraph style"
-              value={heading ? heading.command : "other"}
+              value={heading?.command ?? "paragraph"}
               tabIndex={tab()}
               data-toolbar-item
               onChange={(e) => {
@@ -134,11 +173,6 @@ export function Toolbar() {
                   {h.label}
                 </option>
               ))}
-              {!heading && (
-                <option value="other" disabled>
-                  Heading {format.heading}
-                </option>
-              )}
             </select>
           )}
         </div>
@@ -162,15 +196,22 @@ export function Toolbar() {
           </button>
         </div>
       )}
+      {tableMenu && (
+        <ContextMenu
+          x={tableMenu.x}
+          y={tableMenu.y}
+          label="Table tools"
+          onClose={() => setTableMenu(null)}
+          items={menuItems(TABLE_ACTIONS)}
+        />
+      )}
       {aiMenu && (
         <ContextMenu
           x={aiMenu.x}
           y={aiMenu.y}
           label="AI assistant"
           onClose={() => setAiMenu(null)}
-          items={AI_ACTIONS.map((id): MenuEntry =>
-            id === "separator" ? "separator" : { label: commands[id].label.replace(/^AI: /, ""), shortcut: formatShortcut(commands[id].shortcut) || undefined, run: () => run(id) },
-          )}
+          items={menuItems(AI_ACTIONS)}
         />
       )}
     </div>

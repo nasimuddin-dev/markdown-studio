@@ -17,7 +17,7 @@ Every example below renders in the Markpion preview as described.
 ### Heading 3
 ```
 
-Up to six levels (`######`). Each heading gets an anchor, so you can link to it with `[see setup](#setup)`. **Ctrl+Alt+1** to **3** apply heading levels (see [Writing tools](/guide/writing-tools#headings)).
+Up to six levels (`######`). Each heading gets an anchor, so you can link to it with `[see setup](#setup)`. **Ctrl+Alt+1** to **6** apply heading levels (see [Writing tools](/guide/writing-tools#headings)).
 
 ## Paragraphs and line breaks
 

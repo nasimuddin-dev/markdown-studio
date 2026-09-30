@@ -23,7 +23,7 @@ Select text and apply a format, or apply it with nothing selected to insert the 
 
 | Command | Shortcut |
 | --- | --- |
-| Heading 1, 2, 3 | Ctrl+Alt+1, Ctrl+Alt+2, Ctrl+Alt+3 |
+| Heading 1 to 6 | Ctrl+Alt+1 to Ctrl+Alt+6 |
 | Normal text (remove the heading) | Ctrl+Alt+0 |
 | Promote heading (`###` → `##`) | Ctrl+Alt+= |
 | Demote heading (`##` → `###`) | Ctrl+Alt+- |
