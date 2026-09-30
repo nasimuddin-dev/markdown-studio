@@ -44,6 +44,10 @@ Put the cursor on a heading and press **F2** (**Format → Rename Heading…**, 
 
 Only numbers with a dot count as existing numbers (`1.`, `2.3`), so a heading such as "2024 Roadmap" or "10 Tips" keeps its text. Numbering changes the headings' anchors (`#1-introduction` instead of `#introduction`); [Check Links](/guide/checking-documents) finds links elsewhere that need updating. To change one heading's text, use [Rename Heading](#rename-a-heading), which updates the links for you.
 
+### Select a section
+
+**Edit → Select Section** selects the section at the cursor: its heading, its text and its subsections. Run it again to select the section it belongs to, and so on up to the top-level section. It's a quick way to copy, cut or replace a whole section.
+
 ### Move a section
 
 **Format → Move Section Up** and **Move Section Down** move the section at the cursor (its heading, its text and all its subsections) above the previous section or below the next one at the same level. Sections don't leave their parent: a `###` under one `##` never jumps into another. Lines inside code blocks that start with `#` are not treated as headings.

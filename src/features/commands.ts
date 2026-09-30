@@ -34,7 +34,7 @@ import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, s
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
 import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
 import { insertOrUpdateToc } from "./toc";
-import { moveSectionDown, moveSectionUp } from "./sections";
+import { moveSectionDown, moveSectionUp, selectSection } from "./sections";
 
 export const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
@@ -308,6 +308,7 @@ export const commands: Record<string, Command> = {
     },
     enabled: hasActive,
   },
+  selectSection: formatCommand("selectSection", "Select Section", selectSection),
   closeAllTabs: { id: "closeAllTabs", label: "Close All Tabs", run: async () => (await import("./pathActions")).closeAllTabs(), enabled: hasActive },
   moveToNewFile: {
     id: "moveToNewFile",

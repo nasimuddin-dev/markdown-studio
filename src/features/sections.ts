@@ -35,6 +35,37 @@ function sectionEnd(list: Heading[], i: number, lastLine: number): number {
 }
 
 /**
+ * Select Section: selects the section around the cursor (its heading, text
+ * and subsections, without the blank lines after it). Run again with the
+ * whole section selected, it selects the parent section.
+ */
+export const selectSection: StateCommand = ({ state, dispatch }) => {
+  const doc = state.doc;
+  const list = headings(doc);
+  const sel = state.selection.main;
+  const range = (i: number) => {
+    let end = sectionEnd(list, i, doc.lines);
+    while (end > list[i].line && !doc.line(end).text.trim()) end--;
+    return { from: doc.line(list[i].line).from, to: doc.line(end).to };
+  };
+  let i = -1;
+  for (let k = 0; k < list.length && list[k].line <= doc.lineAt(sel.head).number; k++) i = k;
+  // Already selected: go up to the enclosing section.
+  while (i >= 0) {
+    const r = range(i);
+    if (!(sel.from === r.from && sel.to === r.to) && sel.from >= r.from && sel.to <= r.to) break;
+    const level = list[i].level;
+    let parent = i - 1;
+    while (parent >= 0 && list[parent].level >= level) parent--;
+    i = parent;
+  }
+  if (i < 0) return false;
+  const r = range(i);
+  dispatch(state.update({ selection: { anchor: r.from, head: r.to }, scrollIntoView: true, userEvent: "select" }));
+  return true;
+};
+
+/**
  * Moves the section around the cursor (its heading, text and subsections)
  * above the previous section or below the next one at the same level, within
  * the same parent. The cursor stays at the same place in the moved section.
