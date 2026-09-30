@@ -4,7 +4,8 @@ import { notify, promptText } from "../stores/uiStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { getEditorView } from "./editorBridge";
 import { findAllLinks, localTargets } from "./lint";
-import { extractHeadings, headingSlugs } from "./outline";
+import { extractHeadings, headingSlugs, plainHeadingText } from "./outline";
+import GithubSlugger from "github-slugger";
 import type { TextChange } from "./referenceLinks";
 import { labelAt, planLabelRename, type LabelTarget } from "./renameLabel";
 import type { EditorView } from "@codemirror/view";
@@ -55,7 +56,21 @@ function decode(id: string): string {
  * document's `#anchor` links, and how anchors changed (renaming can also
  * change the numbering of later headings with the same text).
  */
-export function planHeadingRename(text: string, line: number, value: string): { changes: TextChange[]; renamed: Map<string, string> } | null {
+/** A wiki link naming the renamed heading by its text (`[[page#Old Text]]`): the edit that writes the new text. */
+function wikiHeadingEdit(text: string, link: { targetFrom: number; sourceLength?: number }, wiki: WikiRename): TextChange | null {
+  const written = text.slice(link.targetFrom, link.targetFrom + (link.sourceLength ?? 0));
+  const hash = written.indexOf("#");
+  if (hash < 0 || new GithubSlugger().slug(written.slice(hash + 1).trim()) !== wiki.oldSlug) return null;
+  return { from: link.targetFrom + hash + 1, to: link.targetFrom + written.length, insert: wiki.text };
+}
+
+/** The renamed heading, for wiki links that name it: its old anchor and its new text. */
+export interface WikiRename {
+  oldSlug: string;
+  text: string;
+}
+
+export function planHeadingRename(text: string, line: number, value: string): { changes: TextChange[]; renamed: Map<string, string>; wiki: WikiRename } | null {
   const h = headingAt(text, line);
   if (!h || !value.trim()) return null;
   const heading = { from: h.from, to: h.to, insert: value.trim() };
@@ -65,19 +80,33 @@ export function planHeadingRename(text: string, line: number, value: string): { 
   const renamed = new Map<string, string>();
   if (before.length === now.length) before.forEach((slug, i) => slug !== now[i] && renamed.set(slug, now[i]));
   const changes: TextChange[] = [heading];
+  const index = extractHeadings(text).findIndex((x) => x.line === h.line);
+  const wiki: WikiRename = { oldSlug: before[index], text: plainHeadingText(value) };
   for (const link of findAllLinks(text)) {
     // Links inside the heading's own text are replaced with it.
-    if (!link.target.startsWith("#") || link.sourceLength !== undefined || (link.to > heading.from && link.from < heading.to)) continue;
+    if (link.to > heading.from && link.from < heading.to) continue;
+    // [[#Heading]] in the same document.
+    if (link.wiki && link.target.startsWith("#")) {
+      const edit = wikiHeadingEdit(text, link, wiki);
+      if (edit) changes.push(edit);
+      continue;
+    }
+    if (!link.target.startsWith("#") || link.sourceLength !== undefined) continue;
     const next = renamed.get(decode(link.target.slice(1)).toLowerCase());
     if (next !== undefined) changes.push({ from: link.targetFrom + 1, to: link.targetFrom + link.target.length, insert: next });
   }
-  return { changes, renamed };
+  return { changes, renamed, wiki };
 }
 
 /** Rewrites `#anchor` parts of links in `text` (a document at `path`) that point to `docPath`. */
-export function rewriteAnchorLinks(text: string, path: string, docPath: string, renamed: Map<string, string>): { text: string; count: number } {
+export function rewriteAnchorLinks(text: string, path: string, docPath: string, renamed: Map<string, string>, wiki?: WikiRename): { text: string; count: number } {
   const edits: TextChange[] = [];
   for (const { link, path: target } of localTargets(findAllLinks(text), path)) {
+    if (link.wiki) {
+      const edit = wiki && target && isInside(target, docPath) && isInside(docPath, target) ? wikiHeadingEdit(text, link, wiki) : null;
+      if (edit) edits.push(edit);
+      continue;
+    }
     const hash = link.target.indexOf("#");
     if (hash < 0 || link.sourceLength !== undefined || !target || !isInside(target, docPath) || !isInside(docPath, target)) continue;
     const next = renamed.get(decode(link.target.slice(hash + 1)).toLowerCase());
@@ -137,7 +166,7 @@ export async function renameHeading(line?: number) {
   const { rewriteWorkspaceLinks } = await import("./linkUpdate");
   await rewriteWorkspaceLinks(
     root,
-    (text, file) => rewriteAnchorLinks(text, file, path, plan.renamed),
+    (text, file) => rewriteAnchorLinks(text, file, path, plan.renamed, plan.wiki),
     (links, files) =>
       `${links} ${links === 1 ? "link" : "links"} in ${files} ${files === 1 ? "file" : "files"} point to this heading in “${basename(path)}”. Update ${links === 1 ? "it" : "them"} to the new name?`,
     path,

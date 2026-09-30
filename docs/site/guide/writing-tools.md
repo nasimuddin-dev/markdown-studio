@@ -34,7 +34,7 @@ Promote and demote work on every selected heading and stay within H1–H6.
 
 ### Rename a heading
 
-Put the cursor on a heading and press **F2** (**Format → Rename Heading…**, or right-click it in the Outline). Type the new text and Markpion changes the heading and every `#anchor` link to it in the document, in the same edit (**Ctrl+Z** undoes it). If other Markdown files in the open folder link to the heading (`guide.md#set-up`), it lists how many and offers to update them too; files with unsaved changes are skipped, and each changed file keeps its previous version in File History. When two headings have the same text, their anchors are numbered (`#notes`, `#notes-1`), and links to both are kept pointing at the right one.
+Put the cursor on a heading and press **F2** (**Format → Rename Heading…**, or right-click it in the Outline). Type the new text and Markpion changes the heading and every `#anchor` link to it in the document (and wiki links such as `[[#Old name]]`), in the same edit (**Ctrl+Z** undoes it). If other Markdown files in the open folder link to the heading (`guide.md#set-up`), it lists how many and offers to update them too; files with unsaved changes are skipped, and each changed file keeps its previous version in File History. When two headings have the same text, their anchors are numbered (`#notes`, `#notes-1`), and links to both are kept pointing at the right one.
 
 **F2** also renames labels: on a footnote such as `[^1]`, every reference to it and its definition get the new label; on a link reference such as `[text][guide]`, `[guide][]` or a `[guide]: …` definition, every link using that label and the definition change together (`[guide][]` becomes `[guide][manual]`, so its text stays).
 

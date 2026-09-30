@@ -42,6 +42,14 @@ describe("renaming a heading", () => {
     expect(rename("text", 1, "B")).toBeNull();
   });
 
+  it("updates wiki links that name the heading by its text", () => {
+    const text = "## Set Up\n\nSee [[#Set Up]], [[#set up|here]] and [[#Other]].";
+    const plan = planHeadingRename(text, 1, "Install **now**")!;
+    expect(applyChanges(text, plan.changes)).toBe("## Install **now**\n\nSee [[#Install now]], [[#Install now|here]] and [[#Other]].");
+    const other = "[[guide#Set Up]] [[guide]] [[notes#Set Up]]";
+    expect(rewriteAnchorLinks(other, "/ws/index.md", "/ws/guide.md", plan.renamed, plan.wiki)).toEqual({ text: "[[guide#Install now]] [[guide]] [[notes#Set Up]]", count: 1 });
+  });
+
   it("updates anchors in links from other documents to this one", () => {
     const text = "[a](guide.md#set-up) [b](./guide.md#other) [c](other.md#set-up) [d](#set-up)";
     expect(rewriteAnchorLinks(text, "/ws/index.md", "/ws/guide.md", new Map([["set-up", "install"]]))).toEqual({
