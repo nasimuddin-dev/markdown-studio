@@ -628,7 +628,7 @@ The user asked to work through the whole backlog.
 
 - Native e2e tests (msedgedriver download)
 - ~~A redirect for the old website address~~: not needed (the user, 2026-09-30).
-- Which languages to translate into
+- ~~Which languages to translate into~~: English only (the user, 2026-09-30); no translation work.
 - **Native end-to-end tests** (the user said yes to the download): msedgedriver 154.0.4258.37 (matching WebView2) in `%LOCALAPPDATA%\markpion-dev\`, tauri-driver 2.1.0 via `cargo install`. `npm run test:native` builds a debug app and runs `e2e-native/` with a small built-in WebDriver client. Three tests cover start-up, a file handed over through single instance, saving and reloading a file changed on disk. msedgedriver doesn't pass `args` to the app, so the tests hand files over with a second launch.
 - **Incident:** the first native runs set temporary APPDATA/LOCALAPPDATA, but Tauri resolves the known folders directly. They wrote to the real profile: `recent.json` now lists four temporary test files, the saved session opens three of them, and two `history/` folders were added. Settings values were kept. Debug builds now take `MARKPION_TEST_DATA_DIR` for every folder, including web storage (release builds ignore it). The runner fails if the real profile changes. The leftover entries weren't cleaned up: the permission check refused editing the real profile, so the user should do it (Clear Recent in the app; the temporary files no longer matter).
 - **Redirect for the old website address:** not needed (the user).

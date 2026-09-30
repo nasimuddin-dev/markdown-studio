@@ -26,9 +26,9 @@ Nothing is actively under development right now. The next items are chosen from 
 
 ## Planned
 
-- **All math in PDF export:** every inline formula, and display formulas on macOS and Linux. Today PDF export draws display formulas on Windows and sets common inline formulas as text; HTML export, Print → Save as PDF and Word export render all formulas.
+- **All math in PDF export:** every inline formula. Display formulas are drawn on every system; inline formulas with symbols the built-in font lacks still keep their LaTeX. HTML export and Print → Save as PDF render all formulas.
 - **Performance:** faster first display of very large documents (a pasted 800 KB document takes about 3.5 seconds to appear today, most of it parsing the Markdown) and a smaller startup bundle.
-- **End-to-end tests of the native app** on Windows, macOS and Linux, and testing the macOS and Linux builds on real hardware.
+- **End-to-end tests of the native app** on macOS and Linux (Windows has a first set, run with `npm run test:native`), and testing the macOS and Linux builds on real hardware.
 
 ## Considering
 
@@ -36,5 +36,4 @@ These depend on decisions or resources that aren't settled yet:
 
 - **Code signing:** Windows Authenticode and Apple notarization, so the first launch doesn't show warnings. This needs signing certificates.
 - **Automatic updates on macOS and Linux**, like on Windows.
-- **Localization** of the interface into other languages.
 - **Future enhancements from the specification:** Git integration, plugins, cloud sync, collaboration and publishing workflows.
