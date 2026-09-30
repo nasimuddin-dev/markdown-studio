@@ -44,6 +44,17 @@ describe("renaming a file opened on its own", () => {
     expect((await b.listRecent()).map((r) => r.path)).toEqual(["/notes/renamed.md"]);
   });
 
+  it("renames the active file from File → Rename File…", async () => {
+    const b = singleFile();
+    await act(async () => void (await b.pickOpenFile()));
+    await openPath("/notes/a.md");
+    const { commands } = await import("../src/features/commands");
+    expect(commands.renameFile.enabled!()).toBe(true);
+    answerPrompt("from-command.md");
+    await act(async () => void (await commands.renameFile.run()));
+    expect(docs()[0].path).toBe("/notes/from-command.md");
+  });
+
   it("lists open files in the Explorer when no folder is open", async () => {
     const b = singleFile();
     await act(async () => void (await b.pickOpenFile()));

@@ -114,6 +114,15 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().openFilePicker(),
     enabled: () => !!useWorkspace.getState().root,
   },
+  renameFile: {
+    id: "renameFile",
+    label: "Rename File…",
+    run: async () => {
+      const doc = activeDoc();
+      if (doc) await (await import("./pathActions")).renameDocument(doc.id);
+    },
+    enabled: () => !!activeDoc()?.path,
+  },
   compareWithFile: {
     id: "compareWithFile",
     label: "Compare with File…",

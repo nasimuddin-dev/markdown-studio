@@ -13,7 +13,7 @@ description: How Markpion protects your work, including safe atomic saves, auto 
 | Save As | Ctrl+Shift+S | Cmd+Shift+S |
 | Save All | Ctrl+Alt+S | Cmd+Option+S |
 
-A new document asks for a name and location the first time you save it; the suggested name comes from its title (the front matter `title`, or else the first `#` heading), so "# Meeting Notes" suggests `Meeting Notes.md`, and the dialog starts in the open folder or, without one, in the folder of another open file. To rename a saved file later, right-click its tab → **Rename…**. Saving is **atomic**: the text is written to a temporary file that then replaces the original, so an interruption (a crash or power loss) can't leave a half-written file.
+A new document asks for a name and location the first time you save it; the suggested name comes from its title (the front matter `title`, or else the first `#` heading), so "# Meeting Notes" suggests `Meeting Notes.md`, and the dialog starts in the open folder or, without one, in the folder of another open file. To rename a saved file later, use **File → Rename File…** or right-click its tab → **Rename…**. Saving is **atomic**: the text is written to a temporary file that then replaces the original, so an interruption (a crash or power loss) can't leave a half-written file.
 
 If saving fails, the document stays marked as unsaved and your text stays in the editor. The message says what happened and what to do, for example:
 
