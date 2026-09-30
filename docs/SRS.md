@@ -14,7 +14,7 @@
 | Desktop Framework | Tauri |
 | Frontend | React + TypeScript |
 | Initial Release | MVP / v0.1 |
-| Current Product Version | 0.19.0 |
+| Current Product Version | 0.20.0 |
 
 ### Revision History
 
@@ -24,7 +24,7 @@
 | 1.1 | 2026-09-25 | Added the revision history and implementation-status notes (§13, §18, §21). Requirement text is unchanged. |
 | 1.2 | 2026-09-29 | The product was renamed from Markdown Studio to Markpion; the name is updated throughout. Requirements are otherwise unchanged. |
 
-> **Implementation status.** Requirement-by-requirement status is tracked in [TRACEABILITY.md](TRACEABILITY.md). As of 0.19.0, every MVP functional requirement (FR-001 to FR-063) is implemented, as are the auto-update requirements. Many §19 future enhancements have been delivered early: outline, linting, Mermaid and math, export to HTML, PDF and Word, version history, and read-only Git integration (status, change bars, the last commit in File History). The notes marked *Status* below record decisions made during development.
+> **Implementation status.** Requirement-by-requirement status is tracked in [TRACEABILITY.md](TRACEABILITY.md). As of 0.20.0, every MVP functional requirement (FR-001 to FR-063) is implemented, as are the auto-update requirements. Many §19 future enhancements have been delivered early: outline, linting, Mermaid and math, export to HTML, PDF and Word, version history, and read-only Git integration (status, change bars, the last commit in File History). The notes marked *Status* below record decisions made during development.
 
 ## Table of Contents
 

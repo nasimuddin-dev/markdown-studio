@@ -21,8 +21,8 @@ Markpion 0.20.0 was released on 2026-09-29 and has a separate installer for each
 
 | Installer | When to use it | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **Standard**: [Markpion-0.20.0-windows-x64-setup.exe](downloads/Markpion-0.20.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 7.1 MB | `4801a37fbe417c09c54752685f14f84d3c1383d6bebb9dfb7d824576f210b3ae` |
-| **Offline**: [Markpion-0.20.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 212.2 MB | `ac01173ea9045f8a5629c49a71aac388864a87940d7e257cc9696230788fda63` |
+| **Standard**: [Markpion-0.20.0-windows-x64-setup.exe](downloads/Markpion-0.20.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 7.1 MB | `8472aa864c358c461e488ef3524504a2c1201e40b44bf3cf509f6cdf29be443e` |
+| **Offline**: [Markpion-0.20.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 212.2 MB | `27b50ff7fa43d92363d98552ecf46a449354409ffddd59df7769d4066e7339f7` |
 
 1. **Download** an installer above.
 2. **Run** it and choose **Anyone who uses this computer**, which needs administrator approval, or **Only for me**, which doesn't. The installer isn't code-signed yet, so if Windows SmartScreen says *"Windows protected your PC"*, choose **More info → Run anyway**.

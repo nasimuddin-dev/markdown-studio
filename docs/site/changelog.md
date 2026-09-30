@@ -7,6 +7,32 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.20.0
+
+Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.20.0)
+
+### Added
+
+- **Fix Table** (Format menu, and the toolbar's Table tools): repairs a table typed with mistakes, such as a missing divider row, rows with too few or too many cells, missing pipes or a pipe inside code.
+- **Compare with File…** (File menu, or **Compare with Active File** in the Explorer): a line diff between the document and another file in the folder.
+- **Convert Selection to Table** (Format menu): comma-, tab-, semicolon- or pipe-separated lines become a Markdown table.
+- **Wrap the selection** by typing `*`, `_`, `` ` ``, `~`, `"`, `(` or `[`: select a word and type `**` to make it bold.
+- **File → Rename File…**; **View → Toggle Word Wrap** (**Alt+Z**) and **Toggle Line Numbers**.
+- **Settings** has a list of sections to jump between.
+- **Save As** suggests a name from the document's title (for example `Meeting Notes.md`) and starts next to your other open files.
+
+### Changed
+
+- The find and replace bar has proper labels (Next, Previous, Select All, Match case, Whole word, Regex, Replace All).
+- The command palette lists whole-word matches first ("tab" finds Close Tab before Table commands).
+- Search: the file filters now sit below the Replace field.
+- The Recent list follows files and folders you rename or move in Markpion.
+
+### Fixed
+
+- The Explorer without a folder showed two buttons that did nearly the same thing; there's now one **Open Folder**.
+- The formatting toolbar could start its second row with a stray divider, and the view buttons at the top right picked up the toolbar's background.
+
 ## v0.19.0
 
 Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.19.0)

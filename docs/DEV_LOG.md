@@ -537,3 +537,17 @@ After 0.18.0 was released and installed locally (the silent install worked), the
 **Unverified:** renaming a single file in the native app (Rust scope tests and the in-browser flow cover it).
 
 **Next up:** unchanged from the 0.18.0 entry (tauri-driver e2e, per-workspace custom CSS).
+
+## 2026-09-29 (8:30–9:40 PM): 0.20.0
+
+0.19.0 was published (the 212 MB offline upload needed three attempts because of TLS "bad record MAC" errors; the size on GitHub matches) and installed here after the user approved the UAC prompt.
+
+- **User-reported:** the Explorer without a folder showed two nearly identical buttons (Open Folder and Open "Downloads"); now one Open Folder that starts in the current file's folder (639adcc).
+- **Visual review** (screenshots of every main screen, both themes): the formatting toolbar and the View options bar shared `.toolbar`, so the view buttons got the toolbar's background and a wrapped toolbar row started with a divider (080b205); the find bar showed CodeMirror's lowercase labels (e81dc4a); Settings became a sectioned layout (795b744); search filters moved below Replace (f891064); the demo guide listed Heading 1–3 (2180bfd). A duplicate-selector scan of `app.css` found no other leaks.
+- **User request:** Format → Fix Table repairs tables typed with mistakes, also from the toolbar's Table tools (which now open for tables the parser doesn't recognise).
+- **Features:** Compare with File (4767763), Convert Selection to Table (4e65d5d), wrap the selection with `*`/`` ` ``/brackets (36c70e5), Rename File command (9b35c20), Toggle Word Wrap / Line Numbers (55cdba5), Save As name from the title (17d372f) and folder next to other open files (a88f081), palette whole-word ranking (2f485a5), recents follow renames (0c0eb4c).
+- **Process note:** several shell heredocs silently dropped backslashes from code (a NUL character and broken regexes appeared); all were found by type checks, tests or an audit and fixed. Edits with escapes now go through written script files or the Edit tool.
+
+**Version:** 0.20.0. **Tests:** Vitest 407 (68 files), Playwright 54, Rust 41 (+1 ignored), website check (50 pages).
+
+**Next up:** tauri-driver e2e (needs the user's go-ahead to download msedgedriver); per-workspace custom CSS; a settings search box.
