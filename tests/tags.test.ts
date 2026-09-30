@@ -5,7 +5,12 @@ import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { ensureSyntaxTree } from "@codemirror/language";
 import { invalidateWorkspaceFiles, tagCompletionSource } from "../src/features/completion";
 import { setWorkspace } from "../src/features/workspace";
-import { collectFolderTags, extractTags } from "../src/features/tags";
+import { EditorView } from "@codemirror/view";
+import { openPath } from "../src/features/documents";
+import { registerEditorView } from "../src/features/editorBridge";
+import { activeDoc } from "../src/stores/documentsStore";
+import { useUi } from "../src/stores/uiStore";
+import { collectFolderTags, extractTags, planTagRename, renameTag, tagAt } from "../src/features/tags";
 import { setupBackend } from "./helpers";
 
 describe("extractTags", () => {
@@ -87,5 +92,55 @@ describe("tags in the preview and HTML export", () => {
     expect(html.match(/md-tag/g)).toHaveLength(2);
     expect(html).toContain("<h1");
     expect(html).toContain("Title #nope</h1>");
+  });
+});
+
+describe("Rename Tag", () => {
+  it("finds the tag at a position", () => {
+    const text = "Plan #idea and `#code` [x](#a)";
+    expect(tagAt(text, 5)).toBe("idea");
+    expect(tagAt(text, 10)).toBe("idea");
+    expect(tagAt(text, 17)).toBeNull();
+    expect(tagAt(text, 27)).toBeNull();
+  });
+
+  it("renames inline and front matter uses, any capitalisation, nested tags too", () => {
+    const text = "---\ntitle: Idea list\ntags: [idea, ideas, \"Idea\"]\nkeywords:\n  - idea\n---\n#Idea #ideas #idea/sub `#idea` [#idea](x.md) idea";
+    const out = planTagRename(text, "idea", "thought");
+    let result = "";
+    let last = 0;
+    for (const c of out) {
+      result += text.slice(last, c.from) + c.insert;
+      last = c.to;
+    }
+    result += text.slice(last);
+    expect(result).toBe("---\ntitle: Idea list\ntags: [thought, ideas, \"thought\"]\nkeywords:\n  - idea\n---\n#thought #ideas #thought/sub `#idea` [#idea](x.md) idea");
+    const list = "---\ntags:\n  - idea\n  - other\n---\n";
+    expect(planTagRename(list, "idea", "x")).toEqual([{ from: 14, to: 18, insert: "x" }]);
+  });
+
+  it("renames in the editor, then in the folder's other files after asking", async () => {
+    const backend = setupBackend({ "/ws/a.md": "Today #idea\n", "/ws/b.md": "---\ntags: [idea]\n---\nAlso #idea and #ideas\n", "/ws/c.md": "none\n" });
+    await setWorkspace("/ws");
+    await openPath("/ws/a.md");
+    const view = new EditorView({ state: EditorState.create({ doc: activeDoc()!.content, selection: { anchor: 8 } }) });
+    registerEditorView(view);
+    const dialogs: string[] = [];
+    const replies: Array<{ button: string; value?: string }> = [{ button: "ok", value: "#thought" }, { button: "update" }];
+    const unsub = useUi.subscribe((s) => {
+      const d = s.dialogs[0];
+      if (!d || !replies.length) return;
+      dialogs.push(`${d.title}: ${d.message}`);
+      const r = replies.shift()!;
+      queueMicrotask(() => useUi.getState().closeDialog(d.id, r));
+    });
+    await renameTag();
+    unsub();
+    expect(dialogs[1]).toBe("Rename in other files?: #idea is used 2 times in 1 other file of “ws”. Rename them too?");
+    expect(view.state.doc.toString()).toBe("Today #thought\n");
+    expect((await backend.readTextFile("/ws/b.md")).content).toBe("---\ntags: [thought]\n---\nAlso #thought and #ideas\n");
+    expect(useUi.getState().toasts.at(-1)?.message).toBe("Renamed the tag in 1 file.");
+    registerEditorView(null);
+    view.destroy();
   });
 });

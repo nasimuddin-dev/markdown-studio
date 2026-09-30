@@ -92,6 +92,7 @@ export async function rewriteWorkspaceLinks(
   rewrite: (text: string, path: string) => { text: string; count: number },
   question: (links: number, files: number) => string,
   skip?: string,
+  words: { title: string; button: string; done: string } = { title: "Update links?", button: "Update Links", done: "Updated links in" },
 ): Promise<number> {
   const b = backend();
   const unsaved = new Set(useDocuments.getState().docs.filter((d) => d.path && isDirty(d)).map((d) => d.path!));
@@ -125,13 +126,13 @@ export async function rewriteWorkspaceLinks(
     return 0;
   }
   const choice = await ask({
-    title: "Update links?",
+    title: words.title,
     message: question(links, planned.length),
     detail:
       (skipped.length ? `Skipped, because they have unsaved changes: ${skipped.join(", ")}. ` : "") + "The previous version of each file is kept in File History.",
     buttons: [
       { id: "keep", label: "Don't Update" },
-      { id: "update", label: "Update Links", variant: "primary" },
+      { id: "update", label: words.button, variant: "primary" },
     ],
     cancelId: "keep",
   });
@@ -149,7 +150,7 @@ export async function rewriteWorkspaceLinks(
       b.log("warn", "links.update", describeError(e, "update links"));
     }
   }
-  if (failed.length) notify("warning", `Updated links in ${files} ${files === 1 ? "file" : "files"}. Couldn't write ${failed.join(", ")}.`);
-  else notify("success", `Updated links in ${files} ${files === 1 ? "file" : "files"}.`);
+  if (failed.length) notify("warning", `${words.done} ${files} ${files === 1 ? "file" : "files"}. Couldn't write ${failed.join(", ")}.`);
+  else notify("success", `${words.done} ${files} ${files === 1 ? "file" : "files"}.`);
   return files;
 }

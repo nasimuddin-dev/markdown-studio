@@ -8,6 +8,7 @@ import { extractHeadings, headingSlugs, plainHeadingText } from "./outline";
 import GithubSlugger from "github-slugger";
 import type { TextChange } from "./referenceLinks";
 import { labelAt, planLabelRename, type LabelTarget } from "./renameLabel";
+import { renameTag, tagAt } from "./tags";
 import type { EditorView } from "@codemirror/view";
 
 /**
@@ -146,7 +147,10 @@ export async function renameHeading(line?: number) {
     // Not a heading: a footnote or link reference label is renamed everywhere in the document.
     const label = line === undefined ? labelAt(view.state.doc.toString(), view.state.selection.main.head) : null;
     if (label) return renameLabel(view, label);
-    notify("info", "Put the cursor on a heading, a footnote or a link reference to rename it.");
+    // A #tag is renamed across the folder.
+    const tag = line === undefined ? tagAt(view.state.doc.toString(), view.state.selection.main.head) : null;
+    if (tag) return renameTag(tag);
+    notify("info", "Put the cursor on a heading, a footnote, a link reference or a #tag to rename it.");
     return;
   }
   const value = await promptText({

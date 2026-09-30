@@ -28,6 +28,7 @@ import { fillTemplate } from "./templates";
 import { convertToInlineLinks, convertToReferenceLinks } from "./referenceLinks";
 import { followLinkAtCursor } from "./followLink";
 import { renameHeading } from "./renameHeading";
+import { renameTag } from "./tags";
 import { toggleComment } from "@codemirror/commands";
 import { foldToLevel } from "./foldLevel";
 import { focusPane } from "./panes";
@@ -81,6 +82,7 @@ export const formatCommands: Record<string, Command> = {
   diagramPie: formatCommand("diagramPie", "Insert Pie Chart (Mermaid)", fmt.insertDiagram("pie")),
   followLink: formatCommand("followLink", "Open Link at Cursor", followLinkAtCursor, "Alt+Enter"),
   renameHeading: { id: "renameHeading", label: "Rename Heading…", shortcut: "F2", run: () => renameHeading(), enabled: hasActive },
+  renameTag: { id: "renameTag", label: "Rename Tag…", run: () => renameTag(), enabled: hasActive },
   referenceLinks: formatCommand("referenceLinks", "Convert Links to Reference Style", convertToReferenceLinks),
   inlineLinks: formatCommand("inlineLinks", "Convert Links to Inline Style", convertToInlineLinks),
   heading1: formatCommand("heading1", "Heading 1", fmt.setHeading(1), "Mod+Alt+1"),
