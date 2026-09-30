@@ -380,6 +380,18 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
+test("Alt+Z toggles word wrap", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  const content = page.locator(".cm-content");
+  await expect(content).toHaveClass(/cm-lineWrapping/);
+  await page.keyboard.press("Alt+Z");
+  await expect(content).not.toHaveClass(/cm-lineWrapping/);
+  await page.keyboard.press("Alt+Z");
+  await expect(content).toHaveClass(/cm-lineWrapping/);
+});
+
 test("compare the document with another file", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

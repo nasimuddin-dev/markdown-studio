@@ -31,8 +31,8 @@ Markdown syntax is highlighted as you type: headings, emphasis, links, lists, qu
 
 ## Line numbers, wrapping and folding
 
-- Line numbers are shown in the gutter. Turn them off in [Settings](/guide/settings).
-- Long lines wrap by default; turn off **Wrap long lines** to scroll horizontally.
+- Line numbers are shown in the gutter. Turn them off with **View → Toggle Line Numbers** or in [Settings](/guide/settings).
+- Long lines wrap by default; **View → Toggle Word Wrap** (**Alt+Z**) or the **Wrap long lines** setting switches to horizontal scrolling.
 - Click the arrow next to a heading, list or code block in the gutter to fold it. **Ctrl+Shift+[** folds and **Ctrl+Shift+]** unfolds at the cursor (on macOS, **Cmd+Option+[** and **Cmd+Option+]**).
 - **View → Fold All** collapses every section to its heading, for an overview of a long document, and **View → Unfold All** opens them again. In the editor, **Ctrl+Alt+[** and **Ctrl+Alt+]** do the same.
 

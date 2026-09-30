@@ -339,6 +339,23 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().setPaletteOpen(!useUi.getState().paletteOpen),
   },
   settings: { id: "settings", label: "Settings…", shortcut: "Mod+,", run: () => useUi.getState().setSettingsOpen(true) },
+  toggleWordWrap: {
+    id: "toggleWordWrap",
+    label: "Toggle Word Wrap",
+    shortcut: "Alt+Z",
+    run: () => {
+      const { settings, update } = useSettings.getState();
+      update({ lineWrapping: !settings.lineWrapping });
+    },
+  },
+  toggleLineNumbers: {
+    id: "toggleLineNumbers",
+    label: "Toggle Line Numbers",
+    run: () => {
+      const { settings, update } = useSettings.getState();
+      update({ lineNumbers: !settings.lineNumbers });
+    },
+  },
   toggleToolbar: {
     id: "toggleToolbar",
     label: "Toggle Formatting Toolbar",
