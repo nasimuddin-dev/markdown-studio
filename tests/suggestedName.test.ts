@@ -22,4 +22,21 @@ describe("the name Save As suggests", () => {
     await saveDocument(id);
     expect(offered).toMatch(/Meeting Notes\.md$/);
   });
+
+  it("starts in the folder of another open file when no folder is open", async () => {
+    setupBackend();
+    let offered = "";
+    // Open File is answered with a file in Downloads; Save As records where it starts, then cancels.
+    const b = new MemoryBackend({
+      files: { "/downloads/a.md": "# A" },
+      prompt: (m, d) => (m.startsWith("Open file") ? "/downloads/a.md" : ((offered = d), null)),
+    });
+    setBackend(b);
+    await b.pickOpenFile();
+    const { openPath } = await import("../src/features/documents");
+    await openPath("/downloads/a.md");
+    const id = newDocument("# Notes\n");
+    await saveDocument(id);
+    expect(offered).toBe("/downloads/Notes.md");
+  });
 });

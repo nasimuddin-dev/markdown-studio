@@ -161,7 +161,9 @@ export async function saveDocument(id: string, opts: SaveOptions = {}): Promise<
   let path = doc.path;
   const isNewPath = opts.saveAs || !path;
   if (isNewPath) {
-    const dir = doc.path ? dirname(doc.path) : useWorkspace.getState().root;
+    // Start in the document's folder, else the open folder, else the folder of another open file.
+    const sibling = docs().docs.find((d) => d.id !== id && d.path)?.path;
+    const dir = doc.path ? dirname(doc.path) : (useWorkspace.getState().root ?? (sibling ? dirname(sibling) : null));
     try {
       path = await backend().pickSavePath(doc.path ? doc.name : suggestedFileName(doc.content, doc.name), dir);
     } catch (e) {
