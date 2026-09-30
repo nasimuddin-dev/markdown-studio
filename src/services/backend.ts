@@ -103,6 +103,8 @@ export interface WorkspaceApi {
   listWorkspaceFiles(root: string): Promise<string[]>;
   /** Git branch and changed files of the repository containing `root`; null without Git or a repository. */
   gitStatus(root: string): Promise<GitStatus | null>;
+  /** An approved file's text as of the last Git commit (line endings normalized to LF); null when untracked or without Git. */
+  gitHeadText(path: string): Promise<string | null>;
   /** Word, PDF, HTML and CSV/TSV files under the workspace (batch conversion). */
   listConvertibleFiles(root: string): Promise<string[]>;
   /** Searches Markdown files under an approved folder. */

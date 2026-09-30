@@ -19,6 +19,8 @@ export interface MemoryBackendOptions {
   prompt?: (message: string, defaultValue: string) => string | null;
   /** What Git status reports (tests); the demo has no Git. */
   git?: GitStatus;
+  /** Committed text per file path, as Git would report it (tests). */
+  gitHead?: Record<string, string>;
   /** Folders that are pre-approved (as if opened via a dialog). */
   approved?: string[];
   /**
@@ -64,6 +66,7 @@ export class MemoryBackend implements Backend {
   private aiKey: string | null = null;
   private readonly policy: unknown;
   private readonly git: GitStatus | null;
+  private readonly gitHead: Record<string, string>;
   readonly logs: string[] = [];
 
   constructor(opts: MemoryBackendOptions = {}) {
@@ -72,6 +75,7 @@ export class MemoryBackend implements Backend {
     this.aiFn = opts.ai;
     this.policy = opts.policy ?? null;
     this.git = opts.git ?? null;
+    this.gitHead = opts.gitHead ?? {};
     this.capabilities = { desktop: false, trash: false, revealInFolder: false, selfUpdate: false, nativeImport: false, ai: !!opts.ai };
     if (!this.restore()) {
       for (const [path, content] of Object.entries(opts.files ?? {})) this.put(path, content);
@@ -442,6 +446,10 @@ export class MemoryBackend implements Backend {
   async gitStatus(root: string): Promise<GitStatus | null> {
     this.check(root);
     return this.git;
+  }
+
+  async gitHeadText(path: string): Promise<string | null> {
+    return this.gitHead[this.check(path)] ?? null;
   }
 
   async listWorkspaceFiles(root: string) {

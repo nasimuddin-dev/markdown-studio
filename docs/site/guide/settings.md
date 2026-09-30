@@ -37,7 +37,7 @@ The moon button at the top right switches between light and dark quickly. **Ctrl
 | Line endings for new files | LF (Unix, macOS), CRLF (Windows), Match operating system | LF |
 | Trim trailing whitespace on save | | Off |
 | Keep the table of contents up to date on save | | On |
-| Show Git branch and changed files | | On |
+| Show Git branch, changed files and changed lines | | On |
 | Insert a final newline on save | | Off |
 
 Existing files always keep their own line endings. Untitled documents are never auto-saved. See [Saving, history & recovery](/guide/saving-and-recovery).

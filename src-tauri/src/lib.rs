@@ -126,6 +126,7 @@ pub fn run() {
             commands::workspace::search_workspace,
             commands::workspace::list_workspace_files,
             commands::workspace::git_status,
+            commands::workspace::git_head_text,
             commands::workspace::list_convertible_files,
             commands::app_data::list_history,
             commands::workspace::watch_workspace,

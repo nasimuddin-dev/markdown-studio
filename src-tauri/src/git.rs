@@ -133,6 +133,25 @@ pub fn status(dir: &Path) -> Option<GitStatus> {
     Some(parse_status(&out, &top))
 }
 
+/// Committed files larger than this aren't compared in the editor.
+const MAX_HEAD_BYTES: usize = 5 * 1024 * 1024;
+
+/// The text of `file` as of the last commit (`HEAD`), for the editor's change
+/// markers; `None` when it isn't tracked, isn't text, is too large, or there's
+/// no Git or repository. Line endings are normalized to `\n` and a BOM removed.
+pub fn head_text(file: &Path) -> Option<String> {
+    let dir = file.parent()?;
+    let name = file.file_name()?.to_str()?;
+    // `HEAD:./name` is resolved relative to `-C dir`, whatever the repository root.
+    let out = git(dir, &["show", &format!("HEAD:./{name}")])?;
+    if out.len() > MAX_HEAD_BYTES {
+        return None;
+    }
+    let text = String::from_utf8(out).ok()?;
+    let text = text.strip_prefix('\u{feff}').unwrap_or(&text);
+    Some(text.replace("\r\n", "\n"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -168,6 +187,18 @@ mod tests {
         assert_eq!(s.files.len(), 1);
         assert_eq!(s.files[0].status, "U");
         assert!(s.files[0].path.ends_with("note.md"));
+
+        // The committed text, from a subfolder too; nothing for untracked files.
+        std::fs::create_dir_all(dir.join("sub")).unwrap();
+        std::fs::write(dir.join("sub").join("n é.md"), "\u{feff}one\r\ntwo\r\n").unwrap();
+        assert!(head_text(&dir.join("sub").join("n é.md")).is_none());
+        let commit = ["-c", "user.name=t", "-c", "user.email=t@t", "-c", "core.autocrlf=false", "commit", "-q", "-m", "x"];
+        git(&dir, &["-c", "core.autocrlf=false", "add", "-A"]).unwrap();
+        git(&dir, &commit).unwrap();
+        std::fs::write(dir.join("sub").join("n é.md"), "changed").unwrap();
+        assert_eq!(head_text(&dir.join("sub").join("n é.md")).as_deref(), Some("one\ntwo\n"));
+        assert_eq!(head_text(&dir.join("note.md")).as_deref(), Some("x"));
+        assert!(head_text(&dir.join("missing.md")).is_none());
         let _ = std::fs::remove_dir_all(&dir);
         assert!(status(&std::env::temp_dir().join("markpion-no-such-dir")).is_none());
     }

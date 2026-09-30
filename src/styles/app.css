@@ -1991,6 +1991,20 @@ body.dragging-entry * {
  * or a shadow get an outline or a border (drawn in system colours) instead.
  */
 @media (forced-colors: active) {
+  /* Git change bars: kept visible (added solid, changed dashed, deleted as a triangle). */
+  .editor-host .cm-git-added,
+  .editor-host .cm-git-modified {
+    forced-color-adjust: none;
+    background: none;
+    border-left: 3px solid CanvasText;
+  }
+  .editor-host .cm-git-modified {
+    border-left-style: dashed;
+  }
+  .editor-host .cm-git-deleted {
+    forced-color-adjust: none;
+    border-left-color: CanvasText;
+  }
   .toolbar-button.pressed {
     border-color: Highlight;
     outline: 1px solid Highlight;

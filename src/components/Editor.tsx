@@ -25,6 +25,7 @@ import { insertImageFiles, isImageFile } from "../features/images";
 import { linkOverSelection, pasteHtmlAsMarkdown, pastePlainTable, pendingPastes } from "../features/richPaste";
 import { markdownLinter } from "../features/lintExtension";
 import { linkCompletion } from "../features/completion";
+import { gitChangeGutter, refreshGitBase } from "../features/gitGutter";
 
 /**
  * Markdown-aware syntax colours (FR-020). Colours come from CSS variables so
@@ -178,6 +179,7 @@ export function Editor() {
         keys.of(editorKeys()),
         appearance.of(appearanceExt(s)),
         gutters.of(s.lineNumbers ? [lineNumbers(), foldGutter(), highlightActiveLineGutter()] : []),
+        gitChangeGutter(),
         wrapping.of(s.lineWrapping ? EditorView.lineWrapping : []),
         tabs.of([EditorState.tabSize.of(s.tabSize), indentUnit.of(" ".repeat(s.tabSize))]),
         linting.of(s.lintMarkdown ? markdownLinter() : []),
@@ -254,6 +256,7 @@ export function Editor() {
     view.setState(state);
     view.dispatch({ effects: reconfigure(useSettings.getState().settings) });
     editorShowing(activeId);
+    void refreshGitBase();
     const sel = state.selection.main;
     const line = state.doc.lineAt(sel.head);
     useUi.getState().setCursor({ line: line.number, col: sel.head - line.from + 1, selected: 0 });

@@ -75,7 +75,13 @@ The Outline sits below the Explorer. Drag the line between them to give either m
 
 When the open folder is in a Git repository, the Explorer marks changed files with a letter: **M** modified, **A** added, **D** deleted, **R** renamed, **U** untracked, **C** conflict. Folders that contain changes get a dot. The status bar shows the branch, with **↑** commits to push and **↓** commits to pull.
 
-This needs Git installed. Markpion runs `git status` in the open folder, read-only, when the folder opens, when files change, and when you come back to the window; it never commits, pulls or pushes. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
+### Changed lines in the editor
+
+For a file that's committed to Git, the editor shows a thin bar next to the lines you've changed since the last commit, as code editors do: **green** for added lines, **amber** for changed lines, and a small **red** triangle where lines were deleted. Hover over a bar to see what it means. The bars update as you type and after you commit (when you come back to the window). Untracked files and documents over 1 MB have no bars. In Windows High Contrast, added lines get a solid bar and changed lines a dashed one.
+
+### Requirements and privacy
+
+This needs Git installed. Markpion runs `git status` in the open folder (and `git show` for the file in the editor), read-only, when the folder opens, when files change, and when you come back to the window; it never commits, pulls or pushes. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
 
 ## Search and links across the folder
 

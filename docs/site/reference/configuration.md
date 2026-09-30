@@ -39,7 +39,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `viewMode` | `"split"` | `"editor"`, `"split"`, `"preview"` |
 | `showExplorer`, `showOutline` | `true` | |
 | `showToolbar` | `true` | The formatting toolbar above the editor |
-| `showGitStatus` | `true` | Git branch and changed files in the Explorer (runs `git status`) |
+| `showGitStatus` | `true` | Git branch and changed files in the Explorer, and change bars in the editor gutter (runs `git status` and `git show`) |
 | `autoSave` | `"off"` | `"off"`, `"afterDelay"`, `"onFocusChange"` |
 | `autoSaveDelayMs` | `1000` | Milliseconds |
 | `trimTrailingWhitespace` | `false` | |

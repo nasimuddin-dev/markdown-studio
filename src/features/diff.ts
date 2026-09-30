@@ -7,7 +7,7 @@ const MAX_CELLS = 4_000_000;
  * Line diff (LCS). `a` is the old text, `b` the new one. Returns `null` when
  * the inputs are too large to diff interactively.
  */
-export function diffLines(a: string, b: string): DiffLine[] | null {
+export function diffLines(a: string, b: string, maxCells = MAX_CELLS): DiffLine[] | null {
   const A = a.split("\n");
   const B = b.split("\n");
   // Trim common prefix/suffix first; most edits are local.
@@ -21,7 +21,7 @@ export function diffLines(a: string, b: string): DiffLine[] | null {
   }
   const a2 = A.slice(start, endA);
   const b2 = B.slice(start, endB);
-  if (a2.length * b2.length > MAX_CELLS) return null;
+  if (a2.length * b2.length > maxCells) return null;
 
   // LCS table over the differing middle.
   const n = a2.length;

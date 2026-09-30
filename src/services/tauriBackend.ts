@@ -62,6 +62,7 @@ export const tauriBackend: Backend = {
   searchWorkspace: (root, options) => call("search_workspace", { root, options }),
   listWorkspaceFiles: (root) => call("list_workspace_files", { root }),
   gitStatus: (root) => call("git_status", { root }),
+  gitHeadText: (path) => call("git_head_text", { path }),
   listConvertibleFiles: (root) => call("list_convertible_files", { root }),
   openExternal: (url) => call("open_external", { url }),
   revealInFolder: (path) => call("reveal_in_folder", { path }),

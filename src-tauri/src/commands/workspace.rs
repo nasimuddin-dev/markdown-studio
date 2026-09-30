@@ -59,6 +59,15 @@ pub fn unwatch_workspace(watcher: State<'_, crate::watcher::WorkspaceWatcher>) {
     watcher.stop();
 }
 
+/// An approved file's text as of the last Git commit, for the editor's change markers; `None` when untracked.
+#[tauri::command]
+pub async fn git_head_text(state: State<'_, AppState>, path: String) -> AppResult<Option<String>> {
+    let file = state.scope.check(Path::new(&path))?;
+    tauri::async_runtime::spawn_blocking(move || crate::git::head_text(&file))
+        .await
+        .map_err(|e| AppError::Io(e.to_string()))
+}
+
 /// Git branch and changed files for an approved folder; `None` without Git or outside a repository.
 #[tauri::command]
 pub async fn git_status(state: State<'_, AppState>, root: String) -> AppResult<Option<crate::git::GitStatus>> {

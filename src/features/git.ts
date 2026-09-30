@@ -1,4 +1,5 @@
 import { backend } from "../services";
+import { refreshGitBase } from "./gitGutter";
 import { useGit } from "../stores/gitStore";
 import { useSettings } from "../stores/settingsStore";
 import { useWorkspace } from "../stores/workspaceStore";
@@ -15,6 +16,7 @@ let generation = 0;
 export async function refreshGitStatus() {
   const root = useWorkspace.getState().root;
   const run = ++generation;
+  void refreshGitBase();
   if (!root || !useSettings.getState().settings.showGitStatus) {
     useGit.getState().set(null);
     return;
