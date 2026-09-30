@@ -9,7 +9,9 @@ import {
   closeDocument, hasClosedDocuments, newDocument, openFileDialog, reopenClosedDocument, saveAll, saveDocument, setReadOnly,
 } from "./documents";
 import { closeWorkspace, createFileIn, openFolderDialog } from "./workspace";
-import { editorCommand, runOnEditor } from "./editorBridge";
+import { editorCommand, getEditorView, runOnEditor } from "./editorBridge";
+import { nextDiagnostic, previousDiagnostic } from "@codemirror/lint";
+import type { EditorView } from "@codemirror/view";
 // Export/print pull in the unified pipeline; load them on first use.
 const exporting = () => import("./exporting");
 const importing = () => import("./importing");
@@ -41,6 +43,14 @@ export interface Command {
 }
 
 const hasActive = () => !!activeDoc();
+
+/** Runs a CodeMirror view command on the active editor and keeps focus there. */
+function withEditor(command: (view: EditorView) => boolean) {
+  const view = getEditorView();
+  if (!view) return;
+  command(view);
+  view.focus();
+}
 
 function formatCommand(id: string, label: string, editor: StateCommand, shortcut?: string): Command {
   return { id, label, shortcut, editor, run: () => runOnEditor(editor), enabled: hasActive };
@@ -130,6 +140,20 @@ export const commands: Record<string, Command> = {
     label: "Compare with File…",
     run: () => useUi.getState().openComparePicker(),
     enabled: () => hasActive() && !!useWorkspace.getState().root,
+  },
+  nextProblem: {
+    id: "nextProblem",
+    label: "Go to Next Problem",
+    shortcut: "F8",
+    run: () => withEditor(nextDiagnostic),
+    enabled: hasActive,
+  },
+  previousProblem: {
+    id: "previousProblem",
+    label: "Go to Previous Problem",
+    shortcut: "Shift+F8",
+    run: () => withEditor(previousDiagnostic),
+    enabled: hasActive,
   },
   goToHeading: {
     id: "goToHeading",

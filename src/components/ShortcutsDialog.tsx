@@ -7,7 +7,7 @@ import { Modal } from "./Dialogs";
 
 const GROUPS: Array<{ title: string; ids: string[] }> = [
   { title: "File", ids: ["newFile", "openFile", "openFolder", "goToFile", "save", "saveAs", "saveAll", "fileHistory", "exportHtml", "print", "closeTab", "reopenClosedTab"] },
-  { title: "Edit & Find", ids: ["undo", "redo", "find", "replace", "gotoLine", "goToHeading", "findInFiles", "selectAll"] },
+  { title: "Edit & Find", ids: ["undo", "redo", "find", "replace", "gotoLine", "goToHeading", "nextProblem", "previousProblem", "findInFiles", "selectAll"] },
   { title: "Format", ids: [...Object.keys(formatCommands), "insertImage"] },
   {
     title: "View & Navigation",

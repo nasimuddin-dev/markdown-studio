@@ -404,6 +404,22 @@ test("Fix Table repairs a table typed with mistakes", async ({ page }) => {
   await expect(page.locator(".markdown-body table")).toHaveCount(2);
 });
 
+test("F8 and Shift+F8 move between problems", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Doc\n\nfine line\n\n#Oops\n\nfine\n\n![](pic.png)\n");
+  await page.keyboard.press(`${mod}+Home`);
+  await expect(page.getByRole("button", { name: /Show problems/ })).toBeVisible();
+  const position = page.locator(".status-right").getByTitle("Line and column");
+  await page.keyboard.press("F8");
+  await expect(position).toContainText("Ln 5,");
+  await page.keyboard.press("F8");
+  await expect(position).toContainText("Ln 9,");
+  await page.keyboard.press("Shift+F8");
+  await expect(position).toContainText("Ln 5,");
+});
+
 test("Alt+Z toggles word wrap", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);
