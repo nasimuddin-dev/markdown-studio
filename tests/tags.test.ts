@@ -144,3 +144,22 @@ describe("Rename Tag", () => {
     view.destroy();
   });
 });
+
+describe("tag completion in the front matter", () => {
+  const complete = async (doc: string) => {
+    const state = EditorState.create({ doc, extensions: [markdown({ base: markdownLanguage })] });
+    const r = await tagCompletionSource(new CompletionContext(state, doc.length, false));
+    return r && { from: r.from, labels: r.options.map((o) => o.label) };
+  };
+
+  it("completes names without # on the tags line and its list items", async () => {
+    setupBackend({ "/ws/a.md": "#idea #work" });
+    await setWorkspace("/ws");
+    invalidateWorkspaceFiles();
+    expect(await complete("---\ntags: [draft, i")).toEqual({ from: 18, labels: ["idea", "work"] });
+    expect(await complete("---\ntags: \"w")).toEqual({ from: 11, labels: ["idea", "work"] });
+    expect(await complete("---\ntitle: x\ntags:\n  - w")).toEqual({ from: 23, labels: ["idea", "work"] });
+    expect(await complete("---\ntitle: i")).toBeNull();
+    expect(await complete("---\ntags: [a]\n---\ntags: i")).toBeNull();
+  });
+});

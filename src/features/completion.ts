@@ -198,13 +198,33 @@ async function wikiHeadingCompletions(ctx: CompletionContext, start: number, typ
 
 let tagCache: { root: string; at: number; tags: Promise<Map<string, Array<{ path: string }>>> } | null = null;
 
+/** True on the front matter's `tags:` line or one of its `- item` lines. */
+function inFrontMatterTags(state: EditorState, pos: number): boolean {
+  const line = state.doc.lineAt(pos);
+  if (line.number < 2 || state.doc.line(1).text.trimEnd() !== "---") return false;
+  let tags = false;
+  for (let n = 2; n <= line.number; n++) {
+    const text = state.doc.line(n).text;
+    if (n < line.number && /^(---|\.\.\.)\s*$/.test(text)) return false;
+    if (/^tags?:/i.test(text)) tags = true;
+    else if (!/^\s+-(\s|$)/.test(text)) tags = false;
+  }
+  return tags;
+}
+
 /**
  * Completes `#tags` already used in this document or the open folder, after
  * `#` and a letter at a word start (not in code), with how many files use each.
+ * In the front matter's `tags`, it completes the names without `#`.
  */
 export async function tagCompletionSource(ctx: CompletionContext): Promise<CompletionResult | null> {
-  const m = ctx.matchBefore(/(?<=^|[\s(])#[\p{L}\p{N}_/-]+$/u);
-  if (!m || !/\p{L}/u.test(m.text) || inCode(ctx.state, ctx.pos) || ctx.state.sliceDoc(m.from - 2, m.from) === "](") return null;
+  const frontMatter = inFrontMatterTags(ctx.state, ctx.pos);
+  const m = frontMatter
+    ? ctx.matchBefore(/(?<=^tags?:.*[\s[,]|^\s+-\s+)["']?[\p{L}\p{N}_/-]+$/iu)
+    : ctx.matchBefore(/(?<=^|[\s(])#[\p{L}\p{N}_/-]+$/u);
+  if (!m || !/\p{L}/u.test(m.text)) return null;
+  if (!frontMatter && (inCode(ctx.state, ctx.pos) || ctx.state.sliceDoc(m.from - 2, m.from) === "](")) return null;
+  const quote = /^["']/.test(m.text) ? 1 : 0;
   const counts = new Map<string, { label: string; files: number }>();
   const root = useWorkspace.getState().root;
   if (root) {
@@ -219,11 +239,12 @@ export async function tagCompletionSource(ctx: CompletionContext): Promise<Compl
     const key = tag.toLowerCase();
     counts.set(key, { label: tag, files: counts.get(key)?.files ?? 0 });
   }
-  const typed = m.text.slice(1).toLowerCase();
+  const typed = m.text.slice(frontMatter ? quote : 1).toLowerCase();
   const options = [...counts.values()]
     .filter((t) => t.label.toLowerCase() !== typed)
-    .map((t): Completion => ({ label: `#${t.label}`, detail: t.files ? `${t.files} file${t.files === 1 ? "" : "s"}` : "this document", type: "keyword" }));
-  return options.length ? { from: m.from, options, validFor: /^#[\p{L}\p{N}_/-]*$/u } : null;
+    .map((t): Completion => ({ label: frontMatter ? t.label : `#${t.label}`, detail: t.files ? `${t.files} file${t.files === 1 ? "" : "s"}` : "this document", type: "keyword" }));
+  if (!options.length) return null;
+  return frontMatter ? { from: m.from + quote, options, validFor: /^[\p{L}\p{N}_/-]*$/u } : { from: m.from, options, validFor: /^#[\p{L}\p{N}_/-]*$/u };
 }
 
 export function linkCompletion(): Extension {
