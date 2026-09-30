@@ -498,3 +498,28 @@ The scheduled run started at 5:37 PM, after the 5:25 PM cut-off for new features
 **Next up:** unchanged from the 0.17.0 entry above (confirm the dialog-parent fix, toolbar headings 4–6 and table menu, tauri-driver e2e).
 
 **Questions for the user:** unchanged from the 0.17.0 entry. Also: the scheduled task fired late today (5:37 PM instead of 4:00 PM); if that keeps happening, a larger time window may be worth setting.
+
+## 2026-09-29 (5:44–7:35 PM, continuous session): 0.18.0
+
+The user asked to keep the loop going, then to release once features were ready.
+
+- **Features:** toolbar Heading 4–6 and Table tools (66b4e21); Git change bars in the gutter (946ffa0), with a pop-up of the committed lines, Revert, and Next/Previous Change (cac881b); the last Git commit in File History (80dd73b) and the saved file while there are unsaved changes (7f234c4); custom CSS for documents, scoped to `.markdown-body` by rebuilding the parsed rules (7f15b2a); Number Headings (e14129d); Find in Files include/exclude globs, in Rust and TypeScript with shared test cases (d673b6c); Copy button on preview code blocks (63da895); Go to Heading (e373084); Edit menu line tools (8b708ee); read-only documents (c998be2); lint rules for table column counts, footnotes and link text (c902a5c), with quick fixes (a39eb90).
+- **Fixes:** HTML entities in `href`/`src` for link checks and updates (dc4f880). Accessibility (1b17f62): the audit now covers the gutters, menus, context menus, find/replace, Problems, Links, Go to File, templates, About, unsaved-changes, File History, the read-only bar and the Git pop-up; it found and fixed Problems-panel contrast, line-number contrast, the unsaved-changes label contrast (light theme) and invalid ARIA in the File History list.
+- **Measured, not changed:** the startup bundle (736 KB): React DOM 202 KB, and ~136 KB of HTML/CSS/JS grammars that `@codemirror/lang-markdown` imports statically (d5eae9f). highlight.js is already lazy.
+- **Native check:** a debug build opened a file in a scratch Git repository; UI Automation confirmed File History shows "Last commit" with the correct diff (the real `git show` path). Screenshots and keyboard input were unavailable (the desktop was locked), so the gutter bars were checked in the browser build only.
+
+**Version:** 0.18.0. **Tests:** Vitest 390 (63 files), Playwright 49, Rust 40 (+1 ignored), website check (50 pages). All passing.
+
+**Unverified:** the gutter bars and read-only locking in the native window (covered by browser e2e and Rust tests); Git features on macOS/Linux.
+
+**Next up:**
+
+1. Tauri-driver e2e against the native build (needs msedgedriver and `cargo install tauri-driver`; see questions).
+2. More lint quick fixes (for example heading levels) and a "Fix All" for a document.
+3. Per-workspace custom CSS (a file in the folder, shared through Git), after weighing the risk of styles from untrusted repositories.
+
+**Questions for the user:**
+
+- May I download msedgedriver (Microsoft) and `cargo install tauri-driver` for native end-to-end tests?
+- Local LLMs (SRS §19, for example Ollama) alongside Claude: wanted?
+- A redirect repository for the old website address?

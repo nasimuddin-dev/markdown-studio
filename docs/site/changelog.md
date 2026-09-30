@@ -7,6 +7,29 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.18.0
+
+Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.18.0)
+
+### Added
+
+- **Git change bars** in the editor: lines added, changed or deleted since the last commit. Click a bar to see the committed lines and **Revert Change**; **Alt+F5** / **Shift+Alt+F5** go to the next and previous change.
+- **File History** also lists the **last Git commit**, and, while you have unsaved changes, the **saved file**, so you can review what saving would change.
+- **Custom CSS for documents** (Settings → Preview): your own styles for the preview, printing, slides and HTML export. It only affects the document, never the app, and IT can preset or lock it.
+- **Read-only files** open locked, with **Save As** or **Edit Anyway**; **View → Toggle Read-Only** protects any document from accidental edits.
+- **Find in Files: files to include and exclude** (for example `docs`, `*.draft.md`); Replace All uses the same filters.
+- **Format → Number Headings** (1., 1.1, 1.1.1) and **Remove Heading Numbers**; running it again renumbers.
+- **Edit → Go to Heading** (**Ctrl+Alt+H**): jump to a heading by typing part of it.
+- **Edit menu line tools:** Sort Lines, Remove Duplicate Lines, Join Lines, and Uppercase / Lowercase / Title Case.
+- **Copy button** on code blocks in the preview.
+- **Toolbar:** Heading 4 to 6 in the paragraph style list (also **Ctrl+Alt+4** to **6**), and **Table tools** (rows, columns, format, sort, copy as CSV) when the cursor is in a table.
+- **Lint:** table rows that don't match the header, a text line right after a table, footnotes without a definition, and links without text, with **quick fixes** (Add Blank Line, Add Empty Cells, Add Definition).
+
+### Fixed
+
+- Link checks and link updates didn't understand HTML entities such as `&amp;` in `<a href>` and `<img src>`.
+- Accessibility: better contrast for the selected row in the Problems panel, the line numbers, and the unsaved-changes label in the status bar (light theme); the File History version list had an invalid screen-reader structure.
+
 ## v0.17.0
 
 Released: 2026-09-29 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.17.0)
