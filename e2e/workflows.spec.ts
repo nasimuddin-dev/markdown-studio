@@ -1154,3 +1154,17 @@ test("clicking the line and column in the status bar opens Go to Line", async ({
   await page.keyboard.press("Enter");
   await expect(page.locator(".cm-activeLine")).toHaveText("two");
 });
+
+test("hovering a heading in the preview offers to copy a link to it", async ({ page, context, browserName }) => {
+  test.skip(browserName !== "chromium", "clipboard permission");
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const heading = page.locator(".preview h2", { hasText: "GitHub Flavored Markdown" });
+  await expect(heading).toHaveAccessibleName("GitHub Flavored Markdown");
+  await heading.hover();
+  await heading.locator(".heading-anchor").click();
+  await expect(page.getByText("Link copied.")).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("#github-flavored-markdown");
+});

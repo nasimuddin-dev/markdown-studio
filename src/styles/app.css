@@ -986,6 +986,31 @@ select {
 .preview:focus-visible {
   outline-offset: -3px;
 }
+/* The link icon that copies a heading's #anchor (preview only, not slides). */
+.preview .markdown-body :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+}
+.heading-anchor {
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  display: flex;
+  padding: 2px;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  opacity: 0;
+  cursor: pointer;
+}
+.preview .markdown-body :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor {
+  opacity: 1;
+}
+.heading-anchor:hover {
+  color: var(--accent);
+}
+.slideshow .heading-anchor {
+  display: none;
+}
+
 /* Find in the preview: a bar over its top-right corner. */
 .preview-find {
   position: absolute;

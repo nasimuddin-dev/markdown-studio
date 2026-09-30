@@ -16,6 +16,7 @@ import { toggleTaskInDocument } from "../features/tasks";
 import { mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
 import { PreviewFind } from "./PreviewFind";
 import { useUi } from "../stores/uiStore";
+import { Icon } from "./Icon";
 
 /** The position of a task checkbox among the document's task list items, or -1. */
 function taskIndex(root: HTMLElement, box: HTMLInputElement): number {
@@ -92,6 +93,26 @@ function mermaidSource(node: unknown): string | null {
   return (code.children ?? []).map((c) => c.value ?? "").join("");
 }
 
+/**
+ * A heading with a link icon on hover that copies its `#anchor`. Mouse only
+ * (hidden from assistive technology, so the heading's name stays its text);
+ * the Outline's Copy Link to Heading does the same from the keyboard.
+ */
+function Heading({ level, id, children, ...rest }: ComponentProps<"h1"> & { level: number }) {
+  const Tag = `h${level}` as "h1";
+  const anchor = typeof id === "string" ? id.replace(/^user-content-/, "") : "";
+  return (
+    <Tag id={id} {...rest}>
+      {children}
+      {anchor && (
+        <span className="heading-anchor" aria-hidden="true" title="Copy link to this heading" onClick={() => void copyText(`#${anchor}`, "Link")}>
+          <Icon name="link" size={14} />
+        </span>
+      )}
+    </Tag>
+  );
+}
+
 /** A code block with a Copy button (shown on hover or keyboard focus). */
 function CodeBlock({ line, ...props }: ComponentProps<"pre"> & { line?: string }) {
   const pre = useRef<HTMLPreElement>(null);
@@ -151,6 +172,12 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text
           </CodeBlock>
         );
       },
+      h1: ({ node: _n, ...p }) => <Heading level={1} {...p} />,
+      h2: ({ node: _n, ...p }) => <Heading level={2} {...p} />,
+      h3: ({ node: _n, ...p }) => <Heading level={3} {...p} />,
+      h4: ({ node: _n, ...p }) => <Heading level={4} {...p} />,
+      h5: ({ node: _n, ...p }) => <Heading level={5} {...p} />,
+      h6: ({ node: _n, ...p }) => <Heading level={6} {...p} />,
       img: ({ src, alt, title }) => (
         <LocalImage src={typeof src === "string" ? src : undefined} alt={alt} title={title} docPath={docPath} />
       ),

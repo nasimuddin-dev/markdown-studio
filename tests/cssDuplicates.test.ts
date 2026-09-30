@@ -20,7 +20,8 @@ function duplicatedSelectors(css: string): string[] {
   for (const ch of text) {
     if (ch === "{") {
       if (depth === 0 && !prelude.trim().startsWith("@")) {
-        for (const sel of prelude.split(",").map((s) => s.trim().replace(/\s+/g, " "))) {
+        // Commas inside :is(…) or :not(…) don't separate selectors.
+        for (const sel of prelude.split(/,(?![^(]*\))/).map((s) => s.trim().replace(/\s+/g, " "))) {
           if (sel && !sel.startsWith(":root") && !sel.startsWith("[data-theme")) seen.set(sel, (seen.get(sel) ?? 0) + 1);
         }
       }
