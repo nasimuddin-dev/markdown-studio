@@ -166,6 +166,15 @@ describe("markdown lint: tables, footnotes and link text", () => {
     expect(only("**Ctrl+Z** and **Ctrl+Y**, **Use `x`** now, 2 * 3 * 4, a_b_c, *fine* and `** x **`, snake__case__name", "emphasis-space")).toEqual([]);
   });
 
+  it("flags link and image paths with spaces", () => {
+    expect(applyFix("See ![Logo](my logo.png) here", "destination-spaces")).toBe("See ![Logo](<my logo.png>) here");
+    expect(applyFix("[Notes](../My Notes.md#top)", "destination-spaces")).toBe("[Notes](<../My Notes.md#top>)");
+    // Titles, wrapped paths, encoded spaces and code are fine.
+    expect(only('[a](b.md "Title") [c](<d e.md>) [f](g%20h.md) `[x](y z)`', "destination-spaces")).toEqual([]);
+    // The fixed link is a real link again (so its target is checked).
+    expect(findLinks("![Logo](<my logo.png>)")[0].target).toBe("my logo.png");
+  });
+
   it("fixes all safe problems at once, repeating as fixes reveal new ones", () => {
     const text = "# A\n\n### B\n\n#### C\n\n| a | b |\n| - | - |\n| 1 |\nafter\n\nSee[^x] and[^y] and [c](#b).";
     const { text: fixed, fixed: count } = fixAllProblems(text);

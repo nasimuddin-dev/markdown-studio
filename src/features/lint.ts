@@ -223,7 +223,13 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
       }
     }
   }
-  problems.push(...lintTables(text, starts), ...lintFootnotes(text), ...lintHeadingSyntax(text, starts), ...lintListsAndEmphasis(text, starts));
+  problems.push(
+    ...lintTables(text, starts),
+    ...lintFootnotes(text),
+    ...lintHeadingSyntax(text, starts),
+    ...lintListsAndEmphasis(text, starts),
+    ...lintSpacesInDestinations(text),
+  );
   return problems.sort((a, b) => a.from - b.from);
 }
 
@@ -397,6 +403,30 @@ function lintHeadingSyntax(text: string, starts: number[]): MarkdownProblem[] {
         fix: { label: "Make It a Rule", edits: [{ at: 0, insert: "\n" }] },
       });
     }
+  }
+  return out;
+}
+
+/**
+ * `[text](my file.md)` and `![alt](my image.png)` aren't links: a destination
+ * with spaces must be wrapped in `<…>` (or the spaces written as %20). A
+ * quoted title after the destination (`(url "Title")`) is fine.
+ */
+function lintSpacesInDestinations(text: string): MarkdownProblem[] {
+  const out: MarkdownProblem[] = [];
+  for (const m of maskCode(text).matchAll(/(!?)\[([^\]\n]*)\]\(([^()<>"'\n]*?\s[^()<>"'\n]*?)\)/g)) {
+    const dest = m[3].trim();
+    // `(url "title")` / `(url 'title')` are excluded by the character class; skip empty or single-word ones.
+    if (!dest || !/\s/.test(dest)) continue;
+    const open = m.index! + m[1].length + m[2].length + 3; // after "]("
+    out.push({
+      from: m.index!,
+      to: m.index! + m[0].length,
+      severity: "warning",
+      rule: "destination-spaces",
+      message: `The ${m[1] ? "image" : "link"} isn't recognised because its path has spaces. Wrap it in <…>: (<${dest}>).`,
+      fix: { label: "Wrap in <…>", edits: [{ at: open - m.index!, remove: m[3].length, insert: `<${dest}>` }] },
+    });
   }
   return out;
 }
