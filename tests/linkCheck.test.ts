@@ -54,6 +54,12 @@ describe("workspace link check", () => {
     expect(report).toMatchObject({ files: [], filesChecked: 2, linksChecked: 1 });
   });
 
+  it("names the file a misspelled link probably meant", async () => {
+    setupBackend({ "/ws/a.md": "[x](gude.md) [y](gone.md)\n", "/ws/guide.md": "# G\n" });
+    const report = await checkWorkspaceLinks("/ws");
+    expect(report.files[0].problems.map((p) => p.message)).toEqual(["Linked file not found: gude.md. Did you mean “guide.md”?", "Linked file not found: gone.md"]);
+  });
+
   it("lists the links between Markdown files, for “Links to this document”", async () => {
     setupBackend({
       "/ws/a.md": "# A\n\n[to B](b.md#b) and [self](a.md) and ![img](b.png)\n",

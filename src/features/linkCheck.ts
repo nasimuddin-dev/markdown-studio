@@ -1,8 +1,8 @@
 import GithubSlugger from "github-slugger";
 import { backend } from "../services";
-import { isInside, isMarkdownPath } from "../services/paths";
+import { basename, dirname, isInside, isMarkdownPath } from "../services/paths";
 import { extractHeadings } from "./outline";
-import { findAllLinks, lintMarkdown, localTargets, type Severity } from "./lint";
+import { closestFileName, findAllLinks, lintMarkdown, localTargets, type Severity } from "./lint";
 
 export interface LinkProblem {
   line: number;
@@ -70,6 +70,13 @@ export async function checkWorkspaceLinks(root: string, onProgress?: (done: numb
     if (!exists.has(path)) exists.set(path, b.fileMtime(path).then((m) => m !== null, () => null));
     return exists.get(path)!;
   };
+  const listings = new Map<string, Promise<string[]>>();
+  /** The file in the same folder a broken link probably meant, if one clearly is. */
+  const nearName = async (path: string) => {
+    const dir = dirname(path);
+    if (!listings.has(dir)) listings.set(dir, b.listDir(dir, { images: true }).then((es) => es.filter((e) => !e.isDir).map((e) => e.name), () => []));
+    return closestFileName(basename(path), await listings.get(dir)!);
+  };
   const anchors = new Map<string, Set<string> | null>();
   const anchorsOf = async (path: string) => {
     if (!anchors.has(path)) {
@@ -114,11 +121,12 @@ export async function checkWorkspaceLinks(root: string, onProgress?: (done: numb
       if (!isInside(path, root)) continue;
       const found = await check(path);
       if (found === false) {
+        const near = await nearName(path);
         problems.push({
           ...where,
           severity: "warning",
           rule: link.image ? "missing-image" : "broken-link",
-          message: `${link.image ? "Image" : "Linked file"} not found: ${link.target}`,
+          message: `${link.image ? "Image" : "Linked file"} not found: ${link.target}${near ? `. Did you mean “${near}”?` : ""}`,
         });
         continue;
       }

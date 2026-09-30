@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeEntities, findAllLinks, fixAllProblems, fixChanges, findHtmlLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
+import { closestFileName, decodeEntities, findAllLinks, fixAllProblems, fixChanges, findHtmlLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
 
 const rules = (text: string) => lintMarkdown(text).map((p) => p.rule);
 
@@ -63,6 +63,17 @@ describe("markdown lint: document rules", () => {
     expect(rules("# A\n\n[y][x]\n\n[x]: #nope")).toEqual(["broken-anchor"]);
     const problems = await lintLinks("[ok]: a.md\n[bad]: missing.md", "/ws/p.md", async (p) => p === "/ws/a.md");
     expect(problems.map((p) => p.message)).toEqual(["Linked file not found: missing.md"]);
+  });
+});
+
+describe("the file a misspelled name meant", () => {
+  it("compares names with the same extension, or the same name with a mistyped extension", () => {
+    const names = ["guide.md", "logo.png", "Setup Notes.md", "a.md", "b.md"];
+    expect(closestFileName("gude.md", names)).toBe("guide.md");
+    expect(closestFileName("LOGO.pgn", names)).toBe("logo.png");
+    expect(closestFileName("lost.png", names)).toBeNull();
+    expect(closestFileName("c.md", names)).toBeNull(); // a.md and b.md are as close
+    expect(closestFileName("setup notes.md", names)).toBe("Setup Notes.md");
   });
 });
 

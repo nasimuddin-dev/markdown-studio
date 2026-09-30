@@ -308,6 +308,28 @@ function distance(a: string, b: string): number {
   return prev[b.length];
 }
 
+/**
+ * The file name in `names` that `name` is clearly a typo of: a name with the
+ * same extension whose stem is a few characters off (and no other as close),
+ * or the same stem with a mistyped extension. Case doesn't matter.
+ */
+export function closestFileName(name: string, names: string[]): string | null {
+  const split = (n: string) => {
+    const dot = n.lastIndexOf(".");
+    return dot > 0 ? [n.slice(0, dot).toLowerCase(), n.slice(dot + 1).toLowerCase()] : [n.toLowerCase(), ""];
+  };
+  const [stem, ext] = split(name);
+  const sameExt = new Map<string, string>();
+  for (const n of names) {
+    const [s, e] = split(n);
+    if (e === ext) sameExt.set(s, n);
+  }
+  const near = closest(stem, new Set(sameExt.keys()));
+  if (near) return sameExt.get(near)!;
+  const sameStem = names.filter((n) => split(n)[0] === stem);
+  return sameStem.length === 1 ? sameStem[0] : null;
+}
+
 /** The anchor closest to `id` if it's clearly a typo of it (a few characters off, and no other as close). */
 function closest(id: string, anchors: Set<string>): string | null {
   let best: string | null = null;
@@ -627,11 +649,7 @@ export async function lintLinks(
     const dir = path.slice(0, cut);
     if (!listings.has(dir)) listings.set(dir, filesIn(dir).catch(() => null));
     const names = await listings.get(dir);
-    if (!names?.length) return null;
-    const wanted = path.slice(cut + 1).toLowerCase();
-    const byLower = new Map(names.map((n) => [n.toLowerCase(), n]));
-    const near = closest(wanted, new Set(byLower.keys()));
-    return near ? byLower.get(near)! : null;
+    return names?.length ? closestFileName(path.slice(cut + 1), names) : null;
   };
   for (const { link, path } of localTargets(findAllLinks(text), docPath)) {
     if (!path) {
