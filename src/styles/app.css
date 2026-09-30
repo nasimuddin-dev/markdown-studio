@@ -763,12 +763,15 @@ select {
 }
 
 /* Formatting toolbar above the editor */
-.toolbar {
+.format-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 2px 0;
-  padding: 3px 6px;
+  padding: 3px 6px 3px 0;
+  /* Each group's divider sits 1px left of it; clipping the left edge hides the divider
+     of whichever group starts a row, so dividers only appear between groups. */
+  overflow: hidden;
   border-bottom: 1px solid var(--border);
   background: var(--bg-chrome);
 }
@@ -776,12 +779,9 @@ select {
   display: flex;
   align-items: center;
   gap: 1px;
+  margin-left: -1px;
   padding: 0 6px;
   border-left: 1px solid var(--border);
-}
-.toolbar-group:first-child {
-  border-left: none;
-  padding-left: 0;
 }
 .toolbar-button {
   display: inline-flex;

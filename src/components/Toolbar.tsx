@@ -116,7 +116,7 @@ export function Toolbar() {
 
   const heading = HEADINGS.find((h) => h.level === format.heading);
   return (
-    <div className="toolbar" role="toolbar" aria-label="Formatting" ref={bar} onKeyDown={onKeyDown}>
+    <div className="format-toolbar" role="toolbar" aria-label="Formatting" ref={bar} onKeyDown={onKeyDown}>
       {GROUPS.map((group, g) => (
         <div className="toolbar-group" key={g}>
           {group.map((b) => {
