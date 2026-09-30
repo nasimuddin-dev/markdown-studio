@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useWorkspace } from "../stores/workspaceStore";
 import { useUi } from "../stores/uiStore";
 import { toAppError } from "../services/errors";
-import { basename } from "../services/paths";
+import { basename, isInside, isMarkdownPath } from "../services/paths";
 import { openPath, saveAll } from "../features/documents";
 import { openFolderDialog } from "../features/workspace";
 import { requestReveal } from "../features/editorBridge";
@@ -19,6 +19,8 @@ export function LinkCheckPanel() {
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const active = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.path ?? null);
+  const [incomingOpen, setIncomingOpen] = useState(true);
   const run = useRef(0);
 
   const check = useCallback(async () => {
@@ -43,7 +45,7 @@ export function LinkCheckPanel() {
     void check();
   }, [check, token]);
 
-  const open = async (path: string, p: LinkProblem) => {
+  const open = async (path: string, p: Pick<LinkProblem, "line" | "column" | "length">) => {
     const id = await openPath(path);
     if (id) requestReveal(id, p.line, p.column, p.length);
   };
@@ -63,6 +65,8 @@ export function LinkCheckPanel() {
   }
 
   const total = report?.files.reduce((n, f) => n + f.problems.length, 0) ?? 0;
+  const showIncoming = !!report && !!active && isMarkdownPath(active) && isInside(active, root);
+  const incoming = showIncoming ? report!.incoming.filter((l) => isInside(l.to, active!) && isInside(active!, l.to)) : [];
   return (
     <section className="search-panel" aria-label="Link check">
       <div className="explorer-header">
@@ -93,6 +97,35 @@ export function LinkCheckPanel() {
           Checks the saved files.{" "}
           <button className="text-link" onClick={() => void saveAll().then(check)}>Save all and check again</button>
         </div>
+      )}
+      {showIncoming && (
+        <ul className="search-results" aria-label="Links to this document">
+          <li>
+            <button className="search-file" title={active!} aria-expanded={incomingOpen} onClick={() => setIncomingOpen(!incomingOpen)}>
+              <Icon name={incomingOpen ? "chevronDown" : "chevronRight"} size={14} />
+              <Icon name="link" size={14} className="tree-file-icon" />
+              <span className="search-file-name">Links to {basename(active!)}</span>
+              <span className="badge">{incoming.length}</span>
+            </button>
+            {incomingOpen &&
+              (incoming.length ? (
+                <ul>
+                  {incoming.map((l, i) => (
+                    <li key={i}>
+                      <button className="search-match link-problem" title={`${l.from}, line ${l.line}`} onClick={() => void open(l.from, l)}>
+                        <span>
+                          <span className="incoming-file">{basename(l.from)}</span> {l.label}
+                        </span>
+                        <span className="link-problem-line">{l.line}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="incoming-none">No other file in the folder links here.</p>
+              ))}
+          </li>
+        </ul>
       )}
       {report && total > 0 && (
         <ul className="search-results" aria-label="Link problems">

@@ -775,6 +775,15 @@ select {
   text-decoration: underline;
 }
 
+.incoming-file {
+  font-weight: 600;
+}
+.incoming-none {
+  margin: 2px 0 6px 34px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 .format-toolbar {
   display: flex;
   flex-wrap: wrap;

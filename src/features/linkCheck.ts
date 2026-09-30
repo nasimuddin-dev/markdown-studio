@@ -13,8 +13,22 @@ export interface LinkProblem {
   message: string;
 }
 
+/** A link from one Markdown file to another (for “Links to this document”). */
+export interface IncomingLink {
+  /** The file the link is in. */
+  from: string;
+  /** The Markdown file it points to. */
+  to: string;
+  line: number;
+  column: number;
+  length: number;
+  /** The link text (or the reference label), else the address as written. */
+  label: string;
+}
+
 export interface LinkReport {
   files: Array<{ path: string; problems: LinkProblem[] }>;
+  incoming: IncomingLink[];
   filesChecked: number;
   linksChecked: number;
 }
@@ -65,7 +79,7 @@ export async function checkWorkspaceLinks(root: string, onProgress?: (done: numb
     return anchors.get(path)!;
   };
 
-  const report: LinkReport = { files: [], filesChecked: 0, linksChecked: 0 };
+  const report: LinkReport = { files: [], incoming: [], filesChecked: 0, linksChecked: 0 };
   for (const [i, doc] of docs.entries()) {
     onProgress?.(i, docs.length);
     const text = await read(doc);
@@ -108,6 +122,7 @@ export async function checkWorkspaceLinks(root: string, onProgress?: (done: numb
         });
         continue;
       }
+      if (found && isMarkdownPath(path) && !link.image && !(isInside(path, doc) && isInside(doc, path))) report.incoming.push({ from: doc, to: path, ...where, label: link.text.trim() || link.target });
       const fragment = fragmentOf(link.target);
       if (found && fragment && isMarkdownPath(path)) {
         const ids = await anchorsOf(path);

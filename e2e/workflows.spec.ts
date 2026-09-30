@@ -994,3 +994,18 @@ test("F2 renames the heading at the cursor and updates links to it", async ({ pa
   await expect(page.locator(".cm-lintRange")).toHaveCount(0);
   await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
 });
+
+test("the Links tab lists the files that link to the open document", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.getByRole("tab", { name: "Links" }).click();
+  const incoming = page.getByRole("list", { name: "Links to this document" });
+  await expect(incoming.getByRole("button", { name: /Links to README\.md/ })).toContainText("1");
+  await incoming.getByRole("button", { name: /guide\.md Back to README/ }).click();
+  await expect(page.getByRole("tab", { name: /guide\.md/ })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator(".cm-activeLine")).toContainText("[Back to README](../README.md)");
+  // guide.md is linked from README.md.
+  await expect(incoming.getByRole("button", { name: /Links to guide\.md/ })).toBeVisible();
+  await expect(incoming.getByRole("button", { name: /README\.md guide/ })).toBeVisible();
+});

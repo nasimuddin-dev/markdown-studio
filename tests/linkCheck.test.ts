@@ -53,4 +53,15 @@ describe("workspace link check", () => {
     const report = await checkWorkspaceLinks("/ws");
     expect(report).toMatchObject({ files: [], filesChecked: 2, linksChecked: 1 });
   });
+
+  it("lists the links between Markdown files, for “Links to this document”", async () => {
+    setupBackend({
+      "/ws/a.md": "# A\n\n[to B](b.md#b) and [self](a.md) and ![img](b.png)\n",
+      "/ws/docs/c.md": "See [ref][b].\n\n[b]: ../b.md\n",
+      "/ws/b.md": "# B\n",
+      "/ws/b.png": "x",
+    });
+    const report = await checkWorkspaceLinks("/ws");
+    expect(report.incoming.map((l) => `${l.from} -> ${l.to} @${l.line}: ${l.label}`)).toEqual(["/ws/a.md -> /ws/b.md @3: to B", "/ws/docs/c.md -> /ws/b.md @3: b"]);
+  });
 });
