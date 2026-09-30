@@ -137,7 +137,7 @@ function Sidebar() {
           onClick={() => setView("explorer")}
           title={`Explorer (${formatShortcut(commands.toggleExplorer.shortcut)})`}
         >
-          <Icon name="files" size={15} /> Explorer
+          <Icon name="files" size={15} /> <span className="sidebar-tab-label">Explorer</span>
         </button>
         <button
           role="tab"
@@ -146,7 +146,7 @@ function Sidebar() {
           onClick={() => useUi.getState().focusSearch()}
           title={`Search (${formatShortcut(commands.findInFiles.shortcut)})`}
         >
-          <Icon name="search" size={15} /> Search
+          <Icon name="search" size={15} /> <span className="sidebar-tab-label">Search</span>
         </button>
         <button
           role="tab"
@@ -155,7 +155,7 @@ function Sidebar() {
           onClick={() => setView("links")}
           title="Check links in the folder"
         >
-          <Icon name="link" size={15} /> Links
+          <Icon name="link" size={15} /> <span className="sidebar-tab-label">Links</span>
         </button>
       </div>
       {view === "explorer" ? (

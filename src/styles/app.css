@@ -479,6 +479,8 @@ select {
   flex-direction: column;
   height: 100%;
   background: var(--bg-sidebar);
+  /* Lets the tabs switch to icons when the sidebar is narrow (see .sidebar-tab-label). */
+  container-type: inline-size;
 }
 
 .explorer {
@@ -1619,6 +1621,20 @@ select {
 .sidebar-tab.active {
   color: var(--text);
   border-bottom-color: var(--accent);
+}
+/* A narrow sidebar shows the tabs as icons (the labels stay as their accessible names and tooltips). */
+@container (max-width: 250px) {
+  .sidebar-tab-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .sidebar-tab {
+    padding: 5px 10px;
+  }
 }
 
 .search-panel {
