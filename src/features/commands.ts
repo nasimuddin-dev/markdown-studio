@@ -21,7 +21,7 @@ import {
   deleteColumn, deleteRow, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
 } from "./tables";
 import { fixAllProblemsCommand } from "./lintExtension";
-import { changeCase, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
+import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
 import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
 import { insertOrUpdateToc } from "./toc";
@@ -72,6 +72,7 @@ export const formatCommands: Record<string, Command> = {
   toggleTaskCheck: formatCommand("toggleTaskCheck", "Check / Uncheck Task", fmt.toggleTaskCheck, "Mod+Enter"),
   footnote: formatCommand("footnote", "Insert Footnote", fmt.insertFootnote, "Mod+Alt+R"),
   table: formatCommand("table", "Insert Table", fmt.insertTable),
+  convertToTable: formatCommand("convertToTable", "Convert Selection to Table", convertSelectionToTable),
   formatTable: formatCommand("formatTable", "Format Table", formatTableAtCursor, "Mod+Alt+T"),
   sortTableAsc: formatCommand("sortTableAsc", "Sort Table by Column (A to Z)", sortTableAtCursor(false)),
   sortTableDesc: formatCommand("sortTableDesc", "Sort Table by Column (Z to A)", sortTableAtCursor(true)),

@@ -33,6 +33,7 @@ Colons in the delimiter row align a column:
 | Command | Shortcut | What it does |
 | --- | --- | --- |
 | Insert Table | | Inserts a two-column table to fill in. The toolbar's Table button lets you choose the number of columns and rows (up to 20 each) |
+| Convert Selection to Table | | Turns selected comma-, tab-, semicolon- or pipe-separated lines into a table; the first line becomes the header and numeric columns are right-aligned. Every line needs the same number of values (at least two) |
 | Format Table | Ctrl+Alt+T | Pads every column to the same width and normalizes the delimiter row. Wide characters (Chinese, Japanese, Korean, emoji) count as two columns, so tables stay aligned |
 | Next / previous cell | Tab / Shift+Tab | In a table, formats it and selects the next or previous cell's text, so you can type over it. Tab in the last cell adds a row. Outside tables, Tab indents as usual |
 | Table: Insert Row Above / Below | | Adds an empty row next to the cursor's row (below the header when the cursor is in the header) and moves the cursor into it |

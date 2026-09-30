@@ -88,6 +88,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Optional auto save (after a delay, or on tab/window focus change) that never overwrites external changes
 - Save options: trim trailing whitespace (keeps Markdown hard breaks and code blocks), final newline, default line ending for new files
 - Typing `*`, `_`, `` ` ``, `~`, `"`, `(` or `[` with text selected wraps the selection (type `**` for bold)
+- Format → Convert Selection to Table (comma, tab, semicolon or pipe separated text)
 - Edit menu line tools: Sort Lines (natural order), Remove Duplicate Lines, Join Lines, and Uppercase / Lowercase / Title Case
 - Copy button on code blocks in the preview (on hover or keyboard focus)
 - Large documents: long previews are built in parts as you scroll to them; live preview pauses above 1 MB of text, with render-on-demand

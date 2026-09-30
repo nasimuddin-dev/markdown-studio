@@ -1,4 +1,5 @@
 import { EditorSelection, type EditorState, type StateCommand, type Text } from "@codemirror/state";
+import { parseDelimited, rowsToMarkdownTable } from "../services/convert/csv";
 
 /**
  * Line and case commands of the Edit menu. Each works on the selected lines
@@ -54,6 +55,22 @@ export const joinLines: StateCommand = ({ state, dispatch }) => {
   const lines = doc.sliceString(first.from, last.to).split("\n");
   const insert = lines.map((l, i) => (i ? l.trim() : l.trimEnd())).filter((l, i) => i === 0 || l).join(" ");
   dispatch(state.update({ changes: { from: first.from, to: last.to, insert }, userEvent: "input.transform" }));
+  return true;
+};
+
+/**
+ * Turns the selected lines of comma-, tab-, semicolon- or pipe-separated text
+ * into a Markdown table (the first line becomes the header). Does nothing
+ * unless every line splits into the same number (2 or more) of cells.
+ */
+export const convertSelectionToTable: StateCommand = ({ state, dispatch }) => {
+  if (state.selection.main.empty) return false;
+  const { from, to, lines } = lineRange(state);
+  const text = lines.join("\n").trim();
+  const rows = parseDelimited(text);
+  if (rows.length < 1 || rows[0].length < 2 || rows.some((r) => r.length !== rows[0].length)) return false;
+  const insert = rowsToMarkdownTable(rows);
+  dispatch(state.update({ changes: { from, to, insert }, selection: EditorSelection.cursor(from + insert.length), scrollIntoView: true, userEvent: "input.transform" }));
   return true;
 };
 
