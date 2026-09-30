@@ -776,6 +776,18 @@ select {
 }
 
 /* Formatting toolbar above the editor */
+/* Outline: collapse a heading's subheadings. */
+.outline-toggle {
+  display: inline-flex;
+  flex: none;
+  width: 14px;
+  margin-left: -4px;
+  color: var(--text-muted);
+}
+.outline-toggle:hover {
+  color: var(--text);
+}
+
 /* A picture opened from the Explorer. */
 .image-preview-modal {
   width: min(760px, 92vw);

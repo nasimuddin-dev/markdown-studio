@@ -42,7 +42,7 @@ Markdown syntax is highlighted as you type: headings, emphasis, links, lists, qu
 ## Moving around
 
 - **Go to Line** (**Ctrl+G**) jumps to a line number.
-- The **Outline** in the sidebar lists the document's headings; click one to jump to it. Right-click a heading to **Rename Heading…** (links to it follow, see [Rename a heading](/guide/writing-tools#rename-a-heading)), **Copy Link to Heading** (`#anchor`) or **Copy Markdown Link** (`[Heading](#anchor)`), using the same anchors as the preview and GitHub. Drag a heading in the outline, or focus it and press **Alt+↑** / **Alt+↓**, to move its whole section (see [Move a section](/guide/writing-tools#move-a-section)).
+- The **Outline** in the sidebar lists the document's headings; click one to jump to it. Click the arrow before a heading that has subheadings, or press **Left** / **Right** on it, to hide or show them. Right-click a heading to **Rename Heading…** (links to it follow, see [Rename a heading](/guide/writing-tools#rename-a-heading)), **Copy Link to Heading** (`#anchor`) or **Copy Markdown Link** (`[Heading](#anchor)`), using the same anchors as the preview and GitHub. Drag a heading in the outline, or focus it and press **Alt+↑** / **Alt+↓**, to move its whole section (see [Move a section](/guide/writing-tools#move-a-section)).
 - The status bar shows the line and column (**Ln**, **Col**); click it to go to a line.
 - The usual keys work: arrows, **Home**/**End**, **Ctrl+Home**/**Ctrl+End**, **Page Up**/**Page Down**, and **Ctrl+←/→** by word.
 

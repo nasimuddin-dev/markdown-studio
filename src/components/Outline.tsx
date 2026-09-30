@@ -39,6 +39,28 @@ export function Outline() {
   const minLevel = headings.reduce((m, h) => Math.min(m, h.level), 6);
   const slugs = useMemo(() => headingSlugs(headings), [headings]);
   const [menu, setMenu] = useState<{ x: number; y: number; index: number } | null>(null);
+  /** Collapsed sections, by heading anchor; subheadings of a collapsed heading aren't listed. */
+  const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
+  useEffect(() => setClosed(new Set()), [docId]);
+  const hasChildren = (i: number) => (headings[i + 1]?.level ?? 0) > headings[i].level;
+  const toggle = (i: number, open?: boolean) =>
+    setClosed((prev) => {
+      const next = new Set(prev);
+      if (open ?? next.has(slugs[i])) next.delete(slugs[i]);
+      else next.add(slugs[i]);
+      return next;
+    });
+  const visible = useMemo(() => {
+    const shown: number[] = [];
+    let hiddenBelow = 0;
+    headings.forEach((h, i) => {
+      if (hiddenBelow && h.level > hiddenBelow) return;
+      hiddenBelow = 0;
+      shown.push(i);
+      if (closed.has(slugs[i])) hiddenBelow = h.level;
+    });
+    return shown;
+  }, [headings, slugs, closed]);
   /** After a keyboard move, focus follows the moved heading. */
   const refocus = useRef<{ text: string; level: number } | null>(null);
 
@@ -48,7 +70,7 @@ export function Outline() {
     const index = headings.findIndex((h) => h.text === target.text && h.level === target.level);
     if (index >= 0) {
       refocus.current = null;
-      list.current.querySelectorAll<HTMLButtonElement>(".outline-item")[index]?.focus();
+      list.current.querySelector<HTMLButtonElement>(`[data-outline-index="${index}"]`)?.focus();
     }
   }, [headings]);
 
@@ -108,6 +130,9 @@ export function Outline() {
     if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
       e.preventDefault();
       move(index, e.key === "ArrowUp" ? -1 : 1);
+    } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && hasChildren(index)) {
+      e.preventDefault();
+      toggle(index, e.key === "ArrowRight");
     } else if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) {
       e.preventDefault();
       const r = e.currentTarget.getBoundingClientRect();
@@ -139,9 +164,12 @@ export function Outline() {
           <p className="sidebar-empty">No headings in this document.</p>
         ) : (
           <ul className={`outline-list${dragging?.drop === headings.length ? " drop-end" : ""}`} ref={list} role="list">
-            {headings.map((h, i) => (
+            {visible.map((i) => {
+              const h = headings[i];
+              return (
               <li key={`${h.line}-${i}`}>
                 <button
+                  aria-expanded={hasChildren(i) ? !closed.has(slugs[i]) : undefined}
                   data-outline-index={i}
                   className={`outline-item${i === current ? " current" : ""}${dragging?.from === i ? " dragging" : ""}${dragging && dragging.drop === i && dragging.from !== i ? " drop-before" : ""}`}
                   style={{ paddingLeft: 12 + (h.level - minLevel) * 14 }}
@@ -158,11 +186,28 @@ export function Outline() {
                     setMenu({ x: e.clientX, y: e.clientY, index: i });
                   }}
                 >
+                  {hasChildren(i) ? (
+                    <span
+                      className="outline-toggle"
+                      aria-hidden="true"
+                      title={closed.has(slugs[i]) ? "Expand (Right arrow)" : "Collapse (Left arrow)"}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggle(i);
+                      }}
+                    >
+                      <Icon name={closed.has(slugs[i]) ? "chevronRight" : "chevronDown"} size={12} />
+                    </span>
+                  ) : (
+                    <span className="outline-toggle" aria-hidden="true" />
+                  )}
                   <span className="outline-level" aria-hidden="true">H{h.level}</span>
                   <span className="outline-text">{h.text}</span>
                 </button>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )
       )}

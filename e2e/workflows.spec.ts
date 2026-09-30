@@ -1274,3 +1274,22 @@ test("pictures in the Explorer: preview, insert a link, or drag into the editor"
   await page.mouse.up();
   await expect(page.locator(".cm-line").nth(2)).toContainText("![logo](assets/logo.svg)");
 });
+
+test("Outline sections collapse and expand, with the mouse or Left/Right", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const outline = page.getByRole("region", { name: "Outline" });
+  const parent = outline.getByRole("button", { name: /GitHub Flavored Markdown/ });
+  await expect(parent).toHaveAttribute("aria-expanded", "true");
+  await parent.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(parent).toHaveAttribute("aria-expanded", "false");
+  await expect(outline.getByRole("button", { name: /Task list/ })).toHaveCount(0);
+  await page.keyboard.press("ArrowRight");
+  await expect(outline.getByRole("button", { name: /Task list/ })).toBeVisible();
+  await parent.locator(".outline-toggle").click();
+  await expect(outline.getByRole("button", { name: /Code/ })).toHaveCount(0);
+  // Clicking the chevron doesn't jump to the heading.
+  await expect(page.locator(".cm-activeLine")).not.toHaveText("## GitHub Flavored Markdown");
+});
