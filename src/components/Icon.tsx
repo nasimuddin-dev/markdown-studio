@@ -9,6 +9,7 @@ const PATHS = {
   folderPlus: "M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 10v6M9 13h6",
   refresh: "M20 11a8 8 0 0 0-14.9-3M4 5v4h4M4 13a8 8 0 0 0 14.9 3M20 19v-4h-4",
   close: "M6 6l12 12M18 6L6 18",
+  collapse: "M7 4l5 5 5-5M7 20l5-5 5 5",
   sidebar: "M4 4h16v16H4zM9 4v16",
   editor: "M4 4h16v16H4zM8 9h8M8 13h8M8 17h5",
   split: "M4 4h16v16H4zM12 4v16",

@@ -36,6 +36,7 @@ When no folder is open, the Explorer lists your **open files**, and below them y
 | Link to a file | Drag a file from the Explorer into the editor: a link to it goes where you drop it, relative to the document (`[guide](docs/guide.md)`). A picture gets an image link (`![logo](assets/logo.png)`). The file isn't moved. The document must be saved first, so the link has a place to start from |
 | Pictures | The Explorer lists pictures (PNG, JPEG, GIF, WebP, SVG, BMP, AVIF) as well as Markdown files; turn that off with **Settings → Files → Show pictures in the Explorer**. Click a picture to see it, with **Insert Link in Document** to link it at the cursor; drag it into the editor to link it where you drop it. Rename, move and delete work as for documents, and renaming or moving offers to update the links that show it |
 | Delete | Right-click → **Delete…**. After you confirm, the item goes to the Trash or Recycle Bin, so it can be restored |
+| Collapse folders | The **Collapse folders** button closes every expanded folder |
 | Refresh | The **Refresh** button |
 | Close the folder | The **×** button at the top of the Explorer, or **File → Close Folder**. The folder leaves the Explorer; nothing is deleted, and open tabs stay open |
 

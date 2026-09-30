@@ -7,7 +7,7 @@ import { useUi } from "../stores/uiStore";
 import type { DirEntry, RecentEntry } from "../types";
 import { closeDocument, openPath, openRecentFile } from "../features/documents";
 import {
-  closeWorkspace, createFileIn, createFolderIn, deleteEntry, duplicateFile, moveEntry, moveEntryTo, openFolderDialog, openRecentFolder, refreshWorkspace, renameEntry,
+  closeWorkspace, collapseAllFolders, createFileIn, createFolderIn, deleteEntry, duplicateFile, moveEntry, moveEntryTo, openFolderDialog, openRecentFolder, refreshWorkspace, renameEntry,
   toggleDir,
 } from "../features/workspace";
 import { Icon } from "./Icon";
@@ -244,6 +244,9 @@ export function FileExplorer() {
           </button>
           <button className="icon-button small" title="New folder" aria-label="New folder" onClick={() => void createFolderIn(root)}>
             <Icon name="folderPlus" size={15} />
+          </button>
+          <button className="icon-button small" title="Collapse folders" aria-label="Collapse all folders" onClick={collapseAllFolders}>
+            <Icon name="collapse" size={15} />
           </button>
           <button className="icon-button small" title="Refresh" aria-label="Refresh file explorer" onClick={() => void refreshWorkspace()}>
             <Icon name="refresh" size={15} />

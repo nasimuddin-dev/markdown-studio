@@ -87,6 +87,11 @@ export async function showInExplorer(path: string): Promise<boolean> {
   return true;
 }
 
+/** Collapses every folder in the Explorer. */
+export function collapseAllFolders() {
+  for (const dir of Object.keys(ws().expanded)) if (ws().expanded[dir]) ws().setExpanded(dir, false);
+}
+
 /** Re-lists every loaded folder, e.g. after the window regains focus. */
 export async function refreshWorkspace() {
   const loaded = Object.keys(ws().children);

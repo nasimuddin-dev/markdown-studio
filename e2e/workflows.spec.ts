@@ -1377,3 +1377,14 @@ test("Copy Link to Current Heading copies the section's #anchor", async ({ page,
   await expect(page.getByText("Link copied.")).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("#getting-started");
 });
+
+test("the Explorer's Collapse Folders button closes every folder", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await page.locator(".tree-row", { hasText: /^docs$/ }).click();
+  await page.locator(".tree-row", { hasText: /^notes$/ }).click();
+  await expect(page.locator(".tree-row", { hasText: /^guide\.md$/ })).toBeVisible();
+  await page.getByRole("button", { name: "Collapse all folders" }).click();
+  await expect(page.locator(".tree-row", { hasText: /^guide\.md$/ })).toHaveCount(0);
+  await expect(page.locator(".tree-row", { hasText: /^todo\.md$/ })).toHaveCount(0);
+});
