@@ -21,15 +21,19 @@ export interface MarkdownProblem {
  */
 export interface ProblemFix {
   label: string;
-  edits: Array<{ at: number | "end"; insert: string }>;
+  /** `remove` characters at `at` are replaced by `insert`. */
+  edits: Array<{ at: number | "end"; remove?: number; insert: string }>;
 }
 
 /** The changes for a fix whose problem now starts at `from` in `text`. Text for the end goes on its own line after a blank one. */
-export function fixChanges(fix: ProblemFix, from: number, text: string): Array<{ from: number; insert: string }> {
-  return fix.edits.map(({ at, insert }) => {
-    if (at !== "end") return { from: Math.min(from + at, text.length), insert };
+export function fixChanges(fix: ProblemFix, from: number, text: string): Array<{ from: number; to: number; insert: string }> {
+  return fix.edits.map(({ at, remove = 0, insert }) => {
+    if (at !== "end") {
+      const start = Math.min(from + at, text.length);
+      return { from: start, to: Math.min(start + remove, text.length), insert };
+    }
     const gap = text.endsWith("\n\n") ? "" : text.endsWith("\n") ? "\n" : "\n\n";
-    return { from: text.length, insert: gap + insert };
+    return { from: text.length, to: text.length, insert: gap + insert };
   });
 }
 
@@ -165,7 +169,15 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
       problems.push({ ...range, severity: "info", rule: "multiple-h1", message: "More than one top-level heading (H1) in the document." });
     }
     if (prevLevel && h.level > prevLevel + 1) {
-      problems.push({ ...range, severity: "info", rule: "heading-increment", message: `Heading level jumps from H${prevLevel} to H${h.level}.` });
+      const atx = /^( {0,3})(#{1,6})(?=[ \t]|$)/.exec(text.slice(range.from, range.to));
+      const level = prevLevel + 1;
+      problems.push({
+        ...range,
+        severity: "info",
+        rule: "heading-increment",
+        message: `Heading level jumps from H${prevLevel} to H${h.level}.`,
+        ...(atx && { fix: { label: `Change to H${level}`, edits: [{ at: atx[1].length, remove: atx[2].length, insert: "#".repeat(level) }] } }),
+      });
     }
     prevLevel = h.level;
   }
@@ -196,12 +208,44 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
         /* keep raw */
       }
       if (id && !anchors.has(id) && !anchors.has(id.toLowerCase())) {
-        problems.push({ ...at, severity: "warning", rule: "broken-anchor", message: `No heading matches “#${id}” in this document.` });
+        // A likely typo: offer the closest heading anchor.
+        const near = link.sourceLength === undefined ? closest(id.toLowerCase(), anchors) : null;
+        problems.push({
+          ...at,
+          severity: "warning",
+          rule: "broken-anchor",
+          message: `No heading matches “#${id}” in this document.${near ? ` Did you mean “#${near}”?` : ""}`,
+          ...(near && { fix: { label: `Change to #${near}`, edits: [{ at: link.targetFrom + 1 - link.from, remove: link.target.length - 1, insert: near }] } }),
+        });
       }
     }
   }
   problems.push(...lintTables(text, starts), ...lintFootnotes(text));
   return problems.sort((a, b) => a.from - b.from);
+}
+
+/** Edit distance between two strings (insertions, deletions, substitutions). */
+function distance(a: string, b: string): number {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+/** The anchor closest to `id` if it's clearly a typo of it (a few characters off, and no other as close). */
+function closest(id: string, anchors: Set<string>): string | null {
+  let best: string | null = null;
+  let bestDistance = Math.max(1, Math.floor(id.length / 3)) + 1;
+  let tie = false;
+  for (const a of anchors) {
+    const d = distance(id, a);
+    if (d < bestDistance) [best, bestDistance, tie] = [a, d, false];
+    else if (d === bestDistance) tie = true;
+  }
+  return tie ? null : best;
 }
 
 /** Cells in a table row as GFM counts them: every unescaped `|` separates, even inside code. */

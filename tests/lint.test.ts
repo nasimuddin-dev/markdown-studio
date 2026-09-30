@@ -114,7 +114,7 @@ describe("markdown lint: tables, footnotes and link text", () => {
     const applyFix = (text: string, rule: string) => {
       const p = only(text, rule).find((x) => x.fix)!;
       let out = text;
-      for (const c of [...fixChanges(p.fix!, p.from, text)].reverse()) out = out.slice(0, c.from) + c.insert + out.slice(c.from);
+      for (const c of [...fixChanges(p.fix!, p.from, text)].reverse()) out = out.slice(0, c.from) + c.insert + out.slice(c.to);
       return out;
     };
     expect(applyFix("| a | b |\n| - | - |\nText", "table-columns")).toBe("| a | b |\n| - | - |\n\nText");
@@ -123,6 +123,13 @@ describe("markdown lint: tables, footnotes and link text", () => {
     expect(only(padded, "table-columns")).toEqual([]);
     expect(applyFix("See[^x].", "footnote")).toBe("See[^x].\n\n[^x]: ");
     expect(applyFix("See[^x].\n", "footnote")).toBe("See[^x].\n\n[^x]: ");
+    expect(applyFix("# A\n\n### Skipped\n", "heading-increment")).toBe("# A\n\n## Skipped\n");
+    expect(only("# A\n\nB\n=\n\nSkipped\n---", "heading-increment")).toEqual([]);
+    const typo = "## Installation\n\n## Usage\n\nSee [install](#instalation).";
+    expect(only(typo, "broken-anchor")[0].message).toMatch(/Did you mean “#installation”\?/);
+    expect(applyFix(typo, "broken-anchor")).toBe("## Installation\n\n## Usage\n\nSee [install](#installation).");
+    // No suggestion when nothing is close.
+    expect(only("## Usage\n\n[x](#something-else)", "broken-anchor")[0].fix).toBeUndefined();
     // Extra cells, or a row without a closing "|", need a person to decide.
     expect(only("| a |\n| - |\n| 1 | 2 |", "table-columns")[0].fix).toBeUndefined();
     expect(only("| a | b |\n| - | - |\n| 1", "table-columns")[0].fix).toBeUndefined();
