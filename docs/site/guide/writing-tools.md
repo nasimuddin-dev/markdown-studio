@@ -19,6 +19,8 @@ Select text and apply a format, or apply it with nothing selected to insert the 
 | Inline code | Ctrl+E | `` `text` `` |
 | Insert link | Ctrl+K | `[text](https://)` |
 
+With the cursor inside an existing link, **Insert Link** (**Ctrl+K**) selects its address so you can change it. **Format → Remove Link** turns the link at the cursor, or every link in the selection, back into plain text (images stay).
+
 ## Headings
 
 | Command | Shortcut |

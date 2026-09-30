@@ -49,6 +49,16 @@ describe("links", () => {
   it("inserts a placeholder link with the label selected", () => {
     expect(run("|", fmt.insertLink)).toMatchObject({ doc: "[link text](https://)", selected: "link text" });
   });
+  it("selects the address of the link the cursor is in, instead of nesting a link", () => {
+    expect(run("see [do|cs](guide.md) now", fmt.insertLink)).toMatchObject({ doc: "see [docs](guide.md) now", selected: "guide.md" });
+    expect(run("[empty](|)", fmt.insertLink)).toMatchObject({ doc: "[empty]()", cursor: 8 });
+  });
+  it("removes the link at the cursor or in the selection, keeping its text", () => {
+    expect(run("see [the do|cs](guide.md) now", fmt.removeLink).doc).toBe("see the docs now");
+    const state = EditorState.create({ doc: "[a](1.md) and [b](2.md) and ![c](3.png)", selection: EditorSelection.single(0, 39) });
+    expect(fmt.applyCommand(state, fmt.removeLink).doc.toString()).toBe("a and b and ![c](3.png)");
+    expect(run("no l|ink", fmt.removeLink).doc).toBe("no link");
+  });
 });
 
 describe("headings", () => {

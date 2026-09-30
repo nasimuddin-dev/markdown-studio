@@ -1,4 +1,5 @@
 import { EditorSelection, type EditorState, type Transaction, type StateCommand } from "@codemirror/state";
+import { findLinks } from "./lint";
 
 /**
  * Markdown formatting commands. They are plain CodeMirror `StateCommand`s so
@@ -54,7 +55,14 @@ export const toggleInlineCode = toggleInline("`");
 
 /** Wraps the selection as `[text](url)` and selects the placeholder that needs editing. */
 export const insertLink: StateCommand = ({ state, dispatch }) => {
+  const links = findLinks(state.doc.toString());
   const tr = state.changeByRange((range) => {
+    // In an existing link, select its address to edit it rather than nesting another link.
+    const inside = range.empty && links.find((l) => range.from > l.from && range.from < l.to);
+    if (inside) {
+      const end = inside.targetFrom + inside.target.length;
+      return { range: inside.target ? EditorSelection.range(inside.targetFrom, end) : EditorSelection.cursor(inside.targetFrom) };
+    }
     const text = state.sliceDoc(range.from, range.to);
     const looksLikeUrl = /^(https?:\/\/|mailto:)\S+$/i.test(text);
     if (looksLikeUrl) {
@@ -72,6 +80,22 @@ export const insertLink: StateCommand = ({ state, dispatch }) => {
     };
   });
   dispatch(state.update(tr, { scrollIntoView: true, userEvent: "input.format" }));
+  return true;
+};
+
+/**
+ * Remove Link: turns the links at the cursor, or in the selection, back into
+ * their text (`[text](address)` → `text`). Images are left alone.
+ */
+export const removeLink: StateCommand = ({ state, dispatch }) => {
+  const text = state.doc.toString();
+  const hits = findLinks(text).filter(
+    (l) => !l.image && state.selection.ranges.some((r) => (r.empty ? r.from > l.from && r.from < l.to : r.from < l.to && r.to > l.from)),
+  );
+  if (!hits.length) return false;
+  // The text as written (code spans are blanked in `l.text`), after "[".
+  const changes = hits.map((l) => ({ from: l.from, to: l.to, insert: text.slice(l.from + 1, l.from + 1 + l.text.length) }));
+  dispatch(state.update({ changes, scrollIntoView: true, userEvent: "input.format" }));
   return true;
 };
 

@@ -68,6 +68,7 @@ export const formatCommands: Record<string, Command> = {
   strikethrough: formatCommand("strikethrough", "Strikethrough", fmt.toggleStrikethrough, "Mod+Shift+X"),
   inlineCode: formatCommand("inlineCode", "Inline Code", fmt.toggleInlineCode, "Mod+E"),
   link: formatCommand("link", "Insert Link", fmt.insertLink, "Mod+K"),
+  removeLink: formatCommand("removeLink", "Remove Link", fmt.removeLink),
   followLink: formatCommand("followLink", "Open Link at Cursor", followLinkAtCursor, "Alt+Enter"),
   renameHeading: { id: "renameHeading", label: "Rename Heading…", shortcut: "F2", run: () => renameHeading(), enabled: hasActive },
   referenceLinks: formatCommand("referenceLinks", "Convert Links to Reference Style", convertToReferenceLinks),
