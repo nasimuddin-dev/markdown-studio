@@ -1388,3 +1388,24 @@ test("the Explorer's Collapse Folders button closes every folder", async ({ page
   await expect(page.locator(".tree-row", { hasText: /^guide\.md$/ })).toHaveCount(0);
   await expect(page.locator(".tree-row", { hasText: /^todo\.md$/ })).toHaveCount(0);
 });
+
+test("a word count goal shows its progress in the status bar", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const count = page.locator(".status-right").getByRole("button", { name: /words/ });
+  await expect(count).toHaveText(/^\d+ words$/);
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("set word count goal");
+  await page.keyboard.press("Enter");
+  const field = page.getByRole("dialog", { name: "Word Count Goal" }).getByRole("textbox");
+  await field.fill("2,000");
+  await page.keyboard.press("Enter");
+  await expect(count).toHaveText(/^\d+ \/ 2\D?000 words$/);
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("set word count goal");
+  await page.keyboard.press("Enter");
+  await field.fill("0");
+  await page.keyboard.press("Enter");
+  await expect(count).toHaveText(/^\d+ words$/);
+});

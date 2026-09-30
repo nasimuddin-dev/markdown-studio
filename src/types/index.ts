@@ -127,6 +127,8 @@ export interface Settings {
   aiConsent: boolean;
   /** Changed keyboard shortcuts: command id → shortcut ("Mod+Shift+K"), or null for none. */
   keybindings: Record<string, string | null>;
+  /** Word count goals by document path (Set Word Count Goal…). */
+  wordGoals: Record<string, number>;
   /** Last session's workspace and open files, restored on launch (FR-003). */
   session: { workspace: string | null; files: string[] };
 }

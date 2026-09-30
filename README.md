@@ -117,7 +117,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Crash recovery for unsaved documents, and session restore for the last folder and open files
 - Rendering errors are contained: if the preview or another area fails, it shows the error with Try Again while the rest of the window, including saving, keeps working
 - UTF-8 (with or without BOM), with LF/CRLF line endings preserved per file
-- Word count in the status bar, with a statistics popover (words, characters, lines, paragraphs, reading time) for the document and the selection; task progress (`2/5 tasks`, click for the next open task)
+- Word count in the status bar, with a statistics popover (words, characters, lines, paragraphs, reading time) for the document and the selection; task progress (`2/5 tasks`, click for the next open task); a word count goal per file (`523 / 1,000 words`)
 - Spell checking with the system dictionary (Settings)
 - Keyboard-first: every core action has a shortcut and an accessible menu, with visible focus states; shortcuts can be changed, removed or reset for any command in Help → Keyboard Shortcuts (conflicts are detected); works with Windows High Contrast (forced colours): selections, active tab, focus and unsaved markers are drawn with outlines in system colours
 - Help → Export Diagnostic Logs for support requests (logs never contain document text)

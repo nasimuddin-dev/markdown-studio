@@ -19,6 +19,7 @@ export function StatusBar() {
   const autoSave = useSettings((s) => s.settings.autoSave);
   const lintOn = useSettings((s) => s.settings.lintMarkdown);
   const problems = useUi((s) => s.problems);
+  const goals = useSettings((s) => s.settings.wordGoals);
   const words = useMemo(() => (doc ? countWords(doc.content) : 0), [doc?.content]); // eslint-disable-line react-hooks/exhaustive-deps
 
   let state = "";
@@ -62,7 +63,7 @@ export function StatusBar() {
             </button>
           )}
           <TaskProgress content={doc.content} />
-          <WordCount words={words} content={doc.content} />
+          <WordCount words={words} content={doc.content} goal={doc.path ? goals[doc.path] : undefined} />
           {autoSave !== "off" && doc.path && <span className="status-item" title="Auto save is on">Auto save</span>}
           <button
             className="status-item status-button status-low"
@@ -165,7 +166,7 @@ function TaskProgress({ content }: { content: string }) {
 }
 
 /** Word count that opens a statistics popover (document and selection). */
-function WordCount({ words, content }: { words: number; content: string }) {
+function WordCount({ words, content, goal }: { words: number; content: string; goal?: number }) {
   const [open, setOpen] = useState(false);
   const cursor = useUi((s) => s.cursor);
   let selectionText = "";
@@ -186,9 +187,9 @@ function WordCount({ words, content }: { words: number; content: string }) {
         onBlur={(e) => {
           if (!e.currentTarget.parentElement?.contains(e.relatedTarget as Node)) setOpen(false);
         }}
-        title="Document statistics"
+        title={goal ? `Document statistics. Goal: ${fmt(goal)} words (${Math.min(100, Math.round((words / goal) * 100))}%)` : "Document statistics"}
       >
-        {fmt(words)} words
+        {goal ? `${fmt(words)} / ${fmt(goal)} words` : `${fmt(words)} words`}
       </button>
       {stats && (
         <div className="status-popover" role="dialog" aria-label="Document statistics" tabIndex={-1}>

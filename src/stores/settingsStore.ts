@@ -43,6 +43,7 @@ export const DEFAULT_SETTINGS: Settings = {
   aiModel: "claude-opus-5-5",
   aiConsent: false,
   keybindings: {},
+  wordGoals: {},
   session: { workspace: null, files: [] },
 };
 
@@ -69,6 +70,16 @@ const clamp = (n: unknown, min: number, max: number, fallback: number) =>
 export function imageFolderName(value: unknown): string {
   const name = typeof value === "string" ? value.trim() : "";
   return name && name.length <= 64 && name !== "." && name !== ".." && !/[\\/:*?"<>|\u0000-\u001f]/.test(name) ? name : "assets";
+}
+
+/** Word goals: paths to whole numbers from 1 to 1,000,000, at most 200 of them. */
+function sanitizeWordGoals(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const out: Record<string, number> = {};
+  for (const [path, goal] of Object.entries(value).slice(-200)) {
+    if (typeof path === "string" && path.length <= 1024 && Number.isInteger(goal) && (goal as number) >= 1 && (goal as number) <= 1_000_000) out[path] = goal as number;
+  }
+  return out;
 }
 
 /** The editor line lengths offered in Settings (0 = full width). */
@@ -131,6 +142,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     aiModel: typeof s.aiModel === "string" && /^claude-[a-z0-9-]{3,60}$/.test(s.aiModel) ? s.aiModel : d.aiModel,
     aiConsent: bool(s.aiConsent, d.aiConsent),
     keybindings: sanitizeKeybindings(s.keybindings),
+    wordGoals: sanitizeWordGoals(s.wordGoals),
     session: {
       workspace: typeof session.workspace === "string" ? session.workspace : null,
       files: Array.isArray(session.files) ? session.files.filter((f): f is string => typeof f === "string").slice(0, 50) : [],

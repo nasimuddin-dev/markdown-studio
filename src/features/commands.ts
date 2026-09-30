@@ -3,7 +3,7 @@ import { useSettings } from "../stores/settingsStore";
 import { useUi } from "../stores/uiStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { backend } from "../services";
-import { notify } from "../stores/uiStore";
+import { notify, promptText } from "../stores/uiStore";
 import type { ViewMode } from "../types";
 import {
   closeDocument, hasClosedDocuments, newDocument, openFileDialog, reopenClosedDocument, saveAll, saveDocument, setReadOnly,
@@ -323,6 +323,32 @@ export const commands: Record<string, Command> = {
       }
       const { copyText } = await import("./pathActions");
       await copyText(`#${headingSlugs(headings)[i]}`, "Link");
+    },
+    enabled: hasActive,
+  },
+  wordGoal: {
+    id: "wordGoal",
+    label: "Set Word Count Goal…",
+    run: async () => {
+      const doc = activeDoc();
+      if (!doc) return;
+      if (!doc.path) {
+        useUi.getState().notify("info", "Save the document first; the goal is kept for its file.");
+        return;
+      }
+      const { settings, update } = useSettings.getState();
+      const current = settings.wordGoals[doc.path];
+      const value = await promptText({ title: "Word Count Goal", message: "How many words is this document aiming for? Enter 0 to remove the goal.", value: current ? String(current) : "1000" });
+      if (value === null) return;
+      const goals = { ...settings.wordGoals };
+      const n = Number(value.replace(/[\s,._]/g, ""));
+      if (n === 0) delete goals[doc.path];
+      else if (Number.isInteger(n) && n >= 1 && n <= 1_000_000) goals[doc.path] = n;
+      else {
+        useUi.getState().notify("info", "Enter a whole number of words, from 1 to 1,000,000 (or 0 to remove the goal).");
+        return;
+      }
+      update({ wordGoals: goals });
     },
     enabled: hasActive,
   },
