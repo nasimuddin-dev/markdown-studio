@@ -7,6 +7,7 @@ import {
   type IParagraphOptions, type ParagraphChild,
 } from "docx";
 import { unified } from "unified";
+import { remarkWikiLinks } from "../wikiLinks";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkGemoji from "remark-gemoji";
@@ -385,7 +386,7 @@ class DocxBuilder {
 
 /** Markdown → Word document (.docx) bytes. */
 export async function markdownToDocx(markdown: string, opts: ExportOptions = {}): Promise<Uint8Array> {
-  const parser = unified().use(remarkParse).use(remarkGfm).use(remarkGemoji);
+  const parser = unified().use(remarkParse).use(remarkGfm).use(remarkGemoji).use(remarkWikiLinks);
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
   // runSync applies transforms such as emoji shortcodes; parse alone only builds the tree.
   const tree = parser.runSync(parser.parse(stripFrontMatter(markdown))) as Root;

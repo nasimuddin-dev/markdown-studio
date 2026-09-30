@@ -1458,3 +1458,16 @@ test("Format > Insert Snippet inserts a snippet at the cursor", async ({ page })
   await page.keyboard.type("First");
   await expect(page.locator(".cm-line")).toHaveText(["- [ ] First", "- [ ] ", "- [ ] ", ""]);
 });
+
+test("wiki links in the preview open the page", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-content").click();
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.insertText("\n\nSee [[docs/guide|the guide]].\n");
+  const link = page.locator(".preview a", { hasText: "the guide" });
+  await expect(link).toHaveAttribute("href", "docs/guide.md");
+  await link.click();
+  await expect(page.getByRole("tab", { name: /guide\.md/ })).toHaveAttribute("aria-selected", "true");
+});

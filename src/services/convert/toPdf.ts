@@ -4,6 +4,7 @@ import { mathTextRuns } from "./mathText";
 import { ALERT_KINDS, takeMdastAlert } from "../alerts";
 import { stripFrontMatter } from "../frontMatter";
 import { unified } from "unified";
+import { remarkWikiLinks } from "../wikiLinks";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -338,6 +339,7 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
   const parser = unified().use(remarkParse).use(remarkGfm);
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
   const tree = parser.parse(stripFrontMatter(markdown)) as Root;
+  remarkWikiLinks()(tree);
   const page = PAGE_POINTS[opts.pageSize ?? "a4"];
   const builder = new PdfBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, opts.renderMath, page.width - 2 * SIDE_MARGIN);
   builder.breakBeforeH1 = !!opts.pageBreakBeforeH1;

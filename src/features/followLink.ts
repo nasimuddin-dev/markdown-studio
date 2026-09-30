@@ -6,6 +6,7 @@ import GithubSlugger from "github-slugger";
 import { backend } from "../services";
 import { describeError } from "../services/errors";
 import { classifyLink } from "../services/linkTarget";
+import { WIKI_LINK, wikiLinkHref } from "../services/wikiLinks";
 import { isMarkdownPath, resolveRelative } from "../services/paths";
 import { activeDoc } from "../stores/documentsStore";
 import { notify } from "../stores/uiStore";
@@ -92,6 +93,9 @@ export function linkAt(text: string, pos: number): EditorLink | null {
   const at = pos - lineStart;
   for (const m of line.matchAll(/<?(https?:\/\/[^\s<>]*[^\s<>.,;:!?)\]'"])>?/gi)) {
     if (at >= m.index && at <= m.index + m[0].length) return { kind: "href", href: m[1] };
+  }
+  for (const m of line.matchAll(WIKI_LINK)) {
+    if (at >= m.index! && at <= m.index! + m[0].length) return { kind: "href", href: wikiLinkHref(m[1]) };
   }
   const definitions = new Map<string, number>();
   for (const d of findLinkDefinitions(text)) if (!definitions.has(normalize(d.text))) definitions.set(normalize(d.text), d.from);

@@ -67,3 +67,17 @@ Notes are numbered in the order they're first referenced, whatever their labels,
 | Preview, HTML export, Print / Save as PDF | Superscript links to a **Footnotes** section at the end, with links back |
 | Export as PDF | Superscript numbers that link to a **Footnotes** section at the end of the document |
 | Export as Word | Real Word footnotes: Word numbers them and places each note at the bottom of its page |
+
+## Wiki links
+
+Markpion understands the double-bracket links of wikis and note-taking apps:
+
+| You write | It links to |
+| --- | --- |
+| `[[Setup Guide]]` | `Setup Guide.md` in the same folder, shown as "Setup Guide" |
+| `[[docs/api\|the API]]` | `docs/api.md`, shown as "the API" |
+| `[[docs/api#Error Codes]]` | the "Error Codes" heading in `docs/api.md` |
+
+The page is a path relative to the document, and `.md` is added when it has no extension. Type `[[` to pick a document of the open folder from a list, and **Ctrl+click** (**Cmd+click**) a wiki link in the editor to open it. The preview, HTML, PDF and Word exports show wiki links as ordinary links.
+
+Wiki links aren't part of GitHub Flavored Markdown, so GitHub and other Markdown apps show them as plain text. The link check and the link updates after renaming a file don't cover them yet.

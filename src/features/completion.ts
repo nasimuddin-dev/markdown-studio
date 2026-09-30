@@ -157,6 +157,23 @@ export async function emojiCompletionSource(ctx: CompletionContext): Promise<Com
   return { from: m.from, options, validFor: /^:[a-z0-9_+-]*$/i };
 }
 
+/** Completes wiki links after `[[`: the folder's documents, by path relative to this one and without `.md`. */
+export async function wikiLinkCompletionSource(ctx: CompletionContext): Promise<CompletionResult | null> {
+  const m = ctx.matchBefore(/\[\[[^[\]|#\n]*/);
+  if (!m) return null;
+  const doc = activeDoc();
+  const root = useWorkspace.getState().root;
+  if (!doc?.path || !root) return null;
+  const files = await workspaceFiles(root);
+  if (ctx.aborted) return null;
+  const close = ctx.state.sliceDoc(ctx.pos, ctx.pos + 2) === "]]" ? "" : "]]";
+  const options = fileCompletions(files, doc.path, false).map((o) => {
+    const page = decodeURI(o.label).replace(/\.(md|markdown)$/i, "");
+    return { ...o, label: page, apply: page + close };
+  });
+  return options.length ? { from: m.from + 2, options, validFor: /^[^[\]|#\n]*$/ } : null;
+}
+
 export function linkCompletion(): Extension {
-  return autocompletion({ override: [linkCompletionSource, referenceCompletionSource, emojiCompletionSource], icons: false, activateOnTyping: true });
+  return autocompletion({ override: [linkCompletionSource, wikiLinkCompletionSource, referenceCompletionSource, emojiCompletionSource], icons: false, activateOnTyping: true });
 }

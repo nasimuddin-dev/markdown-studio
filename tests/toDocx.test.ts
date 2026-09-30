@@ -252,3 +252,11 @@ describe("Word export: a new page for each top-level heading", () => {
     expect((await xml(true)).match(/<w:pageBreakBefore/g)).toHaveLength(2);
   });
 });
+
+describe("Word export: wiki links", () => {
+  it("show their text, like other links to local files", async () => {
+    const xml = await documentXml(await markdownToDocx("See [[Setup Guide|the guide]].", { loadImage: makeImageLoader(null, async () => "") }));
+    expect(xml).toContain("the guide");
+    expect(xml).not.toContain("[[");
+  });
+});
