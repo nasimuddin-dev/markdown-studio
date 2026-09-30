@@ -25,6 +25,7 @@ Drag the dividers between panels to resize them. The sizes are remembered.
 - **Focus Mode** (**Ctrl+Shift+Enter**) hides everything except the editor and preview. Press **Esc** or the same shortcut to leave.
 - **Line length** (Settings → Editor): on a wide screen, long lines are hard to follow. Choose about 72, 80, 100 or 120 characters and the text (with its line numbers) stays that wide, centered in the editor; with **Wrap long lines** on, lines wrap there. A narrow editor, as in split view, still uses its full width.
 - **Typewriter scrolling** (**View → Toggle Typewriter Scrolling**, or in Settings → Editor) keeps the line you're typing in the middle of the editor, so your eyes stay in one place. It pairs well with Focus Mode.
+- **Dim other paragraphs** (**View → Toggle Dim Other Paragraphs**, or in Settings → Editor) fades every paragraph except the one the cursor is in, so the sentence you're writing stands out. A paragraph here is a run of lines without a blank line between them.
 - **Full Screen** (**F11**) fills the screen.
 
 ## Syntax highlighting

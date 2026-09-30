@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS: Settings = {
   renderDiagrams: true,
   lintMarkdown: true,
   typewriterScrolling: false,
+  dimOtherParagraphs: false,
   editorLineLength: 0,
   lintDisabledRules: [],
   spellCheck: true,
@@ -91,6 +92,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     renderDiagrams: bool(s.renderDiagrams, d.renderDiagrams),
     lintMarkdown: bool(s.lintMarkdown, d.lintMarkdown),
     typewriterScrolling: bool(s.typewriterScrolling, d.typewriterScrolling),
+    dimOtherParagraphs: bool(s.dimOtherParagraphs, d.dimOtherParagraphs),
     editorLineLength: LINE_LENGTHS.includes(s.editorLineLength as number) ? (s.editorLineLength as number) : d.editorLineLength,
     lintDisabledRules: Array.isArray(s.lintDisabledRules)
       ? [...new Set(s.lintDisabledRules.filter((r): r is string => typeof r === "string" && /^[a-z0-9-]{1,40}$/.test(r)))].slice(0, 50)

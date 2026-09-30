@@ -1096,3 +1096,22 @@ test("dragging a file from the Explorer into the editor inserts a link to it", a
   // The file stayed where it was.
   await expect(page.locator(".tree-row", { hasText: /^guide\.md$/ })).toBeVisible();
 });
+
+test("View > Toggle Dim Other Paragraphs dims all but the paragraph being written", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("First paragraph.\n\nSecond one,\nstill second.\n\nThird.");
+  const toggle = async () => {
+    await page.getByRole("button", { name: "View", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Toggle Dim Other Paragraphs" }).click();
+  };
+  await toggle();
+  await page.locator(".cm-line", { hasText: "still second." }).click();
+  await expect(page.locator(".cm-line.cm-dimmed")).toHaveCount(4);
+  await expect(page.locator(".cm-line", { hasText: "Second one," })).not.toHaveClass(/cm-dimmed/);
+  await page.locator(".cm-line", { hasText: "Third." }).click();
+  await expect(page.locator(".cm-line", { hasText: "Second one," })).toHaveClass(/cm-dimmed/);
+  await toggle();
+  await expect(page.locator(".cm-line.cm-dimmed")).toHaveCount(0);
+});

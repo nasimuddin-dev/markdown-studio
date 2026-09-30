@@ -94,6 +94,8 @@ export interface Settings {
   lintMarkdown: boolean;
   /** Keep the cursor's line vertically centred while typing. */
   typewriterScrolling: boolean;
+  /** Dim every paragraph except the one with the cursor. */
+  dimOtherParagraphs: boolean;
   /** Editor text width in characters, centered (0 = the full width of the pane). */
   editorLineLength: number;
   /** Lint checks (rule ids) turned off with "Don't Show This Check". */

@@ -416,6 +416,14 @@ export const commands: Record<string, Command> = {
       update({ typewriterScrolling: !settings.typewriterScrolling });
     },
   },
+  toggleDimParagraphs: {
+    id: "toggleDimParagraphs",
+    label: "Toggle Dim Other Paragraphs",
+    run: () => {
+      const { settings, update } = useSettings.getState();
+      update({ dimOtherParagraphs: !settings.dimOtherParagraphs });
+    },
+  },
   toggleLineNumbers: {
     id: "toggleLineNumbers",
     label: "Toggle Line Numbers",

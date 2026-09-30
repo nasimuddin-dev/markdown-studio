@@ -50,7 +50,7 @@ const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
   {
     label: "View",
     items: () => [
-      c("viewEditor"), c("viewSplit"), c("viewPreview"), c("toggleView"), sep, c("commandPalette"), sep, c("toggleExplorer"), c("toggleOutline"), c("toggleToolbar"), c("toggleWordWrap"), c("toggleLineNumbers"), c("toggleTypewriter"), c("toggleTheme"), sep, c("foldAll"), c("unfoldAll"), c("foldLevel1"), c("foldLevel2"), c("foldLevel3"), sep, c("focusMode"), c("fullScreen"), c("presentSlides"), c("printSlides"), c("toggleReadOnly"),
+      c("viewEditor"), c("viewSplit"), c("viewPreview"), c("toggleView"), sep, c("commandPalette"), sep, c("toggleExplorer"), c("toggleOutline"), c("toggleToolbar"), c("toggleWordWrap"), c("toggleLineNumbers"), c("toggleTypewriter"), c("toggleDimParagraphs"), c("toggleTheme"), sep, c("foldAll"), c("unfoldAll"), c("foldLevel1"), c("foldLevel2"), c("foldLevel3"), sep, c("focusMode"), c("fullScreen"), c("presentSlides"), c("printSlides"), c("toggleReadOnly"),
       sep, c("zoomIn"), c("zoomOut"), c("zoomReset"), sep, c("nextTab"), c("prevTab"),
     ],
   },

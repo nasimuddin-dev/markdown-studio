@@ -18,6 +18,7 @@ import { useUi } from "../stores/uiStore";
 import type { Settings } from "../types";
 import { editorShowing, openReplacePanel, registerEditorView } from "../features/editorBridge";
 import { followLinks } from "../features/followLink";
+import { paragraphFocus } from "../features/paragraphFocus";
 import { editorTopLine, scrollEditorToLine, scrollSync } from "../features/scrollSync";
 import { editorKeymap } from "../features/commands";
 import { minimalChange } from "../features/saveTransforms";
@@ -96,6 +97,7 @@ const PHRASES: Record<string, string> = {
 };
 const locking = new Compartment();
 const typewriter = new Compartment();
+const dimming = new Compartment();
 /** Typewriter scrolling: every edit or cursor move keeps the cursor's line in the middle of the editor. */
 const typewriterExt = (on: boolean): Extension =>
   on
@@ -132,6 +134,7 @@ function reconfigure(s: Settings) {
     linting.reconfigure(s.lintMarkdown ? markdownLinter() : []),
     spelling.reconfigure(spellAttr(s.spellCheck)),
     typewriter.reconfigure(typewriterExt(s.typewriterScrolling)),
+    dimming.reconfigure(s.dimOtherParagraphs ? paragraphFocus() : []),
     keys.reconfigure(editorKeys()),
   ];
 }
@@ -179,6 +182,7 @@ export function Editor() {
         surroundSelection,
         spelling.of(spellAttr(s.spellCheck)),
         typewriter.of(typewriterExt(s.typewriterScrolling)),
+        dimming.of(s.dimOtherParagraphs ? paragraphFocus() : []),
         locking.of(lockExt(isLocked(docId))),
         // Pasted or dropped images are saved to assets/ and linked.
         EditorView.domEventHandlers({
@@ -330,7 +334,7 @@ export function Editor() {
   // Apply settings changes (FR-025).
   useEffect(() => {
     viewRef.current?.dispatch({ effects: reconfigure(settings) });
-  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck, settings.typewriterScrolling, settings.editorLineLength]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck, settings.typewriterScrolling, settings.dimOtherParagraphs, settings.editorLineLength]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <div className="editor-host" ref={host} />;
 }
