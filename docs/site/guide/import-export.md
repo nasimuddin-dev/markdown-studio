@@ -54,6 +54,7 @@ Export commands are in the **File** menu. You choose where to save the file.
 | HTML | Export as HTML… | One standalone, styled `.html` file with images embedded, sanitized like the preview; printed from Chrome or Edge, its pages get the title and page numbers too |
 | Markdown and pictures | Export as Markdown with Images (.zip)… | A `.zip` with the document and the local pictures it shows, in an `images` folder, with the links changed to point there. Unzipped anywhere, the document still shows its pictures. Web images stay links, and a picture that can't be read is left out (Markpion says which) |
 | Clipboard | Copy as Formatted Text | The rendered document as formatted text (headings, lists, tables, links, images), for pasting into Word, Outlook, Gmail or Google Docs. Plain-text editors receive the Markdown |
+| Clipboard | Copy as Plain Text | The selection, or the whole document, as text without Markdown syntax: no `#`, `**` or link addresses, while list bullets and numbers, checkboxes (☐ ☑), line breaks and tab-separated table cells stay. For forms, chat and other places that show text as it is |
 | Clipboard | Copy as HTML | The HTML source, for pasting into a CMS or an HTML file |
 | Printer or PDF | Print / Save as PDF… (Ctrl+P) | The preview, printed with your system's print dialog. On Windows each page gets the document's title at the top and "page / pages" at the bottom (macOS and Linux print without them) |
 

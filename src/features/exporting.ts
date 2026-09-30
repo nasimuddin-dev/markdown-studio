@@ -3,6 +3,7 @@ import { describeError } from "../services/errors";
 import { scopeCustomCss } from "../services/customCss";
 import { buildHtmlDocument, exportFileName, printPageStyle, renderHtml } from "../services/exportHtml";
 import { activeDoc } from "../stores/documentsStore";
+import { editorDocId, getEditorView } from "./editorBridge";
 import { notify } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
 import { basename } from "../services/paths";
@@ -200,6 +201,21 @@ function copyHtmlWithSelection(html: string) {
 }
 
 /** Copies the rendered HTML of the active document to the clipboard. */
+/** Copies the selection (or the whole document) as plain text without Markdown syntax. */
+export async function copyActiveAsPlainText() {
+  const doc = activeDoc();
+  if (!doc) return;
+  try {
+    const view = getEditorView();
+    const selected = view && editorDocId() === doc.id ? view.state.selection.ranges.map((r) => view.state.sliceDoc(r.from, r.to)).join("\n\n").trim() : "";
+    const { markdownToPlainText } = await import("../services/convert/plainText");
+    await navigator.clipboard.writeText(markdownToPlainText(selected || doc.content));
+    notify("success", selected ? "Selection copied as plain text." : "Document copied as plain text.");
+  } catch (e) {
+    notify("error", describeError(e, "copy the text"));
+  }
+}
+
 export async function copyActiveAsHtml() {
   const doc = activeDoc();
   if (!doc) return;

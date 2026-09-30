@@ -1,0 +1,65 @@
+import { describe, expect, it } from "vitest";
+import { markdownToPlainText } from "../src/services/convert/plainText";
+
+describe("Markdown as plain text", () => {
+  it("drops the syntax and keeps the structure", () => {
+    const md = [
+      "---",
+      "title: Notes",
+      "---",
+      "# Release **notes**",
+      "",
+      "See [the guide](guide.md) and ![logo](logo.png), `code` here.  ",
+      "Next line.",
+      "",
+      "- one",
+      "- two",
+      "  1. nested",
+      "",
+      "* [x] done",
+      "* [ ] open",
+      "",
+      "| Name | Value |",
+      "| --- | --- |",
+      "| a | 1 |",
+      "",
+      "> Quoted *text*.",
+      "",
+      "```js",
+      "let x = 1;",
+      "```",
+      "",
+      "---",
+      "",
+      "Math $x^2$ and a note[^1]. <!-- hidden --> <b>bold</b>",
+      "",
+      "[^1]: The note.",
+      "",
+      "[ref]: https://example.com",
+    ].join("\n");
+    expect(markdownToPlainText(md)).toBe(
+      [
+        "Release notes",
+        "",
+        "See the guide and logo, code here.\nNext line.",
+        "",
+        "• one\n• two\n  1. nested",
+        "",
+        "☑ done\n☐ open",
+        "",
+        "Name\tValue\na\t1",
+        "",
+        "Quoted text.",
+        "",
+        "let x = 1;",
+        "",
+        "—",
+        "",
+        "Math x^2 and a note[1].  bold",
+        "",
+        "[1] The note.",
+        "",
+      ].join("\n"),
+    );
+  });
+});

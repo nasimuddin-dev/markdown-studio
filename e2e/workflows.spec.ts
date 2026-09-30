@@ -1215,3 +1215,18 @@ test("Move Selection to New File creates the file and links to it", async ({ pag
   await expect(page.locator(".cm-line", { hasText: "[Task list](Task%20list.md)" })).toHaveCount(1);
   await expect(page.getByRole("treeitem", { name: /Task list\.md/ })).toBeVisible();
 });
+
+test("Copy as Plain Text copies the selection without Markdown syntax", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Title\n\nSome **bold** and [a link](x.md).\n\nNot copied.");
+  await page.keyboard.press(`${mod}+Home`);
+  for (let i = 0; i < 3; i++) await page.keyboard.press("Shift+ArrowDown");
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Copy as Plain Text" }).click();
+  await expect(page.getByText("Selection copied as plain text.")).toBeVisible();
+  // The Windows clipboard uses CRLF line breaks.
+  expect((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, "\n")).toBe("Title\n\nSome bold and a link.\n");
+});
