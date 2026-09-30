@@ -63,7 +63,7 @@ If you need those, consider whether the content is really a table. A list of sec
 
 Hand-aligning columns is tedious, and editing one cell breaks the alignment. Let your editor do it:
 
-- In Markpion, **Format → Format Table** (**Ctrl+Alt+T**) pads every column to the same width, even with Chinese, Japanese or Korean text, which takes two columns per character.
+- In Markpion, **Table → Format Table** (**Ctrl+Alt+T**) pads every column to the same width, even with Chinese, Japanese or Korean text, which takes two columns per character.
 - **Sort Table by Column** sorts the rows by the column under the cursor, numerically for numbers.
 - Pasting cells from Excel or Google Sheets creates the Markdown table for you, and **Copy Table as CSV** goes the other way.
 

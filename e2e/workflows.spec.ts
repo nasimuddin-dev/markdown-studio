@@ -399,7 +399,7 @@ test("Fix Table repairs a table typed with mistakes", async ({ page }) => {
   await page.keyboard.insertText("\n\nCity,Country\nParis,France");
   await page.keyboard.press("Shift+ArrowUp");
   await page.keyboard.press("Shift+Home");
-  await page.getByRole("button", { name: "Format", exact: true }).click();
+  await page.getByRole("button", { name: "Table", exact: true }).click();
   await page.getByRole("menuitem", { name: "Fix Table" }).click();
   await expect(page.locator(".markdown-body table")).toHaveCount(2);
 });

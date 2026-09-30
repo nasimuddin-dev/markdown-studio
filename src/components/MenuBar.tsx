@@ -8,9 +8,11 @@ import { useSettings } from "../stores/settingsStore";
 import type { RecentEntry, ViewMode } from "../types";
 import { Icon } from "./Icon";
 
-type Item = { type: "command"; command: Command } | { type: "separator" } | { type: "recent"; entry: RecentEntry };
+type Item = { type: "command"; command: Command; label?: string } | { type: "separator" } | { type: "recent"; entry: RecentEntry };
 
 const c = (id: keyof typeof commands): Item => ({ type: "command", command: commands[id] });
+/** A Table menu item, without the "Table: " prefix the command palette needs. */
+const t = (id: keyof typeof commands): Item => ({ type: "command", command: commands[id], label: commands[id].label.replace(/^Table: /, "") });
 const sep: Item = { type: "separator" };
 
 const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
@@ -32,7 +34,17 @@ const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
       c("bold"), c("italic"), c("strikethrough"), c("inlineCode"), c("link"), c("insertImage"), sep,
       c("heading1"), c("heading2"), c("heading3"), c("heading4"), c("heading5"), c("heading6"), c("paragraph"), c("promoteHeading"), c("demoteHeading"), c("numberHeadings"), c("removeHeadingNumbers"), c("moveSectionUp"), c("moveSectionDown"), sep,
       c("bulletList"), c("orderedList"), c("taskList"), c("toggleTaskCheck"), c("quote"), sep,
-      c("codeBlock"), c("table"), c("fixTable"), c("convertToTable"), c("formatTable"), c("tableRowAbove"), c("tableRowBelow"), c("tableColumnLeft"), c("tableColumnRight"), c("tableDeleteRow"), c("tableDeleteColumn"), c("tableAlignLeft"), c("tableAlignCenter"), c("tableAlignRight"), c("tableMoveColumnLeft"), c("tableMoveColumnRight"), c("sortTableAsc"), c("sortTableDesc"), c("copyTableCsv"), c("horizontalRule"), c("footnote"), sep, c("toc"),
+      c("codeBlock"), c("horizontalRule"), c("footnote"), sep, c("toc"),
+    ],
+  },
+  {
+    label: "Table",
+    items: () => [
+      t("table"), t("fixTable"), t("convertToTable"), t("formatTable"), sep,
+      t("tableRowAbove"), t("tableRowBelow"), t("tableDeleteRow"), sep,
+      t("tableColumnLeft"), t("tableColumnRight"), t("tableDeleteColumn"), t("tableMoveColumnLeft"), t("tableMoveColumnRight"), sep,
+      t("tableAlignLeft"), t("tableAlignCenter"), t("tableAlignRight"), sep,
+      t("sortTableAsc"), t("sortTableDesc"), sep, t("importCsv"), t("copyTableCsv"),
     ],
   },
   {
@@ -123,7 +135,7 @@ function Menu({ label, items, open, onOpen, onClose }: {
             const disabled = command.enabled ? !command.enabled() : false;
             return (
               <button key={command.id} role="menuitem" className="menu-item" disabled={disabled} onClick={() => run(command.run)}>
-                <span className="menu-item-label">{command.label}</span>
+                <span className="menu-item-label">{item.label ?? command.label}</span>
                 <kbd className="menu-item-shortcut">{formatShortcut(command.shortcut)}</kbd>
               </button>
             );

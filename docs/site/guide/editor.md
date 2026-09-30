@@ -87,7 +87,7 @@ Copy, cut and paste use the system clipboard. Markpion adds some smart behaviour
 
 ## Formatting
 
-The **Format** menu has commands for bold, italic, links, headings, lists, tables and more. They're described in [Writing tools](/guide/writing-tools).
+The **Format** menu has commands for bold, italic, links, headings, lists and more; the **Table** menu has everything for tables. They're described in [Writing tools](/guide/writing-tools).
 
 ### Formatting toolbar
 

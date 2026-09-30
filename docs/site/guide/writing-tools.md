@@ -5,7 +5,7 @@ description: Markpion's formatting commands, heading tools, move section, task l
 
 # Writing tools
 
-Everything here is in the **Format** menu (or **File** menu for templates) and the command palette (**Ctrl+Shift+P**). On macOS, use **Cmd** for **Ctrl** and **Option** for **Alt**.
+Everything here is in the **Format** menu (the **Table** menu for tables, the **File** menu for templates) and the command palette (**Ctrl+Shift+P**). On macOS, use **Cmd** for **Ctrl** and **Option** for **Alt**.
 
 ## Text formatting
 

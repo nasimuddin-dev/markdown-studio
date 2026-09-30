@@ -15,7 +15,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 ## Writing and editing
 
 - A CodeMirror 6 editor with Markdown syntax highlighting, highlighting for code-block languages, line numbers, code folding, multiple cursors, and undo and redo per tab. [Editor guide](/guide/editor)
-- A Format menu and shortcuts for bold, italic, strikethrough, inline code, links, headings 1–6, promoting and demoting headings, numbering headings (1., 1.1, 1.1.1), bulleted, numbered and task lists, quotes, code blocks, tables, horizontal rules and footnotes. [Writing tools](/guide/writing-tools)
+- A Format menu and shortcuts for bold, italic, strikethrough, inline code, links, headings 1–6, promoting and demoting headings, numbering headings (1., 1.1, 1.1.1), bulleted, numbered and task lists, quotes, code blocks, horizontal rules and footnotes, and a Table menu for tables. [Writing tools](/guide/writing-tools)
 - A formatting toolbar above the editor (undo, paragraph style, bold, italic, lists, links, images, tables and more) that shows the formatting at the cursor; inside a table it offers the table tools. [Editor](/guide/editor#formatting-toolbar)
 - **Move Section Up/Down** moves a heading with its text and subsections past its neighbour.
 - Tables: **Format Table** aligns columns (CJK-aware), **Tab** and **Shift+Tab** move between cells (Tab in the last cell adds a row), rows and columns can be inserted or deleted at the cursor, and **Sort Table by Column** sorts rows. You can also paste cells from Excel or Google Sheets as a table, and copy a table as CSV. [Tables](/markdown/tables)
