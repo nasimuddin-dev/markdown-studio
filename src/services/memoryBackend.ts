@@ -504,16 +504,17 @@ export class MemoryBackend implements Backend {
     return result;
   }
 
-  async saveImageAsset(docPath: string, fileName: string, dataBase64: string) {
+  async saveImageAsset(docPath: string, fileName: string, dataBase64: string, folder = "assets") {
     const doc = this.check(docPath);
     const name = this.validateName(fileName);
+    const folderName = this.validateName(folder);
     const dot = name.lastIndexOf(".");
     const stem = dot > 0 ? name.slice(0, dot) : name;
     const ext = (dot > 0 ? name.slice(dot + 1) : "png").toLowerCase();
     if (!["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "avif"].includes(ext)) {
       throw new AppError("invalidPath", "Only image files can be added to a document");
     }
-    const dir = join(dirname(doc), "assets");
+    const dir = join(dirname(doc), folderName);
     this.check(join(dir, name));
     let target = join(dir, `${stem}.${ext}`);
     for (let n = 1; this.files.has(target); n++) target = join(dir, `${stem}-${n}.${ext}`);

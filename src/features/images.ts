@@ -3,6 +3,7 @@ import { describeError } from "../services/errors";
 import { basename, dirname, isInside, relativePath } from "../services/paths";
 import { activeDoc } from "../stores/documentsStore";
 import { notify } from "../stores/uiStore";
+import { imageFolderName, useSettings } from "../stores/settingsStore";
 import { getEditorView } from "./editorBridge";
 
 const IMAGE_TYPES: Record<string, string> = {
@@ -44,12 +45,15 @@ export function assetFileName(file: File, now = new Date()): string {
   return `${stem}.${ext}`;
 }
 
-/** Markdown for an image stored at `assets/<name>` next to the document. */
-export function imageMarkdown(savedPath: string): string {
+/** Markdown for an image stored at `<folder>/<name>` next to the document. */
+export function imageMarkdown(savedPath: string, folder = "assets"): string {
   const name = basename(savedPath);
   const alt = name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
-  return `![${alt}](assets/${encodeURI(name)})`;
+  return `![${alt}](${encodeURI(folder)}/${encodeURI(name)})`;
 }
+
+/** The folder for new images, from Settings. */
+const imageFolder = () => imageFolderName(useSettings.getState().settings.imageFolder);
 
 /**
  * Saves pasted/dropped images next to the active document and inserts
@@ -61,14 +65,14 @@ export async function insertImageFiles(files: File[]): Promise<boolean> {
   const doc = activeDoc();
   if (!doc) return false;
   if (!doc.path) {
-    notify("info", "Save the document first. Pasted images are stored in an “assets” folder next to it.");
+    notify("info", `Save the document first. Pasted images are stored in an “${imageFolder()}” folder next to it.`);
     return true;
   }
   const links: string[] = [];
   for (const file of images) {
     try {
-      const saved = await backend().saveImageAsset(doc.path, assetFileName(file), await toBase64(file));
-      links.push(imageMarkdown(saved));
+      const saved = await backend().saveImageAsset(doc.path, assetFileName(file), await toBase64(file), imageFolder());
+      links.push(imageMarkdown(saved, imageFolder()));
     } catch (e) {
       const msg = describeError(e, `add “${file.name || "the image"}”`);
       notify("error", /outOfScope|access/i.test(msg) ? msg + " Open the document's folder to allow adding images." : msg);
@@ -105,7 +109,7 @@ export function relativeImageMarkdown(docPath: string, imagePath: string): strin
 /**
  * Format → Insert Image…: asks for an image file and links it at the cursor.
  * An image inside the document's folder is linked where it is; any other is
- * copied into the "assets" folder next to the document first.
+ * copied into the images folder next to the document first ("assets", or the one set in Settings).
  */
 export async function insertImageFromFile() {
   const doc = activeDoc();
@@ -133,8 +137,8 @@ export async function insertImageFromFile() {
     const local = isInside(path, dirname(doc.path)) ? relativeImageMarkdown(doc.path, path) : null;
     if (local) return insertImageLinks([local]);
     const name = assetFileName(new File([], basename(path)));
-    const saved = await b.saveImageAsset(doc.path, name, await b.readBinaryFile(path));
-    insertImageLinks([imageMarkdown(saved)]);
+    const saved = await b.saveImageAsset(doc.path, name, await b.readBinaryFile(path), imageFolder());
+    insertImageLinks([imageMarkdown(saved, imageFolder())]);
   } catch (e) {
     notify("error", describeError(e, "insert the image"));
   }

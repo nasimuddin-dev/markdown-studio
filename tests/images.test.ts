@@ -5,6 +5,7 @@ import { assetFileName, imageMarkdown, insertImageFiles, insertImageFromFile, is
 import { registerEditorView } from "../src/features/editorBridge";
 import { newDocument, openPath } from "../src/features/documents";
 import { useUi } from "../src/stores/uiStore";
+import { imageFolderName, sanitizeSettings, useSettings } from "../src/stores/settingsStore";
 import { setupBackend } from "./helpers";
 
 const png = (name = "image.png") => new File([new Uint8Array([137, 80, 78, 71])], name, { type: "image/png" });
@@ -46,6 +47,24 @@ describe("inserting images", () => {
     expect(view.state.doc.toString()).toBe("Intro\n![chart](assets/chart.png)\n![chart 1](assets/chart-1.png)");
     expect(await backend.readImage("/ws/docs/assets/chart.png")).toBe("data:image/png;base64,iVBORw==");
     view.destroy();
+  });
+
+  it("saves into the folder set in Settings, falling back to assets/ for an invalid name", async () => {
+    const backend = setupBackend({ "/ws/p.md": "" });
+    await openPath("/ws/p.md");
+    const view = mountEditor("");
+    useSettings.getState().update({ imageFolder: "media files" });
+    try {
+      await insertImageFiles([png("x.png")]);
+      expect(view.state.doc.toString()).toBe("![x](media%20files/x.png)");
+      expect(await backend.readImage("/ws/media files/x.png")).toBe("data:image/png;base64,iVBORw==");
+      expect(imageFolderName("../up")).toBe("assets");
+      expect(imageFolderName(" images ")).toBe("images");
+      expect(sanitizeSettings({ imageFolder: "a/b" }).imageFolder).toBe("assets");
+    } finally {
+      useSettings.getState().update({ imageFolder: "assets" });
+      view.destroy();
+    }
   });
 
   it("puts images on their own line when pasted mid-line", async () => {

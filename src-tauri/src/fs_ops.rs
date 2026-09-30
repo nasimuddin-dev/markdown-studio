@@ -306,7 +306,7 @@ pub fn unique_child(dir: &Path, stem: &str, ext: &str) -> PathBuf {
 
 /// Saves image bytes into an `assets` folder next to a document and returns
 /// the new file's path. Never overwrites an existing file.
-pub fn save_asset(doc_dir: &Path, stem: &str, ext: &str, bytes: &[u8]) -> AppResult<PathBuf> {
+pub fn save_asset(doc_dir: &Path, folder: &str, stem: &str, ext: &str, bytes: &[u8]) -> AppResult<PathBuf> {
     let ext = ext.to_ascii_lowercase();
     if !IMAGE_EXTENSIONS.contains(&ext.as_str()) {
         return Err(AppError::InvalidPath("Only image files can be added to a document".into()));
@@ -314,7 +314,7 @@ pub fn save_asset(doc_dir: &Path, stem: &str, ext: &str, bytes: &[u8]) -> AppRes
     if bytes.len() as u64 > MAX_ASSET_BYTES {
         return Err(AppError::TooLarge("Images larger than 20 MB can't be added".into()));
     }
-    let assets = doc_dir.join("assets");
+    let assets = doc_dir.join(folder);
     fs::create_dir_all(&assets)?;
     let target = unique_child(&assets, stem, &ext);
     let mut file = File::options().write(true).create_new(true).open(&target)?;
@@ -456,12 +456,14 @@ mod tests {
     #[test]
     fn saves_assets_without_overwriting() {
         let tmp = tempfile::tempdir().unwrap();
-        let a = save_asset(tmp.path(), "shot", "PNG", b"one").unwrap();
-        let b = save_asset(tmp.path(), "shot", "png", b"two").unwrap();
+        let a = save_asset(tmp.path(), "assets", "shot", "PNG", b"one").unwrap();
+        let b = save_asset(tmp.path(), "assets", "shot", "png", b"two").unwrap();
         assert_eq!(a, tmp.path().join("assets").join("shot.png"));
         assert_eq!(b, tmp.path().join("assets").join("shot-1.png"));
         assert_eq!(fs::read(&a).unwrap(), b"one");
-        assert!(matches!(save_asset(tmp.path(), "x", "exe", b"MZ"), Err(AppError::InvalidPath(_))));
+        assert!(matches!(save_asset(tmp.path(), "assets", "x", "exe", b"MZ"), Err(AppError::InvalidPath(_))));
+        let c = save_asset(tmp.path(), "images", "shot", "png", b"three").unwrap();
+        assert_eq!(c, tmp.path().join("images").join("shot.png"));
     }
 
     #[test]

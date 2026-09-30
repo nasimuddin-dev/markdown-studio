@@ -41,6 +41,7 @@ The moon button at the top right switches between light and dark quickly. **Ctrl
 | Keep the table of contents up to date on save | | On |
 | Show Git branch, changed files and changed lines | | On |
 | Insert a final newline on save | | Off |
+| Folder for pasted images | One folder name | assets |
 
 Existing files always keep their own line endings. Untitled documents are never auto-saved. See [Saving, history & recovery](/guide/saving-and-recovery).
 

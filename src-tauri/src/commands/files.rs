@@ -114,14 +114,16 @@ pub async fn delete_path(state: State<'_, AppState>, path: String) -> AppResult<
     state.track("fs.delete", fs_ops::delete_to_trash(&target))
 }
 
-/// Saves a pasted/dropped image next to a saved document (in `assets/`) and
-/// returns its path. The document's folder must be writable in the scope.
+/// Saves a pasted/dropped image next to a saved document (in `assets/`, or
+/// the folder named in Settings) and returns its path. The document's folder
+/// must be writable in the scope.
 #[tauri::command]
 pub async fn save_image_asset(
     state: State<'_, AppState>,
     doc_path: String,
     file_name: String,
     data_base64: String,
+    folder: Option<String>,
 ) -> AppResult<String> {
     use base64::Engine;
     let doc = state.scope.check(Path::new(&doc_path))?;
@@ -130,15 +132,18 @@ pub async fn save_image_asset(
         .ok_or_else(|| AppError::InvalidPath("Document has no folder".into()))?
         .to_path_buf();
     scope::validate_file_name(&file_name)?;
+    // One folder name (no separators, "." or ".."), so it stays inside the document's folder.
+    let folder = folder.unwrap_or_else(|| "assets".into());
+    scope::validate_file_name(&folder)?;
     let name = Path::new(&file_name);
     let stem = name.file_stem().and_then(|s| s.to_str()).unwrap_or("image");
     let ext = name.extension().and_then(|s| s.to_str()).unwrap_or("png");
-    // The target is always `<document folder>/assets/<validated name>`, a
+    // The target is always `<document folder>/<validated folder>/<validated name>`, a
     // location derived from an approved document, never a caller-supplied path.
     let bytes = base64::engine::general_purpose::STANDARD
         .decode(data_base64.as_bytes())
         .map_err(|_| AppError::InvalidPath("Invalid image data".into()))?;
-    let saved = state.track("asset.save", fs_ops::save_asset(&dir, stem, ext, &bytes))?;
+    let saved = state.track("asset.save", fs_ops::save_asset(&dir, folder.trim(), stem, ext, &bytes))?;
     Ok(fs_ops::path_string(&saved))
 }
 

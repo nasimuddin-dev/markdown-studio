@@ -34,6 +34,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `lintMarkdown` | `true` | |
 | `typewriterScrolling` | `false` | Keep the line being typed in the middle of the editor |
 | `dimOtherParagraphs` | `false` | Dim every paragraph except the one with the cursor |
+| `imageFolder` | `"assets"` | Folder next to the document for pasted, dropped and inserted images: one name, without `/`, `\` or other characters not allowed in file names |
 | `lintDisabledRules` | `[]` | Lint checks that are turned off, by id: `broken-link`, `missing-image`, `broken-anchor`, `empty-link`, `duplicate-heading`, `multiple-h1`, `heading-increment`, `image-alt`, `link-text`, `table-columns`, `footnote`, `reference`, `heading-space`, `setext-heading`, `list-space`, `emphasis-space`, `destination-spaces` |
 | `pasteRichTextAsMarkdown` | `true` | |
 | `previewDebounceMs` | `150` | 0–1000 |

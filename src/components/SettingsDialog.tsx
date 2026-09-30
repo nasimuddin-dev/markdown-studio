@@ -121,6 +121,9 @@ export function SettingsDialog() {
           <label className="check"><input type="checkbox" checked={settings.updateTocOnSave} disabled={isLocked("updateTocOnSave")} onChange={(e) => update({ updateTocOnSave: e.target.checked })} /> Keep the table of contents up to date on save</label>
           <label className="check"><input type="checkbox" checked={settings.showGitStatus} disabled={isLocked("showGitStatus")} onChange={(e) => update({ showGitStatus: e.target.checked })} /> Show Git branch, changed files and changed lines (runs Git, read-only)</label>
           <label className="check"><input type="checkbox" checked={settings.insertFinalNewline} disabled={isLocked("insertFinalNewline")} onChange={(e) => update({ insertFinalNewline: e.target.checked })} /> Insert a final newline on save</label>
+          <label htmlFor="setting-imageFolder">Folder for pasted images</label>
+          <input type="text" spellCheck={false} aria-describedby="setting-imageFolder-hint" {...field("imageFolder")} onChange={(e) => update({ imageFolder: e.target.value })} />
+          <p className="muted small" id="setting-imageFolder-hint">Pasted, dropped and inserted pictures are saved in this folder next to the document (one folder name, such as “assets” or “images”).</p>
           <label htmlFor="setting-newFileLineEnding">Line endings for new files</label>
           <select {...field("newFileLineEnding")} onChange={(e) => update({ newFileLineEnding: e.target.value as Settings["newFileLineEnding"] })}>
             <option value="lf">LF (Unix, macOS)</option>

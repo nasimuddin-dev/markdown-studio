@@ -36,6 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   newFileLineEnding: "lf",
   exportPageSize: "auto",
   customCss: "",
+  imageFolder: "assets",
   aiEnabled: false,
   aiModel: "claude-opus-5-5",
   aiConsent: false,
@@ -58,6 +59,15 @@ function sanitizeKeybindings(raw: unknown): Record<string, string | null> {
 
 const clamp = (n: unknown, min: number, max: number, fallback: number) =>
   typeof n === "number" && Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback;
+
+/**
+ * The folder name for pasted images: one name without path separators or
+ * reserved characters (checked again natively), else "assets".
+ */
+export function imageFolderName(value: unknown): string {
+  const name = typeof value === "string" ? value.trim() : "";
+  return name && name.length <= 64 && name !== "." && name !== ".." && !/[\\/:*?"<>|\u0000-\u001f]/.test(name) ? name : "assets";
+}
 
 /** The editor line lengths offered in Settings (0 = full width). */
 export const LINE_LENGTHS = [0, 72, 80, 100, 120];
@@ -112,6 +122,7 @@ export function sanitizeSettings(raw: unknown): Settings {
         : d.newFileLineEnding,
     exportPageSize: s.exportPageSize === "a4" || s.exportPageSize === "letter" || s.exportPageSize === "auto" ? s.exportPageSize : d.exportPageSize,
     customCss: typeof s.customCss === "string" ? s.customCss.slice(0, MAX_CUSTOM_CSS) : d.customCss,
+    imageFolder: imageFolderName(s.imageFolder),
     aiEnabled: bool(s.aiEnabled, d.aiEnabled),
     aiModel: typeof s.aiModel === "string" && /^claude-[a-z0-9-]{3,60}$/.test(s.aiModel) ? s.aiModel : d.aiModel,
     aiConsent: bool(s.aiConsent, d.aiConsent),

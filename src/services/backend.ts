@@ -88,7 +88,7 @@ export interface FilesApi {
    * Saves an image into `assets/` next to a saved document; returns the new
    * file's absolute path. Never overwrites existing files.
    */
-  saveImageAsset(docPath: string, fileName: string, dataBase64: string): Promise<string>;
+  saveImageAsset(docPath: string, fileName: string, dataBase64: string, folder?: string): Promise<string>;
   /**
    * Asks the user where to save an exported file (native Save dialog) and
    * writes it there. Returns the chosen path, or `null` if cancelled.

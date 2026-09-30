@@ -276,7 +276,7 @@ flowchart LR
 
 | Data | Location | Written by |
 | --- | --- | --- |
-| Documents and images | Wherever the user keeps them | Safe save (section 6); pasted images go to `assets/` next to the document |
+| Documents and images | Wherever the user keeps them | Safe save (section 6); pasted images go to `assets/` (or the one folder name set in Settings, validated natively as a single name) next to the document |
 | Settings | App config folder, `settings.json` | `storage.rs` (written through a temporary file) |
 | Recent files and folders | App config folder, `recent.json` | `commands/app_data.rs` |
 | Crash recovery | App data folder, `recovery/session.json` | Recovery timer (section 7) |
