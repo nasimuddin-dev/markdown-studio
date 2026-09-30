@@ -80,4 +80,4 @@ Markpion understands the double-bracket links of wikis and note-taking apps:
 
 The page is a path relative to the document, and `.md` is added when it has no extension. Type `[[` to pick a document of the open folder from a list, and **Ctrl+click** (**Cmd+click**) a wiki link in the editor to open it. The preview, HTML, PDF and Word exports show wiki links as ordinary links.
 
-Wiki links aren't part of GitHub Flavored Markdown, so GitHub and other Markdown apps show them as plain text. Missing pages and headings are reported like other broken links, and wiki links count in **Links to this document**. Renaming or moving a file doesn't update the wiki links to it yet.
+Wiki links aren't part of GitHub Flavored Markdown, so GitHub and other Markdown apps show them as plain text. Missing pages and headings are reported like other broken links, and wiki links count in **Links to this document**. Renaming or moving a file in Markpion updates the wiki links to it, as it does for Markdown links, keeping their style (`[[docs/guide]]` stays without `.md`), heading and text.

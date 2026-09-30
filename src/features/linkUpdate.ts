@@ -32,7 +32,19 @@ const escapeTarget = (path: string) => path.replace(/[%\s()<>]/g, (c) => "%" + c
 export function rewriteLinks(text: string, oldDocPath: string, newDocPath: string, moved: (path: string) => string): { text: string; count: number } {
   const edits: Array<{ from: number; to: number; insert: string }> = [];
   for (const { link, path } of localTargets(findAllLinks(text), oldDocPath)) {
-    if (link.wiki) continue;
+    if (link.wiki) {
+      // [[page#Heading|text]]: the page is written without .md unless it had an extension.
+      if (!path) continue;
+      const written = text.slice(link.targetFrom, link.targetFrom + (link.sourceLength ?? 0));
+      const [page, heading] = written.split(/#(.*)/s);
+      const rel = relativePath(dirname(newDocPath), moved(path));
+      if (rel === null) continue;
+      const insert = (/\.[a-z0-9]+$/i.test(page.trim()) ? rel : rel.replace(/\.(md|markdown)$/i, "")) + (heading !== undefined ? `#${heading}` : "");
+      const now = resolveRelative(newDocPath, link.target);
+      if (now && samePath(now, moved(path))) continue;
+      edits.push({ from: link.targetFrom, to: link.targetFrom + written.length, insert });
+      continue;
+    }
     if (!path || /^([a-zA-Z]:)?[\\/]/.test(link.target)) continue; // absolute paths are left alone
     const target = moved(path);
     const now = resolveRelative(newDocPath, link.target);

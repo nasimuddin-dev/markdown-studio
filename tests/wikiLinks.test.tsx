@@ -49,8 +49,9 @@ describe("wiki links", () => {
     expect(problems.map((p) => [p.message, !!p.fix])).toEqual([["Linked file not found: missing.md", false]]);
   });
 
-  it("aren't rewritten by the link updates after a rename (their text isn't a path)", () => {
-    expect(rewriteLinks("[[b]] and [x](b.md)", "/ws/a.md", "/ws/a.md", (p) => (p === "/ws/b.md" ? "/ws/c.md" : p)).text).toBe("[[b]] and [x](c.md)");
+  it("follow a renamed or moved page, keeping their style, heading and text", () => {
+    const moved = (p: string) => (p === "/ws/b.md" ? "/ws/docs/c.md" : p);
+    expect(rewriteLinks("[[b]] [[b#Intro|see]] [[b.md]] [[other]] [x](b.md)", "/ws/a.md", "/ws/a.md", moved).text).toBe("[[docs/c]] [[docs/c#Intro|see]] [[docs/c.md]] [[other]] [x](docs/c.md)");
   });
 
   it("complete with the folder's documents after [[", async () => {
