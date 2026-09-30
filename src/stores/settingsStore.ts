@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: Settings = {
   lintMarkdown: true,
   typewriterScrolling: false,
   dimOtherParagraphs: false,
+  closeBrackets: false,
   editorLineLength: 0,
   lintDisabledRules: [],
   spellCheck: true,
@@ -118,6 +119,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     lintMarkdown: bool(s.lintMarkdown, d.lintMarkdown),
     typewriterScrolling: bool(s.typewriterScrolling, d.typewriterScrolling),
     dimOtherParagraphs: bool(s.dimOtherParagraphs, d.dimOtherParagraphs),
+    closeBrackets: bool(s.closeBrackets, d.closeBrackets),
     editorLineLength: LINE_LENGTHS.includes(s.editorLineLength as number) ? (s.editorLineLength as number) : d.editorLineLength,
     lintDisabledRules: Array.isArray(s.lintDisabledRules)
       ? [...new Set(s.lintDisabledRules.filter((r): r is string => typeof r === "string" && /^[a-z0-9-]{1,40}$/.test(r)))].slice(0, 50)

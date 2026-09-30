@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Annotation, EditorState, Compartment, type Extension } from "@codemirror/state";
+import { Annotation, EditorState, Compartment, Prec, type Extension } from "@codemirror/state";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import {
   EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter,
   drawSelection, dropCursor, rectangularSelection, crosshairCursor, placeholder, highlightSpecialChars,
@@ -99,6 +100,16 @@ const PHRASES: Record<string, string> = {
 const locking = new Compartment();
 const typewriter = new Compartment();
 const dimming = new Compartment();
+const bracketing = new Compartment();
+/** Close brackets and backticks as they're typed (not quotes: apostrophes are common in prose). */
+const bracketsExt = (on: boolean): Extension =>
+  on
+    ? [
+        closeBrackets(),
+        Prec.high(keymap.of(closeBracketsKeymap)),
+        EditorState.languageData.of(() => [{ closeBrackets: { brackets: ["(", "[", "{", "`"] } }]),
+      ]
+    : [];
 /** Typewriter scrolling: every edit or cursor move keeps the cursor's line in the middle of the editor. */
 const typewriterExt = (on: boolean): Extension =>
   on
@@ -136,6 +147,7 @@ function reconfigure(s: Settings) {
     spelling.reconfigure(spellAttr(s.spellCheck)),
     typewriter.reconfigure(typewriterExt(s.typewriterScrolling)),
     dimming.reconfigure(s.dimOtherParagraphs ? paragraphFocus() : []),
+    bracketing.reconfigure(bracketsExt(s.closeBrackets)),
     keys.reconfigure(editorKeys()),
   ];
 }
@@ -185,6 +197,7 @@ export function Editor() {
         spelling.of(spellAttr(s.spellCheck)),
         typewriter.of(typewriterExt(s.typewriterScrolling)),
         dimming.of(s.dimOtherParagraphs ? paragraphFocus() : []),
+        bracketing.of(bracketsExt(s.closeBrackets)),
         locking.of(lockExt(isLocked(docId))),
         // Pasted or dropped images are saved to assets/ and linked.
         EditorView.domEventHandlers({
@@ -336,7 +349,7 @@ export function Editor() {
   // Apply settings changes (FR-025).
   useEffect(() => {
     viewRef.current?.dispatch({ effects: reconfigure(settings) });
-  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck, settings.typewriterScrolling, settings.dimOtherParagraphs, settings.editorLineLength]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck, settings.typewriterScrolling, settings.dimOtherParagraphs, settings.closeBrackets, settings.editorLineLength]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <div className="editor-host" ref={host} />;
 }

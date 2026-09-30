@@ -81,6 +81,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Export to standalone HTML (styled, images inlined, sanitized), Copy as Formatted Text (paste into Word, email or Google Docs), Copy as HTML, and Print / Save as PDF (Ctrl/Cmd+P)
 - Custom CSS for documents (Settings → Preview): your own styles for the preview, printing, slides and HTML export, scoped to the document so they never change the app; IT can preset or lock it with managed settings
 - Markdown lint in the editor: broken links, missing images, broken anchors, duplicate headings, skipped heading levels, missing alt text and link text, `#Title` without a space, `---` that turns a line into a heading, `-item` without a space in a list, `** bold**` with inner spaces, link or image paths with spaces, table rows that don't match the header, and footnotes or reference links (`[text][id]`) without a definition (or definitions nothing uses), with a Problems panel, F8 / Shift+F8 to move between problems, Don't Show This Check per rule (re-enable in Settings), and quick fixes (Add Blank Line, Add Empty Cells, Add Definition, fix a skipped heading level, correct a misspelled #anchor or file name) and Edit → Fix All Problems
+- Optional automatic closing of `(`, `[`, `{` and backticks (Settings → Editor)
 - Dim Other Paragraphs (View menu or Settings): fades all but the paragraph being written
 - Line length setting: keep the editor text about 72, 80, 100 or 120 characters wide, centered (Settings → Editor)
 - F6 / Shift+F6 move focus between the sidebar, editor and preview

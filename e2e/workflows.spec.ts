@@ -1430,3 +1430,17 @@ test("Select Section from the Outline selects the heading's whole section", asyn
   expect(selected).toContain("Save it with");
   expect(selected).not.toContain("### Code");
 });
+
+test("Close brackets automatically (Settings) closes ( [ { and backticks, not quotes", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+,`);
+  await page.getByLabel("Close brackets and backticks automatically").check();
+  await page.keyboard.press("Escape");
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.type("see [link");
+  await expect(page.locator(".cm-line").first()).toHaveText("see [link]");
+  await page.keyboard.press("End");
+  await page.keyboard.type(" it's (x");
+  await expect(page.locator(".cm-line").first()).toHaveText("see [link] it's (x)");
+});

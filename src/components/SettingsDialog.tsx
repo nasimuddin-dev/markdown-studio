@@ -66,6 +66,7 @@ export function SettingsDialog() {
           <label className="check"><input type="checkbox" checked={settings.spellCheck} disabled={isLocked("spellCheck")} onChange={(e) => update({ spellCheck: e.target.checked })} /> Check spelling (uses the system dictionary)</label>
           <label className="check"><input type="checkbox" checked={settings.typewriterScrolling} disabled={isLocked("typewriterScrolling")} onChange={(e) => update({ typewriterScrolling: e.target.checked })} /> Typewriter scrolling (keep the line you're typing in the middle)</label>
           <label className="check"><input type="checkbox" checked={settings.dimOtherParagraphs} disabled={isLocked("dimOtherParagraphs")} onChange={(e) => update({ dimOtherParagraphs: e.target.checked })} /> Dim other paragraphs (highlight the one you're writing)</label>
+          <label className="check"><input type="checkbox" checked={settings.closeBrackets} disabled={isLocked("closeBrackets")} onChange={(e) => update({ closeBrackets: e.target.checked })} /> Close brackets and backticks automatically</label>
           <label className="check"><input type="checkbox" checked={settings.lintMarkdown} disabled={isLocked("lintMarkdown")} onChange={(e) => update({ lintMarkdown: e.target.checked })} /> Check Markdown for problems (broken links, headings, tables, alt text)</label>
           {settings.lintDisabledRules.length > 0 && (
             <div className="hidden-checks">

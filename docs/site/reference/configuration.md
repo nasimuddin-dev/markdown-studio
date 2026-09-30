@@ -33,6 +33,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `spellCheck` | `true` | |
 | `lintMarkdown` | `true` | |
 | `typewriterScrolling` | `false` | Keep the line being typed in the middle of the editor |
+| `closeBrackets` | `false` | Type the closing `)`, `]`, `}` or `` ` `` along with the opening one |
 | `dimOtherParagraphs` | `false` | Dim every paragraph except the one with the cursor |
 | `formatTablesOnSave` | `false` | Align every table when saving, as Format Table does |
 | `explorerShowImages` | `true` | List pictures in the Explorer besides Markdown files |

@@ -98,6 +98,8 @@ export interface Settings {
   typewriterScrolling: boolean;
   /** Dim every paragraph except the one with the cursor. */
   dimOtherParagraphs: boolean;
+  /** Type the closing ), ], } or ` along with the opening one. */
+  closeBrackets: boolean;
   /** Editor text width in characters, centered (0 = the full width of the pane). */
   editorLineLength: number;
   /** Lint checks (rule ids) turned off with "Don't Show This Check". */
