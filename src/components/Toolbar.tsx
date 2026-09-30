@@ -57,6 +57,7 @@ const TABLE_ACTIONS = [
   "fixTable", "separator",
   "tableRowAbove", "tableRowBelow", "tableColumnLeft", "tableColumnRight", "separator",
   "tableDeleteRow", "tableDeleteColumn", "separator",
+  "tableAlignLeft", "tableAlignCenter", "tableAlignRight", "tableMoveColumnLeft", "tableMoveColumnRight", "separator",
   "formatTable", "sortTableAsc", "sortTableDesc", "copyTableCsv",
 ];
 

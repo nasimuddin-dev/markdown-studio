@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { EditorSelection, EditorState } from "@codemirror/state";
 import {
-  deleteColumn, deleteRow, deleteTableColumn, deleteTableRow, displayWidth, formatTable, formatTableAtCursor, insertColumnLeft,
-  insertColumnRight, insertRowAbove, insertRowBelow, insertTableColumn, insertTableRow, moveTableCell, sortTableAtCursor, sortTableRows, splitRow,
+  alignColumn, alignTableColumn, deleteColumn, deleteRow, deleteTableColumn, deleteTableRow, displayWidth, formatTable, formatTableAtCursor, insertColumnLeft,
+  insertColumnRight, insertRowAbove, insertRowBelow, insertTableColumn, insertTableRow, moveColumn, moveTableCell, moveTableColumn, sortTableAtCursor, sortTableRows, splitRow,
 } from "../src/features/tables";
 import { applyCommand } from "../src/features/formatting";
 
@@ -154,5 +154,34 @@ describe("Tab and Shift+Tab in tables", () => {
     expect(moveTableCell(true)({ state: plain, dispatch: () => {} })).toBe(false);
     const multi = EditorState.create({ doc, selection: EditorSelection.range(0, doc.length) });
     expect(moveTableCell(true)({ state: multi, dispatch: () => {} })).toBe(false);
+  });
+});
+
+describe("column alignment and order", () => {
+  const table = ["| Name | Qty |", "| --- | --- |", "| Apples | 3 |"];
+
+  it("aligns a column", () => {
+    expect(alignTableColumn(table, 2, 1, "right")!.lines[1]).toBe("| --- | --: |");
+    expect(alignTableColumn(table, 0, 0, "center")!.lines[1]).toBe("| :-: | --- |");
+    expect(alignTableColumn(table, 0, 0, "left")!.lines[1]).toBe("| :-- | --- |");
+    expect(alignTableColumn(["not a table"], 0, 0, "left")).toBeNull();
+  });
+
+  it("moves a column with its alignment", () => {
+    const aligned = ["| Name | Qty |", "| :-- | --: |", "| Apples | 3 |"];
+    const moved = moveTableColumn(aligned, 2, 0, 1)!;
+    expect(moved.lines).toEqual(["| Qty | Name |", "| --: | :-- |", "| 3 | Apples |"]);
+    expect(moved.cell).toBe(1);
+    expect(moveTableColumn(aligned, 2, 0, -1)).toBeNull(); // already first
+    expect(moveTableColumn(aligned, 2, 1, 1)).toBeNull(); // already last
+  });
+
+  it("works from the cursor and formats the table", () => {
+    const doc = table.join("\n");
+    const state = EditorState.create({ doc, selection: EditorSelection.cursor(doc.indexOf("3")) });
+    const next = applyCommand(state, alignColumn("right"));
+    expect(next.doc.toString()).toBe("| Name   | Qty |\n| ------ | --: |\n| Apples |   3 |");
+    const moved = applyCommand(next, moveColumn(-1));
+    expect(moved.doc.toString()).toBe("| Qty | Name   |\n| --: | ------ |\n|   3 | Apples |");
   });
 });

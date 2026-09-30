@@ -297,6 +297,34 @@ export function insertTableColumn(lines: string[], row: number, col: number, rig
 }
 
 /** Deletes column `col`; a table keeps at least one column. */
+/** Sets the alignment of column `col` (the divider row's colons). */
+export function alignTableColumn(lines: string[], row: number, col: number, align: "left" | "center" | "right"): TableEdit {
+  if (!isTable(lines)) return null;
+  const cols = columnCount(lines);
+  if (col >= cols) return null;
+  const divider = splitRow(lines[1]);
+  while (divider.length < cols) divider.push("---");
+  divider[col] = align === "left" ? ":--" : align === "center" ? ":-:" : "--:";
+  const next = [...lines];
+  next[1] = joinRow(indentOf(lines[1]), divider);
+  return { lines: next, row, cell: col };
+}
+
+/** Swaps column `col` with its neighbour to the left (-1) or right (+1), alignment included. */
+export function moveTableColumn(lines: string[], row: number, col: number, delta: -1 | 1): TableEdit {
+  if (!isTable(lines)) return null;
+  const cols = columnCount(lines);
+  const to = col + delta;
+  if (col >= cols || to < 0 || to >= cols) return null;
+  const next = lines.map((line, i) => {
+    const cells = splitRow(line);
+    while (cells.length < cols) cells.push(i === 1 ? "---" : "");
+    [cells[col], cells[to]] = [cells[to], cells[col]];
+    return joinRow(indentOf(line), cells);
+  });
+  return { lines: next, row, cell: to };
+}
+
 export function deleteTableColumn(lines: string[], row: number, col: number): TableEdit {
   if (!isTable(lines)) return null;
   const cols = columnCount(lines);
@@ -355,6 +383,9 @@ export const deleteRow = editTableAtCursor(deleteTableRow, "delete.tableRow");
 export const insertColumnLeft = editTableAtCursor((l, row, cell) => insertTableColumn(l, row, cell, false), "input.tableColumn");
 export const insertColumnRight = editTableAtCursor((l, row, cell) => insertTableColumn(l, row, cell, true), "input.tableColumn");
 export const deleteColumn = editTableAtCursor(deleteTableColumn, "delete.tableColumn");
+export const alignColumn = (align: "left" | "center" | "right") =>
+  editTableAtCursor((l, row, cell) => alignTableColumn(l, row, cell, align), "input.tableAlign");
+export const moveColumn = (delta: -1 | 1) => editTableAtCursor((l, row, cell) => moveTableColumn(l, row, cell, delta), "move.tableColumn");
 
 /** The text of cell `cell` in a formatted row ("| a   | b |"), as [start, end) offsets. */
 function cellTextRange(row: string, cell: number): [number, number] {

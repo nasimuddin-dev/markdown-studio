@@ -40,6 +40,8 @@ Colons in the delimiter row align a column:
 | Table: Insert Row Above / Below | | Adds an empty row next to the cursor's row (below the header when the cursor is in the header) and moves the cursor into it |
 | Table: Insert Column Left / Right | | Adds an empty column next to the cursor's column; the other columns keep their alignment |
 | Table: Delete Row / Delete Column | | Removes the cursor's body row or column. The header row, and a table's last column, can't be deleted |
+| Table: Align Column Left / Center / Right | | Sets the alignment of the cursor's column (the colons in the divider row) and aligns the table |
+| Table: Move Column Left / Right | | Swaps the cursor's column with its neighbour, alignment included |
 | Sort Table by Column (A to Z / Z to A) | | Sorts the body rows by the column the cursor is in, then formats the table |
 | Copy Table as CSV | | Copies the table at the cursor as CSV for a spreadsheet |
 

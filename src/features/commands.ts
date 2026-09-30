@@ -20,7 +20,7 @@ import type { StateCommand } from "@codemirror/state";
 import type { KeyBinding } from "@codemirror/view";
 import * as fmt from "./formatting";
 import {
-  deleteColumn, deleteRow, fixTableAtCursor, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
+  alignColumn, deleteColumn, deleteRow, fixTableAtCursor, moveColumn, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
 } from "./tables";
 import { fixAllProblemsCommand } from "./lintExtension";
 import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
@@ -94,6 +94,11 @@ export const formatCommands: Record<string, Command> = {
   tableColumnRight: formatCommand("tableColumnRight", "Table: Insert Column Right", insertColumnRight),
   tableDeleteRow: formatCommand("tableDeleteRow", "Table: Delete Row", deleteRow),
   tableDeleteColumn: formatCommand("tableDeleteColumn", "Table: Delete Column", deleteColumn),
+  tableAlignLeft: formatCommand("tableAlignLeft", "Table: Align Column Left", alignColumn("left")),
+  tableAlignCenter: formatCommand("tableAlignCenter", "Table: Align Column Center", alignColumn("center")),
+  tableAlignRight: formatCommand("tableAlignRight", "Table: Align Column Right", alignColumn("right")),
+  tableMoveColumnLeft: formatCommand("tableMoveColumnLeft", "Table: Move Column Left", moveColumn(-1)),
+  tableMoveColumnRight: formatCommand("tableMoveColumnRight", "Table: Move Column Right", moveColumn(1)),
   gitNextChange: formatCommand("gitNextChange", "Go to Next Change (Git)", nextChange, "Alt+F5"),
   gitPreviousChange: formatCommand("gitPreviousChange", "Go to Previous Change (Git)", previousChange, "Shift+Alt+F5"),
   gitShowChange: formatCommand("gitShowChange", "Show Change Since Last Commit", showChangeAtCursor),
