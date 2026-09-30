@@ -20,6 +20,14 @@ describe("fuzzy matching", () => {
     expect(fuzzyFilter(labels, "sa", (s) => s)[0].item).toBe("Save");
     expect(fuzzyFilter(labels, "ct", (s) => s)[0].item).toBe("Close Tab");
   });
+
+  it("ranks a whole word above the start of a longer one", () => {
+    const labels = ["Table: Delete Row", "Copy Table as CSV", "Close Tab", "Previous Tab"];
+    const ranked = fuzzyFilter(labels, "tab", (s) => s);
+    expect(ranked.slice(0, 2).map((r) => r.item)).toEqual(["Close Tab", "Previous Tab"]);
+    expect(ranked[0].match.indices).toEqual([6, 7, 8]);
+    expect(fuzzyFilter(labels, "table", (s) => s)[0].item).toBe("Table: Delete Row");
+  });
 });
 
 describe("command palette", () => {

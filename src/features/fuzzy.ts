@@ -24,6 +24,14 @@ export function fuzzyScore(query: string, text: string): { score: number; indice
     prev = found;
     ti = found + 1;
   }
+  // A whole word typed out ("tab" in "Close Tab") beats a prefix of a longer word ("Table").
+  const word = q.replace(/\s+/g, "");
+  const whole = new RegExp(`(^|[\\s\\-_/.:>])${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=$|[\\s\\-_/.:>])`).exec(t);
+  if (whole) {
+    score += 6;
+    const start = whole.index + whole[1].length;
+    indices.splice(0, indices.length, ...Array.from({ length: word.length }, (_, i) => start + i));
+  }
   // Prefer shorter labels when scores tie.
   score -= text.length * 0.01;
   return { score, indices };
