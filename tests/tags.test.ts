@@ -10,7 +10,7 @@ import { openPath } from "../src/features/documents";
 import { registerEditorView } from "../src/features/editorBridge";
 import { activeDoc } from "../src/stores/documentsStore";
 import { useUi } from "../src/stores/uiStore";
-import { collectFolderTags, extractTags, planTagRename, renameTag, tagAt } from "../src/features/tags";
+import { collectFolderTags, extractTags, planTagRename, renameTag, tagAt, tagLabel } from "../src/features/tags";
 import { setupBackend } from "./helpers";
 
 describe("extractTags", () => {
@@ -42,10 +42,11 @@ describe("collectFolderTags", () => {
     setupBackend({ "/ws/a.md": "#Idea and #idea\n\n#work", "/ws/b.md": "---\ntags: [idea]\n---\n", "/ws/c.txt": "#idea" });
     const tags = await collectFolderTags("/ws");
     expect(tags.get("idea")).toEqual([
-      { path: "/ws/a.md", line: 1, count: 2 },
-      { path: "/ws/b.md", line: 2, count: 1 },
+      { path: "/ws/a.md", line: 1, count: 2, tag: "Idea" },
+      { path: "/ws/b.md", line: 2, count: 1, tag: "idea" },
     ]);
-    expect(tags.get("work")).toEqual([{ path: "/ws/a.md", line: 3, count: 1 }]);
+    expect(tags.get("work")).toEqual([{ path: "/ws/a.md", line: 3, count: 1, tag: "work" }]);
+    expect(tagLabel(tags.get("idea")!)).toBe("Idea");
   });
 });
 
@@ -65,7 +66,7 @@ describe("tag completion", () => {
       from: 17,
       options: [
         ["#idea", "2 files"],
-        ["#work", "1 file"],
+        ["#Work", "1 file"],
         ["#local", "this document"],
       ],
     });

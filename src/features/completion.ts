@@ -8,7 +8,7 @@ import { activeDoc, useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { findLinkDefinitions, maskCode } from "./lint";
 import { extractHeadings } from "./outline";
-import { collectFolderTags, extractTags } from "./tags";
+import { collectFolderTags, extractTags, tagLabel, type FileTagUse } from "./tags";
 
 const CACHE_MS = 10_000;
 let cache: { root: string; at: number; files: Promise<string[]> } | null = null;
@@ -196,7 +196,7 @@ async function wikiHeadingCompletions(ctx: CompletionContext, start: number, typ
   return options.length ? { from: start + 2 + hash + 1, options, validFor: /^[^[\]|#\n]*$/ } : null;
 }
 
-let tagCache: { root: string; at: number; tags: Promise<Map<string, Array<{ path: string }>>> } | null = null;
+let tagCache: { root: string; at: number; tags: Promise<Map<string, FileTagUse[]>> } | null = null;
 
 /** True on the front matter's `tags:` line or one of its `- item` lines. */
 function inFrontMatterTags(state: EditorState, pos: number): boolean {
@@ -231,7 +231,7 @@ export async function tagCompletionSource(ctx: CompletionContext): Promise<Compl
     if (!tagCache || tagCache.root !== root || Date.now() - tagCache.at > CACHE_MS) tagCache = { root, at: Date.now(), tags: collectFolderTags(root) };
     const folder = await tagCache.tags;
     if (ctx.aborted) return null;
-    for (const [key, uses] of folder) counts.set(key, { label: key, files: uses.length });
+    for (const [key, uses] of folder) counts.set(key, { label: tagLabel(uses), files: uses.length });
   }
   // This document's tags as typed, minus the one being typed.
   const doc = ctx.state.doc.toString();

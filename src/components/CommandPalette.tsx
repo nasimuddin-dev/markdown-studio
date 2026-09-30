@@ -10,7 +10,7 @@ import { isMarkdownPath } from "../services/paths";
 import { openPath } from "../features/documents";
 import { requestReveal } from "../features/editorBridge";
 import { collectFolderHeadings, type FolderHeading } from "../features/workspace";
-import { collectFolderTags } from "../features/tags";
+import { collectFolderTags, tagLabel } from "../features/tags";
 import { recentCommands, rememberCommand } from "../features/recentCommands";
 import { extractHeadings } from "../features/outline";
 import { goToHeading } from "./Outline";
@@ -111,7 +111,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         .flatMap(([tag, uses]) =>
           uses.map((u, i) => ({
             id: `tag:${tag}:${i}`,
-            label: `#${tag}`,
+            label: `#${tagLabel(uses)}`,
             hint: `${relativePath(u.path, root ?? "")}${u.count > 1 ? ` · ${u.count}` : ""}`,
             run: () => void openPath(u.path).then((id) => id && requestReveal(id, u.line, 0, 0)),
           })),

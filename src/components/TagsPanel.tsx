@@ -4,7 +4,7 @@ import { basename } from "../services/paths";
 import { openPath } from "../features/documents";
 import { openFolderDialog } from "../features/workspace";
 import { requestReveal } from "../features/editorBridge";
-import { collectFolderTags } from "../features/tags";
+import { collectFolderTags, tagLabel } from "../features/tags";
 import { Icon } from "./Icon";
 
 type FolderTags = Awaited<ReturnType<typeof collectFolderTags>>;
@@ -62,7 +62,7 @@ export function TagsPanel() {
             <li key={tag}>
               <button className="search-file" aria-expanded={!!open[tag]} onClick={() => setOpen((o) => ({ ...o, [tag]: !o[tag] }))}>
                 <Icon name={open[tag] ? "chevronDown" : "chevronRight"} size={14} />
-                <span className="search-file-name">#{tag}</span>
+                <span className="search-file-name">#{tagLabel(uses)}</span>
                 <span className="badge" title={`${uses.length} ${uses.length === 1 ? "file" : "files"}`}>{uses.length}</span>
               </button>
               {open[tag] && (

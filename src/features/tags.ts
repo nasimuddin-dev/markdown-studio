@@ -51,20 +51,35 @@ export function extractTags(text: string): TagUse[] {
   return out;
 }
 
-/** Tags across the folder's Markdown files (open tabs as edited): tag → the files and first line using it. */
-export async function collectFolderTags(root: string): Promise<Map<string, Array<{ path: string; line: number; count: number }>>> {
+/** One file's use of a tag: the first line using it, how many times, and the tag as written there. */
+export interface FileTagUse {
+  path: string;
+  line: number;
+  count: number;
+  tag: string;
+}
+
+/** The most common way a tag is written in the folder (the first one on a tie). */
+export const tagLabel = (uses: FileTagUse[]): string => {
+  const votes = new Map<string, number>();
+  for (const u of uses) votes.set(u.tag, (votes.get(u.tag) ?? 0) + u.count);
+  return [...votes].reduce((best, v) => (v[1] > best[1] ? v : best))[0];
+};
+
+/** Tags across the folder's Markdown files (open tabs as edited): lower-case tag → the files and first line using it. */
+export async function collectFolderTags(root: string): Promise<Map<string, FileTagUse[]>> {
   const b = backend();
   const paths = (await b.listWorkspaceFiles(root).catch(() => [] as string[])).filter(isMarkdownPath);
   const open = new Map(useDocuments.getState().docs.filter((d) => d.path).map((d) => [d.path!, d.content]));
-  const byTag = new Map<string, Array<{ path: string; line: number; count: number }>>();
+  const byTag = new Map<string, FileTagUse[]>();
   for (const path of paths) {
     const text = open.get(path) ?? (await b.readTextFile(path).then((f) => f.content, () => ""));
-    const seen = new Map<string, { path: string; line: number; count: number }>();
+    const seen = new Map<string, FileTagUse>();
     for (const { tag, line } of extractTags(text)) {
       const key = tag.toLowerCase();
       const hit = seen.get(key);
       if (hit) hit.count++;
-      else seen.set(key, { path, line, count: 1 });
+      else seen.set(key, { path, line, count: 1, tag });
     }
     for (const [key, hit] of seen) byTag.set(key, [...(byTag.get(key) ?? []), hit]);
   }
