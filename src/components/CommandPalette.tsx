@@ -8,13 +8,16 @@ import { useWorkspace } from "../stores/workspaceStore";
 import { backend } from "../services";
 import { isMarkdownPath } from "../services/paths";
 import { openPath } from "../features/documents";
+import { extractHeadings } from "../features/outline";
+import { goToHeading } from "./Outline";
 
-type PaletteMode = "commands" | "templates" | "files";
+type PaletteMode = "commands" | "templates" | "files" | "headings";
 
 const LABELS: Record<PaletteMode, { dialog: string; placeholder: string; list: string; empty: string }> = {
   commands: { dialog: "Command palette", placeholder: "Type a command or tab name…", list: "Commands", empty: "No matching commands" },
   templates: { dialog: "New from template", placeholder: "Choose a template…", list: "Templates", empty: "No matching templates" },
   files: { dialog: "Go to file", placeholder: "Type part of a file name or path…", list: "Files", empty: "No matching files" },
+  headings: { dialog: "Go to heading", placeholder: "Type part of a heading…", list: "Headings", empty: "No matching headings" },
 };
 
 /** A path relative to the folder, with forward slashes. */
@@ -27,6 +30,8 @@ interface PaletteItem {
   label: string;
   hint?: string;
   shortcut?: string;
+  /** Heading level - 1, for Go to Heading. */
+  indent?: number;
   run(): void | Promise<void>;
 }
 
@@ -67,6 +72,16 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
     if (mode === "templates") {
       return (templates ?? []).map((t) => ({ id: `tpl:${t.id}`, label: t.name, hint: t.description, run: () => void newFromTemplate(t) }));
     }
+    if (mode === "headings") {
+      const content = docs.find((d) => d.id === useDocuments.getState().activeId)?.content ?? "";
+      return extractHeadings(content).map((h, index) => ({
+        id: `heading:${index}`,
+        label: h.text,
+        hint: `H${h.level} · line ${h.line}`,
+        indent: h.level - 1,
+        run: () => goToHeading(h, index),
+      }));
+    }
     if (mode === "files") {
       // Open files first, then the rest in folder order; matching uses the relative path.
       const open = new Set(docs.map((d) => d.path));
@@ -90,7 +105,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
     return [...cmdItems, ...tabItems];
   }, [docs, mode, templates, files, root]);
 
-  const results = useMemo(() => fuzzyFilter(items, query, (i) => i.label).slice(0, 50), [items, query]);
+  const results = useMemo(() => fuzzyFilter(items, query, (i) => i.label).slice(0, mode === "headings" ? 1000 : 50), [items, query, mode]);
 
   useEffect(() => {
     input.current?.focus();
@@ -136,7 +151,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
           }}
         />
         <ul className="palette-list" id="palette-list" role="listbox" ref={list} aria-label={LABELS[mode].list}>
-          {results.length === 0 && (mode === "commands" || (mode === "templates" ? templates !== null : files !== null)) && (
+          {results.length === 0 && (mode === "commands" || mode === "headings" || (mode === "templates" ? templates !== null : files !== null)) && (
             <li className="palette-empty">{LABELS[mode].empty}</li>
           )}
           {results.map(({ item, match }, i) => (
@@ -150,7 +165,9 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
               onPointerMove={() => setActive(i)}
               onClick={() => runItem(item)}
             >
-              <span className="palette-label">{highlight(item.label, match.indices)}</span>
+              <span className="palette-label" style={item.indent && !query ? { paddingLeft: `${item.indent}em` } : undefined}>
+                {highlight(item.label, match.indices)}
+              </span>
               {item.hint && <span className="palette-hint">{item.hint}</span>}
               {item.shortcut && <kbd>{formatShortcut(item.shortcut)}</kbd>}
             </li>

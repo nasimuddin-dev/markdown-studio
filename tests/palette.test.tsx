@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { fuzzyFilter, fuzzyScore } from "../src/features/fuzzy";
@@ -50,5 +50,28 @@ describe("command palette", () => {
     expect(screen.getByText("No matching commands")).toBeInTheDocument();
     await userEvent.keyboard("{Escape}");
     expect(useUi.getState().paletteOpen).toBe(false);
+  });
+});
+
+describe("go to heading", () => {
+  it("lists the document's headings and jumps to the chosen one", async () => {
+    const { openPath } = await import("../src/features/documents");
+    const editorBridge = await import("../src/features/editorBridge");
+    setupBackend({ "/ws/a.md": "# Title\n\n## Install\n\ntext\n\n### Windows\n\n## Usage\n" });
+    useSettings.setState((s) => ({ settings: { ...s.settings, viewMode: "editor" } }));
+    await openPath("/ws/a.md");
+    const revealed: number[] = [];
+    const spy = vi.spyOn(editorBridge, "revealLine").mockImplementation((line) => void revealed.push(line));
+    render(<CommandPalette />);
+    act(() => useUi.getState().openHeadingPicker());
+    expect(screen.getByRole("dialog", { name: "Go to heading" })).toBeInTheDocument();
+    expect(screen.getAllByRole("option").map((o) => o.textContent)).toEqual([
+      "TitleH1 · line 1", "InstallH2 · line 3", "WindowsH3 · line 7", "UsageH2 · line 9",
+    ]);
+    await userEvent.type(screen.getByRole("combobox"), "win");
+    await userEvent.keyboard("{Enter}");
+    await new Promise((r) => setTimeout(r, 0));
+    expect(revealed).toEqual([7]);
+    spy.mockRestore();
   });
 });

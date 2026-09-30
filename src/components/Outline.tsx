@@ -17,6 +17,13 @@ function revealInPreview(index: number) {
   headings[index]?.scrollIntoView({ block: "start" });
 }
 
+/** Shows the n-th heading (at line `h.line`) in the editor and the preview, as the view mode allows. */
+export function goToHeading(h: Heading, index: number) {
+  const viewMode = useSettings.getState().settings.viewMode;
+  if (viewMode !== "preview") revealLine(h.line);
+  if (viewMode !== "editor") revealInPreview(index);
+}
+
 /** Document outline: navigable list of headings for the active document. */
 export function Outline() {
   const docId = useDocuments((s) => s.activeId);
@@ -111,11 +118,7 @@ export function Outline() {
     list.current?.querySelector(".outline-item.current")?.scrollIntoView({ block: "nearest" });
   }, [current]);
 
-  const go = (h: Heading, index: number) => {
-    const viewMode = useSettings.getState().settings.viewMode;
-    if (viewMode !== "preview") revealLine(h.line);
-    if (viewMode !== "editor") revealInPreview(index);
-  };
+  const go = goToHeading;
 
   return (
     <section className={`sidebar-section outline${collapsed ? " collapsed" : ""}`} aria-label="Outline">
