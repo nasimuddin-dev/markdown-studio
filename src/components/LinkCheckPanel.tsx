@@ -77,29 +77,8 @@ export function LinkCheckPanel() {
           </button>
         </div>
       </div>
-      <div className="search-summary" role="status" aria-live="polite">
-        {error ? (
-          <span className="search-error">{error}</span>
-        ) : progress ? (
-          progress
-        ) : report ? (
-          total === 0 ? (
-            `No broken links in ${report.filesChecked} file${report.filesChecked === 1 ? "" : "s"} (${report.linksChecked} link${report.linksChecked === 1 ? "" : "s"} checked).`
-          ) : (
-            `${total} problem${total === 1 ? "" : "s"} in ${report.files.length} file${report.files.length === 1 ? "" : "s"}`
-          )
-        ) : (
-          ""
-        )}
-      </div>
-      {unsaved && !progress && (
-        <div className="search-summary">
-          Checks the saved files.{" "}
-          <button className="text-link" onClick={() => void saveAll().then(check)}>Save all and check again</button>
-        </div>
-      )}
       {showIncoming && (
-        <ul className="search-results" aria-label="Links to this document">
+        <ul className="search-results incoming-links" aria-label="Links to this document">
           <li>
             <button className="search-file" title={active!} aria-expanded={incomingOpen} onClick={() => setIncomingOpen(!incomingOpen)}>
               <Icon name={incomingOpen ? "chevronDown" : "chevronRight"} size={14} />
@@ -126,6 +105,27 @@ export function LinkCheckPanel() {
               ))}
           </li>
         </ul>
+      )}
+      <div className="search-summary" role="status" aria-live="polite">
+        {error ? (
+          <span className="search-error">{error}</span>
+        ) : progress ? (
+          progress
+        ) : report ? (
+          total === 0 ? (
+            `No broken links in ${report.filesChecked} file${report.filesChecked === 1 ? "" : "s"} (${report.linksChecked} link${report.linksChecked === 1 ? "" : "s"} checked).`
+          ) : (
+            `${total} problem${total === 1 ? "" : "s"} in ${report.files.length} file${report.files.length === 1 ? "" : "s"}`
+          )
+        ) : (
+          ""
+        )}
+      </div>
+      {unsaved && !progress && (
+        <div className="search-summary">
+          Checks the saved files.{" "}
+          <button className="text-link" onClick={() => void saveAll().then(check)}>Save all and check again</button>
+        </div>
       )}
       {report && total > 0 && (
         <ul className="search-results" aria-label="Link problems">

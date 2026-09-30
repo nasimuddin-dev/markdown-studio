@@ -775,6 +775,12 @@ select {
   text-decoration: underline;
 }
 
+.search-results.incoming-links {
+  flex: none;
+  max-height: 40%;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
 .incoming-file {
   font-weight: 600;
 }
