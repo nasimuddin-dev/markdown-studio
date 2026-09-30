@@ -76,6 +76,22 @@ const wrapping = new Compartment();
 const tabs = new Compartment();
 const linting = new Compartment();
 const spelling = new Compartment();
+/** Labels for CodeMirror's find/replace, go-to-line and lint panels, in the app's capitalization. */
+const PHRASES: Record<string, string> = {
+  next: "Next",
+  previous: "Previous",
+  all: "Select All",
+  "match case": "Match case",
+  "by word": "Whole word",
+  regexp: "Regex",
+  replace: "Replace",
+  "replace all": "Replace All",
+  close: "Close",
+  "Go to line": "Go to line",
+  go: "Go",
+  Diagnostics: "Problems",
+  "No diagnostics": "No problems",
+};
 const locking = new Compartment();
 /** Marks changes that come from outside the editor (reload from disk), which a read-only document still takes. */
 const externalSync = Annotation.define<boolean>();
@@ -144,6 +160,7 @@ export function Editor() {
         syntaxHighlighting(markdownHighlight),
         placeholder("Start writing Markdown…"),
         EditorView.contentAttributes.of({ "aria-label": "Markdown editor" }),
+        EditorState.phrases.of(PHRASES),
         spelling.of(spellAttr(s.spellCheck)),
         locking.of(lockExt(isLocked(docId))),
         // Pasted or dropped images are saved to assets/ and linked.

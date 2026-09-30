@@ -7,19 +7,19 @@ description: Find and replace text in a Markdown document, with match case, whol
 
 ## Find in the document
 
-Press **Ctrl+F** (**Cmd+F** on macOS) to open the search bar at the top of the editor. Matches are highlighted, and **Enter** / **Shift+Enter** move to the next or previous one.
+Press **Ctrl+F** (**Cmd+F** on macOS) to open the search bar at the top of the editor. Matches are highlighted; **Enter** / **Shift+Enter** (or **Next** and **Previous**) move to the next or previous one, and **Select All** selects every match for editing them together.
 
 The search bar has three options:
 
-- **match case**: `Readme` doesn't match `README`.
-- **by word**: finds whole words only.
-- **regexp**: treats the search as a regular expression, for example `^## ` for level-2 headings or `\bTODO\b`.
+- **Match case**: `Readme` doesn't match `README`.
+- **Whole word**: finds whole words only.
+- **Regex**: treats the search as a regular expression, for example `^## ` for level-2 headings or `\bTODO\b`.
 
 Press **Esc** to close it.
 
 ## Replace
 
-Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the replace field. **replace** replaces the current match, and **replace all** replaces every match. With **regexp** on, the replacement can use groups such as `$1`. A replacement can be undone with **Ctrl+Z**.
+Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the replace field. **Replace** replaces the current match, and **Replace All** replaces every match. With **Regex** on, the replacement can use groups such as `$1`. A replacement can be undone with **Ctrl+Z**.
 
 ## Go to line
 

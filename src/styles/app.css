@@ -890,6 +890,19 @@ select {
 }
 .editor-host .cm-panel input[type="checkbox"] {
   accent-color: var(--accent);
+  margin: 0 4px 0 0;
+  vertical-align: -2px;
+}
+.editor-host .cm-panel.cm-search label {
+  margin-left: 10px;
+  white-space: nowrap;
+}
+.editor-host .cm-panel.cm-search .cm-button,
+.editor-host .cm-panel.cm-search .cm-textfield {
+  margin: 2px 4px 2px 0;
+}
+.editor-host .cm-button:hover {
+  background: var(--bg-hover);
 }
 .editor-host .cm-textfield {
   padding: 4px 7px;
