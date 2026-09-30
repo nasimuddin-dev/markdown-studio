@@ -35,6 +35,7 @@ export const LINT_RULES: Record<string, string> = {
   "list-space": "List items without a space",
   "emphasis-space": "Bold with spaces inside",
   "destination-spaces": "Paths with spaces",
+  "front-matter": "Front matter without its closing ---",
 };
 
 /**
@@ -262,6 +263,7 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
     ...lintHeadingSyntax(text, starts),
     ...lintListsAndEmphasis(text, starts),
     ...lintSpacesInDestinations(text),
+    ...lintFrontMatter(text),
   );
   return problems.sort((a, b) => a.from - b.from);
 }
@@ -562,6 +564,30 @@ function lintFootnotes(text: string): MarkdownProblem[] {
     if (!used.has(id)) out.push({ ...at, severity: "info", rule: "footnote", message: `Footnote [^${id}] is defined but never referenced.` });
   }
   return out;
+}
+
+/**
+ * Front matter that's never closed: the document starts with `---` and
+ * `key: value` lines but no closing `---`, so it shows as a rule and text.
+ * The fix adds the closing line after the properties.
+ */
+function lintFrontMatter(text: string): MarkdownProblem[] {
+  const lines = text.split("\n");
+  if (!/^---[ \t]*$/.test(lines[0] ?? "") || !/^[\w-]+:(\s|$)/.test(lines[1] ?? "")) return [];
+  if (lines.slice(1).some((l) => /^(---|\.\.\.)[ \t]*$/.test(l))) return [];
+  let last = 1;
+  while (last + 1 < lines.length && /^([\w-]+:(\s|$)|[ \t]+\S|- )/.test(lines[last + 1])) last++;
+  const end = lines.slice(0, last + 1).join("\n").length;
+  return [
+    {
+      from: 0,
+      to: 3,
+      severity: "warning",
+      rule: "front-matter",
+      message: "The front matter has no closing ---, so it shows as a line and text. Add --- after its last property.",
+      fix: { label: "Close Front Matter", edits: [{ at: end, insert: "\n---" }] },
+    },
+  ];
 }
 
 /** How reference labels match: case-insensitive, with runs of whitespace as one space. */

@@ -41,7 +41,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `pageBreakBeforeH1` | `false` | PDF, Word and printing: each top-level heading after the first starts a new page |
 | `askImageName` | `false` | Ask for a file name when pasting a screenshot, instead of a timestamped name |
 | `imageFolder` | `"assets"` | Folder next to the document for pasted, dropped and inserted images: one name, without `/`, `\` or other characters not allowed in file names |
-| `lintDisabledRules` | `[]` | Lint checks that are turned off, by id: `broken-link`, `missing-image`, `broken-anchor`, `empty-link`, `duplicate-heading`, `multiple-h1`, `heading-increment`, `image-alt`, `link-text`, `table-columns`, `footnote`, `reference`, `heading-space`, `setext-heading`, `list-space`, `emphasis-space`, `destination-spaces` |
+| `lintDisabledRules` | `[]` | Lint checks that are turned off, by id: `broken-link`, `missing-image`, `broken-anchor`, `empty-link`, `duplicate-heading`, `multiple-h1`, `heading-increment`, `image-alt`, `link-text`, `table-columns`, `footnote`, `reference`, `front-matter`, `heading-space`, `setext-heading`, `list-space`, `emphasis-space`, `destination-spaces` |
 | `pasteRichTextAsMarkdown` | `true` | |
 | `previewDebounceMs` | `150` | 0–1000 |
 | `renderMath` | `true` | |

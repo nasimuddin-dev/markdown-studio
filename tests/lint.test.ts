@@ -237,6 +237,14 @@ describe("markdown lint: tables, footnotes and link text", () => {
     expect(only("[![badge][b]](https://example.com)\n\n[b]: b.svg", "reference")).toEqual([]);
   });
 
+  it("flags front matter without its closing --- and adds it", () => {
+    const text = "---\ntitle: Notes\ntags:\n  - a\n\n# Notes\n";
+    expect(only(text, "front-matter")).toHaveLength(1);
+    expect(fixAllProblems(text).text).toBe("---\ntitle: Notes\ntags:\n  - a\n---\n\n# Notes\n");
+    expect(only("---\ntitle: A\n---\n# A", "front-matter")).toEqual([]);
+    expect(only("---\n\nA rule, then text.", "front-matter")).toEqual([]);
+  });
+
   it("flags a link label defined twice", () => {
     expect(only("[a][x]\n\n[x]: one.md\n[X]: two.md", "reference").map((p) => p.message)).toEqual(["Link definition [X] is defined again; links use the one on line 3."]);
   });
