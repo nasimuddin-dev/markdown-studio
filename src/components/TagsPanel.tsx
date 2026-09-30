@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
+import { useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { basename } from "../services/paths";
 import { openPath } from "../features/documents";
@@ -27,6 +29,18 @@ export function TagsPanel() {
     setTags(null);
     void load();
   }, [load]);
+
+  // Saving a document (or reloading one changed on disk) refreshes the list shortly after.
+  const saved = useDocuments(useShallow((s) => s.docs.map((d) => d.savedContent)));
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    const timer = setTimeout(() => void load(), 400);
+    return () => clearTimeout(timer);
+  }, [saved, load]);
 
   if (!root) {
     return (

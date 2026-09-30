@@ -1062,6 +1062,11 @@ test("the Tags tab lists the folder's tags and opens a file at its tag", async (
   await tag.click();
   await panel.getByRole("button", { name: /README\.md/ }).click();
   await expect(page.locator(".cm-activeLine")).toHaveText("See #giraffe-facts");
+  // Saving a new tag adds it to the list.
+  await page.keyboard.press("End");
+  await page.keyboard.type(" #okapi");
+  await page.keyboard.press(`${mod}+S`);
+  await expect(panel.getByRole("button", { name: /#okapi/ })).toBeVisible();
 });
 
 test("File History marks the words that changed within a line", async ({ page }) => {
