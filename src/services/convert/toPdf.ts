@@ -71,6 +71,9 @@ function headingAnchors(tree: Root): Set<string> {
 
 class PdfBuilder {
   private headingIds: Array<{ depth: number; id: string }> = [];
+  /** Set from ExportOptions.pageBreakBeforeH1; counts the H1s seen so far. */
+  breakBeforeH1 = false;
+  private h1Count = 0;
   /** Gives headings the same anchors as the preview, so `#anchor` links can jump to them. */
   private slugger = new GithubSlugger();
   /** Anchors of the document's headings, for links within the document. */
@@ -220,6 +223,7 @@ class PdfBuilder {
             outline: true,
             outlineText: plain(node),
             ...(parent ? { outlineParentId: parent } : {}),
+            ...(this.breakBeforeH1 && node.depth === 1 && this.h1Count++ > 0 ? { pageBreak: "before" } : {}),
           } as Content,
         ];
       }
@@ -336,6 +340,7 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
   const tree = parser.parse(stripFrontMatter(markdown)) as Root;
   const page = PAGE_POINTS[opts.pageSize ?? "a4"];
   const builder = new PdfBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, opts.renderMath, page.width - 2 * SIDE_MARGIN);
+  builder.breakBeforeH1 = !!opts.pageBreakBeforeH1;
   builder.anchors = headingAnchors(tree);
   const content: Content[] = [];
   for (const node of tree.children) content.push(...(await builder.block(node)));

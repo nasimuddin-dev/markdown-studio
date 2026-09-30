@@ -1298,17 +1298,25 @@ test("F6 and Shift+F6 move focus between the sidebar, editor and preview", async
   await start(page);
   await openDemoFolder(page);
   await openFile(page, "README.md");
-  const editor = page.getByRole("textbox", { name: "Markdown editor" });
-  const preview = page.getByRole("document", { name: "Markdown preview" });
-  await editor.click();
+  // Which pane has focus, from document.activeElement (toBeFocused also needs the window to be
+  // focused, which tests running side by side take from each other).
+  const focused = () =>
+    page.evaluate(() => {
+      const el = document.activeElement;
+      return el?.closest(".cm-editor") ? "editor" : el?.closest(".preview") ? "preview" : el?.closest(".tree-row") ? `tree:${el.textContent}` : el?.tagName;
+    });
+  // The preview is loaded on demand; until then its placeholder can't take focus.
+  await expect(page.locator(".preview[tabindex] h1")).toBeVisible();
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await expect.poll(focused).toBe("editor");
   await page.keyboard.press("F6");
-  await expect(preview).toBeFocused();
+  await expect.poll(focused).toBe("preview");
   await page.keyboard.press("F6");
-  await expect(page.locator(".tree-row", { hasText: /^README\.md$/ })).toBeFocused();
+  await expect.poll(focused).toBe("tree:README.md");
   await page.keyboard.press("F6");
-  await expect(editor).toBeFocused();
+  await expect.poll(focused).toBe("editor");
   await page.keyboard.press("Shift+F6");
-  await expect(page.locator(".tree-row", { hasText: /^README\.md$/ })).toBeFocused();
+  await expect.poll(focused).toBe("tree:README.md");
 });
 
 test("clicking a picture in the preview opens it at full size", async ({ page }) => {

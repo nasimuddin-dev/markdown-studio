@@ -64,6 +64,7 @@ Existing files always keep their own line endings. Untitled documents are never 
 | Setting | Options | Default |
 | --- | --- | --- |
 | Page size for PDF and Word | Automatic, A4 (210 × 297 mm), Letter (8.5 × 11 in) | Automatic |
+| Start each top-level heading on a new page (PDF, Word and printing) | | Off |
 
 **Automatic** uses Letter when your system language names a region that uses Letter paper (for example English (United States), French (Canada) or Spanish (Mexico)), and A4 otherwise. Print → Save as PDF uses the paper size you choose in the print dialog.
 

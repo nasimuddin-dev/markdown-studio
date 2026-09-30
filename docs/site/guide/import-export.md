@@ -58,7 +58,7 @@ Export commands are in the **File** menu. You choose where to save the file.
 | Clipboard | Copy as HTML | The HTML source, for pasting into a CMS or an HTML file |
 | Printer or PDF | Print / Save as PDF… (Ctrl+P) | The preview, printed with your system's print dialog. On Windows each page gets the document's title at the top and "page / pages" at the bottom (macOS and Linux print without them) |
 
-PDF and Word exports use A4 or Letter paper: automatically from your system's region, or the size you choose in [Settings → Export](/guide/settings#export).
+PDF and Word exports use A4 or Letter paper: automatically from your system's region, or the size you choose in [Settings → Export](/guide/settings#export). There you can also have each top-level heading (`#`) after the first start a new page, in PDF and Word exports and when printing, which suits reports and manuals.
 
 The document's front matter isn't exported; its `title` becomes the exported document's title, and `author`, `description` and `keywords` its document properties (see [Front matter](/markdown/extras#front-matter)).
 

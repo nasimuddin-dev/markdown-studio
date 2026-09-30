@@ -118,6 +118,8 @@ export interface Settings {
   exportPageSize: "auto" | "a4" | "letter";
   /** Extra CSS for rendered documents (preview, print, slides, HTML export), scoped to the document. */
   customCss: string;
+  /** PDF, Word and printing: each top-level heading after the first starts a new page. */
+  pageBreakBeforeH1: boolean;
   /** Folder (one name, next to the document) for pasted, dropped and inserted images. */
   imageFolder: string;
   /** The optional AI assistant (off until turned on and given an API key). */

@@ -6,7 +6,8 @@ const PANES: Array<{ area: string; targets: string[] }> = [
   // The selected Explorer row, else the first Outline heading, else the selected sidebar tab.
   { area: ".sidebar", targets: [".tree-row[tabindex='0']", ".sidebar-pane [tabindex='0']", ".outline-item", ".sidebar [role='tab'][aria-selected='true']"] },
   { area: ".cm-editor", targets: [".cm-content"] },
-  { area: ".preview", targets: [".preview"] },
+  // Not the placeholder shown while the preview loads, which can't take focus.
+  { area: ".preview", targets: [".preview[tabindex]"] },
 ];
 
 const shown = (el: Element | null): el is HTMLElement => !!el && el instanceof HTMLElement && el.getClientRects().length > 0;

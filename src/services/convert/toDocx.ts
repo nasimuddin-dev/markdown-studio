@@ -38,6 +38,8 @@ export interface ExportOptions {
   renderMath?: DiagramRenderer;
   /** Paper size for PDF and Word (default A4). */
   pageSize?: PageSize;
+  /** Start each top-level heading after the first on a new page. */
+  pageBreakBeforeH1?: boolean;
   /** Document properties (from the front matter). */
   author?: string;
   description?: string;
@@ -124,6 +126,9 @@ function headingBookmarks(tree: Root): { names: string[]; byAnchor: Map<string, 
 class DocxBuilder {
   private listInstance = 0;
   private headingIndex = 0;
+  /** Set from ExportOptions.pageBreakBeforeH1; counts the H1s seen so far. */
+  breakBeforeH1 = false;
+  private h1Count = 0;
   constructor(
     private loadImage?: DocxImageLoader,
     private footnotes?: Footnotes,
@@ -280,7 +285,8 @@ class DocxBuilder {
       case "heading": {
         const name = this.bookmarks.names[this.headingIndex++];
         const children = await this.inline(node.children);
-        return [new Paragraph({ heading: HEADINGS[node.depth - 1], children: name ? [new Bookmark({ id: name, children })] : children })];
+        const pageBreakBefore = this.breakBeforeH1 && node.depth === 1 && this.h1Count++ > 0;
+        return [new Paragraph({ heading: HEADINGS[node.depth - 1], pageBreakBefore, children: name ? [new Bookmark({ id: name, children })] : children })];
       }
       case "paragraph":
         return [await this.paragraph(node.children, { indent, spacing: { after: 120 } })];
@@ -384,6 +390,7 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
   // runSync applies transforms such as emoji shortcodes; parse alone only builds the tree.
   const tree = parser.runSync(parser.parse(stripFrontMatter(markdown))) as Root;
   const builder = new DocxBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, headingBookmarks(tree));
+  builder.breakBeforeH1 = !!opts.pageBreakBeforeH1;
   const children: Array<Paragraph | Table> = [];
   for (const node of tree.children) children.push(...(await builder.block(node)));
   const footnotes = await builder.footnoteContent();

@@ -243,3 +243,12 @@ describe("Word export: running title", () => {
     expect(await plain.file("word/document.xml")!.async("string")).not.toContain("<w:titlePg/>");
   });
 });
+
+describe("Word export: a new page for each top-level heading", () => {
+  it("marks every H1 after the first to start a new page when asked", async () => {
+    const md = "# One\n\nText.\n\n## Sub\n\n# Two\n\n# Three\n";
+    const xml = async (pageBreakBeforeH1: boolean) => documentXml(await markdownToDocx(md, { loadImage: makeImageLoader(null, async () => ""), pageBreakBeforeH1 }));
+    expect((await xml(false)).match(/<w:pageBreakBefore/g)).toBeNull();
+    expect((await xml(true)).match(/<w:pageBreakBefore/g)).toHaveLength(2);
+  });
+});

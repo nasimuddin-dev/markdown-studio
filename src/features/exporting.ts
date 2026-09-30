@@ -74,6 +74,7 @@ async function exportAsDocx(src: ExportSource) {
       renderDiagram: await diagramRenderer(src.content),
       math: features().math,
       pageSize: pageSize(),
+      pageBreakBeforeH1: useSettings.getState().settings.pageBreakBeforeH1,
       ...frontMatterMetadata(src.content),
       renderMath: await mathRenderer(src.content),
     });
@@ -118,6 +119,7 @@ async function exportAsPdf(src: ExportSource, onPrint?: () => Promise<void>) {
       renderDiagram: await diagramRenderer(src.content),
       math: features().math,
       pageSize: pageSize(),
+      pageBreakBeforeH1: useSettings.getState().settings.pageBreakBeforeH1,
       ...frontMatterMetadata(src.content),
       renderMath: await mathRenderer(src.content),
     });
@@ -239,7 +241,8 @@ export async function printActive() {
   try {
     const html = await renderHtml(doc.content, doc.path, loadImage, features());
     const { documentTitle } = await import("../services/exportHtml");
-    await printHtml(`<article class="markdown-body">${html}</article>`, printPageStyle(documentTitle(doc.content, doc.name)));
+    const breaks = useSettings.getState().settings.pageBreakBeforeH1 ? ".markdown-body > h1 ~ h1 { break-before: page; }" : "";
+    await printHtml(`<article class="markdown-body">${html}</article>`, printPageStyle(documentTitle(doc.content, doc.name)) + breaks);
   } catch (e) {
     notify("error", describeError(e, "print the document"));
   }

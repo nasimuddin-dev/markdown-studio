@@ -239,3 +239,13 @@ describe("PDF export: links within the document", () => {
     expect(raw).toContain("h-install");
   });
 });
+
+describe("PDF export: a new page for each top-level heading", () => {
+  it("breaks before every H1 after the first when asked", async () => {
+    const lib = await pdfjs();
+    const md = "# One\n\nText.\n\n## Sub\n\nMore.\n\n# Two\n\nText.\n\n# Three\n\nText.\n";
+    const pages = async (pageBreakBeforeH1: boolean) => (await lib.getDocument({ data: new Uint8Array(await markdownToPdf(md, { pageBreakBeforeH1 })) }).promise).numPages;
+    expect(await pages(false)).toBe(1);
+    expect(await pages(true)).toBe(3);
+  }, 30_000);
+});

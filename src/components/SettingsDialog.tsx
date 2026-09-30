@@ -168,6 +168,7 @@ export function SettingsDialog() {
             <option value="a4">A4 (210 × 297 mm)</option>
             <option value="letter">Letter (8.5 × 11 in)</option>
           </select>
+          <label className="check"><input type="checkbox" checked={settings.pageBreakBeforeH1} disabled={isLocked("pageBreakBeforeH1")} onChange={(e) => update({ pageBreakBeforeH1: e.target.checked })} /> Start each top-level heading on a new page (PDF, Word and printing)</label>
         </section>
 
         <AiSettings />
