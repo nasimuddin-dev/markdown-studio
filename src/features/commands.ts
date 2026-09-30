@@ -20,6 +20,7 @@ import * as fmt from "./formatting";
 import {
   deleteColumn, deleteRow, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
 } from "./tables";
+import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
 import { insertOrUpdateToc } from "./toc";
 import { moveSectionDown, moveSectionUp } from "./sections";
 
@@ -77,6 +78,10 @@ export const formatCommands: Record<string, Command> = {
   tableColumnRight: formatCommand("tableColumnRight", "Table: Insert Column Right", insertColumnRight),
   tableDeleteRow: formatCommand("tableDeleteRow", "Table: Delete Row", deleteRow),
   tableDeleteColumn: formatCommand("tableDeleteColumn", "Table: Delete Column", deleteColumn),
+  gitNextChange: formatCommand("gitNextChange", "Go to Next Change (Git)", nextChange, "Alt+F5"),
+  gitPreviousChange: formatCommand("gitPreviousChange", "Go to Previous Change (Git)", previousChange, "Shift+Alt+F5"),
+  gitShowChange: formatCommand("gitShowChange", "Show Change Since Last Commit", showChangeAtCursor),
+  gitRevertChange: formatCommand("gitRevertChange", "Revert Change to Last Commit", revertChangeAtCursor),
   toc: formatCommand("toc", "Insert / Update Table of Contents", insertOrUpdateToc),
   horizontalRule: formatCommand("horizontalRule", "Horizontal Rule", fmt.insertHorizontalRule),
 };

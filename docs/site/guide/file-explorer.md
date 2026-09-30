@@ -77,7 +77,12 @@ When the open folder is in a Git repository, the Explorer marks changed files wi
 
 ### Changed lines in the editor
 
-For a file that's committed to Git, the editor shows a thin bar next to the lines you've changed since the last commit, as code editors do: **green** for added lines, **amber** for changed lines, and a small **red** triangle where lines were deleted. Hover over a bar to see what it means. The bars update as you type and after you commit (when you come back to the window). Untracked files and documents over 1 MB have no bars. In Windows High Contrast, added lines get a solid bar and changed lines a dashed one.
+For a file that's committed to Git, the editor shows a thin bar next to the lines you've changed since the last commit, as code editors do: **green** for added lines, **amber** for changed lines, and a small **red** triangle where lines were deleted. Hover over a bar to see what it means.
+
+- **Click a bar** (or use **Edit → Show Change Since Last Commit**) to see the committed lines. **Revert Change** puts them back (**Ctrl+Z** undoes it); **Escape** closes the pop-up.
+- **Alt+F5** and **Shift+Alt+F5** move the cursor to the next and previous change. **Edit → Revert Change to Last Commit** reverts the change at the cursor.
+
+The bars update as you type and after you commit (when you come back to the window). Untracked files and documents over 1 MB have no bars. In Windows High Contrast, added lines get a solid bar and changed lines a dashed one.
 
 ### Requirements and privacy
 

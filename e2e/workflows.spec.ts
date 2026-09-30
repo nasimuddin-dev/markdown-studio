@@ -518,6 +518,39 @@ test("resize the outline against the explorer, and close the folder from the exp
   await expect(page.getByRole("tab", { name: /README\.md/ })).toBeVisible();
 });
 
+test("Git change bars: see the committed lines and revert a change", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await page.getByRole("treeitem", { name: /README\.md/ }).click();
+  const firstLine = page.locator(".cm-line").first();
+  const original = await firstLine.textContent();
+  await firstLine.click();
+  await page.keyboard.press("End");
+  await page.keyboard.type(" (edited)");
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.type("\nA new last line");
+  await expect(page.locator(".cm-git-modified")).toHaveCount(1);
+  await expect(page.locator(".cm-git-added")).toHaveCount(1);
+
+  // Alt+F5 goes to the next change (wrapping to the first), then the pop-up reverts it.
+  await page.keyboard.press("Alt+F5");
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Show Change Since Last Commit" }).click();
+  const peek = page.getByRole("dialog", { name: "Change since the last commit" });
+  await expect(peek.locator("pre")).toHaveText(original!);
+  await expect(peek.getByRole("button", { name: "Revert Change" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(peek).toBeHidden();
+  await expect(firstLine).toHaveText(original!);
+  await expect(page.locator(".cm-git-modified")).toHaveCount(0);
+
+  // Clicking a bar opens the pop-up too; Escape closes it.
+  await page.locator(".cm-git-added").click();
+  await expect(peek).toContainText("1 line added since the last commit.");
+  await page.keyboard.press("Escape");
+  await expect(peek).toBeHidden();
+});
+
 test("formatting toolbar reflects and applies formatting", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

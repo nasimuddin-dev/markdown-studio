@@ -17,7 +17,7 @@ export interface MemoryBackendOptions {
   storageKey?: string | null;
   /** Answers native-dialog requests (defaults to `window.prompt`). */
   prompt?: (message: string, defaultValue: string) => string | null;
-  /** What Git status reports (tests); the demo has no Git. */
+  /** What Git status reports (tests); the demo has none. */
   git?: GitStatus;
   /** Committed text per file path, as Git would report it (tests). */
   gitHead?: Record<string, string>;
@@ -644,5 +644,6 @@ export class MemoryBackend implements Backend {
 }
 
 export function createDemoBackend() {
-  return new MemoryBackend({ files: DEMO_FILES, storageKey: "demo-fs" });
+  // The sample files count as committed, so editing one shows the Git change bars.
+  return new MemoryBackend({ files: DEMO_FILES, storageKey: "demo-fs", gitHead: DEMO_FILES });
 }

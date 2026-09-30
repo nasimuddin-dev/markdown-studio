@@ -23,7 +23,7 @@
   --warning-bg: #fff6dc;
   --warning-border: #e9c46a;
   --success: #1f8a4c;
-  --dirty: #d97706;
+  --dirty: #a35200;
   --shadow: 0 8px 28px rgba(15, 23, 42, 0.18);
 
   --hl-heading: #1a3fbf;
@@ -1586,6 +1586,30 @@ select {
   background: var(--bg);
   color: var(--text);
   box-shadow: var(--shadow);
+}
+
+/* Git: the committed lines behind a change bar */
+.editor-host .cm-git-peek {
+  max-width: min(560px, 80vw);
+  padding: 8px 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+.editor-host .cm-git-peek-old {
+  max-height: 200px;
+  overflow: auto;
+  margin: 6px 0 8px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--danger);
+  background: var(--bg-code);
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+}
+.editor-host .cm-git-peek-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 /* ------------------------------------------------------------ file history */

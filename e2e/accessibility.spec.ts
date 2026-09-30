@@ -45,6 +45,19 @@ for (const theme of ["light", "dark"] as const) {
       await audit(page, "editor");
     });
 
+    test("Git change bars and pop-up", async ({ page }) => {
+      await start(page, theme);
+      await page.getByRole("button", { name: "Open Folder" }).first().click();
+      await page.locator(".tree-row", { hasText: /^README\.md$/ }).click();
+      await page.locator(".cm-line").first().click();
+      await page.keyboard.press("End");
+      await page.keyboard.type(" (edited)");
+      await expect(page.locator(".cm-git-modified")).toHaveCount(1);
+      await page.locator(".cm-git-modified").click();
+      await expect(page.getByRole("dialog", { name: "Change since the last commit" })).toBeVisible();
+      await audit(page, "git change pop-up");
+    });
+
     test("slide show", async ({ page }) => {
       await start(page, theme);
       await page.getByRole("button", { name: "Open Folder" }).first().click();
