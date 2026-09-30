@@ -78,6 +78,9 @@ for (const theme of ["light", "dark"] as const) {
       await page.keyboard.press(`${mod}+,`);
       await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
       await audit(page, "settings");
+      await page.getByRole("searchbox", { name: "Search settings" }).fill("git");
+      await audit(page, "settings search");
+      await page.keyboard.press("Escape");
       await page.keyboard.press("Escape");
       await page.keyboard.press(`${mod}+Shift+P`);
       await expect(page.getByRole("combobox")).toBeFocused();

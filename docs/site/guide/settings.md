@@ -5,7 +5,7 @@ description: Every Markpion setting explained, covering theme, editor font and s
 
 # Settings
 
-Open settings with **Ctrl+,** (**Cmd+,** on macOS), the gear button at the top right, or **File → Settings…**. The list on the left jumps to a section (Appearance, Editor, Files, Preview, Export, AI Assistant, Startup). Changes apply immediately and are saved automatically. Where they're stored is described in [Configuration](/reference/configuration).
+Open settings with **Ctrl+,** (**Cmd+,** on macOS), the gear button at the top right, or **File → Settings…**. The list on the left jumps to a section (Appearance, Editor, Files, Preview, Export, AI Assistant, Startup), and **Search settings** above it shows only the settings that match what you type (for example "wrap" or "git"); **Esc** clears the search. Changes apply immediately and are saved automatically. Where they're stored is described in [Configuration](/reference/configuration).
 
 ## Appearance
 

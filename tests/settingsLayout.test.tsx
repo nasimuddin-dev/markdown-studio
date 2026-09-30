@@ -20,4 +20,33 @@ describe("settings sections", () => {
     expect(buttons[4]).toHaveAttribute("aria-current", "true");
     expect(screen.getByLabelText("Page size for PDF and Word")).toHaveFocus();
   });
+
+  it("filters settings by the search text", async () => {
+    setupBackend();
+    render(<SettingsDialog />);
+    act(() => useUi.getState().setSettingsOpen(true));
+    const visible = (text: RegExp) => {
+      const el = screen.getByText(text).closest("label, section") as HTMLElement;
+      return el.style.display !== "none" && (el.closest("section") as HTMLElement).style.display !== "none";
+    };
+    await userEvent.type(screen.getByRole("searchbox", { name: "Search settings" }), "wrap");
+    expect(visible(/Wrap long lines/)).toBe(true);
+    expect(visible(/Show line numbers/)).toBe(false);
+    expect(visible(/Reopen last folder/)).toBe(false);
+    expect(screen.getByRole("status")).toHaveTextContent("1 setting found");
+
+    // A section's name shows all of its settings.
+    await userEvent.clear(screen.getByRole("searchbox", { name: "Search settings" }));
+    await userEvent.type(screen.getByRole("searchbox", { name: "Search settings" }), "startup");
+    expect(visible(/Reopen last folder/)).toBe(true);
+    expect(visible(/Check for updates/)).toBe(true);
+
+    await userEvent.type(screen.getByRole("searchbox", { name: "Search settings" }), "zzz");
+    expect(screen.getByText(/No settings match/)).toBeInTheDocument();
+    // Escape clears the search before it would close the dialog.
+    await userEvent.keyboard("{Escape}");
+    expect(screen.getByRole("searchbox", { name: "Search settings" })).toHaveValue("");
+    expect(useUi.getState().settingsOpen).toBe(true);
+    expect(visible(/Show line numbers/)).toBe(true);
+  });
 });
