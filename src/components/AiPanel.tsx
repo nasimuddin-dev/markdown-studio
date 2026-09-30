@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAi, type AiPlacement } from "../stores/aiStore";
 import { notify } from "../stores/uiStore";
 import { applyAiReview, cancelAiRequest } from "../features/ai";
+import { diffLines } from "../features/diff";
 import { Modal } from "./Dialogs";
+import { DiffRows } from "./DiffView";
 
 /** "Claude is working…" while an AI request runs, with Cancel. */
 function AiBusy() {
@@ -27,7 +29,11 @@ const PRIMARY_LABEL: Record<AiPlacement, string> = { replace: "Replace", below: 
 function AiReviewDialog() {
   const review = useAi((s) => s.review);
   const [text, setText] = useState("");
+  // For a replacement, the left side can show what would change instead of the original.
+  const [showChanges, setShowChanges] = useState(true);
   useEffect(() => setText(review?.suggestion ?? ""), [review]);
+  const original = review?.placement === "replace" ? review.original : "";
+  const changes = useMemo(() => (original && text ? diffLines(original, text) : null), [original, text]);
   if (!review) return null;
   const streaming = !!review.streaming;
   // Closing while Claude is still writing stops the request.
@@ -48,10 +54,28 @@ function AiReviewDialog() {
       <div className="ai-review">
         {review.original && (
           <section>
-            <h3 id="ai-original-label">Original</h3>
-            <pre className="ai-original" aria-labelledby="ai-original-label" tabIndex={0}>
-              {review.original}
-            </pre>
+            <div className="ai-original-head">
+              <h3 id="ai-original-label">{changes && showChanges ? "Changes" : "Original"}</h3>
+              {changes && (
+                <div className="segmented small" role="group" aria-label="Show">
+                  <button type="button" aria-pressed={!showChanges} onClick={() => setShowChanges(false)}>
+                    Original
+                  </button>
+                  <button type="button" aria-pressed={showChanges} onClick={() => setShowChanges(true)}>
+                    Changes
+                  </button>
+                </div>
+              )}
+            </div>
+            {changes && showChanges ? (
+              <div className="ai-original ai-changes" role="region" aria-labelledby="ai-original-label" tabIndex={0}>
+                <DiffRows lines={changes} />
+              </div>
+            ) : (
+              <pre className="ai-original" aria-labelledby="ai-original-label" tabIndex={0}>
+                {review.original}
+              </pre>
+            )}
           </section>
         )}
         <section>

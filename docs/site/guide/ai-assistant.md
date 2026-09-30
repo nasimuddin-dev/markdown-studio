@@ -37,6 +37,8 @@ The review window opens straight away and shows the answer as Claude writes it. 
 
 ## Review before anything changes
 
+For commands that replace the text, the window shows the **Changes** first: the original and the suggestion as a diff, with the changed words marked, so a grammar fix is easy to check. It follows your edits to the suggestion. Choose **Original** to see the original text as it was.
+
 When Claude has finished, you can **edit the suggestion**, then:
 
 - **Replace** (or **Insert** / **Insert Below**, depending on the command) puts it into the document as one edit, so **Ctrl+Z** undoes it;

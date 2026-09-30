@@ -2309,6 +2309,35 @@ body.dragging-entry * {
   font-size: 13px;
   opacity: 0.85;
 }
+.ai-original-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.segmented.small button {
+  padding: 2px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.segmented.small button[aria-pressed="true"] {
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+.segmented.small button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.ai-original.ai-changes {
+  padding: 4px 0;
+  opacity: 1;
+}
 .ai-suggestion {
   width: 100%;
   min-height: 180px;
