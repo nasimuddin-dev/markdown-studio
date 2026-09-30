@@ -38,5 +38,4 @@ These depend on decisions or resources that aren't settled yet:
 - **Automatic updates on macOS and Linux**, like on Windows.
 - **ARM64 builds** for Windows and Linux.
 - **Localization** of the interface into other languages.
-- **A native macOS menu bar.**
 - **Future enhancements from the specification:** Git integration, plugins, cloud sync, collaboration and publishing workflows.

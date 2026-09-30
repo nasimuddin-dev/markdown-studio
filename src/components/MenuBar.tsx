@@ -159,6 +159,26 @@ export function MenuBar() {
   const viewMode = useSettings((s) => s.settings.viewMode);
   const showExplorer = useSettings((s) => s.settings.showExplorer);
   const update = useSettings((s) => s.update);
+  // On macOS the menus go to the system menu bar instead.
+  const [nativeMenu, setNativeMenu] = useState(false);
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    let cancelled = false;
+    void (async () => {
+      const { nativeMenus, runMenuCommand } = await import("../features/nativeMenu");
+      const installed = await backend()
+        .setNativeMenu(nativeMenus(MENUS.map((m) => ({ label: m.label, items: m.items([]) }))))
+        .catch(() => false);
+      if (!installed || cancelled) return;
+      unlisten = await backend().onMenuCommand(runMenuCommand);
+      if (cancelled) unlisten();
+      else setNativeMenu(true);
+    })();
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, []);
 
   useEffect(() => {
     if (openIdx === null) return;
@@ -172,7 +192,7 @@ export function MenuBar() {
 
   return (
     <header className="menubar" ref={bar}>
-      <nav className="menus" aria-label="Application menu"
+      {!nativeMenu && <nav className="menus" aria-label="Application menu"
         onKeyDown={(e) => {
           if (openIdx === null) return;
           if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
@@ -194,7 +214,7 @@ export function MenuBar() {
             }}
           />
         ))}
-      </nav>
+      </nav>}
       <div className="toolbar" role="toolbar" aria-label="View options">
         <button
           className={`icon-button${showExplorer ? " active" : ""}`}

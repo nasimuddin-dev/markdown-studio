@@ -88,6 +88,11 @@ export const tauriBackend: Backend = {
     const { listen } = await import("@tauri-apps/api/event");
     return listen<OpenPaths>("open-paths", (e) => handler(e.payload));
   },
+  setNativeMenu: (menus) => call("set_native_menu", { menus }),
+  onMenuCommand: async (handler) => {
+    const { listen } = await import("@tauri-apps/api/event");
+    return listen<string>("menu-command", (e) => handler(e.payload));
+  },
 
   checkAppUpdate: () => call("check_app_update"),
   installAppUpdate: () => call("install_app_update"),

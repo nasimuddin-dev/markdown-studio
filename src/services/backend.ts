@@ -134,6 +134,12 @@ export interface StorageApi {
   readHistory(path: string, id: number): Promise<string>;
 }
 
+/** One menu of a native menu bar: command ids and labels, and separators. */
+export interface NativeMenu {
+  label: string;
+  items: Array<{ type: "command"; id: string; label: string } | { type: "separator" }>;
+}
+
 /** The app itself and the operating system around it. */
 export interface PlatformApi {
   appInfo(): Promise<AppInfo>;
@@ -154,6 +160,13 @@ export interface PlatformApi {
   /** Shows `title` in the window's title bar (the page title is set separately). */
   setWindowTitle(title: string): Promise<void>;
   toggleFullScreen(): Promise<void>;
+  /**
+   * Shows these menus in the system's menu bar where the platform has one
+   * (macOS). Returns false where it doesn't, and the UI keeps its own.
+   */
+  setNativeMenu(menus: NativeMenu[]): Promise<boolean>;
+  /** Subscribes to commands chosen in the native menu bar, by id. */
+  onMenuCommand(handler: (id: string) => void): Promise<() => void>;
   /**
    * Protects unsaved work when the window closes. The desktop app asks
    * `canClose` (which may show Save / Don't Save) and stays open if it

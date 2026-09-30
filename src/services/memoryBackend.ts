@@ -1,4 +1,4 @@
-import type { AiRequest, Backend, WriteRequest } from "./backend";
+import type { AiRequest, Backend, NativeMenu, WriteRequest } from "./backend";
 import { AppError } from "./errors";
 import { basename, dirname, isMarkdownPath, join } from "./paths";
 import type { AppUpdate, DirEntry, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
@@ -623,6 +623,15 @@ export class MemoryBackend implements Backend {
     return { files: [], folders: [] };
   }
   private openListeners = new Set<(p: OpenPaths) => void>();
+  /** A browser has no menu bar of its own to fill. */
+  async setNativeMenu(_menus: NativeMenu[]) {
+    return false;
+  }
+
+  async onMenuCommand(_handler: (id: string) => void) {
+    return () => {};
+  }
+
   async onOpenPaths(handler: (p: OpenPaths) => void) {
     this.openListeners.add(handler);
     return () => void this.openListeners.delete(handler);

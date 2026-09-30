@@ -9,7 +9,11 @@ The editor is where you write Markdown. It's built on [CodeMirror 6](https://cod
 
 ## Layout
 
-By default the window shows the sidebar (Explorer and Outline), the tabs, the editor and the [preview](/guide/preview) side by side. Change it from the **View** menu or the buttons at the top right:
+By default the window shows the sidebar (Explorer and Outline), the tabs, the editor and the [preview](/guide/preview) side by side. Change it from the **View** menu or the buttons at the top right.
+
+On macOS the menus (File, Edit, Format and the rest) are in the system menu bar at the top of the screen, next to the **Markpion** menu with About, Hide and Quit, and a **Window** menu. Keyboard shortcuts work the same, but the menus don't list them; see **Help → Keyboard Shortcuts**. Recent files are in the Explorer and on the welcome screen. On Windows and Linux the menus are in the window.
+
+The view modes:
 
 | View | Shortcut |
 | --- | --- |

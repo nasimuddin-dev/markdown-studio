@@ -4,6 +4,7 @@ mod error;
 mod fs_ops;
 mod git;
 mod history;
+mod menu;
 mod open_paths;
 mod scope;
 mod search;
@@ -119,6 +120,7 @@ pub fn run() {
             commands::dialogs::pick_import_file,
             commands::files::read_binary_file,
             commands::platform::open_external,
+            commands::platform::set_native_menu,
             commands::platform::reveal_in_folder,
             commands::files::export_file,
             commands::files::export_binary_file,

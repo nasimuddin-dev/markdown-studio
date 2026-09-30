@@ -9,6 +9,13 @@ pub fn take_pending_opens(state: State<'_, AppState>) -> crate::open_paths::Open
     std::mem::take(&mut *state.pending_open.lock().unwrap())
 }
 
+/// Installs the native menu bar from the UI's menus (macOS only). Returns
+/// whether it did; elsewhere the UI keeps its own menu bar.
+#[tauri::command]
+pub fn set_native_menu(app: AppHandle, menus: Vec<crate::menu::MenuSpec>) -> AppResult<bool> {
+    crate::menu::install(&app, &menus).map_err(|e| AppError::Io(format!("Couldn't build the menu bar: {e}")))
+}
+
 /// Shows a file or folder in the system file manager (Explorer / Finder).
 #[tauri::command]
 pub fn reveal_in_folder(app: AppHandle, state: State<'_, AppState>, path: String) -> AppResult<()> {
