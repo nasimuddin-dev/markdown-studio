@@ -18,7 +18,7 @@ import type { StateCommand } from "@codemirror/state";
 import type { KeyBinding } from "@codemirror/view";
 import * as fmt from "./formatting";
 import {
-  deleteColumn, deleteRow, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
+  deleteColumn, deleteRow, fixTableAtCursor, formatTableAtCursor, insertColumnLeft, insertColumnRight, insertRowAbove, insertRowBelow, sortTableAtCursor,
 } from "./tables";
 import { fixAllProblemsCommand } from "./lintExtension";
 import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
@@ -73,6 +73,8 @@ export const formatCommands: Record<string, Command> = {
   footnote: formatCommand("footnote", "Insert Footnote", fmt.insertFootnote, "Mod+Alt+R"),
   table: formatCommand("table", "Insert Table", fmt.insertTable),
   convertToTable: formatCommand("convertToTable", "Convert Selection to Table", convertSelectionToTable),
+  // A table with mistakes, or (for a selection without "|") comma- or tab-separated text.
+  fixTable: formatCommand("fixTable", "Fix Table", (target) => fixTableAtCursor(target) || convertSelectionToTable(target)),
   formatTable: formatCommand("formatTable", "Format Table", formatTableAtCursor, "Mod+Alt+T"),
   sortTableAsc: formatCommand("sortTableAsc", "Sort Table by Column (A to Z)", sortTableAtCursor(false)),
   sortTableDesc: formatCommand("sortTableDesc", "Sort Table by Column (Z to A)", sortTableAtCursor(true)),

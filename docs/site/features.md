@@ -73,6 +73,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Light, dark and system themes; configurable editor font, size, wrapping and tab size. [Settings](/guide/settings)
 - Keyboard-first: every command has a menu entry, many have [shortcuts](/reference/keyboard-shortcuts), and the command palette finds them all.
 - Export and import settings and shortcuts as a file, to move to another computer or share a team setup. [Settings](/guide/settings#export-and-import)
+- **Fix Table** repairs a table typed with mistakes (a missing divider row, short or long rows, missing pipes) in one step. [Tables](/markdown/tables#table-tools)
 - Line tools: sort lines, remove duplicate lines, join lines, and change case (upper, lower, title). Typing `*`, `` ` `` or a bracket with text selected wraps it. [Editor](/guide/editor#editing-lines)
 - Customizable keyboard shortcuts for every command (Help → Keyboard Shortcuts), with conflict detection. [Keyboard shortcuts](/reference/keyboard-shortcuts#change-a-shortcut)
 - Custom CSS for your documents (preview, printing, slides and HTML export), for example your organization's colours and fonts; it never changes the app itself. [Settings](/guide/settings#preview)

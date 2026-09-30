@@ -380,6 +380,30 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
+test("Fix Table repairs a table typed with mistakes", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("Name | Qty | Price\n| Apples | 3\nPears | 12 | 0.5 | extra");
+  // The divider is missing, so this isn't a table yet; the toolbar still offers Table tools.
+  await expect(page.locator(".markdown-body table")).toHaveCount(0);
+  const toolbar = page.getByRole("toolbar", { name: "Formatting" });
+  await toolbar.getByRole("button", { name: "Table tools" }).click();
+  await page.getByRole("menuitem", { name: "Fix Table" }).click();
+  await expect(page.locator(".markdown-body table")).toHaveCount(1);
+  await expect(page.locator(".markdown-body table th")).toHaveText(["Name", "Qty", "Price", "Column 4"]);
+  await expect(page.locator(".markdown-body table tbody tr")).toHaveCount(2);
+
+  // Comma-separated text: select it and use Format → Fix Table.
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.insertText("\n\nCity,Country\nParis,France");
+  await page.keyboard.press("Shift+ArrowUp");
+  await page.keyboard.press("Shift+Home");
+  await page.getByRole("button", { name: "Format", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Fix Table" }).click();
+  await expect(page.locator(".markdown-body table")).toHaveCount(2);
+});
+
 test("Alt+Z toggles word wrap", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

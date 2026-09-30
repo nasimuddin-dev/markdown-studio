@@ -98,7 +98,7 @@ The toolbar above the editor puts the common commands one click away, like a wor
 | History | Undo, Redo, and the **paragraph style** list (Normal text, Heading 1–6) |
 | Text | Bold, Italic, Strikethrough, Inline code |
 | Paragraphs | Bulleted list, Numbered list, Task list, Quote |
-| Insert | Link, Image, Table (choose the size: hover over the grid and click, or type the columns and rows, header row included), Code block, Horizontal rule, Footnote, Table of contents. With the cursor in a table, the Table button becomes **Table tools**: insert or delete rows and columns, format, sort, or copy the table as CSV |
+| Insert | Link, Image, Table (choose the size: hover over the grid and click, or type the columns and rows, header row included), Code block, Horizontal rule, Footnote, Table of contents. With the cursor in a table (even one with mistakes) or several lines selected, the Table button becomes **Table tools**: **Fix Table**, insert or delete rows and columns, format, sort, or copy the table as CSV |
 | AI | A menu of the [AI assistant](/guide/ai-assistant)'s actions (only when the assistant is turned on) |
 
 - Buttons light up for the formatting at the cursor: **Bold** inside `**bold**`, **Bulleted list** in a bulleted list, and so on. The paragraph style list shows the current heading level.

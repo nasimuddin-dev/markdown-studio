@@ -94,6 +94,70 @@ export function formatTable(lines: string[]): string[] | null {
   });
 }
 
+/** A divider cell, also as mistyped: en/em dashes, `=`, `_`, spaces around colons. */
+const LOOSE_DIVIDER_CELL = /^\s*:?\s*[-–—=_]+\s*:?\s*$/;
+const isDividerRow = (cells: string[]) => cells.length > 0 && cells.every((c) => LOOSE_DIVIDER_CELL.test(c)) && cells.some((c) => c.trim());
+
+/** Escapes `|` inside code spans, which GFM would otherwise treat as a cell boundary. */
+function escapePipesInCode(cell: string): string {
+  return cell.replace(/(`+)([\s\S]*?)\1/g, (_span, ticks: string, code: string) => ticks + code.replace(/(?<!\\)\|/g, "\\|") + ticks);
+}
+
+/**
+ * Repairs a table typed with mistakes, then formats it: a missing or
+ * malformed divider row (wrong number of cells, `===`, en/em dashes) is
+ * rebuilt keeping any alignment colons; a table that starts with its divider
+ * gets a header; short rows get empty cells and long rows keep their cells
+ * (the header gains columns, named "Column N"); rows without outer `|` get
+ * them; a `|` inside code is escaped. Blank lines are removed. Returns null
+ * when there's nothing table-like (fewer than two columns anywhere).
+ */
+export function fixTable(lines: string[]): string[] | null {
+  const indent = /^\s*/.exec(lines.find((l) => l.trim()) ?? "")![0];
+  let rows = lines.filter((l) => l.trim()).map((l) => splitRow(l).map(escapePipesInCode));
+  if (!rows.length) return null;
+  // The first divider-like row gives the alignment; any others are dropped.
+  const dividerAt = rows.findIndex(isDividerRow);
+  const divider = dividerAt >= 0 ? rows[dividerAt] : [];
+  rows = rows.filter((r) => !isDividerRow(r));
+  if (dividerAt === 0) rows.unshift([]); // the table started with its divider: no header
+  const cols = Math.max(...rows.map((r) => r.length), divider.length);
+  if (cols < 2 && !lines.some((l) => l.includes("|"))) return null;
+  const header = Array.from({ length: cols }, (_, i) => rows[0]?.[i]?.trim() || `Column ${i + 1}`);
+  const aligns = Array.from({ length: cols }, (_, i) => {
+    const c = (divider[i] ?? "").replace(/\s+/g, "");
+    return c.startsWith(":") && c.endsWith(":") && c.length > 1 ? ":-:" : c.startsWith(":") ? ":--" : c.endsWith(":") ? "--:" : "---";
+  });
+  const row = (cells: string[]) => `${indent}| ${Array.from({ length: cols }, (_, i) => cells[i] ?? "").join(" | ")} |`;
+  const out = [row(header), row(aligns), ...rows.slice(1).map(row)];
+  return formatTable(out) ?? out;
+}
+
+/** Command: Format → Fix Table. Works on the selected lines, or the table around the cursor. */
+export const fixTableAtCursor: StateCommand = ({ state, dispatch }) => {
+  const sel = state.selection.main;
+  let first: number;
+  let last: number;
+  if (!sel.empty) {
+    first = state.doc.lineAt(sel.from).number;
+    last = state.doc.lineAt(sel.to > sel.from && state.doc.lineAt(sel.to).from === sel.to ? sel.to - 1 : sel.to).number;
+  } else {
+    const range = tableAround(state, state.doc.lineAt(sel.head).number);
+    if (!range) return false;
+    ({ first, last } = range);
+  }
+  const lines: string[] = [];
+  for (let n = first; n <= last; n++) lines.push(state.doc.line(n).text);
+  const fixed = fixTable(lines);
+  if (!fixed) return false;
+  const from = state.doc.line(first).from;
+  const to = state.doc.line(last).to;
+  const insert = fixed.join("\n");
+  if (insert === state.sliceDoc(from, to)) return true;
+  dispatch(state.update({ changes: { from, to, insert }, selection: { anchor: from + 2 }, scrollIntoView: true, userEvent: "input.format" }));
+  return true;
+};
+
 /** Line range (1-based, inclusive) of the table around `line`, if any. */
 export function tableAround(state: EditorState, lineNo: number): { first: number; last: number } | null {
   const doc = state.doc;

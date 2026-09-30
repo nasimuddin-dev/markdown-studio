@@ -9,20 +9,20 @@ The requirements are in [docs/SRS.md](docs/SRS.md), and implementation status pe
 ## Download
 
 <!-- download:start -->
-Markpion 0.19.0 was released on 2026-09-29 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.19.0 release page](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.19.0).
+Markpion 0.20.0 was released on 2026-09-29 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.20.0 release page](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.20.0).
 
 | Operating system | Download |
 | --- | --- |
-| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/Markpion-0.19.0-windows-x64-setup.exe?raw=true) (7.1 MB) · [Offline installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.19.0/Markpion-0.19.0-windows-x64-offline-setup.exe) (212.2 MB) |
-| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markpion/releases/download/v0.19.0/Markpion-0.19.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markpion/releases/download/v0.19.0/Markpion-0.19.0-macos-x64.dmg) |
-| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.19.0/Markpion-0.19.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.19.0/Markpion-0.19.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.19.0/Markpion-0.19.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
+| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/Markpion-0.20.0-windows-x64-setup.exe?raw=true) (7.1 MB) · [Offline installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-windows-x64-offline-setup.exe) (212.2 MB) |
+| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-macos-x64.dmg) |
+| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
 
 ### Windows
 
 | Installer | When to use it | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **Standard**: [Markpion-0.19.0-windows-x64-setup.exe](downloads/Markpion-0.19.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 7.1 MB | `f62eeb9e2adf5724dd51d42f76a5f77a10f1d78766e6cdc07802d96b925f0795` |
-| **Offline**: [Markpion-0.19.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.19.0/Markpion-0.19.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 212.2 MB | `197d0f6bb4292bdefbf7e7192c8c50b3f18356f6613d70e5b5f52f3f933d8492` |
+| **Standard**: [Markpion-0.20.0-windows-x64-setup.exe](downloads/Markpion-0.20.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 7.1 MB | `4801a37fbe417c09c54752685f14f84d3c1383d6bebb9dfb7d824576f210b3ae` |
+| **Offline**: [Markpion-0.20.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.20.0/Markpion-0.20.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 212.2 MB | `ac01173ea9045f8a5629c49a71aac388864a87940d7e257cc9696230788fda63` |
 
 1. **Download** an installer above.
 2. **Run** it and choose **Anyone who uses this computer**, which needs administrator approval, or **Only for me**, which doesn't. The installer isn't code-signed yet, so if Windows SmartScreen says *"Windows protected your PC"*, choose **More info → Run anyway**.
@@ -39,8 +39,8 @@ The app appears in **Settings → Apps → Installed apps** and in **Control Pan
 ### Linux
 
 - **AppImage** (any distribution, no installation needed): download it, run `chmod +x Markpion-*.AppImage`, then start it.
-- **Debian, Ubuntu, Mint**: `sudo apt install ./Markpion-0.19.0-linux-amd64.deb` (apt installs the required system libraries automatically).
-- **Fedora, RHEL, openSUSE**: `sudo dnf install ./Markpion-0.19.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
+- **Debian, Ubuntu, Mint**: `sudo apt install ./Markpion-0.20.0-linux-amd64.deb` (apt installs the required system libraries automatically).
+- **Fedora, RHEL, openSUSE**: `sudo dnf install ./Markpion-0.20.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
 
 On macOS and Linux, the app tells you when a new version is available and opens its download page.
 
@@ -88,6 +88,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Optional auto save (after a delay, or on tab/window focus change) that never overwrites external changes
 - Save options: trim trailing whitespace (keeps Markdown hard breaks and code blocks), final newline, default line ending for new files
 - Typing `*`, `_`, `` ` ``, `~`, `"`, `(` or `[` with text selected wraps the selection (type `**` for bold)
+- Format → Fix Table: repairs tables typed with mistakes (missing or wrong divider row, missing header, short or long rows, missing outer pipes, a pipe inside code), also from the toolbar's Table tools
 - Format → Convert Selection to Table (comma, tab, semicolon or pipe separated text)
 - Edit menu line tools: Sort Lines (natural order), Remove Duplicate Lines, Join Lines, and Uppercase / Lowercase / Title Case
 - Copy button on code blocks in the preview (on hover or keyboard focus)

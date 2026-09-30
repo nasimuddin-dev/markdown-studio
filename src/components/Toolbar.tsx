@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from "
 import { commands, formatShortcut } from "../features/commands";
 import { getEditorView, runOnEditor } from "../features/editorBridge";
 import { insertTableOf } from "../features/formatting";
+import { tableAround } from "../features/tables";
 import { TablePicker } from "./TablePicker";
 import { formatStateAt, NO_FORMAT, type FormatState } from "../features/formatState";
 import { useDocuments } from "../stores/documentsStore";
@@ -53,6 +54,7 @@ const HEADINGS = [
 
 /** Shown by the table button when the cursor is already in a table. */
 const TABLE_ACTIONS = [
+  "fixTable", "separator",
   "tableRowAbove", "tableRowBelow", "tableColumnLeft", "tableColumnRight", "separator",
   "tableDeleteRow", "tableDeleteColumn", "separator",
   "formatTable", "sortTableAsc", "sortTableDesc", "copyTableCsv",
@@ -91,6 +93,15 @@ export function Toolbar() {
     const view = getEditorView();
     return view ? formatStateAt(view.state) : NO_FORMAT;
   }, [cursor, content]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Table tools also for tables with mistakes (not parsed as tables) and multi-line selections, so Fix Table is at hand.
+  const tableish = useMemo(() => {
+    const view = getEditorView();
+    if (!view) return false;
+    const { state } = view;
+    const sel = state.selection.main;
+    if (!sel.empty && state.doc.lineAt(sel.from).number !== state.doc.lineAt(sel.to).number) return true;
+    return tableAround(state, state.doc.lineAt(sel.head).number) !== null;
+  }, [cursor, content]); // eslint-disable-line react-hooks/exhaustive-deps
   const bar = useRef<HTMLDivElement>(null);
   const [focusIndex, setFocusIndex] = useState(0);
   const [aiMenu, setAiMenu] = useState<{ x: number; y: number } | null>(null);
@@ -122,7 +133,7 @@ export function Toolbar() {
           {group.map((b) => {
             const pressed = b.pressed?.(format);
             // Inside a table the table button opens the table tools instead of inserting another table.
-            if (b.id === "table" && format.table)
+            if (b.id === "table" && (format.table || tableish))
               return (
                 <button
                   key={b.id}
