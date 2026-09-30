@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { openPath } from "../src/features/documents";
-import { setLineEnding } from "../src/features/lineEndings";
+import { setBom, setLineEnding } from "../src/features/lineEndings";
 import { activeDoc, useDocuments } from "../src/stores/documentsStore";
 import { useUi } from "../src/stores/uiStore";
 import { setupBackend } from "./helpers";
@@ -14,6 +14,16 @@ describe("changing a document's line endings", () => {
     expect(activeDoc()!.lineEnding).toBe("crlf");
     expect((await backend.readTextFile("/ws/a.md")).lineEnding).toBe("crlf");
     expect(useUi.getState().toasts.at(-1)?.message).toBe("Saved with CRLF line endings.");
+  });
+
+  it("adds or removes the byte order mark", async () => {
+    const backend = setupBackend({ "/ws/c.md": "text\n" });
+    await openPath("/ws/c.md");
+    await setBom(true);
+    expect((await backend.readTextFile("/ws/c.md")).bom).toBe(true);
+    expect(useUi.getState().toasts.at(-1)?.message).toBe("Saved with UTF-8 with BOM encoding.");
+    await setBom(false);
+    expect((await backend.readTextFile("/ws/c.md")).bom).toBe(false);
   });
 
   it("waits for the next save when there are unsaved changes", async () => {

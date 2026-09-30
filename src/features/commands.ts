@@ -308,6 +308,18 @@ export const commands: Record<string, Command> = {
     run: async () => (await import("./lineEndings")).setLineEnding("crlf"),
     enabled: hasActive,
   },
+  encodingUtf8: {
+    id: "encodingUtf8",
+    label: "Change Encoding to UTF-8",
+    run: async () => (await import("./lineEndings")).setBom(false),
+    enabled: hasActive,
+  },
+  encodingUtf8Bom: {
+    id: "encodingUtf8Bom",
+    label: "Change Encoding to UTF-8 with BOM",
+    run: async () => (await import("./lineEndings")).setBom(true),
+    enabled: hasActive,
+  },
   exportZip: {
     id: "exportZip",
     label: "Export as Markdown with Images (.zip)…",

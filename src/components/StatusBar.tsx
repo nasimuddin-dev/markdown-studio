@@ -72,7 +72,14 @@ export function StatusBar() {
           >
             {doc.lineEnding.toUpperCase()}
           </button>
-          <span className="status-item status-low" title="Text encoding">{doc.bom ? "UTF-8 with BOM" : "UTF-8"}</span>
+          <button
+            className="status-item status-button status-low"
+            title={`Encoding: ${doc.bom ? "UTF-8 with BOM" : "UTF-8"}. Change to ${doc.bom ? "UTF-8 without BOM" : "UTF-8 with BOM"}`}
+            aria-label={`Encoding ${doc.bom ? "UTF-8 with BOM" : "UTF-8"}. Change to ${doc.bom ? "UTF-8 without BOM" : "UTF-8 with BOM"}.`}
+            onClick={() => void commands[doc.bom ? "encodingUtf8" : "encodingUtf8Bom"].run()}
+          >
+            {doc.bom ? "UTF-8 with BOM" : "UTF-8"}
+          </button>
           <span className="status-item status-low">Markdown</span>
         </div>
       )}

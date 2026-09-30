@@ -320,12 +320,13 @@ export class MemoryBackend implements Backend {
     const f = this.files.get(p);
     if (!f) throw new AppError("notFound", "File not found");
     const crlf = f.content.includes("\r\n");
+    const bom = f.content.startsWith("﻿");
     return {
       path: p,
-      content: f.content.replace(/\r\n/g, "\n"),
+      content: (bom ? f.content.slice(1) : f.content).replace(/\r\n/g, "\n"),
       mtime: f.mtime,
       lineEnding: crlf ? ("crlf" as const) : ("lf" as const),
-      bom: false,
+      bom,
       readOnly: this.readOnlyFiles.has(p),
     };
   }
@@ -352,7 +353,7 @@ export class MemoryBackend implements Backend {
       throw new AppError("conflict", "The file was changed by another program after it was opened.");
     }
     if (!this.dirs.has(dirname(p))) throw new AppError("notFound", "Folder not found");
-    const content = req.lineEnding === "crlf" ? req.content.replace(/\n/g, "\r\n") : req.content;
+    const content = (req.bom ? "﻿" : "") + (req.lineEnding === "crlf" ? req.content.replace(/\n/g, "\r\n") : req.content);
     if (existing) {
       const versions = this.history.get(p) ?? [];
       if (versions[versions.length - 1]?.content !== existing.content) {

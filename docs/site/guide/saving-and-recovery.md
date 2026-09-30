@@ -77,7 +77,7 @@ By default, Markpion reopens your last folder and files when it starts. Turn thi
 
 - Files are read and written as **UTF-8**. A byte-order mark (BOM) is kept if the file had one; the status bar shows **UTF-8** or **UTF-8 with BOM**.
 - A file that isn't valid UTF-8 is **not opened**, so it can't be corrupted by saving it.
-- **LF** and **CRLF** line endings are preserved per file (shown in the status bar). New files use the setting **Line endings for new files** (LF by default). To change a file's line endings, click **LF** or **CRLF** in the status bar, or run **Change Line Endings to LF / CRLF** from the command palette: a saved file without other changes is saved at once; otherwise the new line endings are used at the next save.
+- **LF** and **CRLF** line endings are preserved per file (shown in the status bar). New files use the setting **Line endings for new files** (LF by default). To change a file's line endings, click **LF** or **CRLF** in the status bar, or run **Change Line Endings to LF / CRLF** from the command palette: a saved file without other changes is saved at once; otherwise the new line endings are used at the next save. Clicking **UTF-8** in the status bar (or **Change Encoding to UTF-8 with BOM** / **to UTF-8**) adds or removes the byte order mark the same way; some older Windows tools expect one.
 
 ## Save options
 
