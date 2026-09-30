@@ -433,7 +433,7 @@ test("F8 and Shift+F8 move between problems", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Show problems/ })).toBeVisible();
   // The count can show a moment before the editor has the problems; wait for their underlines.
   await expect(page.locator(".cm-lintRange").first()).toBeVisible();
-  const position = page.locator(".status-right").getByTitle("Line and column");
+  const position = page.locator(".status-right").getByTitle(/^Go to Line/);
   await page.keyboard.press("F8");
   await expect(position).toContainText("Ln 5,");
   await page.keyboard.press("F8");
@@ -1140,4 +1140,17 @@ test("the status bar shows task progress and goes to the next open task", async 
   await expect(page.locator(".cm-activeLine")).toHaveText("- [ ] first open");
   await progress.click();
   await expect(page.locator(".cm-activeLine")).toHaveText("- [ ] second open");
+});
+
+test("clicking the line and column in the status bar opens Go to Line", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("one\ntwo\nthree\n");
+  await page.locator(".status-right").getByRole("button", { name: /^Ln 4, Col 1/ }).click();
+  const field = page.locator(".cm-panel input[name=line]");
+  await expect(field).toBeFocused();
+  await field.fill("2");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-activeLine")).toHaveText("two");
 });

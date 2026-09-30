@@ -6,7 +6,7 @@ import { useSettings } from "../stores/settingsStore";
 import { countWords, textStats } from "../services/textStats";
 import { getEditorView, showProblems } from "../features/editorBridge";
 import { changeCounts, gitHunksOf, useGitBaseVersion } from "../features/gitGutter";
-import { commands } from "../features/commands";
+import { commands, formatShortcut } from "../features/commands";
 import { backend } from "../services";
 import { EditorView } from "@codemirror/view";
 import { nextOpenTask, taskCounts } from "../features/taskCount";
@@ -56,10 +56,10 @@ export function StatusBar() {
             </button>
           )}
           {viewMode !== "preview" && (
-            <span className="status-item" title="Line and column">
+            <button className="status-item status-button" title={`Go to Line (${formatShortcut(commands.gotoLine.shortcut)})`} onClick={() => void commands.gotoLine.run()}>
               Ln {cursor.line}, Col {cursor.col}
               {cursor.selected > 0 && ` (${cursor.selected} selected)`}
-            </span>
+            </button>
           )}
           <TaskProgress content={doc.content} />
           <WordCount words={words} content={doc.content} />
