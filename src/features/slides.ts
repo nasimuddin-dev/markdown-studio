@@ -4,6 +4,31 @@ const FENCE = /^ {0,3}(`{3,}|~{3,})/;
 const SEPARATOR = /^ {0,3}---\s*$/;
 const SLIDE_HEADING = /^ {0,3}#{1,2}\s/;
 
+const NOTE = /^ {0,3}notes?:[ \t]*/i;
+
+/**
+ * Speaker notes: a line starting with `Note:` (or `Notes:`), outside code,
+ * begins the slide's notes, which the audience doesn't see (the reveal.js
+ * convention). Returns the slide without them, and the notes.
+ */
+export function splitNotes(slide: string): { body: string; notes: string } {
+  const lines = slide.split("\n");
+  let fence: string | null = null;
+  for (let i = 0; i < lines.length; i++) {
+    const f = FENCE.exec(lines[i]);
+    if (f) {
+      if (!fence) fence = f[1];
+      else if (f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
+      continue;
+    }
+    if (!fence && NOTE.test(lines[i])) {
+      const notes = [lines[i].replace(NOTE, ""), ...lines.slice(i + 1)].join("\n").trim();
+      return { body: lines.slice(0, i).join("\n").trim(), notes };
+    }
+  }
+  return { body: slide, notes: "" };
+}
+
 /**
  * Splits a document into slides for View → Present as Slides. Slides are
  * separated by `---` lines that follow a blank line (a `---` right under a

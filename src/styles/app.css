@@ -1518,6 +1518,18 @@ select {
   font-size: 1.6em;
   border-bottom: none;
 }
+.slide-notes {
+  max-height: 28vh;
+  overflow: auto;
+  padding: 10px 6vw;
+  border-top: 1px solid var(--border);
+  background: var(--bg-chrome);
+  font-size: 15px;
+}
+.slide-notes .markdown-body,
+.slide-notes > p {
+  margin: 0;
+}
 .slideshow-bar {
   display: flex;
   gap: 12px;

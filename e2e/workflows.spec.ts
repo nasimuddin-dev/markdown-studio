@@ -442,6 +442,24 @@ test("F8 and Shift+F8 move between problems", async ({ page }) => {
   await expect(position).toContainText("Ln 5,");
 });
 
+test("speaker notes are hidden from slides and shown with N", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Results\n\nRevenue is up.\n\nNote: Thank the sales team.\n\n---\n\n# Next steps\n");
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("present as slides");
+  await page.keyboard.press("Enter");
+  const show = page.getByRole("dialog", { name: "Slide show" });
+  await expect(show.locator(".slide")).toContainText("Revenue is up.");
+  await expect(show.locator(".slide")).not.toContainText("Thank the sales team");
+  await page.keyboard.press("n");
+  await expect(show.getByRole("complementary", { name: "Speaker notes" })).toContainText("Thank the sales team.");
+  await expect(show.getByRole("button", { name: "Notes (N)" })).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("ArrowRight");
+  await expect(show.getByRole("complementary", { name: "Speaker notes" })).toContainText("No notes for this slide.");
+});
+
 test("typewriter scrolling keeps the current line in the middle", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

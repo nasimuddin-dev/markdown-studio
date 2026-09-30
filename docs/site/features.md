@@ -33,7 +33,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - [Mermaid diagrams](/markdown/mermaid) and [LaTeX math](/markdown/math).
 - [YAML front matter, GitHub alerts and footnotes](/markdown/extras).
 - Long documents: the preview builds the part you are looking at first. Above 1 MB of text, the live preview pauses and renders on demand, so typing stays fast.
-- Present a document as slides (View → Present as Slides), split at `---` lines or at headings. [Preview](/guide/preview#presenting-as-slides)
+- Present a document as slides (View → Present as Slides), split at `---` lines or at headings, with speaker notes. [Preview](/guide/preview#presenting-as-slides)
 
 ## Files and workspaces
 

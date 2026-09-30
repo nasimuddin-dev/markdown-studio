@@ -71,6 +71,9 @@ for (const theme of ["light", "dark"] as const) {
       await page.keyboard.press("Enter");
       await expect(page.getByRole("dialog", { name: "Slide show" })).toBeVisible();
       await audit(page, "slide show");
+      await page.keyboard.press("n");
+      await expect(page.getByRole("complementary", { name: "Speaker notes" })).toBeVisible();
+      await audit(page, "slide show with notes");
     });
 
     test("settings dialog and command palette", async ({ page }) => {
