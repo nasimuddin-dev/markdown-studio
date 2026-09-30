@@ -28,11 +28,12 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `fontFamily` | `""` | A font name; empty for the default monospace font |
 | `lineNumbers` | `true` | |
 | `lineWrapping` | `true` | |
+| `editorLineLength` | `0` | `0` (full width), `72`, `80`, `100`, `120`: the editor text's width in characters, centered |
 | `tabSize` | `2` | `2`, `4`, `8` |
 | `spellCheck` | `true` | |
 | `lintMarkdown` | `true` | |
 | `typewriterScrolling` | `false` | Keep the line being typed in the middle of the editor |
-| `lintDisabledRules` | `[]` | Lint checks that are turned off, by id: `broken-link`, `missing-image`, `broken-anchor`, `empty-link`, `duplicate-heading`, `multiple-h1`, `heading-increment`, `image-alt`, `link-text`, `table-columns`, `footnote`, `heading-space`, `setext-heading`, `list-space`, `emphasis-space`, `destination-spaces` |
+| `lintDisabledRules` | `[]` | Lint checks that are turned off, by id: `broken-link`, `missing-image`, `broken-anchor`, `empty-link`, `duplicate-heading`, `multiple-h1`, `heading-increment`, `image-alt`, `link-text`, `table-columns`, `footnote`, `reference`, `heading-space`, `setext-heading`, `list-space`, `emphasis-space`, `destination-spaces` |
 | `pasteRichTextAsMarkdown` | `true` | |
 | `previewDebounceMs` | `150` | 0–1000 |
 | `renderMath` | `true` | |

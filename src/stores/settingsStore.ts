@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS: Settings = {
   renderDiagrams: true,
   lintMarkdown: true,
   typewriterScrolling: false,
+  editorLineLength: 0,
   lintDisabledRules: [],
   spellCheck: true,
   pasteRichTextAsMarkdown: true,
@@ -57,6 +58,9 @@ function sanitizeKeybindings(raw: unknown): Record<string, string | null> {
 const clamp = (n: unknown, min: number, max: number, fallback: number) =>
   typeof n === "number" && Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback;
 
+/** The editor line lengths offered in Settings (0 = full width). */
+export const LINE_LENGTHS = [0, 72, 80, 100, 120];
+
 /** Custom CSS beyond this is cut off. */
 export const MAX_CUSTOM_CSS = 100_000;
 
@@ -87,6 +91,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     renderDiagrams: bool(s.renderDiagrams, d.renderDiagrams),
     lintMarkdown: bool(s.lintMarkdown, d.lintMarkdown),
     typewriterScrolling: bool(s.typewriterScrolling, d.typewriterScrolling),
+    editorLineLength: LINE_LENGTHS.includes(s.editorLineLength as number) ? (s.editorLineLength as number) : d.editorLineLength,
     lintDisabledRules: Array.isArray(s.lintDisabledRules)
       ? [...new Set(s.lintDisabledRules.filter((r): r is string => typeof r === "string" && /^[a-z0-9-]{1,40}$/.test(r)))].slice(0, 50)
       : d.lintDisabledRules,

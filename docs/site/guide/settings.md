@@ -21,6 +21,7 @@ The moon button at the top right switches between light and dark quickly. **Ctrl
 
 | Setting | Default |
 | --- | --- |
+| Line length (full width, or about 72, 80, 100 or 120 characters, centered) | Full width |
 | Tab size (2, 4 or 8 spaces) | 2 |
 | Show line numbers | On |
 | Wrap long lines | On |

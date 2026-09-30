@@ -112,11 +112,14 @@ const isLocked = (docId: string) => !!useDocuments.getState().docs.find((d) => d
 const spellAttr = (on: boolean) => EditorView.contentAttributes.of({ spellcheck: on ? "true" : "false" });
 
 function appearanceExt(s: Settings): Extension {
+  const font = s.fontFamily ? `${s.fontFamily}, var(--font-mono)` : "var(--font-mono)";
   return EditorView.theme({
     "&": { fontSize: `${s.fontSize}px` },
-    ".cm-content, .cm-gutters": {
-      fontFamily: s.fontFamily ? `${s.fontFamily}, var(--font-mono)` : "var(--font-mono)",
-    },
+    ".cm-content, .cm-gutters": { fontFamily: font },
+    // A limited line length centers the text (with its gutters, about 8 characters wide) in a wide pane.
+    ...(s.editorLineLength > 0 && {
+      ".cm-scroller": { fontFamily: font, paddingInline: `max(0px, calc((100% - ${s.editorLineLength + 8}ch) / 2))` },
+    }),
   });
 }
 
@@ -327,7 +330,7 @@ export function Editor() {
   // Apply settings changes (FR-025).
   useEffect(() => {
     viewRef.current?.dispatch({ effects: reconfigure(settings) });
-  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck, settings.typewriterScrolling]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck, settings.typewriterScrolling, settings.editorLineLength]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <div className="editor-host" ref={host} />;
 }

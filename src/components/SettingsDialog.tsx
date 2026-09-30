@@ -3,7 +3,7 @@ import { SettingsLayout } from "./SettingsLayout";
 import { LINT_RULES } from "../features/lint";
 import { useEffect, useState } from "react";
 import { useUi } from "../stores/uiStore";
-import { DEFAULT_SETTINGS, useSettings } from "../stores/settingsStore";
+import { DEFAULT_SETTINGS, LINE_LENGTHS, useSettings } from "../stores/settingsStore";
 import { Modal } from "./Dialogs";
 import { backend } from "../services";
 import type { AppInfo, Settings } from "../types";
@@ -85,6 +85,10 @@ export function SettingsDialog() {
               </ul>
             </div>
           )}
+          <label htmlFor="setting-editorLineLength">Line length</label>
+          <select {...field("editorLineLength")} onChange={(e) => update({ editorLineLength: Number(e.target.value) })}>
+            {LINE_LENGTHS.map((n) => <option key={n} value={n}>{n ? `About ${n} characters, centered` : "Full width of the editor"}</option>)}
+          </select>
           <label htmlFor="setting-tabSize">Tab size</label>
           <select {...field("tabSize")} onChange={(e) => update({ tabSize: Number(e.target.value) })}>
             {[2, 4, 8].map((n) => <option key={n} value={n}>{n} spaces</option>)}
