@@ -807,7 +807,6 @@ select {
   background: var(--bg);
   border-right: none;
   color: var(--text-muted);
-  opacity: 0.8;
 }
 .editor-host .cm-activeLine {
   background: var(--accent-soft);
@@ -1579,6 +1578,20 @@ select {
 }
 .editor-host .cm-panel.cm-panel-lint ul [aria-selected] {
   background: var(--accent-soft);
+}
+/* CodeMirror's focused selection uses the system highlight colour (4.49:1 on Windows); use the theme's accent. */
+.editor-host .cm-panel.cm-panel-lint ul:focus [aria-selected] {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+/* The rule name: full opacity and a readable size (CodeMirror fades it to 70% at 70% size). */
+.editor-host .cm-panel.cm-panel-lint .cm-diagnosticSource {
+  opacity: 1;
+  font-size: 11px;
+}
+.editor-host .cm-panel.cm-panel-lint ul:not(:focus) .cm-diagnosticSource,
+.editor-host .cm-panel.cm-panel-lint ul:focus li:not([aria-selected]) .cm-diagnosticSource {
+  color: var(--text-muted);
 }
 .editor-host .cm-tooltip {
   border: 1px solid var(--border-strong);

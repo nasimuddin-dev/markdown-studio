@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { diffLines, diffStats, withContext } from "../src/features/diff";
 import { HistoryDialog, relativeTime } from "../src/components/HistoryDialog";
@@ -47,7 +47,7 @@ describe("file history", () => {
 
     render(<HistoryDialog />);
     act(() => useUi.getState().setHistoryDocId(id));
-    const options = await screen.findAllByRole("option");
+    const options = within(await screen.findByRole("list", { name: "Versions" })).getAllByRole("button");
     expect(options).toHaveLength(2);
     await userEvent.click(options[1]);
     await waitFor(() => expect(screen.getByText(/− 1 in this version/)).toBeInTheDocument());

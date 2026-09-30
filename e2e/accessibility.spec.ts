@@ -16,14 +16,18 @@ async function start(page: Page, theme: "light" | "dark") {
   await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
 }
 
-/** WCAG 2.1 A/AA checks (SRS §15). CodeMirror's editable surface is excluded: its internals are managed by the library. */
+/** WCAG 2.1 A/AA checks (SRS §15). CodeMirror's editable text is excluded (its internals are managed by the library); its gutters are checked. */
 async function audit(page: Page, label: string, disableRules: string[] = []) {
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .exclude(".cm-scroller")
+    .exclude(".cm-content")
     .disableRules(disableRules)
     .analyze();
-  const summary = results.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length}× ${v.nodes[0]?.target.join(" ")} — ${v.help}`);
+  // The editor's scroller is reachable through its text (excluded above), which axe can't see.
+  const violations = results.violations
+    .map((v) => (v.id === "scrollable-region-focusable" ? { ...v, nodes: v.nodes.filter((n) => n.target.join(" ") !== ".cm-scroller") } : v))
+    .filter((v) => v.nodes.length);
+  const summary = violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length}× ${v.nodes[0]?.target.join(" ")} — ${v.help}`);
   expect(summary, `${label}\n${summary.join("\n")}`).toEqual([]);
 }
 
@@ -82,6 +86,67 @@ for (const theme of ["light", "dark"] as const) {
       await page.keyboard.press("Enter");
       await expect(page.getByRole("dialog", { name: "Keyboard Shortcuts" })).toBeVisible();
       await audit(page, "shortcuts");
+    });
+
+    test("menus, panels and dialogs", async ({ page }) => {
+      const palette = async (command: string) => {
+        await page.keyboard.press(`${mod}+Shift+P`);
+        await page.keyboard.type(command);
+        await page.keyboard.press("Enter");
+      };
+      await start(page, theme);
+      await page.getByRole("button", { name: "Open Folder" }).first().click();
+      await page.locator(".tree-row", { hasText: /^README\.md$/ }).click();
+      await expect(page.locator(".markdown-body h1")).toBeVisible();
+
+      await page.getByRole("button", { name: "File", exact: true }).click();
+      await expect(page.getByRole("menu")).toBeVisible();
+      await audit(page, "file menu");
+      await page.keyboard.press("Escape");
+      await page.locator(".tree-row", { hasText: /^README\.md$/ }).click({ button: "right" });
+      await expect(page.getByRole("menu")).toBeVisible();
+      await audit(page, "explorer context menu");
+      await page.keyboard.press("Escape");
+      await palette("go to file");
+      await page.keyboard.type("guide");
+      await audit(page, "go to file");
+      await page.keyboard.press("Escape");
+
+      // Editing: find and replace, lint problems, an unsaved document.
+      await page.locator(".cm-line").first().click();
+      await page.keyboard.press(`${mod}+End`);
+      await page.keyboard.type("\n\n# Welcome to Markpion\n");
+      await page.keyboard.press(`${mod}+H`);
+      await expect(page.locator(".cm-search")).toBeVisible();
+      await audit(page, "find and replace");
+      await page.keyboard.press("Escape");
+      await page.getByRole("button", { name: /Show problems/ }).click();
+      await expect(page.locator(".cm-panel-lint")).toBeVisible();
+      await audit(page, "problems");
+
+      await palette("check links in folder");
+      await expect(page.getByRole("tab", { name: "Links", selected: true })).toBeVisible();
+      await audit(page, "link check");
+
+      await palette("close tab");
+      await expect(page.getByRole("alertdialog").or(page.getByRole("dialog"))).toBeVisible();
+      await audit(page, "unsaved changes");
+      await page.keyboard.press("Escape");
+
+      await palette("new from template");
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await audit(page, "templates");
+      await page.keyboard.press("Escape");
+
+      await palette("about markpion");
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await audit(page, "about");
+      await page.keyboard.press("Escape");
+
+      await page.keyboard.press(`${mod}+S`);
+      await palette("file history");
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await audit(page, "file history");
     });
 
     test("search view with results", async ({ page }) => {

@@ -80,12 +80,11 @@ export function HistoryDialog() {
         </p>
       ) : (
         <div className="history-body">
-          <ul className="history-list" role="listbox" aria-label="Versions">
+          <ul className="history-list" aria-label="Versions">
             {versions.map((v) => (
               <li key={v.id}>
                 <button
-                  role="option"
-                  aria-selected={v.id === selected}
+                  aria-current={v.id === selected ? "true" : undefined}
                   className={`history-item${v.id === selected ? " active" : ""}`}
                   onClick={() => setSelected(v.id)}
                   title={new Date(v.id).toLocaleString()}
