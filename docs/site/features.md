@@ -49,7 +49,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 
 - Atomic saves, detection of files changed on disk (Reload, Compare or Keep Mine), and clear errors with next steps. [Saving & recovery](/guide/saving-and-recovery)
 - Optional auto save after a delay or when switching tabs or windows.
-- Local file history: the previous version is kept on every save (30 per file), with a line diff and restore.
+- Local file history: the previous version is kept on every save (30 per file), with a line diff and restore; for files in Git, the last commit too.
 - Crash recovery for unsaved documents, and session restore of the last folder and files.
 - UTF-8 with or without BOM; LF and CRLF line endings are preserved per file.
 - Save options: trim trailing whitespace, insert a final newline, and choose line endings for new files.

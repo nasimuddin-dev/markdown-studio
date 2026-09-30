@@ -91,7 +91,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.17.0. **Done** means im
 | Mermaid diagrams and LaTeX math (preview, exports; native Word equations) | `components/MermaidDiagram.tsx`, `services/markdown.ts`, `services/convert/latex.ts`, `omml.ts`, `services/mathImage.ts` | §18 v0.3 |
 | Markdown lint with a Problems panel | `features/lint.ts`, `features/lintExtension.ts` | §19 Markdown linting |
 | Workspace link check (files, images, anchors) | `features/linkCheck.ts`, `components/LinkCheckPanel.tsx` | §19 Markdown linting |
-| Local file history with diff and restore | `src-tauri/src/history.rs`, `components/HistoryDialog.tsx` | §19 version history and snapshots |
+| Local file history with diff and restore; the last Git commit is listed too for tracked files | `src-tauri/src/history.rs`, `components/HistoryDialog.tsx` | §19 version history and snapshots |
 | Export to HTML, PDF and Word (with footnotes: a Footnotes section in PDF, native footnotes in Word; Mermaid diagrams drawn as pictures); Copy as Formatted Text and Copy as HTML; Print | `services/exportHtml.ts`, `services/convert/toPdf.ts`, `toDocx.ts`, `footnotes.ts` | §19 export to HTML and PDF |
 | Import Word, PDF, HTML and CSV/TSV; paste rich text and spreadsheet cells | `services/convert/`, `features/importing.ts`, `features/richPaste.ts` | §5 technical writer needs |
 | Convert a folder to Markdown; combine a folder into one document; export a folder as one PDF or Word file | `features/batchConvert.ts`, `features/combine.ts`, `features/exporting.ts` | §19 publishing workflows |

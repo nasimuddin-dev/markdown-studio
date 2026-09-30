@@ -7,6 +7,8 @@ import { openPath, saveDocument } from "../src/features/documents";
 import { useDocuments } from "../src/stores/documentsStore";
 import { useUi } from "../src/stores/uiStore";
 import { docs, setupBackend } from "./helpers";
+import { setBackend } from "../src/services";
+import { MemoryBackend } from "../src/services/memoryBackend";
 
 describe("line diff", () => {
   it("finds added and removed lines", () => {
@@ -65,5 +67,19 @@ describe("file history", () => {
     render(<HistoryDialog />);
     act(() => useUi.getState().setHistoryDocId(id));
     expect(await screen.findByText(/No earlier versions yet/)).toBeInTheDocument();
+  });
+
+  it("offers the last Git commit to compare with and restore", async () => {
+    setupBackend();
+    setBackend(new MemoryBackend({ files: { "/ws/a.md": "edited line\n" }, approved: ["/ws"], gitHead: { "/ws/a.md": "committed line\n" } }));
+    const id = (await openPath("/ws/a.md"))!;
+    render(<HistoryDialog />);
+    act(() => useUi.getState().setHistoryDocId(id));
+    const entry = await screen.findByRole("button", { name: /Last commit/ });
+    expect(entry).toHaveAttribute("aria-current", "true"); // no saved versions yet
+    await waitFor(() => expect(document.querySelector(".diff-del")?.textContent).toContain("committed line"));
+    await userEvent.click(screen.getByRole("button", { name: "Restore This Version" }));
+    expect(docs()[0].content).toBe("committed line\n");
+    expect(useUi.getState().toasts.at(-1)?.message).toMatch(/Restored the last committed version/);
   });
 });
