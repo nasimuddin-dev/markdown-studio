@@ -83,3 +83,21 @@ describe("go to heading", () => {
     spy.mockRestore();
   });
 });
+
+describe("recently used commands", () => {
+  it("lists them first when the palette opens", async () => {
+    localStorage.clear();
+    setupBackend();
+    const { unmount } = render(<CommandPalette />);
+    act(() => useUi.getState().setPaletteOpen(true));
+    await userEvent.type(screen.getByRole("combobox"), "keyboard shortcuts");
+    await userEvent.keyboard("{Enter}");
+    unmount();
+    render(<CommandPalette />);
+    act(() => useUi.getState().setPaletteOpen(true));
+    const first = screen.getAllByRole("option")[0];
+    expect(first).toHaveTextContent("Keyboard Shortcuts");
+    expect(first).toHaveTextContent("Recently used");
+    localStorage.clear();
+  });
+});

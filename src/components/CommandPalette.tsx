@@ -8,6 +8,7 @@ import { useWorkspace } from "../stores/workspaceStore";
 import { backend } from "../services";
 import { isMarkdownPath } from "../services/paths";
 import { openPath } from "../features/documents";
+import { recentCommands, rememberCommand } from "../features/recentCommands";
 import { extractHeadings } from "../features/outline";
 import { goToHeading } from "./Outline";
 
@@ -19,6 +20,12 @@ const LABELS: Record<PaletteMode, { dialog: string; placeholder: string; list: s
   files: { dialog: "Go to file", placeholder: "Type part of a file name or path…", list: "Files", empty: "No matching files" },
   compare: { dialog: "Compare with file", placeholder: "Choose a file to compare with…", list: "Files", empty: "No matching files" },
   headings: { dialog: "Go to heading", placeholder: "Type part of a heading…", list: "Headings", empty: "No matching headings" },
+};
+
+/** Position in the recently used list (unlisted commands after all of them). */
+const rank = (recent: string[], itemId: string) => {
+  const i = recent.indexOf(itemId.slice(4));
+  return i < 0 ? recent.length : i;
 };
 
 /** A path relative to the folder, with forward slashes. */
@@ -104,9 +111,18 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         run: () => void openPath(path),
       }));
     }
+    const recent = recentCommands();
     const cmdItems = Object.values(commands)
       .filter((c) => c.id !== "commandPalette" && (!c.enabled || c.enabled()))
-      .map((c) => ({ id: `cmd:${c.id}`, label: c.label.replace(/…$/, ""), shortcut: c.shortcut, run: c.run }));
+      .map((c) => ({
+        id: `cmd:${c.id}`,
+        label: c.label.replace(/…$/, ""),
+        shortcut: c.shortcut,
+        hint: recent.includes(c.id) ? "Recently used" : undefined,
+        run: c.run,
+      }))
+      // Recently used commands first (newest first); the rest keep their order. With a query, matching decides.
+      .sort((a, b) => rank(recent, a.id) - rank(recent, b.id));
     const tabItems = docs.map((d) => ({
       id: `tab:${d.id}`,
       label: `Go to Tab: ${d.name}`,
@@ -130,6 +146,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
 
   const runItem = (item: PaletteItem | undefined) => {
     if (!item) return;
+    if (item.id.startsWith("cmd:")) rememberCommand(item.id.slice(4));
     onClose();
     // Let the palette unmount (and focus return) before running.
     setTimeout(() => void item.run(), 0);

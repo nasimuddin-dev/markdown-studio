@@ -72,4 +72,4 @@ What happens:
 
 ## Command palette
 
-To find a **command** rather than text, open the command palette with **Ctrl+Shift+P** or **F1** and type part of its name, for example "table" or "export". To open a **file** by name, use **Go to File** (**Ctrl+Alt+O**); see [File explorer](/guide/file-explorer#go-to-file).
+To find a **command** rather than text, open the command palette with **Ctrl+Shift+P** or **F1** and type part of its name, for example "table" or "export". Before you type, the commands you used most recently are at the top. To open a **file** by name, use **Go to File** (**Ctrl+Alt+O**); see [File explorer](/guide/file-explorer#go-to-file).
