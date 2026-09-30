@@ -117,7 +117,7 @@ class PdfBuilder {
           out.push({ text: n.alt ? `[${n.alt}]` : "[image]", italics: true, color: "#666666" });
           break;
         case "html":
-          out.push(n.value.replace(/<[^>]+>/g, ""));
+          out.push(n.value.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, ""));
           break;
         case "inlineMath": {
           // PDF text can't flow around pictures, so inline formulas are set as
@@ -271,7 +271,7 @@ class PdfBuilder {
       case "thematicBreak":
         return [{ canvas: [{ type: "line", x1: 0, y1: 0, x2: this.contentWidth, y2: 0, lineWidth: 1, lineColor: "#C3C9D2" }], margin: [0, 6, 0, 12] }];
       case "html": {
-        const text = node.value.replace(/<[^>]+>/g, "").trim();
+        const text = node.value.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, "").trim();
         return text ? [{ text, margin: [0, 0, 0, 8] }] : [];
       }
       case "footnoteDefinition":

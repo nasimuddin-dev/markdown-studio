@@ -42,6 +42,16 @@ async function documentXml(bytes: Uint8Array) {
   return zip.file("word/document.xml")!.async("string");
 }
 
+describe("HTML comments in exports", () => {
+  it("leave nothing in the Word document, even with > inside", async () => {
+    const md = "Visible.\n\n<!-- hidden > still hidden -->\n\nAlso <!-- inline > note --> visible.\n";
+    const xml = await documentXml(await markdownToDocx(md, { loadImage: makeImageLoader(null, async () => "") }));
+    expect(xml).toContain("Visible.");
+    expect(xml).not.toContain("hidden");
+    expect(xml).not.toContain("note");
+  });
+});
+
 describe("Markdown → Word (.docx)", () => {
   it("produces a valid Word package with Word heading styles, lists, tables and images", async () => {
     const bytes = await markdownToDocx(SAMPLE, {

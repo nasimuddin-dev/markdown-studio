@@ -34,7 +34,7 @@ const MENUS: { label: string; items: (recent: RecentEntry[]) => Item[] }[] = [
       c("bold"), c("italic"), c("strikethrough"), c("inlineCode"), c("link"), c("removeLink"), c("insertImage"), c("referenceLinks"), c("inlineLinks"), sep,
       c("heading1"), c("heading2"), c("heading3"), c("heading4"), c("heading5"), c("heading6"), c("paragraph"), c("promoteHeading"), c("demoteHeading"), c("renameHeading"), c("numberHeadings"), c("removeHeadingNumbers"), c("moveSectionUp"), c("moveSectionDown"), sep,
       c("bulletList"), c("orderedList"), c("taskList"), c("toggleTaskCheck"), c("quote"), c("calloutNote"), c("calloutTip"), c("calloutImportant"), c("calloutWarning"), c("calloutCaution"), sep,
-      c("codeBlock"), c("horizontalRule"), c("footnote"), c("insertDate"), c("insertDateTime"), sep, c("toc"),
+      c("codeBlock"), c("horizontalRule"), c("footnote"), c("toggleComment"), c("insertDate"), c("insertDateTime"), sep, c("toc"),
     ],
   },
   {

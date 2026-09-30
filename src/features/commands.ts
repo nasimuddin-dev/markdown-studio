@@ -27,6 +27,7 @@ import { fillTemplate } from "./templates";
 import { convertToInlineLinks, convertToReferenceLinks } from "./referenceLinks";
 import { followLinkAtCursor } from "./followLink";
 import { renameHeading } from "./renameHeading";
+import { toggleComment } from "@codemirror/commands";
 import { foldToLevel } from "./foldLevel";
 import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
@@ -69,6 +70,7 @@ export const formatCommands: Record<string, Command> = {
   inlineCode: formatCommand("inlineCode", "Inline Code", fmt.toggleInlineCode, "Mod+E"),
   link: formatCommand("link", "Insert Link", fmt.insertLink, "Mod+K"),
   removeLink: formatCommand("removeLink", "Remove Link", fmt.removeLink),
+  toggleComment: formatCommand("toggleComment", "Toggle Comment", toggleComment, "Mod+/"),
   followLink: formatCommand("followLink", "Open Link at Cursor", followLinkAtCursor, "Alt+Enter"),
   renameHeading: { id: "renameHeading", label: "Rename Heading…", shortcut: "F2", run: () => renameHeading(), enabled: hasActive },
   referenceLinks: formatCommand("referenceLinks", "Convert Links to Reference Style", convertToReferenceLinks),

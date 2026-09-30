@@ -179,7 +179,7 @@ class DocxBuilder {
           out.push(await this.image(n.url, n.alt ?? ""));
           break;
         case "html":
-          out.push(this.run(n.value.replace(/<[^>]+>/g, ""), s));
+          out.push(this.run(n.value.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, ""), s));
           break;
         case "inlineMath": {
           // A native Word equation; formulas outside the supported subset keep their LaTeX.
@@ -344,7 +344,7 @@ class DocxBuilder {
       case "thematicBreak":
         return [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "C3C9D2", space: 1 } }, children: [] })];
       case "html": {
-        const text = node.value.replace(/<[^>]+>/g, "").trim();
+        const text = node.value.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, "").trim();
         return text ? [new Paragraph({ indent, children: [new TextRun(text)] })] : [];
       }
       case "footnoteDefinition":
