@@ -114,7 +114,7 @@ The toolbar above the editor puts the common commands one click away, like a wor
 ## Spelling and statistics
 
 - Spelling is checked with your operating system's dictionary, and misspelled words are underlined. Turn it off in Settings.
-- The status bar shows the word count. Click it to see words, characters, lines, paragraphs and reading time for the document, and for the selection if there is one.
+- The status bar shows the word count. Click it to see words, characters, lines, sentences, paragraphs, reading time (230 words a minute) and speaking time (130 words a minute) for the document, and for the selection if there is one. **Readability** is the Flesch reading ease score, from 0 (hard) to 100 (easy), with a word for its band ("plain English" is 60–69). It is an estimate for English prose of 30 words or more: syllables are guessed from the spelling, Markdown symbols count as text, and other languages show "—".
 - **Set Word Count Goal…** (command palette) gives a saved document a target, and the status bar then shows your progress, such as `523 / 1,000 words`. Enter 0 to remove the goal. Goals are kept in your settings, per file, and follow the file when you rename or move it in Markpion.
 - In a document with task lists, the status bar also shows how many tasks are done (`2/5 tasks`). Click it to go to the next open task. In a narrow window, the line ending, encoding and "Markdown" labels are hidden to make room.
 

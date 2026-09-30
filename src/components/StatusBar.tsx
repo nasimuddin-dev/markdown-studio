@@ -3,7 +3,9 @@ import { useGit } from "../stores/gitStore";
 import { useDocuments, isDirty } from "../stores/documentsStore";
 import { useUi } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
-import { countWords, textStats } from "../services/textStats";
+import { countWords, readingEaseLabel, textStats } from "../services/textStats";
+
+const ease = (score: number | null) => (score === null ? "—" : `${score} (${readingEaseLabel(score)})`);
 import { getEditorView, showProblems } from "../features/editorBridge";
 import { changeCounts, gitHunksOf, useGitBaseVersion } from "../features/gitGutter";
 import { commands, formatShortcut } from "../features/commands";
@@ -199,8 +201,15 @@ function WordCount({ words, content, goal }: { words: number; content: string; g
               <tr><th scope="row">Characters</th><td>{fmt(stats.characters)}</td>{sel && <td>{fmt(sel.characters)}</td>}</tr>
               <tr><th scope="row">Without spaces</th><td>{fmt(stats.charactersNoSpaces)}</td>{sel && <td>{fmt(sel.charactersNoSpaces)}</td>}</tr>
               <tr><th scope="row">Lines</th><td>{fmt(stats.lines)}</td>{sel && <td>{fmt(sel.lines)}</td>}</tr>
+              <tr><th scope="row">Sentences</th><td>{fmt(stats.sentences)}</td>{sel && <td>{fmt(sel.sentences)}</td>}</tr>
               <tr><th scope="row">Paragraphs</th><td>{fmt(stats.paragraphs)}</td>{sel && <td>{fmt(sel.paragraphs)}</td>}</tr>
               <tr><th scope="row">Reading time</th><td>{stats.readingMinutes} min</td>{sel && <td>{sel.readingMinutes} min</td>}</tr>
+              <tr><th scope="row">Speaking time</th><td>{stats.speakingMinutes} min</td>{sel && <td>{sel.speakingMinutes} min</td>}</tr>
+              <tr>
+                <th scope="row" title="Flesch reading ease, for English text of 30 words or more: 0–100, higher is easier">Readability</th>
+                <td>{ease(stats.readingEase)}</td>
+                {sel && <td>{ease(sel.readingEase)}</td>}
+              </tr>
             </tbody>
             {sel && (
               <thead>
