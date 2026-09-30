@@ -96,6 +96,25 @@
 .explorer-actions {
   display: flex;
 }
+/* In a narrow sidebar the folder name gets the whole header; its buttons
+   appear over it on hover or keyboard focus (they stay focusable). */
+@container (max-width: 240px) {
+  .explorer-header {
+    position: relative;
+  }
+  .explorer-actions {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+    background: var(--bg-sidebar);
+    opacity: 0;
+  }
+  .explorer-header:hover .explorer-actions,
+  .explorer-header:focus-within .explorer-actions {
+    opacity: 1;
+  }
+}
 
 .explorer-empty {
   padding: 16px;

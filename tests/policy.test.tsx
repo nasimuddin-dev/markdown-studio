@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import { autoAnswer } from "./helpers";
 import { MemoryBackend } from "../src/services/memoryBackend";
 import { setBackend } from "../src/services";
 import { applyPolicy, parsePolicy } from "../src/stores/policy";
@@ -41,9 +42,11 @@ describe("managed settings policy", () => {
     expect(screen.getByRole("note")).toHaveTextContent("managed by your organization");
     expect(screen.getByRole("checkbox", { name: /Turn on AI commands/ })).toBeDisabled();
     expect(screen.getByRole("checkbox", { name: /Show line numbers/ })).toBeEnabled();
-    // Reset returns to the organization's defaults.
+    // Reset (after confirming) returns to the organization's defaults.
+    const answered = autoAnswer("reset");
     act(() => screen.getByRole("button", { name: /Reset/ }).click());
-    expect(useSettings.getState().settings.exportPageSize).toBe("letter");
+    await waitFor(() => expect(useSettings.getState().settings.exportPageSize).toBe("letter"));
+    answered.stop();
   });
 
   it("changes nothing without a policy", async () => {

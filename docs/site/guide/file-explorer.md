@@ -44,6 +44,8 @@ Type in **Filter files** at the top of the Explorer to list only the files whose
 | Refresh | The **Refresh** button |
 | Close the folder | The **×** button at the top of the Explorer, or **File → Close Folder**. The folder leaves the Explorer; nothing is deleted, and open tabs stay open |
 
+When the sidebar is narrow, the buttons at the top of the Explorer (**New file**, **New folder**, **Collapse folders**, **Refresh**, **×**) make room for the folder name: point at the header, or press **Tab** to reach them, and they appear.
+
 Other right-click actions: **Open**, **Reveal in File Explorer** (**Reveal in Finder** on macOS, **Open Containing Folder** on Linux), **Copy Path** and **Copy Relative Path**.
 
 ## Links follow renamed and moved files

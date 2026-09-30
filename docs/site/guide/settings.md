@@ -81,7 +81,7 @@ The update check asks GitHub for the latest version number; nothing else is sent
 
 ## Reset to defaults
 
-**Reset to Defaults** at the bottom of the Settings dialog restores every setting above to its default. Your open folder and files are kept.
+**Reset to Defaults…** at the bottom left of the Settings dialog asks first, then restores every setting above to its default, including custom keyboard shortcuts and word count goals. Your documents, open folder and recent files are kept.
 
 ## Export and import
 

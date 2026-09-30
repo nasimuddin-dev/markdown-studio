@@ -2,7 +2,7 @@ import { AiSettings } from "./AiSettings";
 import { SettingsLayout } from "./SettingsLayout";
 import { LINT_RULES } from "../features/lint";
 import { useEffect, useState } from "react";
-import { useUi } from "../stores/uiStore";
+import { ask, useUi } from "../stores/uiStore";
 import { DEFAULT_SETTINGS, LINE_LENGTHS, useSettings } from "../stores/settingsStore";
 import { Modal } from "./Dialogs";
 import { refreshWorkspace } from "../features/workspace";
@@ -182,22 +182,38 @@ export function SettingsDialog() {
         </section>
       </SettingsLayout>
       <div className="modal-buttons">
-        <button
-          className="button"
-          onClick={() => update({ ...DEFAULT_SETTINGS, ...useSettings.getState().managedDefaults, session: settings.session })}
-        >
-          Reset to Defaults
-        </button>
-        <button className="button" onClick={() => void import("../features/settingsTransfer").then((m) => m.exportSettings())}>
-          Export…
-        </button>
-        <button className="button" onClick={() => void import("../features/settingsTransfer").then((m) => m.importSettings())}>
-          Import…
-        </button>
+        <div className="modal-buttons-start">
+          <button className="button" onClick={() => void import("../features/settingsTransfer").then((m) => m.importSettings())}>
+            Import…
+          </button>
+          <button className="button" onClick={() => void import("../features/settingsTransfer").then((m) => m.exportSettings())}>
+            Export…
+          </button>
+          <button className="button" onClick={() => void resetSettings()}>
+            Reset to Defaults…
+          </button>
+        </div>
         <button className="button primary" onClick={() => setOpen(false)}>Done</button>
       </div>
     </Modal>
   );
+}
+
+/** Restores every setting to its default after asking (managed settings keep their IT values). */
+async function resetSettings() {
+  const choice = await ask({
+    title: "Reset settings",
+    message: "Reset all settings to their defaults?",
+    detail: "This includes your keyboard shortcuts and word count goals. Your documents, open folder and recent files aren't affected.",
+    buttons: [
+      { id: "cancel", label: "Cancel" },
+      { id: "reset", label: "Reset", variant: "danger" },
+    ],
+    cancelId: "cancel",
+  });
+  if (choice !== "reset") return;
+  const { settings, update, managedDefaults } = useSettings.getState();
+  update({ ...DEFAULT_SETTINGS, ...managedDefaults, session: settings.session });
 }
 
 export function AboutDialog() {

@@ -45,6 +45,13 @@
   gap: 8px;
   margin-top: 18px;
 }
+/* Secondary actions on the left, the dialog's main button alone on the right. */
+.modal-buttons-start {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-right: auto;
+}
 
 .settings-modal {
   width: min(780px, 100%);

@@ -46,6 +46,10 @@
   --mark-bg: #f5d77e;
   --mark-text: #1d2330;
 
+  /* Motion (turned off when the system asks for reduced motion) */
+  --duration-fast: 120ms;
+  --duration-slow: 200ms;
+
   /* Stacking layers, lowest first. Values under 10 are local to a component. */
   --z-dropdown: 50;
   --z-popover: 60;

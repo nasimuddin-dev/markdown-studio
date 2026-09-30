@@ -132,3 +132,17 @@ select {
   white-space: nowrap;
   min-width: 0;
 }
+
+/* Hover and press feedback eases in; menus and lists of results stay instant, like native ones. */
+.button,
+.icon-button,
+.toolbar-button,
+.menu-button,
+.sidebar-tab,
+.tab,
+.tree-row {
+  transition:
+    background-color var(--duration-fast) ease-out,
+    border-color var(--duration-fast) ease-out,
+    color var(--duration-fast) ease-out;
+}

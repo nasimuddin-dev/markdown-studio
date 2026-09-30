@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SettingsDialog } from "../src/components/SettingsDialog";
 import { useUi } from "../src/stores/uiStore";
-import { setupBackend } from "./helpers";
+import { useSettings } from "../src/stores/settingsStore";
+import { autoAnswer, setupBackend } from "./helpers";
 
 describe("settings sections", () => {
   it("lists the sections and jumps to one", async () => {
@@ -48,5 +49,26 @@ describe("settings sections", () => {
     expect(screen.getByRole("searchbox", { name: "Search settings" })).toHaveValue("");
     expect(useUi.getState().settingsOpen).toBe(true);
     expect(visible(/Show line numbers/)).toBe(true);
+  });
+});
+
+describe("reset to defaults", () => {
+  it("asks first and only resets when confirmed", async () => {
+    setupBackend();
+    render(<SettingsDialog />);
+    act(() => useUi.getState().setSettingsOpen(true));
+    act(() => useSettings.getState().update({ lineNumbers: false, fontSize: 19 }));
+    const reset = screen.getByRole("button", { name: "Reset to Defaults…" });
+
+    let answered = autoAnswer("cancel");
+    await userEvent.click(reset);
+    answered.stop();
+    expect(answered.titles).toEqual(["Reset settings"]);
+    expect(useSettings.getState().settings).toMatchObject({ lineNumbers: false, fontSize: 19 });
+
+    answered = autoAnswer("reset");
+    await userEvent.click(reset);
+    answered.stop();
+    await vi.waitFor(() => expect(useSettings.getState().settings).toMatchObject({ lineNumbers: true, fontSize: 15 }));
   });
 });

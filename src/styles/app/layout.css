@@ -67,7 +67,7 @@
 }
 .focus-mode .menubar {
   opacity: 0.35;
-  transition: opacity 0.2s;
+  transition: opacity var(--duration-slow);
 }
 .focus-mode .menubar:hover,
 .focus-mode .menubar:focus-within {
