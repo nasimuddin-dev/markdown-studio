@@ -3,7 +3,7 @@ import { EditorState } from "@codemirror/state";
 import { CompletionContext } from "@codemirror/autocomplete";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { ensureSyntaxTree } from "@codemirror/language";
-import { emojiCompletionSource, fileCompletions, headingCompletions, invalidateWorkspaceFiles, linkCompletionSource } from "../src/features/completion";
+import { emojiCompletionSource, fileCompletions, headingCompletions, invalidateWorkspaceFiles, linkCompletionSource, referenceCompletionSource } from "../src/features/completion";
 import { relativePath } from "../src/services/paths";
 import { openPath } from "../src/features/documents";
 import { setWorkspace } from "../src/features/workspace";
@@ -70,5 +70,24 @@ describe("emoji shortcode completion", () => {
     expect(await complete("see http://example")).toBeNull();
     expect(await complete("`:roc")).toBeNull();
     expect(await complete("```\n:roc")).toBeNull();
+  });
+});
+
+describe("reference and footnote label completion", () => {
+  const complete = (doc: string) => {
+    const result = referenceCompletionSource(new CompletionContext(EditorState.create({ doc }), doc.length, false));
+    return result && { from: result.from, labels: result.options.map((o) => `${o.label}=${o.detail}`) };
+  };
+  const defs = "\n\n[Guide]: guide.md\n[home]: /\n[guide]: dup.md\n[^note]: A note.\n`[code]: x`";
+
+  it("offers the document's link definitions after ][", () => {
+    expect(complete(defs + "\nSee [the guide][")).toEqual({ from: defs.length + 17, labels: ["Guide=guide.md", "home=/"] });
+    expect(complete(defs + "\n![logo][ho")?.labels).toEqual(["Guide=guide.md", "home=/"]);
+    expect(complete("[a][")).toBeNull();
+  });
+
+  it("offers defined footnotes after [^, but not where a definition starts", () => {
+    expect(complete(defs + "\nText[^")).toEqual({ from: defs.length + 7, labels: ["note=A note."] });
+    expect(complete(defs + "\n[^")).toBeNull();
   });
 });

@@ -903,3 +903,30 @@ test("editor and preview scroll to the same source line; double-click in the pre
   const [inPreview, inEditor] = [await offset(".preview", "p|" + (await paragraph.textContent())), await offset(".cm-scroller", ".cm-line|Section 31 line 0")];
   expect(Math.abs(inPreview! - inEditor!)).toBeLessThan(30);
 });
+
+test("completes reference link labels the document defines", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("\n\n[Install guide]: docs/install.md\n");
+  await page.keyboard.press(`${mod}+Home`);
+  await page.keyboard.type("Read the [guide][");
+  const list = page.locator(".cm-tooltip-autocomplete");
+  await expect(list).toContainText("Install guide");
+  await expect(list).toContainText("docs/install.md");
+  // CodeMirror ignores Enter for a moment after the list opens.
+  await page.waitForTimeout(150);
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-line").first()).toHaveText("Read the [guide][Install guide]");
+  // With a ] already there, it is not doubled.
+  await page.keyboard.type(" and [notes][]");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.type("I");
+  await expect(list).toContainText("Install guide");
+  // CodeMirror ignores Enter for a moment after the list opens.
+  await page.waitForTimeout(150);
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-line").first()).toHaveText("Read the [guide][Install guide] and [notes][Install guide]");
+  // The reference is defined, so the lint has nothing to report about it.
+  await expect(page.locator(".cm-lintRange")).toHaveCount(0);
+});

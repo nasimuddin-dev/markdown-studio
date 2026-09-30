@@ -6,6 +6,7 @@ import { backend } from "../services";
 import { basename, dirname, isMarkdownPath, relativePath } from "../services/paths";
 import { activeDoc } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
+import { findLinkDefinitions, maskCode } from "./lint";
 import { extractHeadings } from "./outline";
 
 const CACHE_MS = 10_000;
@@ -75,6 +76,41 @@ export async function linkCompletionSource(ctx: CompletionContext): Promise<Comp
   return options.length ? { from, options, validFor: /^[^)\s#]*$/ } : null;
 }
 
+/**
+ * Completes labels the document defines: link references after `][`
+ * (`[text][` → `[text][guide`), with the address as detail, and footnotes
+ * after `[^` (except at the start of a line, where a definition is being written).
+ */
+export function referenceCompletionSource(ctx: CompletionContext): CompletionResult | null {
+  const reference = ctx.matchBefore(/!?\[[^\]\n]*\]\[[^\]\n]*/);
+  const footnote = reference ? null : ctx.matchBefore(/\[\^[^\]\s]*/);
+  const m = reference ?? footnote;
+  if (!m) return null;
+  const line = ctx.state.doc.lineAt(m.from);
+  if (footnote && !line.text.slice(0, m.from - line.from).trim()) return null;
+  const text = ctx.state.doc.toString();
+  const seen = new Set<string>();
+  const options: Completion[] = [];
+  // Close the brackets unless a ] already follows.
+  const close = ctx.state.sliceDoc(ctx.pos, ctx.pos + 1) === "]" ? "" : "]";
+  if (reference) {
+    for (const d of findLinkDefinitions(text)) {
+      if (d.text.startsWith("^") || seen.has(d.text.toLowerCase())) continue;
+      seen.add(d.text.toLowerCase());
+      options.push({ label: d.text, apply: d.text + close, detail: d.target, type: "constant" });
+    }
+  } else {
+    for (const f of maskCode(text).matchAll(/^ {0,3}\[\^([^\]\s]+)\]:[ \t]*(.*)$/gm)) {
+      if (seen.has(f[1].toLowerCase())) continue;
+      seen.add(f[1].toLowerCase());
+      options.push({ label: f[1], apply: f[1] + close, detail: f[2].slice(0, 60), type: "constant" });
+    }
+  }
+  if (!options.length) return null;
+  const from = reference ? m.from + m.text.lastIndexOf("[") + 1 : m.from + 2;
+  return { from, options, validFor: reference ? /^[^\]\n]*$/ : /^[^\]\s]*$/ };
+}
+
 let emojiOptions: Promise<Completion[]> | null = null;
 
 /** Every GitHub emoji shortcode, loaded on first use. */
@@ -111,5 +147,5 @@ export async function emojiCompletionSource(ctx: CompletionContext): Promise<Com
 }
 
 export function linkCompletion(): Extension {
-  return autocompletion({ override: [linkCompletionSource, emojiCompletionSource], icons: false, activateOnTyping: true });
+  return autocompletion({ override: [linkCompletionSource, referenceCompletionSource, emojiCompletionSource], icons: false, activateOnTyping: true });
 }

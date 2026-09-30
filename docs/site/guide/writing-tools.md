@@ -69,7 +69,7 @@ The list commands work on all selected lines, and applying one again removes it.
 
 ## Links
 
-- **Autocompletion:** type `](` to get a list of the workspace's Markdown files, `![](` for images, and `](#` for the headings in the document. Type a colon and two letters, such as `:roc`, to pick an emoji shortcode (🚀 `:rocket:`); it isn't offered inside code or right after a letter or digit, so times like `10:30` are left alone.
+- **Autocompletion:** type `](` to get a list of the workspace's Markdown files, `![](` for images, and `](#` for the headings in the document. After `][`, as in `[text][`, you get the reference labels the document defines (`[label]: address` lines), with their addresses; after `[^` in text, the footnotes it defines. Picking one adds the closing `]` if it's missing. Type a colon and two letters, such as `:roc`, to pick an emoji shortcode (🚀 `:rocket:`); it isn't offered inside code or right after a letter or digit, so times like `10:30` are left alone.
 - **Paste a URL over a selection** to turn the selected text into a link.
 - **Link to a heading:** right-click it in the Outline and choose **Copy Link to Heading** or **Copy Markdown Link**.
 - The [link check](/guide/checking-documents) finds links that point nowhere.
