@@ -3,7 +3,7 @@ import { useUi } from "../stores/uiStore";
 import { useDocuments } from "../stores/documentsStore";
 import { commands, formatShortcut } from "../features/commands";
 import { fuzzyFilter } from "../features/fuzzy";
-import { listTemplates, newFromTemplate, type Template } from "../features/templates";
+import { insertSnippet, listSnippets, listTemplates, newFromTemplate, type Template } from "../features/templates";
 import { useWorkspace } from "../stores/workspaceStore";
 import { backend } from "../services";
 import { isMarkdownPath } from "../services/paths";
@@ -14,11 +14,12 @@ import { recentCommands, rememberCommand } from "../features/recentCommands";
 import { extractHeadings } from "../features/outline";
 import { goToHeading } from "./Outline";
 
-type PaletteMode = "commands" | "templates" | "files" | "headings" | "folderHeadings" | "compare";
+type PaletteMode = "commands" | "templates" | "snippets" | "files" | "headings" | "folderHeadings" | "compare";
 
 const LABELS: Record<PaletteMode, { dialog: string; placeholder: string; list: string; empty: string }> = {
   commands: { dialog: "Command palette", placeholder: "Type a command or tab name…", list: "Commands", empty: "No matching commands" },
   templates: { dialog: "New from template", placeholder: "Choose a template…", list: "Templates", empty: "No matching templates" },
+  snippets: { dialog: "Insert snippet", placeholder: "Choose a snippet…", list: "Snippets", empty: "No matching snippets" },
   files: { dialog: "Go to file", placeholder: "Type part of a file name or path…", list: "Files", empty: "No matching files" },
   compare: { dialog: "Compare with file", placeholder: "Choose a file to compare with…", list: "Files", empty: "No matching files" },
   headings: { dialog: "Go to heading", placeholder: "Type part of a heading…", list: "Headings", empty: "No matching headings" },
@@ -73,6 +74,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
   const root = useWorkspace((s) => s.root);
   useEffect(() => {
     if (mode === "templates") void listTemplates().then(setTemplates);
+    if (mode === "snippets") void listSnippets().then(setTemplates);
     if ((mode === "files" || mode === "compare") && root) {
       void backend()
         .listWorkspaceFiles(root)
@@ -82,8 +84,9 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
   }, [mode, root]);
 
   const items = useMemo<PaletteItem[]>(() => {
-    if (mode === "templates") {
-      return (templates ?? []).map((t) => ({ id: `tpl:${t.id}`, label: t.name, hint: t.description, run: () => void newFromTemplate(t) }));
+    if (mode === "templates" || mode === "snippets") {
+      const run = mode === "templates" ? newFromTemplate : insertSnippet;
+      return (templates ?? []).map((t) => ({ id: `tpl:${t.id}`, label: t.name, hint: t.description, run: () => void run(t) }));
     }
     if (mode === "headings") {
       const content = docs.find((d) => d.id === useDocuments.getState().activeId)?.content ?? "";
@@ -148,8 +151,9 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
   const results = useMemo(() => fuzzyFilter(items, query, (i) => i.label).slice(0, mode === "headings" ? 1000 : mode === "folderHeadings" ? 200 : 50), [items, query, mode]);
 
   useEffect(() => {
-    input.current?.focus();
+    // Remember where focus was before the palette took it, to give it back on close.
     const previous = document.activeElement as HTMLElement | null;
+    input.current?.focus();
     return () => previous?.focus?.();
   }, []);
   useEffect(() => setActive(0), [query]);
@@ -192,7 +196,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
           }}
         />
         <ul className="palette-list" id="palette-list" role="listbox" ref={list} aria-label={LABELS[mode].list}>
-          {results.length === 0 && (mode === "commands" || mode === "headings" || (mode === "templates" ? templates !== null : mode === "folderHeadings" ? folderHeadings !== null : files !== null)) && (
+          {results.length === 0 && (mode === "commands" || mode === "headings" || (mode === "templates" || mode === "snippets" ? templates !== null : mode === "folderHeadings" ? folderHeadings !== null : files !== null)) && (
             <li className="palette-empty">{LABELS[mode].empty}</li>
           )}
           {results.map(({ item, match }, i) => (

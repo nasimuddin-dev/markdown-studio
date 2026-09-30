@@ -109,6 +109,10 @@ It lists the top two heading levels below the title (a single H1 at the top is l
 
 **Format → Insert Date** inserts today's date (`2026-09-30`), and **Insert Date and Time** adds the time (`2026-09-30 14:05`), in your computer's time zone: the same formats templates use for `{{date}}` and `{{datetime}}`.
 
+## Snippets
+
+**Format → Insert Snippet…** inserts a piece of text at the cursor: a collapsible section (`<details>`), a keyboard key (`<kbd>`) or a task list, plus any Markdown file in a folder named `snippets` at the top of your open workspace. Snippets can use the same placeholders as templates (below), such as `{{date}}`, and `{{cursor}}` marks where the cursor goes. The selected text, if any, is replaced.
+
 ## Templates
 
 **File → New from Template…** starts a new document from a template:

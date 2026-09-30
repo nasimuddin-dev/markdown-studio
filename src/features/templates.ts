@@ -6,7 +6,7 @@ import { useWorkspace } from "../stores/workspaceStore";
 import { notify, promptText } from "../stores/uiStore";
 import { newDocument } from "./documents";
 import { refreshDir } from "./workspace";
-import { requestReveal } from "./editorBridge";
+import { getEditorView, requestReveal } from "./editorBridge";
 
 export interface Template {
   id: string;
@@ -274,6 +274,48 @@ export async function saveAsTemplate() {
   } catch (e) {
     notify("error", toAppError(e).kind === "alreadyExists" ? `A template named “${fileName}” already exists.` : describeError(e, "save the template"));
   }
+}
+
+/** Built-in snippets, inserted at the cursor (Format → Insert Snippet…). */
+export const BUILT_IN_SNIPPETS: Template[] = [
+  { id: "snippet:details", name: "Collapsible section", description: "<details> with a summary line", body: "<details>\n<summary>{{cursor}}Summary</summary>\n\nContent\n\n</details>\n" },
+  { id: "snippet:kbd", name: "Keyboard key", description: "<kbd>Ctrl</kbd>", body: "<kbd>{{cursor}}</kbd>" },
+  { id: "snippet:tasks", name: "Task list", description: "Three open tasks", body: "- [ ] {{cursor}}\n- [ ] \n- [ ] \n" },
+];
+
+/** Built-in snippets plus Markdown files in the workspace's `snippets/` folder. */
+export async function listSnippets(): Promise<Template[]> {
+  const root = useWorkspace.getState().root;
+  if (!root) return BUILT_IN_SNIPPETS;
+  let files: string[] = [];
+  try {
+    const dir = join(root, "snippets");
+    files = (await backend().listWorkspaceFiles(root)).filter((p) => isMarkdownPath(p) && isInside(p, dir));
+  } catch {
+    // The built-in snippets still work.
+  }
+  const own: Template[] = files.map((path) => ({ id: `file:${path}`, name: basename(path).replace(/\.(md|markdown)$/i, ""), description: "From this folder's snippets/", path }));
+  return [...own, ...BUILT_IN_SNIPPETS];
+}
+
+/** Inserts a snippet at the cursor (replacing the selection), with placeholders filled and the cursor at {{cursor}}. */
+export async function insertSnippet(snippet: Template) {
+  const view = getEditorView();
+  const doc = activeDoc();
+  if (!view || !doc) return;
+  let body = snippet.body ?? "";
+  if (snippet.path) {
+    try {
+      body = (await backend().readTextFile(snippet.path)).content;
+    } catch (e) {
+      notify("error", describeError(e, `read the snippet “${snippet.name}”`));
+      return;
+    }
+  }
+  const { text, cursor } = fillTemplate(body, doc.name.replace(/\.(md|markdown)$/i, ""));
+  const range = view.state.selection.main;
+  view.dispatch({ changes: { from: range.from, to: range.to, insert: text }, selection: { anchor: range.from + cursor }, scrollIntoView: true, userEvent: "input" });
+  view.focus();
 }
 
 /** Opens a new, unsaved document from a template with the cursor at {{cursor}}. */

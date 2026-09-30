@@ -353,6 +353,7 @@ export const commands: Record<string, Command> = {
     enabled: hasActive,
   },
   selectSection: formatCommand("selectSection", "Select Section", selectSection),
+  insertSnippet: { id: "insertSnippet", label: "Insert Snippet…", run: () => useUi.getState().openSnippetPicker(), enabled: hasActive },
   closeAllTabs: { id: "closeAllTabs", label: "Close All Tabs", run: async () => (await import("./pathActions")).closeAllTabs(), enabled: hasActive },
   moveToNewFile: {
     id: "moveToNewFile",

@@ -1444,3 +1444,17 @@ test("Close brackets automatically (Settings) closes ( [ { and backticks, not qu
   await page.keyboard.type(" it's (x");
   await expect(page.locator(".cm-line").first()).toHaveText("see [link] it's (x)");
 });
+
+test("Format > Insert Snippet inserts a snippet at the cursor", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.getByRole("button", { name: "Format", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Insert Snippet…" }).click();
+  const palette = page.getByRole("dialog", { name: "Insert snippet" });
+  await palette.getByRole("combobox").fill("task list");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-line").first()).toHaveText("- [ ] ");
+  await page.keyboard.type("First");
+  await expect(page.locator(".cm-line")).toHaveText(["- [ ] First", "- [ ] ", "- [ ] ", ""]);
+});
