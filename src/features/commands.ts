@@ -195,6 +195,12 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().openHeadingPicker(),
     enabled: hasActive,
   },
+  goToTag: {
+    id: "goToTag",
+    label: "Go to Tag…",
+    run: () => useUi.getState().openTagPicker(),
+    enabled: () => !!useWorkspace.getState().root,
+  },
   goToFolderHeading: {
     id: "goToFolderHeading",
     label: "Go to Heading in Folder…",

@@ -1024,6 +1024,25 @@ test("Go to Heading in Folder opens another document at the heading", async ({ p
   await expect(page.locator(".cm-activeLine")).toHaveText("## LaTeX math");
 });
 
+test("Go to Tag lists the folder's tags and opens the file at the tag", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-content").click();
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.type("\n\nFiled under #zebra-notes");
+  await page.keyboard.press(`${mod}+Home`);
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("go to tag");
+  await page.keyboard.press("Enter");
+  const palette = page.getByRole("dialog", { name: "Go to tag" });
+  await palette.getByRole("combobox").fill("zebra");
+  await expect(palette.getByRole("option").first()).toContainText("#zebra-notes");
+  await expect(palette.getByRole("option").first()).toContainText("README.md");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-activeLine")).toHaveText("Filed under #zebra-notes");
+});
+
 test("File History marks the words that changed within a line", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

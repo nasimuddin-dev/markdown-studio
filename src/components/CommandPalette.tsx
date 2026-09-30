@@ -10,15 +10,17 @@ import { isMarkdownPath } from "../services/paths";
 import { openPath } from "../features/documents";
 import { requestReveal } from "../features/editorBridge";
 import { collectFolderHeadings, type FolderHeading } from "../features/workspace";
+import { collectFolderTags } from "../features/tags";
 import { recentCommands, rememberCommand } from "../features/recentCommands";
 import { extractHeadings } from "../features/outline";
 import { goToHeading } from "./Outline";
 
-type PaletteMode = "commands" | "templates" | "snippets" | "files" | "headings" | "folderHeadings" | "compare";
+type PaletteMode = "commands" | "templates" | "snippets" | "files" | "headings" | "folderHeadings" | "tags" | "compare";
 
 const LABELS: Record<PaletteMode, { dialog: string; placeholder: string; list: string; empty: string }> = {
   commands: { dialog: "Command palette", placeholder: "Type a command or tab name…", list: "Commands", empty: "No matching commands" },
   templates: { dialog: "New from template", placeholder: "Choose a template…", list: "Templates", empty: "No matching templates" },
+  tags: { dialog: "Go to tag", placeholder: "Type part of a tag…", list: "Tags", empty: "No matching tags" },
   snippets: { dialog: "Insert snippet", placeholder: "Choose a snippet…", list: "Snippets", empty: "No matching snippets" },
   files: { dialog: "Go to file", placeholder: "Type part of a file name or path…", list: "Files", empty: "No matching files" },
   compare: { dialog: "Compare with file", placeholder: "Choose a file to compare with…", list: "Files", empty: "No matching files" },
@@ -71,6 +73,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
   const [templates, setTemplates] = useState<Template[] | null>(null);
   const [files, setFiles] = useState<string[] | null>(null);
   const [folderHeadings, setFolderHeadings] = useState<FolderHeading[] | null>(null);
+  const [tags, setTags] = useState<Awaited<ReturnType<typeof collectFolderTags>> | null>(null);
   const root = useWorkspace((s) => s.root);
   useEffect(() => {
     if (mode === "templates") void listTemplates().then(setTemplates);
@@ -81,6 +84,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         .then((all) => setFiles(all.filter(isMarkdownPath)), () => setFiles([]));
     }
     if (mode === "folderHeadings" && root) void collectFolderHeadings(root).then(setFolderHeadings);
+    if (mode === "tags" && root) void collectFolderTags(root).then(setTags);
   }, [mode, root]);
 
   const items = useMemo<PaletteItem[]>(() => {
@@ -97,6 +101,18 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         indent: h.level - 1,
         run: () => goToHeading(h, index),
       }));
+    }
+    if (mode === "tags") {
+      return [...(tags ?? [])]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .flatMap(([tag, uses]) =>
+          uses.map((u, i) => ({
+            id: `tag:${tag}:${i}`,
+            label: `#${tag}`,
+            hint: `${relativePath(u.path, root ?? "")}${u.count > 1 ? ` · ${u.count}` : ""}`,
+            run: () => void openPath(u.path).then((id) => id && requestReveal(id, u.line, 0, 0)),
+          })),
+        );
     }
     if (mode === "folderHeadings") {
       return (folderHeadings ?? []).map(({ path, heading }, index) => ({
@@ -146,9 +162,9 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
       run: () => useDocuments.getState().setActive(d.id),
     }));
     return [...cmdItems, ...tabItems];
-  }, [docs, mode, templates, files, folderHeadings, root]);
+  }, [docs, mode, templates, files, folderHeadings, tags, root]);
 
-  const results = useMemo(() => fuzzyFilter(items, query, (i) => i.label).slice(0, mode === "headings" ? 1000 : mode === "folderHeadings" ? 200 : 50), [items, query, mode]);
+  const results = useMemo(() => fuzzyFilter(items, query, (i) => i.label).slice(0, mode === "headings" ? 1000 : mode === "folderHeadings" || mode === "tags" ? 200 : 50), [items, query, mode]);
 
   useEffect(() => {
     // Remember where focus was before the palette took it, to give it back on close.
@@ -196,7 +212,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
           }}
         />
         <ul className="palette-list" id="palette-list" role="listbox" ref={list} aria-label={LABELS[mode].list}>
-          {results.length === 0 && (mode === "commands" || mode === "headings" || (mode === "templates" || mode === "snippets" ? templates !== null : mode === "folderHeadings" ? folderHeadings !== null : files !== null)) && (
+          {results.length === 0 && (mode === "commands" || mode === "headings" || (mode === "templates" || mode === "snippets" ? templates !== null : mode === "folderHeadings" ? folderHeadings !== null : mode === "tags" ? tags !== null : files !== null)) && (
             <li className="palette-empty">{LABELS[mode].empty}</li>
           )}
           {results.map(({ item, match }, i) => (

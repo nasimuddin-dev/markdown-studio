@@ -35,6 +35,10 @@ Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the rep
 
 **Edit → Go to Heading in Folder…** (**Ctrl+Shift+Alt+H**, **Cmd+Shift+Option+H** on macOS) does the same across every Markdown file of the open folder: each heading shows its file, and **Enter** opens that file at the heading. Open documents are searched as they are in their tab, including unsaved changes.
 
+## Tags
+
+Write a tag as `#word` in the text (`#draft`, `#project/alpha`), or list tags in the front matter (`tags: [draft, work]`). **Edit → Go to Tag…** lists the tags used across the open folder, one row per file with how many times it's used there. Type part of a tag and press **Enter** to open that file at the first use. Headings, code and links aren't tags, nor is a number like `#1`; tags match whatever their capitalisation.
+
 ## Find in Files
 
 **Find in Files** (**Ctrl+Shift+F**, or the **Search** tab in the sidebar) searches every Markdown file in the open folder.
