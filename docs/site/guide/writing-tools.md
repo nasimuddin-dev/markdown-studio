@@ -30,6 +30,12 @@ Select text and apply a format, or apply it with nothing selected to insert the 
 
 Promote and demote work on every selected heading and stay within H1–H6.
 
+### Number headings
+
+**Format → Number Headings** numbers every heading, as in specifications and policies: `## 1. Introduction`, `### 1.1 Purpose`, `#### 1.1.1 Scope`. A single H1 title at the top of the document isn't numbered. After you add, remove or move sections, run it again to renumber. **Format → Remove Heading Numbers** takes the numbers off again. Both are one edit, so **Ctrl+Z** undoes them, and a [table of contents](#table-of-contents) in the document is updated too.
+
+Only numbers with a dot count as existing numbers (`1.`, `2.3`), so a heading such as "2024 Roadmap" or "10 Tips" keeps its text. Numbering changes the headings' anchors (`#1-introduction` instead of `#introduction`); [Check Links](/guide/checking-documents) finds links elsewhere that need updating.
+
 ### Move a section
 
 **Format → Move Section Up** and **Move Section Down** move the section at the cursor (its heading, its text and all its subsections) above the previous section or below the next one at the same level. Sections don't leave their parent: a `###` under one `##` never jumps into another. Lines inside code blocks that start with `#` are not treated as headings.

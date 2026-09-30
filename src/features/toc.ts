@@ -4,7 +4,7 @@ import { extractHeadings } from "./outline";
 
 export const TOC_START = "<!-- toc -->";
 export const TOC_END = "<!-- tocstop -->";
-const TOC_BLOCK = /<!-- toc -->[\s\S]*?<!-- tocstop -->/;
+export const TOC_BLOCK = /<!-- toc -->[\s\S]*?<!-- tocstop -->/;
 
 /**
  * Builds a nested, linked table of contents from the document's headings
