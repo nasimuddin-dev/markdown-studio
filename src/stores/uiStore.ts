@@ -35,10 +35,11 @@ interface UiState {
   aboutOpen: boolean;
   paletteOpen: boolean;
   /** What the palette lists: commands and tabs, or document templates. */
-  paletteMode: "commands" | "templates" | "files" | "headings";
+  paletteMode: "commands" | "templates" | "files" | "headings" | "compare";
   openTemplatePicker(): void;
   openFilePicker(): void;
   openHeadingPicker(): void;
+  openComparePicker(): void;
   shortcutsOpen: boolean;
   setShortcutsOpen(open: boolean): void;
   /** Distraction-free writing: hides chrome and centres the editor. */
@@ -52,6 +53,9 @@ interface UiState {
   /** Document whose File History dialog is open. */
   historyDocId: string | null;
   setHistoryDocId(id: string | null): void;
+  /** Compare dialog: the active document and the other file. */
+  compare: { docId: string; path: string } | null;
+  setCompare(compare: { docId: string; path: string } | null): void;
   setProblems(p: UiState["problems"]): void;
   /** Incremented to move focus into the search box. */
   searchFocusToken: number;
@@ -84,6 +88,7 @@ export const useUi = create<UiState>((set, get) => ({
   openTemplatePicker: () => set({ paletteOpen: true, paletteMode: "templates" }),
   openFilePicker: () => set({ paletteOpen: true, paletteMode: "files" }),
   openHeadingPicker: () => set({ paletteOpen: true, paletteMode: "headings" }),
+  openComparePicker: () => set({ paletteOpen: true, paletteMode: "compare" }),
   shortcutsOpen: false,
   setShortcutsOpen: (shortcutsOpen) => set({ shortcutsOpen }),
   focusMode: false,
@@ -94,6 +99,8 @@ export const useUi = create<UiState>((set, get) => ({
   problems: null,
   historyDocId: null,
   setHistoryDocId: (historyDocId) => set({ historyDocId }),
+  compare: null,
+  setCompare: (compare) => set({ compare }),
   setProblems: (problems) => set({ problems }),
   searchFocusToken: 0,
   linkCheckToken: 0,

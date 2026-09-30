@@ -113,6 +113,12 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().openFilePicker(),
     enabled: () => !!useWorkspace.getState().root,
   },
+  compareWithFile: {
+    id: "compareWithFile",
+    label: "Compare with File…",
+    run: () => useUi.getState().openComparePicker(),
+    enabled: () => hasActive() && !!useWorkspace.getState().root,
+  },
   goToHeading: {
     id: "goToHeading",
     label: "Go to Heading…",

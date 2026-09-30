@@ -156,6 +156,13 @@ for (const theme of ["light", "dark"] as const) {
       await palette("file history");
       await expect(page.getByRole("dialog")).toBeVisible();
       await audit(page, "file history");
+      await page.keyboard.press("Escape");
+
+      await palette("compare with file");
+      await page.keyboard.type("guide");
+      await page.keyboard.press("Enter");
+      await expect(page.getByRole("dialog", { name: /^Compare — / })).toBeVisible();
+      await audit(page, "compare");
     });
 
     test("search view with results", async ({ page }) => {

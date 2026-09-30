@@ -61,6 +61,10 @@ While you have unsaved changes, the list starts with **Saved file**, selected fi
 
 When the file is committed to Git, the list also has **Last commit**: compare the whole file with its committed version, or restore it. (For single changes, use the [change bars](/guide/file-explorer#changed-lines-in-the-editor) in the editor.) This needs Git installed and **Settings → Files → Show Git branch, changed files and changed lines** on.
 
+## Comparing two documents
+
+**File → Compare with File…** compares the document you're editing with another Markdown file in the open folder: pick the file by typing part of its name. The diff shows the lines only in the other file (**−**) and only in yours (**+**), with unchanged parts collapsed; your unsaved changes count. You can also right-click a file in the Explorer and choose **Compare with Active File**. **Open** opens the other file in a tab.
+
 ## Crash recovery
 
 While you work, unsaved documents are snapshotted every few seconds to the app data folder. If Markpion or your computer stops unexpectedly, the next start offers to recover those documents. Saved files don't need recovery.

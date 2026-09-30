@@ -380,6 +380,23 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
+test("compare the document with another file", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("compare with file");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog", { name: "Compare with file" })).toBeVisible();
+  await page.keyboard.type("guide");
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Compare — README.md and guide.md" });
+  await expect(dialog.locator(".diff-add").first()).toBeVisible();
+  await expect(dialog).toContainText("only in guide.md");
+  await dialog.getByRole("button", { name: "Close" }).click();
+  await expect(dialog).toBeHidden();
+});
+
 test("typing * or ` with text selected wraps it", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

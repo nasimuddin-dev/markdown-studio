@@ -20,6 +20,7 @@ const Preview = lazy(() => import("./components/Preview").then((m) => ({ default
 const loadHistory = () => import("./components/HistoryDialog");
 const loadShortcuts = () => import("./components/ShortcutsDialog");
 const loadAi = () => import("./components/AiPanel");
+const CompareDialog = lazy(() => import("./components/CompareDialog").then((m) => ({ default: m.CompareDialog })));
 const HistoryDialog = lazy(() => loadHistory().then((m) => ({ default: m.HistoryDialog })));
 const ShortcutsDialog = lazy(() => loadShortcuts().then((m) => ({ default: m.ShortcutsDialog })));
 const AiPanel = lazy(() => loadAi().then((m) => ({ default: m.AiPanel })));
@@ -32,12 +33,14 @@ function OnDemandDialogs() {
   const shortcuts = useUi((s) => s.shortcutsOpen);
   const ai = useAi((s) => !!s.busy || !!s.review);
   const presenting = useUi((s) => s.presenting);
+  const compare = useUi((s) => s.compare !== null);
   return (
     <Suspense fallback={null}>
       {history && <HistoryDialog />}
       {shortcuts && <ShortcutsDialog />}
       {ai && <AiPanel />}
       {presenting && <SlideShow />}
+      {compare && <CompareDialog />}
     </Suspense>
   );
 }

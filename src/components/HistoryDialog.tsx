@@ -4,7 +4,8 @@ import { useDocuments } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
 import { backend } from "../services";
 import { describeError } from "../services/errors";
-import { diffLines, diffStats, withContext } from "../features/diff";
+import { diffLines, diffStats } from "../features/diff";
+import { DiffRows } from "./DiffView";
 import type { HistoryEntry } from "../types";
 import { Modal } from "./Dialogs";
 
@@ -157,19 +158,7 @@ export function HistoryDialog() {
                   <span className="diff-del-chip">− {stats!.removed} in this version</span>{" "}
                   <span className="diff-add-chip">+ {stats!.added} now</span>
                 </p>
-                <pre className="diff">
-                  {withContext(diff).map((row, i) =>
-                    row.kind === "gap" ? (
-                      <div key={i} className="diff-gap">⋯ {row.hidden} unchanged line{row.hidden === 1 ? "" : "s"}</div>
-                    ) : (
-                      <div key={i} className={`diff-line diff-${row.kind}`}>
-                        <span className="diff-sign" aria-hidden="true">{row.kind === "add" ? "+" : row.kind === "del" ? "−" : " "}</span>
-                        <span className="sr-only">{row.kind === "add" ? "added: " : row.kind === "del" ? "removed: " : ""}</span>
-                        {row.text || " "}
-                      </div>
-                    ),
-                  )}
-                </pre>
+                <DiffRows lines={diff} />
               </>
             )}
           </div>

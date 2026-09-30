@@ -1,7 +1,8 @@
 import { useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { useWorkspace } from "../stores/workspaceStore";
 import { useDocuments, isDirty } from "../stores/documentsStore";
-import { basename, dirname, isInside } from "../services/paths";
+import { basename, dirname, isInside, isMarkdownPath } from "../services/paths";
+import { useUi } from "../stores/uiStore";
 import type { DirEntry } from "../types";
 import { openPath } from "../features/documents";
 import {
@@ -120,6 +121,7 @@ function TreeNode({ entry, depth, onContext, onDragStart, dropTarget }: {
 export function FileExplorer() {
   const root = useWorkspace((s) => s.root);
   const activePath = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.path ?? null);
+  const activeDocId = useDocuments((s) => s.activeId);
   const rootChildren = useWorkspace((s) => (s.root ? s.children[s.root] : undefined));
   const hasSelection = useWorkspace((s) => !!s.selected);
   const [menu, setMenu] = useState<ContextMenu | null>(null);
@@ -276,6 +278,9 @@ export function FileExplorer() {
               : ([
                   { label: "Open", run: () => openPath(menu.entry.path) },
                   { label: "Duplicate", run: () => duplicateFile(menu.entry.path) },
+                  ...(activeDocId && activePath !== menu.entry.path && isMarkdownPath(menu.entry.path)
+                    ? [{ label: "Compare with Active File", run: () => useUi.getState().setCompare({ docId: activeDocId, path: menu.entry.path }) }]
+                    : []),
                   "separator",
                 ] as MenuEntry[])),
             { label: revealLabel, run: () => revealInFolder(menu.entry.path), disabled: !backend().capabilities.revealInFolder },

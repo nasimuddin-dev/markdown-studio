@@ -11,12 +11,13 @@ import { openPath } from "../features/documents";
 import { extractHeadings } from "../features/outline";
 import { goToHeading } from "./Outline";
 
-type PaletteMode = "commands" | "templates" | "files" | "headings";
+type PaletteMode = "commands" | "templates" | "files" | "headings" | "compare";
 
 const LABELS: Record<PaletteMode, { dialog: string; placeholder: string; list: string; empty: string }> = {
   commands: { dialog: "Command palette", placeholder: "Type a command or tab name…", list: "Commands", empty: "No matching commands" },
   templates: { dialog: "New from template", placeholder: "Choose a template…", list: "Templates", empty: "No matching templates" },
   files: { dialog: "Go to file", placeholder: "Type part of a file name or path…", list: "Files", empty: "No matching files" },
+  compare: { dialog: "Compare with file", placeholder: "Choose a file to compare with…", list: "Files", empty: "No matching files" },
   headings: { dialog: "Go to heading", placeholder: "Type part of a heading…", list: "Headings", empty: "No matching headings" },
 };
 
@@ -61,7 +62,7 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
   const root = useWorkspace((s) => s.root);
   useEffect(() => {
     if (mode === "templates") void listTemplates().then(setTemplates);
-    if (mode === "files" && root) {
+    if ((mode === "files" || mode === "compare") && root) {
       void backend()
         .listWorkspaceFiles(root)
         .then((all) => setFiles(all.filter(isMarkdownPath)), () => setFiles([]));
@@ -81,6 +82,16 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
         indent: h.level - 1,
         run: () => goToHeading(h, index),
       }));
+    }
+    if (mode === "compare") {
+      const active = docs.find((d) => d.id === useDocuments.getState().activeId);
+      return (files ?? [])
+        .filter((path) => path !== active?.path)
+        .map((path) => ({
+          id: `compare:${path}`,
+          label: relativePath(path, root ?? ""),
+          run: () => active && useUi.getState().setCompare({ docId: active.id, path }),
+        }));
     }
     if (mode === "files") {
       // Open files first, then the rest in folder order; matching uses the relative path.
