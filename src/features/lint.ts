@@ -85,6 +85,15 @@ const DEFINITION = /^( {0,3}\[([^\]\n]+)\]:[ \t]*)(<[^>\n]*>|\S+)/gm;
  * (same length), so link/heading rules never fire inside code.
  */
 export function maskCode(text: string): string {
+  // Every rule masks the same text during one lint run; keep the last result.
+  if (text === lastMasked.text) return lastMasked.masked;
+  const masked = computeMask(text);
+  lastMasked = { text, masked };
+  return masked;
+}
+let lastMasked = { text: "", masked: "" };
+
+function computeMask(text: string): string {
   const lines = text.split("\n");
   let fence: string | null = null;
   const out = lines.map((line) => {
