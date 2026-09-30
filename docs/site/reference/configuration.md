@@ -39,6 +39,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `explorerShowImages` | `true` | List pictures in the Explorer besides Markdown files |
 | `wordGoals` | `{}` | Word count goals by file path, set with **Set Word Count Goal…** (whole numbers from 1 to 1,000,000) |
 | `pageBreakBeforeH1` | `false` | PDF, Word and printing: each top-level heading after the first starts a new page |
+| `askImageName` | `false` | Ask for a file name when pasting a screenshot, instead of a timestamped name |
 | `imageFolder` | `"assets"` | Folder next to the document for pasted, dropped and inserted images: one name, without `/`, `\` or other characters not allowed in file names |
 | `lintDisabledRules` | `[]` | Lint checks that are turned off, by id: `broken-link`, `missing-image`, `broken-anchor`, `empty-link`, `duplicate-heading`, `multiple-h1`, `heading-increment`, `image-alt`, `link-text`, `table-columns`, `footnote`, `reference`, `heading-space`, `setext-heading`, `list-space`, `emphasis-space`, `destination-spaces` |
 | `pasteRichTextAsMarkdown` | `true` | |

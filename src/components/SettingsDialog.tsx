@@ -128,6 +128,7 @@ export function SettingsDialog() {
           <label htmlFor="setting-imageFolder">Folder for pasted images</label>
           <input type="text" spellCheck={false} aria-describedby="setting-imageFolder-hint" {...field("imageFolder")} onChange={(e) => update({ imageFolder: e.target.value })} />
           <p className="muted small" id="setting-imageFolder-hint">Pasted, dropped and inserted pictures are saved in this folder next to the document (one folder name, such as “assets” or “images”).</p>
+          <label className="check"><input type="checkbox" checked={settings.askImageName} disabled={isLocked("askImageName")} onChange={(e) => update({ askImageName: e.target.checked })} /> Ask for a name when pasting a screenshot</label>
           <label htmlFor="setting-newFileLineEnding">Line endings for new files</label>
           <select {...field("newFileLineEnding")} onChange={(e) => update({ newFileLineEnding: e.target.value as Settings["newFileLineEnding"] })}>
             <option value="lf">LF (Unix, macOS)</option>

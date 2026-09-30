@@ -124,6 +124,8 @@ export interface Settings {
   pageBreakBeforeH1: boolean;
   /** Folder (one name, next to the document) for pasted, dropped and inserted images. */
   imageFolder: string;
+  /** Ask for a file name when pasting a screenshot (else a timestamp). */
+  askImageName: boolean;
   /** The optional AI assistant (off until turned on and given an API key). */
   aiEnabled: boolean;
   aiModel: string;

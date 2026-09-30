@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
-import { assetFileName, imageMarkdown, insertImageFiles, insertImageFromFile, isImageFile, relativeImageMarkdown, toBase64 } from "../src/features/images";
+import { assetFileName, imageMarkdown, insertImageFiles, insertImageFromFile, isImageFile, namedImageFile, relativeImageMarkdown, toBase64 } from "../src/features/images";
 import { registerEditorView } from "../src/features/editorBridge";
 import { newDocument, openPath } from "../src/features/documents";
 import { useUi } from "../src/stores/uiStore";
@@ -63,6 +63,29 @@ describe("inserting images", () => {
       expect(sanitizeSettings({ imageFolder: "a/b" }).imageFolder).toBe("assets");
     } finally {
       useSettings.getState().update({ imageFolder: "assets" });
+      view.destroy();
+    }
+  });
+
+  it("asks for a name for a pasted screenshot when the setting is on", async () => {
+    const backend = setupBackend({ "/ws/p.md": "" });
+    await openPath("/ws/p.md");
+    const view = mountEditor("");
+    useSettings.getState().update({ askImageName: true });
+    const unsub = useUi.subscribe((s) => {
+      const d = s.dialogs[0];
+      if (!d) return;
+      unsub();
+      queueMicrotask(() => useUi.getState().closeDialog(d.id, { button: "ok", value: "Login page v1.2" }));
+    });
+    try {
+      await insertImageFiles([png("image.png")]);
+      expect(view.state.doc.toString()).toBe("![Login page v1.2](assets/Login-page-v1.2.png)");
+      expect(await backend.readImage("/ws/assets/Login-page-v1.2.png")).toContain("base64");
+      expect(namedImageFile("shot.PNG", "image-1.png")).toBe("shot.png");
+      expect(namedImageFile("  ", "image-1.png")).toBe("image-1.png");
+    } finally {
+      useSettings.getState().update({ askImageName: false });
       view.destroy();
     }
   });

@@ -2,7 +2,7 @@ import { backend } from "../services";
 import { describeError } from "../services/errors";
 import { basename, dirname, isInside, relativePath } from "../services/paths";
 import { activeDoc } from "../stores/documentsStore";
-import { notify } from "../stores/uiStore";
+import { notify, promptText } from "../stores/uiStore";
 import { imageFolderName, useSettings } from "../stores/settingsStore";
 import { getEditorView } from "./editorBridge";
 
@@ -45,6 +45,13 @@ export function assetFileName(file: File, now = new Date()): string {
   return `${stem}.${ext}`;
 }
 
+/** A name typed for a pasted picture, made file-safe, keeping the picture's type. */
+export function namedImageFile(typed: string, suggested: string): string {
+  const ext = suggested.split(".").pop()!;
+  const stem = typed.trim().replace(/\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i, "").replace(/[^\p{L}\p{N}._ -]+/gu, "-").replace(/\s+/g, "-").replace(/^[-.]+|[-.]+$/g, "");
+  return stem ? `${stem}.${ext}` : suggested;
+}
+
 /** Markdown for an image stored at `<folder>/<name>` next to the document. */
 export function imageMarkdown(savedPath: string, folder = "assets"): string {
   const name = basename(savedPath);
@@ -71,7 +78,14 @@ export async function insertImageFiles(files: File[]): Promise<boolean> {
   const links: string[] = [];
   for (const file of images) {
     try {
-      const saved = await backend().saveImageAsset(doc.path, assetFileName(file), await toBase64(file), imageFolder());
+      let name = assetFileName(file);
+      // Screenshots from the clipboard have no name of their own: ask for one when the setting is on.
+      if (name.startsWith("image-") && useSettings.getState().settings.askImageName) {
+        const typed = await promptText({ title: "Name the Picture", message: `The picture is saved in “${imageFolder()}” next to the document.`, value: name.replace(/\.[^.]+$/, ""), okLabel: "Save" });
+        if (typed === null) continue;
+        name = namedImageFile(typed, name);
+      }
+      const saved = await backend().saveImageAsset(doc.path, name, await toBase64(file), imageFolder());
       links.push(imageMarkdown(saved, imageFolder()));
     } catch (e) {
       const msg = describeError(e, `add “${file.name || "the image"}”`);
