@@ -217,6 +217,19 @@ describe("emoji shortcodes in PDF export", () => {
   }, 30_000);
 });
 
+describe("PDF export: running title", () => {
+  it("shows the title at the top of every page after the first", async () => {
+    const lib = await pdfjs();
+    const bytes = await markdownToPdf("# Annual Review\n\n" + "A paragraph of text.\n\n".repeat(150), { title: "Annual Review" });
+    const doc = await lib.getDocument({ data: new Uint8Array(bytes) }).promise;
+    expect(doc.numPages).toBeGreaterThan(1);
+    const text = async (n: number) => (await (await doc.getPage(n)).getTextContent()).items.map((i) => ("str" in i ? i.str : "")).join(" ");
+    expect((await text(1)).match(/Annual Review/g)).toHaveLength(1); // only the heading
+    expect(await text(2)).toContain("Annual Review");
+    expect(await text(2)).toContain(`2 / ${doc.numPages}`);
+  });
+});
+
 describe("PDF export: links within the document", () => {
   it("makes #anchor links jump to the heading", async () => {
     const bytes = await markdownToPdf("# Guide\n\n- [Install](#install)\n- [Missing](#nowhere)\n\n## Install\n\ntext");

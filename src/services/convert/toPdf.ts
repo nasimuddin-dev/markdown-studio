@@ -354,6 +354,8 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
     pageMargins: [SIDE_MARGIN, 48, SIDE_MARGIN, 56],
     content,
     footer: (page, pages) => ({ text: `${page} / ${pages}`, alignment: "center", fontSize: 8, color: "#8A93A3", margin: [0, 20, 0, 0] }),
+    // The title at the top of every page after the first (the first shows it as its heading), like printing.
+    header: (page) => (page > 1 && opts.title ? { text: opts.title, alignment: "center", fontSize: 8, color: "#8A93A3", margin: [SIDE_MARGIN, 22, SIDE_MARGIN, 0] } : null),
     defaultStyle: { font: "Roboto", fontSize: 10.5, lineHeight: 1.3, color: "#1D2330" },
     styles: {
       h1: { fontSize: 22, bold: true, margin: [0, 6, 0, 8] },
