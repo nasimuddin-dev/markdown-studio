@@ -10,7 +10,7 @@ Choose your system: [Windows](#windows) · [macOS](#macos) · [Linux](#linux). E
 
 ### Requirements
 
-- Windows 10 (version 1803 or later) or Windows 11, 64-bit (x64)
+- Windows 10 (version 1803 or later) or Windows 11, 64-bit (x64). From 0.23.0, an ARM64 installer (`Markpion-<version>-windows-arm64-setup.exe`) is also on the release page, built in CI and not yet tested on ARM hardware; it offers new versions as a download rather than installing them in place.
 - About 20 MB of free disk space
 - Administrator rights are only needed if you install for everyone on the computer.
 

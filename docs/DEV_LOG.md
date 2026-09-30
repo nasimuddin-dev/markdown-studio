@@ -609,3 +609,23 @@ The user asked to keep developing until 10 AM and to release at the end, without
 - A redirect repository for the old website address?
 - Pictures show in the Explorer by default (Settings → Files turns them off). Keep that default?
 - Which languages should the app be translated into?
+
+### After the 0.22.0 release (same morning)
+
+The user asked to work through the whole backlog.
+
+- **macOS menu bar** (8021f2a): the in-app menus go to the system menu bar on macOS (`src-tauri/src/menu.rs`, `features/nativeMenu.ts`, new `setNativeMenu` / `onMenuCommand` in `PlatformApi`), with the standard Markpion and Window menus and macOS's own Undo/Redo/Cut/Copy/Paste/Select All. Items carry no accelerators, so keys keep going through the app's shortcut handling. Unverified: not run on a Mac (it compiles and its menu JSON is unit-tested).
+- **ARM64 build check** (d89b646): `.github/workflows/arm64.yml`, run by hand; it publishes nothing. Windows ARM64 built on the first run. Linux ARM64 needed `xdg-utils` for the AppImage.
+- **Update prompt:** the user asked for an update check at startup that asks before updating. This already works (`features/updates.ts`): 5 s after launch, if **Check for updates when Markpion starts** is on (the default), the app asks with **Update Now**, **Later** or **Skip This Version**. A skipped version isn't offered again at startup, but **Help → Check for Updates…** still offers it. The 0.22.0 `latest.json` is live, so 0.21.0 installs will be offered this update.
+
+**Can't be done from here:**
+
+- Code signing and notarization (they need certificates or an Apple Developer ID).
+- Testing on real Mac and Linux hardware.
+- The startup-bundle split (it needs a fork of `@codemirror/lang-markdown`).
+
+**Waiting on your answers:**
+
+- Native e2e tests (msedgedriver download)
+- A redirect for the old website address
+- Which languages to translate into

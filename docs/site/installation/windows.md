@@ -7,7 +7,7 @@ description: Install Markpion on Windows 10 or 11. Requirements, standard vs off
 
 ## Requirements
 
-- Windows 10 (version 1803 or later) or Windows 11, 64-bit (x64).
+- Windows 10 (version 1803 or later) or Windows 11, 64-bit (x64). From version 0.23.0 there is also an ARM64 installer for Windows on ARM; it hasn't been tested on ARM hardware yet, and new versions are offered as a download instead of being installed in place.
 - About 20 MB of free disk space.
 - Administrator rights only if you install for everyone on the PC.
 - Microsoft Edge **WebView2**, which draws the window. It's part of Windows 11 and is kept up to date on Windows 10 by Windows Update. If it's missing, the standard installer adds it (this needs internet), and the offline installer includes it.

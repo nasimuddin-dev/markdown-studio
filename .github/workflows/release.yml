@@ -13,7 +13,11 @@ name: Release
 #   Markpion-<version>-linux-x86_64.AppImage
 #   Markpion-<version>-linux-amd64.deb
 #   Markpion-<version>-linux-x86_64.rpm
-#   SHA256SUMS-macos-linux.txt
+#   Markpion-<version>-linux-aarch64.AppImage   (from 0.23.0)
+#   Markpion-<version>-linux-arm64.deb
+#   Markpion-<version>-linux-aarch64.rpm
+#   Markpion-<version>-windows-arm64-setup.exe  (no in-app updates yet)
+#   SHA256SUMS-macos-linux.txt                  (also covers the ARM64 files)
 on:
   push:
     tags: ["v*"]
@@ -46,6 +50,14 @@ jobs:
           - name: Linux x86_64
             platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
+          - name: Linux ARM64
+            platform: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+          # The x64 Windows installers are built locally (they carry the signed
+          # in-app update); the ARM64 one is built here.
+          - name: Windows ARM64
+            platform: windows-latest
+            target: aarch64-pc-windows-msvc
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +67,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf rpm
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf rpm xdg-utils
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -97,6 +109,7 @@ jobs:
           case "${{ runner.os }}" in
             macOS) bundles="app,dmg" ;;
             Linux) bundles="appimage,deb,rpm" ;;
+            Windows) bundles="nsis" ;;
           esac
           npx tauri build --target "${{ matrix.target }}" --bundles "$bundles" \
             --config '{"bundle":{"createUpdaterArtifacts":false}}'
@@ -115,6 +128,12 @@ jobs:
               cp "$bundle"/deb/*.deb "out/Markpion-$version-linux-amd64.deb"
               cp "$bundle"/rpm/*.rpm "out/Markpion-$version-linux-x86_64.rpm"
               ;;
+            aarch64-unknown-linux-gnu)
+              cp "$bundle"/appimage/*.AppImage "out/Markpion-$version-linux-aarch64.AppImage"
+              cp "$bundle"/deb/*.deb "out/Markpion-$version-linux-arm64.deb"
+              cp "$bundle"/rpm/*.rpm "out/Markpion-$version-linux-aarch64.rpm"
+              ;;
+            aarch64-pc-windows-msvc) cp "$bundle"/nsis/*.exe "out/Markpion-$version-windows-arm64-setup.exe" ;;
           esac
           ls -l out
 
@@ -141,7 +160,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           mkdir assets && cd assets
-          gh release download "$TAG" --pattern "*-macos-*" --pattern "*-linux-*"
+          gh release download "$TAG" --pattern "*-macos-*" --pattern "*-linux-*" --pattern "*-windows-arm64-*"
           sha256sum * > ../SHA256SUMS-macos-linux.txt
           cat ../SHA256SUMS-macos-linux.txt
           gh release upload "$TAG" ../SHA256SUMS-macos-linux.txt --clobber

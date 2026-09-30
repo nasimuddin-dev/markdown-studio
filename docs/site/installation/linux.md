@@ -7,7 +7,7 @@ description: Install Markpion on Linux with the AppImage, the .deb package (Ubun
 
 ## Requirements
 
-- A 64-bit (x86_64) distribution from 2022 or later, such as Ubuntu 22.04+, Debian 12+, Fedora 36+ or openSUSE Leap 15.5+.
+- A 64-bit (x86_64) distribution from 2022 or later, such as Ubuntu 22.04+, Debian 12+, Fedora 36+ or openSUSE Leap 15.5+. From version 0.23.0 there are also ARM64 packages (`linux-aarch64.AppImage`, `linux-arm64.deb`, `linux-aarch64.rpm`); they haven't been tested on ARM hardware yet.
 - The WebKitGTK library (`libwebkit2gtk-4.1`). The `.deb` and `.rpm` packages declare it, so your package manager installs it automatically. Current desktop distributions usually include it, which the AppImage needs.
 
 ARM64 Linux builds aren't available yet.

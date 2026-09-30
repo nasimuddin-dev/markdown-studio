@@ -145,6 +145,13 @@ const linux = {
   deb: `Markpion-${version}-linux-amd64.deb`,
   rpm: `Markpion-${version}-linux-x86_64.rpm`,
 };
+// ARM64 installers are built by release.yml from 0.23.0 on.
+const [major, minor] = version.split(".").map(Number);
+const arm64 = major > 0 || minor >= 23;
+const armWindows = arm64 ? ` · [ARM64 installer](${asset(`Markpion-${version}-windows-arm64-setup.exe`)})` : "";
+const armLinuxRow = arm64
+  ? `\n| **Linux** ARM64 | [AppImage](${asset(`Markpion-${version}-linux-aarch64.AppImage`)}) · [.deb](${asset(`Markpion-${version}-linux-arm64.deb`)}) · [.rpm](${asset(`Markpion-${version}-linux-aarch64.rpm`)}) |`
+  : "";
 // The macOS and Linux installers are built by .github/workflows/release.yml
 // when the tag is pushed, and attached to the same release.
 const section = `<!-- download:start -->
@@ -152,9 +159,9 @@ Markpion ${version} was released on ${date} and has a separate installer for eac
 
 | Operating system | Download |
 | --- | --- |
-| **Windows** 10 (1803+) and 11, x64 | [Standard installer](${link}) (${sizeMb} MB)${hasOffline ? ` · [Offline installer](${offlineUrl}) (${mb(offlineTarget)} MB)` : ""} |
+| **Windows** 10 (1803+) and 11, x64 | [Standard installer](${link}) (${sizeMb} MB)${hasOffline ? ` · [Offline installer](${offlineUrl}) (${mb(offlineTarget)} MB)` : ""}${armWindows} |
 | **macOS** 10.15+ | [Apple Silicon (M1 and later)](${asset(mac("arm64"))}) · [Intel](${asset(mac("x64"))}) |
-| **Linux** x86_64 | [AppImage](${asset(linux.appImage)}) (any distribution) · [.deb](${asset(linux.deb)}) (Ubuntu, Debian, Mint) · [.rpm](${asset(linux.rpm)}) (Fedora, RHEL, openSUSE) |
+| **Linux** x86_64 | [AppImage](${asset(linux.appImage)}) (any distribution) · [.deb](${asset(linux.deb)}) (Ubuntu, Debian, Mint) · [.rpm](${asset(linux.rpm)}) (Fedora, RHEL, openSUSE) |${armLinuxRow}
 
 ### Windows
 

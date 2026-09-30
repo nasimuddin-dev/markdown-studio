@@ -36,6 +36,5 @@ These depend on decisions or resources that aren't settled yet:
 
 - **Code signing:** Windows Authenticode and Apple notarization, so the first launch doesn't show warnings. This needs signing certificates.
 - **Automatic updates on macOS and Linux**, like on Windows.
-- **ARM64 builds** for Windows and Linux.
 - **Localization** of the interface into other languages.
 - **Future enhancements from the specification:** Git integration, plugins, cloud sync, collaboration and publishing workflows.
