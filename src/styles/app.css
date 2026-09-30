@@ -684,6 +684,12 @@ select {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.tab-hint {
+  margin-left: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
 
 .tab-close {
   display: grid;

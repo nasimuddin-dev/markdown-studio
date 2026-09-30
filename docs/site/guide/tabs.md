@@ -22,6 +22,7 @@ A dot on a tab marks unsaved changes, its name is shown in italics, and the tab'
 
 - Drag a tab left or right to reorder it.
 - Long file names are shortened with "…"; hover a tab to see its full path.
+- When two open files have the same name (say two `README.md`), each tab also shows, dimmed, the end of its folder path that tells them apart: `docs` and `notes`, or `api/docs` and `web/docs`.
 - When more tabs are open than fit, scroll the tab strip with the mouse wheel. The active tab is always scrolled into view.
 - When the tab list has focus, the arrow keys move between tabs.
 - The **+** button after the last tab creates a new file.

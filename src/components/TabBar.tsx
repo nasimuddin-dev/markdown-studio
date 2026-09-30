@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type WheelEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type WheelEvent } from "react";
 import { useDocuments, isDirty } from "../stores/documentsStore";
 import { closeDocument, newDocument } from "../features/documents";
 import { commands, formatShortcut } from "../features/commands";
 import { Icon } from "./Icon";
+import { tabHints } from "../features/tabNames";
 import { ContextMenu } from "./ContextMenu";
 import { closeOthers, closeSaved, closeToTheRight, copyPath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
 import { useWorkspace } from "../stores/workspaceStore";
@@ -86,6 +87,7 @@ export function TabBar() {
     tabs[next]?.click();
   };
 
+  const hints = useMemo(() => tabHints(docs), [docs]);
   return (
     <div className="tabbar">
       <div className="tabs" role="tablist" aria-label="Open documents" ref={list} onKeyDown={onKey} onWheel={onWheel}>
@@ -117,6 +119,12 @@ export function TabBar() {
               <div role="tab" aria-selected={active} tabIndex={active ? 0 : -1} className="tab-main">
                 <Icon name="file" size={14} className="tab-icon" />
                 <span className="tab-label">{d.name}</span>
+                {hints.has(d.id) && (
+                  <span className="tab-hint">
+                    <span className="sr-only"> in </span>
+                    {hints.get(d.id)}
+                  </span>
+                )}
                 {dirty && <span className="sr-only"> (unsaved)</span>}
               </div>
               {/* Mouse affordance only: keyboard users close with Ctrl/Cmd+W, Delete or the context menu. */}
