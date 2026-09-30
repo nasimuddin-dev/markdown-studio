@@ -2,7 +2,7 @@ import GithubSlugger from "github-slugger";
 import { ALERT_KINDS, takeMdastAlert } from "../alerts";
 import { stripFrontMatter } from "../frontMatter";
 import {
-  AlignmentType, Bookmark, BorderStyle, Document, InternalHyperlink, ExternalHyperlink, Footer, FootnoteReferenceRun, HeadingLevel, ImageRun, LevelFormat, Packer,
+  AlignmentType, Bookmark, BorderStyle, Document, InternalHyperlink, ExternalHyperlink, Footer, Header, FootnoteReferenceRun, HeadingLevel, ImageRun, LevelFormat, Packer,
   PageNumber, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType,
   type IParagraphOptions, type ParagraphChild,
 } from "docx";
@@ -89,6 +89,17 @@ function plainText(node: RootContent | PhrasingContent): string {
   if ("value" in node && typeof node.value === "string") return node.value;
   if ("children" in node) return (node.children as Array<RootContent | PhrasingContent>).map(plainText).join("");
   return "";
+}
+
+function pageNumberFooter() {
+  return new Footer({
+    children: [
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({ children: [PageNumber.CURRENT, " / ", PageNumber.TOTAL_PAGES], size: 16, color: "8A93A3" })],
+      }),
+    ],
+  });
 }
 
 /**
@@ -403,19 +414,18 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
     },
     sections: [
       {
-        // Twips (1/20 pt); Word's default margins fit both sizes.
-        properties: { page: { size: { width: Math.round(page.width * 20), height: Math.round(page.height * 20) } } },
-        // "page / pages", like the PDF export.
-        footers: {
-          default: new Footer({
-            children: [
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [new TextRun({ children: [PageNumber.CURRENT, " / ", PageNumber.TOTAL_PAGES], size: 16, color: "8A93A3" })],
-              }),
-            ],
-          }),
-        },
+        // Twips (1/20 pt); Word's default margins fit both sizes. With a title, the first page
+        // has its own (empty) header: it shows the title as its heading.
+        properties: { titlePage: !!opts.title, page: { size: { width: Math.round(page.width * 20), height: Math.round(page.height * 20) } } },
+        // The title at the top of every page after the first, like the PDF export and printing.
+        ...(opts.title && {
+          headers: {
+            default: new Header({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: opts.title, size: 16, color: "8A93A3" })] })] }),
+            first: new Header({ children: [] }),
+          },
+        }),
+        // "page / pages", like the PDF export (on the first page too).
+        footers: { default: pageNumberFooter(), first: pageNumberFooter() },
         children,
       },
     ],

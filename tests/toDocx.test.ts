@@ -219,3 +219,17 @@ describe("Word import: links within the document", () => {
     expect(htmlFileToMarkdown(page).markdown).toContain("[Jump](#getting-started)");
   });
 });
+
+describe("Word export: running title", () => {
+  it("puts the title in the header of pages after the first, and page numbers on every page", async () => {
+    const zip = await JSZip.loadAsync(await markdownToDocx("# Annual Review\n\ntext", { title: "Annual Review" }));
+    const doc = await zip.file("word/document.xml")!.async("string");
+    expect(doc).toContain("<w:titlePg/>");
+    const headers = await Promise.all(Object.keys(zip.files).filter((f) => /word\/header\d+\.xml$/.test(f)).map((f) => zip.file(f)!.async("string")));
+    expect(headers.some((h) => h.includes("Annual Review"))).toBe(true);
+    expect(Object.keys(zip.files).filter((f) => /word\/footer\d+\.xml$/.test(f))).toHaveLength(2);
+    // Without a title, no header and no special first page.
+    const plain = await JSZip.loadAsync(await markdownToDocx("text"));
+    expect(await plain.file("word/document.xml")!.async("string")).not.toContain("<w:titlePg/>");
+  });
+});
