@@ -551,3 +551,33 @@ After 0.18.0 was released and installed locally (the silent install worked), the
 **Version:** 0.20.0. **Tests:** Vitest 407 (68 files), Playwright 54, Rust 41 (+1 ignored), website check (50 pages).
 
 **Next up:** tauri-driver e2e (needs the user's go-ahead to download msedgedriver); per-workspace custom CSS; a settings search box.
+
+## 2026-09-29 (9:40 PM) – 2026-09-30 (6:00 AM), overnight session: 0.21.0
+
+The user asked to keep developing until 8:30 AM and to create the release build at the end.
+
+- **Checking documents:** Fix Table as a quick fix (46980f3); `#Title` without a space and `---` under text (3b616c5); list items without a space and bold with inner spaces (aafafe0); paths with spaces, with a test that keeps the project's own docs lint-clean (9b4c09d); F8 / Shift+F8 (7272d9e); turning checks off, with accessible Problems-panel actions (389965f); code masked once per run (cf278d2); reference links without a definition or unused (dbefd15), and a label defined twice (2f3f02e); misspelled file names get a suggestion and a quick fix (e3bc658), compared by stem and extension (ef1c7a6).
+- **Links and headings:** scroll sync by source line and double-click to the source (03f8133); reference-label, footnote and other-document heading completion (d772f9b, 1f4bd9d); convert links to reference/inline style (e08d38f); Ctrl/Cmd+click and Alt+Enter follow links (8d996ef); Rename Heading with link updates across the folder (e3ed1d8), and F2 on footnote/reference labels (289b6ac); Links to this document (b118ff6, 97bbd52); Go to Heading in Folder (2c0ef4e); Remove Link (a3ef45c); image hover (7a8b1d6); heading link icon in the preview (dd1c849); Copy Link to Current Heading (d2af3d1); links to headings in PDF and Word exports (803ab9e, 8af88ea).
+- **Editing:** Table menu and column tools (60f7c83, 1f20e47); callouts, dates (7490d8d, e5824c1); typewriter scrolling (61d3525); Find in the preview (ef5fca7); line length (5d3a8b1); Fold to Level (607be46, made parser-independent in 462ed75); Dim Other Paragraphs (f6a371d); Toggle Comment (17aa041); math and Mermaid starters (945ac32); Select Section (aba3439, 0813f6d); collapsible Outline (f5d212d); F6 pane focus (d43ac4e, e32b08b); Align tables on save (462ed75).
+- **Files:** Explorer recent list without a folder (7d03944) with removal (85b1e2b); drag a file into the editor to link it (2d94dcc); pictures in the Explorer with a preview dialog (c6bb502, d923fe1); Collapse Folders (a68976a); folder for pasted images, used by imports too (9e1b55a, 69045c4); Move Selection to New File (e872484); Save as Template (fb9b1a6); Close All Tabs (eea697e); Show in Explorer (1abc759); Copy Relative Path on tabs (450e1b8); line endings and BOM from the status bar (11c7287, f0606c4); tab folder hints (c6ccd4b).
+- **Status bar:** Git change summary (7656bf6), task progress (1d34a1f), Go to Line on Ln/Col (63dd44e), word count goal (147ce22, ba79651).
+- **Export, print, review:** title and page numbers when printing and in printed HTML (e0346f6, ed1f537), running titles in PDF and Word (c6d2016, 033cf94); Markdown with Images as .zip (447173b); Copy as Plain Text (457de7a); a new page per top-level heading (e32b08b); word-level diffs and removals before additions (61e554d); the AI review's Changes view (72f9c2e); speaker notes and Print Slides (623102c, dad3d06).
+- **Fixes:** long menus ran off short windows (7075686); the Links tab was cut off in a narrow sidebar (665efaf); HTML comments containing `>` leaked text into Word/PDF exports (17aa041); following links from the editor had pulled the Markdown renderer into the startup bundle (3690fe1), now guarded by `tests/startupImports.test.ts` (8a9ab86).
+- **Process:** a commit went in with a failing docs-lint test because `vitest | grep && git commit` hides vitest's exit code; it was fixed in the next commit (6fa019a), and every commit since then went through a check script that stops on any failure. The F6 e2e test was flaky in parallel runs because F6 could land on the preview's loading placeholder, which can't take focus; the app now skips it (e32b08b).
+
+**Version:** 0.21.0. **Tests:** Vitest 522 (99 files), Playwright 93, Rust 41 (+1 ignored), website check (50 pages). Startup JavaScript 1,155 KB (384 KB gzipped).
+
+**Unverified:** the new native command parameters (`list_dir` with pictures, `save_image_asset` with a folder, the `zip` export kind) are covered by Rust unit tests and the installer build, not by clicking through the native app (the session ran unattended); F6 inside the native webview (Chromium-based browsers can treat F6 as their own shortcut, though a webview has no toolbar to move to).
+
+**Next up:**
+
+1. Tauri-driver e2e against the native build (needs msedgedriver and `cargo install tauri-driver`; see questions).
+2. Per-workspace custom CSS, after weighing the risk of styles from untrusted repositories.
+3. Wiki-style `[[links]]`, if wanted (completion, preview, link checks and renames would all need to understand them).
+
+**Questions for the user:**
+
+- May I download msedgedriver (Microsoft) and `cargo install tauri-driver` for native end-to-end tests?
+- Local LLMs (SRS §19, for example Ollama) alongside Claude: wanted?
+- A redirect repository for the old website address?
+- Pictures now show in the Explorer by default (Settings → Files turns them off). Keep that default?

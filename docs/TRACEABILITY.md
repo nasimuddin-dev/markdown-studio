@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-Status of each [SRS](SRS.md) requirement as of version 0.20.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
+Status of each [SRS](SRS.md) requirement as of version 0.21.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
 
 ## Functional requirements
 
@@ -134,10 +134,10 @@ Status of each [SRS](SRS.md) requirement as of version 0.20.0. **Done** means im
 
 ## Test coverage
 
-| Level | Where | Count (0.20.0) |
+| Level | Where | Count (0.21.0) |
 | --- | --- | --- |
-| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 407 tests in 68 files |
-| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 54 tests |
+| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 522 tests in 99 files |
+| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 93 tests |
 | Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 41 tests (plus 1 ignored live API test) |
 
 ## Known gaps and next improvements
@@ -149,7 +149,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.20.0. **Done** means im
 - macOS builds are ad-hoc signed, not notarized (needs an Apple Developer ID). In-place updates are Windows-only; macOS and Linux are offered the download page (signing their updates in CI needs the updater key as a repository secret).
 - The macOS and Linux builds haven't been run on real hardware yet, only built in CI.
 - ARM64 builds for Windows and Linux (SRS §13.1, §21).
-- The JavaScript loaded at startup (the entry script and the chunks `index.html` preloads) is 1,136 KB (378 KB gzipped, measured 2026-09-30 before the 0.21.0 release; 0.20.0 measured the same way: 1,100 KB). An earlier figure of 736 KB (2026-09-29) counted less of it. The editor follows links without loading the Markdown renderer (`services/linkTarget.ts`), and `tests/startupImports.test.ts` fails if the renderer, exporters or diagram code become static imports of the entry point; the preview pipeline (with highlight.js), export, Mermaid and the History, Keyboard Shortcuts and AI review dialogs are lazy-loaded. By source map, the largest parts are React DOM (202 KB) and the HTML, CSS and JavaScript grammars (about 136 KB), which `@codemirror/lang-markdown` imports statically to highlight HTML inside Markdown; splitting them out would need a patched or forked package.
+- The JavaScript loaded at startup (the entry script and the chunks `index.html` preloads) is 1,155 KB (384 KB gzipped, measured 2026-09-30 for 0.21.0; 0.20.0 measured the same way: 1,100 KB). An earlier figure of 736 KB (2026-09-29) counted less of it. The editor follows links without loading the Markdown renderer (`services/linkTarget.ts`), and `tests/startupImports.test.ts` fails if the renderer, exporters or diagram code become static imports of the entry point; the preview pipeline (with highlight.js), export, Mermaid and the History, Keyboard Shortcuts and AI review dialogs are lazy-loaded. By source map, the largest parts are React DOM (202 KB) and the HTML, CSS and JavaScript grammars (about 136 KB), which `@codemirror/lang-markdown` imports statically to highlight HTML inside Markdown; splitting them out would need a patched or forked package.
 - A native OS menu bar on macOS (the in-app menu is used on all platforms today).
 - Large documents (measured 2026-09-29, production build, Edge): a keystroke costs at most 0–120 ms up to 800 KB. Pasting a whole document into a new tab takes about 1.7 s at 100 KB, 6.7 s at 400 KB and 11 s at 800 KB until the preview shows it (before two fixes: 3.4, 9.6 and 21 s). The HTML re-parse (rehype-raw) now runs only for documents that contain HTML, and bulk changes rebuild the preview instead of inserting thousands of blocks one by one. Parsing in a Web Worker was tried and measured slower (2026-09-29: sending the syntax tree back costs more than parsing, and made keystrokes in a 100 KB document block for ~0.8 s), so it was not kept. Re-parsing on a keystroke is already fast; the remaining cost is building the page's DOM the first time, so progressive rendering (the first 150 blocks at once, the rest in steps) was tried next; it showed the top of the document sooner but made keystrokes in a 100 KB document block for ~0.8 s and the full render slower, so it was not kept either. Both experiments replaced react-markdown's renderer. What shipped instead keeps it: a rehype step groups long documents (150+ top-level blocks) into chunks of 50 blocks, and each chunk builds its DOM only when it comes within 1500 px of the visible area. Measured 2026-09-29 (production build, Edge, a generated document pasted into a new tab, median of 5 alternating runs): 400 KB 2.1 → 1.6 s and 800 KB 5.2 → 3.5 s until the end of the document shows; keystrokes 54–69 ms. The remaining time is Markdown parsing. Placeholder heights are estimates, so on WebKit (macOS, no scroll anchoring) the preview can shift when a chunk above the viewport is built. CSS `content-visibility: auto` on the preview's blocks (skipping layout and painting off screen) was measured too (2026-09-29, three alternating runs at 100/400/800 KB): no consistent gain, so it was not kept; the cost is creating the DOM, not laying it out. Live preview pauses above 1 MB.
 - Playwright runs against the browser demo; a Tauri-driver e2e run against the native build is still to do.

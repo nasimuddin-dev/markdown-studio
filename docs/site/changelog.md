@@ -7,6 +7,69 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.21.0
+
+Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.21.0)
+
+### Added
+
+**Links and headings**
+
+- **Ctrl+click** (**Cmd+click** on macOS) follows a link in the editor, or put the cursor on it and press **Alt+Enter**: web pages open in your browser, `#heading` links and reference links move to their target, and Markdown files open in a tab at the named heading.
+- **Rename Heading** (**F2**, Format menu or the Outline): renames a heading and updates the `#anchor` links to it, in the document and, after asking, in the folder's other files. On a footnote or a link reference label, **F2** renames the label everywhere.
+- **Links to this document** in the Links tab: the other files in the folder that link to the open document.
+- **Format → Convert Links to Reference Style** and **to Inline Style**; **Remove Link**; **Insert Link** inside a link selects its address.
+- Completion for the reference labels a document defines (after `][`), footnotes (after `[^`) and another document's headings (after `](guide.md#`).
+- **Go to Heading in Folder** (**Ctrl+Shift+Alt+H**) and **Copy Link to Current Heading** (command palette). Hovering a heading in the preview shows a link icon that copies its anchor.
+- Hovering an image link in the editor shows the picture; clicking a picture in the preview shows it at full size.
+
+**Checking documents**
+
+- New checks with quick fixes: reference links without a definition, unused or doubly defined labels, `#Title` without a space, `---` that turns a line into a heading, list items without a space, bold with spaces inside, and paths with spaces. A table with mistakes offers **Fix Table**.
+- A link or image to a misspelled file name suggests the file that was meant (**Change to guide.md**); the Links tab names it too.
+- **F8** / **Shift+F8** go to the next or previous problem; each kind of check can be turned off (**Don't Show This Check**) and back on in Settings.
+
+**Writing and editing**
+
+- **Table menu**, with column alignment and moving columns; **Align tables on save** (Settings → Files).
+- **Format → Insert Callout** (Note, Tip, Important, Warning, Caution), **Insert Date / Date and Time**, **Inline Math**, **Insert Math Block**, Mermaid starters (flowchart, sequence diagram, Gantt chart, pie chart) and **Toggle Comment** (**Ctrl+/**).
+- **Edit → Select Section** (again for the parent section), also from the Outline; the Outline's sections can be collapsed.
+- **View → Fold to Level 1, 2 or 3**, **Toggle Typewriter Scrolling** and **Dim Other Paragraphs**; a **Line length** setting keeps the text a readable width.
+- **Find in the preview** (**Ctrl+F** when the preview is shown alone or has focus).
+- The editor and preview scroll together line by line, and double-clicking the preview puts the cursor on that block's source.
+- **F6** / **Shift+F6** move the focus between the sidebar, the editor and the preview.
+
+**Files**
+
+- The Explorer lists pictures (preview them, link them, or drag them into the editor), has a **Collapse Folders** button, and dragging a file into the editor links it.
+- **File → Move Selection to New File…**, **Save as Template…**, **Close All Tabs**, **Show in Explorer** and **Copy Relative Path** (tab menu).
+- Without a folder, the Explorer lists recent files and folders (each can be removed from the list).
+- Change a file's line endings (LF or CRLF) or byte order mark from the status bar.
+- **Settings → Files → Folder for pasted images** (instead of `assets`), used by imports too.
+- Tabs of files with the same name show their folder.
+- The status bar shows the file's changes since the last Git commit, task progress (click for the next open task) and a word count goal (**Set Word Count Goal…**); click **Ln, Col** to go to a line.
+
+**Export, print and review**
+
+- Printing adds the document's title and page numbers to each page (also for printed HTML exports); PDF and Word exports put the title at the top of each page after the first.
+- `#anchor` links jump to their heading in PDF exports and survive Word export and import.
+- **Export as Markdown with Images (.zip)** and **Copy as Plain Text**.
+- **Start each top-level heading on a new page** (Settings → Export) for PDF, Word and printing.
+- File History and Compare mark the words that changed within a line; the AI review shows the changes for commands that replace text.
+- Slides: speaker notes, and **View → Print Slides**.
+- Settings has a search box; the command palette lists recently used commands first.
+
+### Changed
+
+- Diffs list removed lines before added ones, as Git does.
+- In a narrow window, the status bar hides the line ending, encoding and language to make room.
+- Checks skip code blocks with one pass over the document instead of one per check.
+
+### Fixed
+
+- HTML comments that contained `>` could leave part of their text in Word and PDF exports.
+- Long menus ran off the bottom of short windows, and the Links tab was cut off in a narrow sidebar.
+
 ## v0.20.0
 
 Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.20.0)
