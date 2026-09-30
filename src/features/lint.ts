@@ -603,10 +603,25 @@ export async function lintLinks(
   text: string,
   docPath: string | null,
   exists: (path: string) => Promise<boolean | null>,
+  /** File names in a folder, to suggest the one a broken link probably meant. */
+  filesIn?: (dir: string) => Promise<string[] | null>,
 ): Promise<MarkdownProblem[]> {
   if (!docPath) return [];
   const problems: MarkdownProblem[] = [];
   const cache = new Map<string, Promise<boolean | null>>();
+  const listings = new Map<string, Promise<string[] | null>>();
+  const suggest = async (path: string): Promise<string | null> => {
+    if (!filesIn) return null;
+    const cut = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+    const dir = path.slice(0, cut);
+    if (!listings.has(dir)) listings.set(dir, filesIn(dir).catch(() => null));
+    const names = await listings.get(dir);
+    if (!names?.length) return null;
+    const wanted = path.slice(cut + 1).toLowerCase();
+    const byLower = new Map(names.map((n) => [n.toLowerCase(), n]));
+    const near = closest(wanted, new Set(byLower.keys()));
+    return near ? byLower.get(near)! : null;
+  };
   for (const { link, path } of localTargets(findAllLinks(text), docPath)) {
     if (!path) {
       problems.push({ from: link.from, to: link.to, severity: "warning", rule: "broken-link", message: "Link points outside the file system root." });
@@ -614,12 +629,24 @@ export async function lintLinks(
     }
     if (!cache.has(path)) cache.set(path, exists(path).catch(() => null));
     if ((await cache.get(path)) === false) {
+      // A likely typo in the file name: offer the closest name in that folder (not for HTML links).
+      const near = link.sourceLength === undefined ? await suggest(path) : null;
+      const cut = link.target.search(/[?#]/);
+      const pathPart = cut < 0 ? link.target : link.target.slice(0, cut);
+      const nameFrom = pathPart.lastIndexOf("/") + 1;
+      const bracketed = text[link.targetFrom - 1] === "<";
       problems.push({
         from: link.from,
         to: link.to,
         severity: "warning",
         rule: link.image ? "missing-image" : "broken-link",
-        message: `${link.image ? "Image" : "Linked file"} not found: ${link.target}`,
+        message: `${link.image ? "Image" : "Linked file"} not found: ${link.target}${near ? `. Did you mean “${near}”?` : ""}`,
+        ...(near && {
+          fix: {
+            label: `Change to ${near}`,
+            edits: [{ at: link.targetFrom - link.from + nameFrom, remove: pathPart.length - nameFrom, insert: bracketed ? near : encodeURI(near).replace(/\(/g, "%28").replace(/\)/g, "%29") }],
+          },
+        }),
       });
     }
   }

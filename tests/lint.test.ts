@@ -66,6 +66,25 @@ describe("markdown lint: document rules", () => {
   });
 });
 
+describe("markdown lint: misspelled file names", () => {
+  it("suggests the closest file in the folder and fixes the name only", async () => {
+    const files: Record<string, string[]> = { "/ws/docs": ["guide.md", "Setup Notes.md", "logo.png"], "/ws": ["README.md"] };
+    const exists = async (p: string) => ["/ws/docs/guide.md", "/ws/docs/Setup Notes.md", "/ws/docs/logo.png", "/ws/README.md"].includes(p);
+    const filesIn = async (dir: string) => files[dir] ?? null;
+    const text = "[a](docs/gude.md#intro) ![b](docs/logo.pgn) [c](docs/Setup%20Note.md) [d](docs/other.md) [e](<docs/setup notes2.md>)";
+    const problems = await lintLinks(text, "/ws/p.md", exists, filesIn);
+    expect(problems.map((p) => p.message)).toEqual([
+      "Linked file not found: docs/gude.md#intro. Did you mean “guide.md”?",
+      "Image not found: docs/logo.pgn. Did you mean “logo.png”?",
+      "Linked file not found: docs/Setup%20Note.md. Did you mean “Setup Notes.md”?",
+      "Linked file not found: docs/other.md",
+      "Linked file not found: docs/setup notes2.md. Did you mean “Setup Notes.md”?",
+    ]);
+    const fixed = problems.reduceRight((t, p) => (p.fix ? fixChanges(p.fix, p.from, t).reduce((s, c) => s.slice(0, c.from) + c.insert + s.slice(c.to), t) : t), text);
+    expect(fixed).toBe("[a](docs/guide.md#intro) ![b](docs/logo.png) [c](docs/Setup%20Notes.md) [d](docs/other.md) [e](<docs/Setup Notes.md>)");
+  });
+});
+
 describe("markdown lint: files", () => {
   it("reports missing local files and images, skipping unknown locations and URLs", async () => {
     const present = new Set(["/ws/docs/guide.md", "/ws/img/a.png"]);

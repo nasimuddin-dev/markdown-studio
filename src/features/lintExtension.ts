@@ -35,6 +35,15 @@ function fixAction(fix: ProblemFix): Action {
 }
 
 /** Existence check for link targets; `null` when the path can't be checked. */
+/** Names of the files (documents and pictures) in a folder, or null when it can't be listed. */
+async function filesIn(dir: string): Promise<string[] | null> {
+  try {
+    return (await backend().listDir(dir, { images: true })).filter((e) => !e.isDir).map((e) => e.name);
+  } catch {
+    return null;
+  }
+}
+
 async function exists(path: string): Promise<boolean | null> {
   try {
     return (await backend().fileMtime(path)) !== null;
@@ -83,7 +92,7 @@ export function markdownLinter(): Extension {
         const text = view.state.doc.toString();
         const doc = activeDoc();
         const hidden = new Set(useSettings.getState().settings.lintDisabledRules);
-        const problems = [...lintMarkdown(text), ...(await lintLinks(text, doc?.path ?? null, exists))].filter((p) => !hidden.has(p.rule));
+        const problems = [...lintMarkdown(text), ...(await lintLinks(text, doc?.path ?? null, exists, filesIn))].filter((p) => !hidden.has(p.rule));
         const len = view.state.doc.length;
         const diagnostics: Diagnostic[] = problems.map((p) => ({
           from: Math.min(p.from, len),
