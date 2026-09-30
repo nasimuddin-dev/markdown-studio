@@ -488,3 +488,13 @@ The user asked for one release and then to keep looping; during the loop they re
 - Local LLMs (SRS §19, for example Ollama) alongside Claude: wanted?
 - A redirect repository for the old website address?
 - Rename the local folder to `markpion`?
+
+## 2026-09-29 (5:37 PM, scheduled session): baseline check only
+
+The scheduled run started at 5:37 PM, after the 5:25 PM cut-off for new features, so no feature was built and no release was made (0.17.0 from the earlier session is current).
+
+- **Baseline:** tree clean on `main` at 17e6923. Typecheck clean; Vitest 358 (57 files) and Rust 39 (+1 ignored) passing. Playwright was not re-run (no code changed since 0.17.0, where 41 passed).
+
+**Next up:** unchanged from the 0.17.0 entry above (confirm the dialog-parent fix, toolbar headings 4–6 and table menu, tauri-driver e2e).
+
+**Questions for the user:** unchanged from the 0.17.0 entry. Also: the scheduled task fired late today (5:37 PM instead of 4:00 PM); if that keeps happening, a larger time window may be worth setting.
