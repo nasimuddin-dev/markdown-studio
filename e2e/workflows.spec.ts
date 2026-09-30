@@ -1047,6 +1047,23 @@ test("Go to Tag lists the folder's tags and opens the file at the tag", async ({
   await expect(page.getByRole("dialog", { name: "Go to tag" }).getByRole("option")).toHaveCount(1);
 });
 
+test("the Tags tab lists the folder's tags and opens a file at its tag", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-content").click();
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.type("\n\nSee #giraffe-facts");
+  await page.keyboard.press(`${mod}+Home`);
+  await page.getByRole("tab", { name: "Tags" }).click();
+  const panel = page.getByRole("region", { name: "Tags" });
+  const tag = panel.getByRole("button", { name: /#giraffe-facts/ });
+  await expect(tag).toContainText("1");
+  await tag.click();
+  await panel.getByRole("button", { name: /README\.md/ }).click();
+  await expect(page.locator(".cm-activeLine")).toHaveText("See #giraffe-facts");
+});
+
 test("File History marks the words that changed within a line", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

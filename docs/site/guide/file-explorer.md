@@ -96,9 +96,12 @@ The status bar sums up the file's changes (for example `+3 ~1 −2`: added, chan
 
 This needs Git installed. Markpion runs `git status` in the open folder (and `git show` for the file in the editor), read-only, when the folder opens, when files change, and when you come back to the window; it never commits, pulls or pushes. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
 
-## Search and links across the folder
+## Search, links and tags across the folder
 
-The sidebar has two more views for the whole workspace:
+The sidebar has three more views for the whole workspace:
 
 - **Search** (**Ctrl+Shift+F**) finds text in every Markdown file. See [Search & replace](/guide/search-replace#find-in-files).
 - **Links** checks every link in every file. See [Checking documents](/guide/checking-documents#link-check).
+- **Tags** lists the `#tags` used in the folder. See [Tags](/guide/search-replace#tags).
+
+When the sidebar is narrow, its tabs show only their icons; hover one for its name.

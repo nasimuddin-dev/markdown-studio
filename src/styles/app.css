@@ -1807,7 +1807,7 @@ select {
   border-bottom-color: var(--accent);
 }
 /* A narrow sidebar shows the tabs as icons (the labels stay as their accessible names and tooltips). */
-@container (max-width: 250px) {
+@container (max-width: 320px) {
   .sidebar-tab-label {
     position: absolute;
     width: 1px;

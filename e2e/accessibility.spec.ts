@@ -139,6 +139,9 @@ for (const theme of ["light", "dark"] as const) {
       await palette("check links in folder");
       await expect(page.getByRole("tab", { name: "Links", selected: true })).toBeVisible();
       await audit(page, "link check");
+      await page.getByRole("tab", { name: "Tags" }).click();
+      await expect(page.getByRole("region", { name: "Tags" }).getByRole("status")).not.toHaveText("Finding tags…");
+      await audit(page, "tags");
 
       await page.getByRole("tab", { name: "Explorer" }).click();
       await page.locator(".tree-row", { hasText: /^assets$/ }).click();

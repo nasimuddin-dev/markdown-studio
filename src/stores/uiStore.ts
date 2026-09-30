@@ -54,7 +54,7 @@ interface UiState {
   /** View → Present as Slides is showing the active document. */
   presenting: boolean;
   setPresenting(on: boolean): void;
-  sidebarView: "explorer" | "search" | "links";
+  sidebarView: "explorer" | "search" | "links" | "tags";
   problems: { errors: number; warnings: number; infos: number } | null;
   /** Document whose File History dialog is open. */
   historyDocId: string | null;

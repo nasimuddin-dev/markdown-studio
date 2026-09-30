@@ -4,6 +4,7 @@ import { FileExplorer } from "./components/FileExplorer";
 import { Outline } from "./components/Outline";
 import { SearchPanel } from "./components/SearchPanel";
 import { LinkCheckPanel } from "./components/LinkCheckPanel";
+import { TagsPanel } from "./components/TagsPanel";
 import { Icon } from "./components/Icon";
 import { useUi } from "./stores/uiStore";
 import { commands, formatShortcut } from "./features/commands";
@@ -160,13 +161,24 @@ function Sidebar() {
         >
           <Icon name="link" size={15} /> <span className="sidebar-tab-label">Links</span>
         </button>
+        <button
+          role="tab"
+          aria-selected={view === "tags"}
+          className={`sidebar-tab${view === "tags" ? " active" : ""}`}
+          onClick={() => setView("tags")}
+          title="Tags used in the folder"
+        >
+          <Icon name="tag" size={15} /> <span className="sidebar-tab-label">Tags</span>
+        </button>
       </div>
       {view === "explorer" ? (
         <ExplorerAndOutline />
       ) : view === "search" ? (
         <SearchPanel />
-      ) : (
+      ) : view === "links" ? (
         <LinkCheckPanel />
+      ) : (
+        <TagsPanel />
       )}
     </div>
   );
