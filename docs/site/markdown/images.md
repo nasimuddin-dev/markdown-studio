@@ -21,7 +21,7 @@ The easiest way to add an image is to **paste** it (for example a screenshot) or
 1. Markpion saves the image in an `assets` folder next to the document, creating the folder if needed.
 2. It inserts a link with a relative path at the cursor. A pasted screenshot gets a timestamped name, for example `![image 20260925 140512](assets/image-20260925-140512.png)`; a dropped file keeps its name. Replace the alt text with a short description.
 
-The document must be saved first, so Markpion knows where to put the `assets` folder. To use another folder name, such as `images` or `media`, set **Settings → Files → Folder for pasted images** (one folder name, next to the document). Supported formats are PNG, JPEG, GIF, WebP, SVG, BMP and AVIF, up to 20 MB per image.
+The document must be saved first, so Markpion knows where to put the `assets` folder. To use another folder name, such as `images` or `media`, set **Settings → Files → Folder for pasted images** (one folder name, next to the document). Imported Word, PDF and HTML documents put their pictures there too. Supported formats are PNG, JPEG, GIF, WebP, SVG, BMP and AVIF, up to 20 MB per image.
 
 ## Insert Image…
 

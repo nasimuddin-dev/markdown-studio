@@ -3,7 +3,7 @@ import { describeError } from "../services/errors";
 import { basename, dirname, isInside } from "../services/paths";
 import type { ConversionResult } from "../services/convert/docx";
 import { useDocuments } from "../stores/documentsStore";
-import { useSettings } from "../stores/settingsStore";
+import { imageFolderName, useSettings } from "../stores/settingsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { notify } from "../stores/uiStore";
 import { newDocument, openPath } from "./documents";
@@ -84,14 +84,16 @@ export function kindForPath(path: string): ImportKind | null {
   return null;
 }
 
-/** Writes a conversion result to `dest`, saving its images to assets/ beside it. */
+/** Writes a conversion result to `dest`, saving its images beside it (in assets/, or the folder set in Settings). */
 export async function writeConverted(dest: string, result: ConversionResult) {
   const b = backend();
+  const folder = imageFolderName(useSettings.getState().settings.imageFolder);
   let markdown = result.markdown;
   for (const img of result.images) {
-    const saved = await b.saveImageAsset(dest, img.name, img.base64);
+    const saved = await b.saveImageAsset(dest, img.name, img.base64, folder);
     const savedName = basename(saved);
-    if (savedName !== img.name) markdown = markdown.split(`assets/${img.name}`).join(`assets/${encodeURI(savedName)}`);
+    // The converters link images as assets/<name>.
+    if (savedName !== img.name || folder !== "assets") markdown = markdown.split(`assets/${img.name}`).join(`${encodeURI(folder)}/${encodeURI(savedName)}`);
   }
   await b.writeTextFile({
     path: dest,
