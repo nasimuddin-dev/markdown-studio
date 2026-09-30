@@ -1069,6 +1069,23 @@ test("the Tags tab lists the folder's tags and opens a file at its tag", async (
   await expect(panel.getByRole("button", { name: /#okapi/ })).toBeVisible();
 });
 
+test("the Explorer's filter lists matching files and opens one", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  const filter = page.getByRole("searchbox", { name: "Filter files by name" });
+  await filter.fill("diagrams");
+  const results = page.getByRole("list", { name: "Matching files" });
+  await expect(results.getByRole("button")).toHaveCount(1);
+  await expect(results.getByRole("button")).toContainText("docs");
+  await filter.press("Enter");
+  await expect(page.getByRole("tab", { name: /diagrams-and-math\.md/ })).toHaveAttribute("aria-selected", "true");
+  await filter.fill("zzz-nothing");
+  await expect(page.getByText("No matching files.")).toBeVisible();
+  await filter.press("Escape");
+  await expect(filter).toHaveValue("");
+  await expect(page.getByRole("tree")).toBeVisible();
+});
+
 test("File History marks the words that changed within a line", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

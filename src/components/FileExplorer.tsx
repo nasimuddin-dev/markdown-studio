@@ -16,6 +16,7 @@ import { ContextMenu, type MenuEntry } from "./ContextMenu";
 import { copyPath, copyRelativePath, insertFileLink, insertFileLinkAt, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
 import { backend } from "../services";
 import { useSettings } from "../stores/settingsStore";
+import { fuzzyFilter } from "../features/fuzzy";
 
 interface ContextMenu {
   x: number;
@@ -132,6 +133,7 @@ export function FileExplorer() {
   const [menu, setMenu] = useState<ContextMenu | null>(null);
   const tree = useRef<HTMLUListElement>(null);
   const [dropTarget, setDropTarget] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
 
   /**
    * Drag a row onto a folder (or the empty part of the tree, for the top
@@ -261,6 +263,33 @@ export function FileExplorer() {
           </button>
         </div>
       </div>
+      <div className="explorer-filter">
+        <input
+          className="text-input"
+          type="search"
+          placeholder="Filter files"
+          aria-label="Filter files by name"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          spellCheck={false}
+          onKeyDown={(e) => {
+            if (e.key === "Escape" && filter) {
+              e.preventDefault();
+              e.stopPropagation();
+              setFilter("");
+            } else if (e.key === "ArrowDown" || e.key === "Enter") {
+              const first = e.currentTarget.parentElement?.nextElementSibling?.querySelector<HTMLElement>("button");
+              if (!first) return;
+              e.preventDefault();
+              if (e.key === "Enter") first.click();
+              else first.focus();
+            }
+          }}
+        />
+      </div>
+      {filter.trim() ? (
+        <FilteredFiles root={root} query={filter.trim()} version={rootChildren} />
+      ) : (
       <ul className={`tree${dropTarget === root ? " drop-root" : ""}`} role="tree" aria-label={basename(root)} ref={tree} onKeyDown={onTreeKey}
         tabIndex={hasSelection ? -1 : 0}
         onFocus={(e) => {
@@ -277,6 +306,7 @@ export function FileExplorer() {
           ))
         )}
       </ul>
+      )}
       {menu && (
         <ContextMenu
           x={menu.x}
@@ -323,6 +353,51 @@ export function FileExplorer() {
  * or saved on its own can still be renamed (F2 or right-click), revealed or
  * closed from here.
  */
+/** The folder's files whose path matches the Explorer's filter, best matches first. */
+function FilteredFiles({ root, query, version }: { root: string; query: string; version: unknown }) {
+  const [files, setFiles] = useState<string[] | null>(null);
+  const showImages = useSettings((s) => s.settings.explorerShowImages);
+  useEffect(() => {
+    let cancelled = false;
+    void backend()
+      .listWorkspaceFiles(root)
+      .then((all) => all, () => [] as string[])
+      .then((all) => !cancelled && setFiles(all));
+    return () => {
+      cancelled = true;
+    };
+    // A refreshed tree (new, renamed or deleted files) lists the files again.
+  }, [root, version]);
+  if (files === null) return <p className="tree-empty">Loading…</p>;
+  const rel = (p: string) => (p.startsWith(root) ? p.slice(root.length) : p).replace(/^[\\/]+/, "").replace(/\\/g, "/");
+  const shown = files.filter((p) => isMarkdownPath(p) || (showImages && /\.(png|jpe?g|gif|svg|webp|bmp|avif)$/i.test(p)));
+  const matches = fuzzyFilter(shown, query, rel).slice(0, 200);
+  if (!matches.length) return <p className="tree-empty">No matching files.</p>;
+  const move = (e: KeyboardEvent<HTMLUListElement>) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    const buttons = [...e.currentTarget.querySelectorAll<HTMLElement>("button")];
+    const i = buttons.indexOf(document.activeElement as HTMLElement);
+    const next = e.key === "ArrowDown" ? buttons[i + 1] : i <= 0 ? e.currentTarget.parentElement?.querySelector<HTMLElement>(".explorer-filter input") : buttons[i - 1];
+    if (next) {
+      e.preventDefault();
+      next.focus();
+    }
+  };
+  return (
+    <ul className="search-results explorer-filter-results" aria-label="Matching files" onKeyDown={move}>
+      {matches.map(({ item }) => (
+        <li key={item}>
+          <button className="search-file" title={item} onClick={() => (isMarkdownPath(item) ? void openPath(item) : useUi.getState().setImagePreview(item))}>
+            <Icon name="file" size={14} className="tree-file-icon" />
+            <span className="search-file-name">{basename(item)}</span>
+            {rel(item).includes("/") && <span className="search-file-dir">{dirname(rel(item))}</span>}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function OpenFiles() {
   const docs = useDocuments((s) => s.docs);
   const activeId = useDocuments((s) => s.activeId);

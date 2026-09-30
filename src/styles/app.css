@@ -493,6 +493,13 @@ select {
   user-select: none;
 }
 
+.explorer-filter {
+  margin: 0 10px 6px;
+  flex: none;
+}
+.explorer-filter-results {
+  overflow: auto;
+}
 .explorer-header {
   display: flex;
   align-items: center;
