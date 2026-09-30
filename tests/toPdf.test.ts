@@ -192,10 +192,11 @@ describe("SVG size", () => {
 describe("math in PDF export", () => {
   const md = "Inline $e^{i\\pi}$ and $A \\subset B$ here.\n\n$$\n\\int_0^1 x^2 \\, dx\n$$";
 
-  it("draws display formulas as images and sets inline ones as text", async () => {
+  it("draws display formulas as vector drawings and sets inline ones as text", async () => {
     const png = Uint8Array.from(atob(PNG_B64), (c) => c.charCodeAt(0));
     const bytes = await markdownToPdf(md, { renderMath: async () => ({ data: png, width: 90, height: 40 }) });
-    expect(new TextDecoder("latin1").decode(bytes)).toMatch(/\/Subtype\s*\/Image/);
+    // MathJax's drawing, not the PNG picture.
+    expect(new TextDecoder("latin1").decode(bytes)).not.toMatch(/\/Subtype\s*\/Image/);
     const text = (await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown;
     expect(text).toContain("π");
     expect(text).not.toContain("$e^{i\\pi}$");
@@ -204,8 +205,21 @@ describe("math in PDF export", () => {
     expect(text).not.toContain("\\int_0^1");
   }, 30_000);
 
-  it("keeps the LaTeX when a formula can't be drawn", async () => {
-    const bytes = await markdownToPdf(md, { renderMath: async () => { throw new Error("SecurityError"); } });
+  const unknown = "$$\n\\notacommand{x}\n$$";
+
+  it("uses the picture when MathJax can't typeset a formula", async () => {
+    const png = Uint8Array.from(atob(PNG_B64), (c) => c.charCodeAt(0));
+    const bytes = await markdownToPdf(unknown, { renderMath: async () => ({ data: png, width: 90, height: 40 }) });
+    expect(new TextDecoder("latin1").decode(bytes)).toMatch(/\/Subtype\s*\/Image/);
+  }, 30_000);
+
+  it("keeps the LaTeX when a formula can't be drawn either way", async () => {
+    const bytes = await markdownToPdf(unknown, { renderMath: async () => { throw new Error("SecurityError"); } });
+    expect((await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown).toContain("\\notacommand{x}");
+  }, 30_000);
+
+  it("keeps the LaTeX when math rendering is off", async () => {
+    const bytes = await markdownToPdf(md);
     expect((await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown).toContain("\\int_0^1");
   }, 30_000);
 });

@@ -134,6 +134,8 @@ class DocxBuilder {
   private headingIndex = 0;
   /** Set from ExportOptions.pageBreakBeforeH1; counts the H1s seen so far. */
   breakBeforeH1 = false;
+  /** Draws display formulas Word can't take as equations (matrices, environments). */
+  renderMath?: DiagramRenderer;
   private h1Count = 0;
   constructor(
     private loadImage?: DocxImageLoader,
@@ -365,6 +367,26 @@ class DocxBuilder {
       case "math": {
         const eq = latexToWordMath(node.value);
         if (eq) return [new Paragraph({ indent, alignment: AlignmentType.CENTER, spacing: { before: 120, after: 120 }, children: [eq] })];
+        const png = this.renderMath ? await this.renderMath(node.value).catch(() => null) : null;
+        if (png) {
+          const scale = Math.min(1, MAX_IMAGE_WIDTH / png.width);
+          return [
+            new Paragraph({
+              indent,
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 120, after: 120 },
+              children: [
+                new ImageRun({
+                  type: "png",
+                  data: png.data,
+                  transformation: { width: Math.round(png.width * scale), height: Math.round(png.height * scale) },
+                  // The LaTeX stays with the picture, for screen readers and editing.
+                  altText: { name: "Formula", description: node.value, title: "Formula" },
+                }),
+              ],
+            }),
+          ];
+        }
         return [new Paragraph({ indent, children: [new TextRun({ text: `$$ ${node.value} $$`, font: MONO, size: 19 })] })];
       }
       default: {
@@ -398,6 +420,7 @@ export async function markdownToDocx(markdown: string, opts: ExportOptions = {})
   const tree = parser.runSync(parser.parse(stripFrontMatter(markdown))) as Root;
   const builder = new DocxBuilder(opts.loadImage, collectFootnotes(tree), opts.renderDiagram, headingBookmarks(tree));
   builder.breakBeforeH1 = !!opts.pageBreakBeforeH1;
+  builder.renderMath = opts.renderMath;
   const children: Array<Paragraph | Table> = [];
   for (const node of tree.children) children.push(...(await builder.block(node)));
   const footnotes = await builder.footnoteContent();

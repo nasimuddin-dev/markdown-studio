@@ -37,11 +37,11 @@ flowchart LR
 | Editor | CodeMirror 6 (Markdown language, search, lint, autocompletion) |
 | Preview | react-markdown on unified: remark-gfm, remark-math, rehype-raw, rehype-sanitize, rehype-katex (MathML), rehype-highlight, rehype-slug; Mermaid for diagrams |
 | State | Zustand stores |
-| Export | HTML (unified), PDF (pdfmake), Word (docx) |
+| Export | HTML (unified), PDF (pdfmake; display math drawn by MathJax as SVG), Word (docx) |
 | Import | Word (mammoth), PDF (pdf.js), HTML (turndown), CSV/TSV |
 | Tests | Vitest, Playwright with axe-core (WCAG 2.1 AA), Rust unit tests |
 
-Heavy libraries (Mermaid, KaTeX, pdfmake, docx, mammoth, pdf.js) are loaded on first use, so they don't slow down startup.
+Heavy libraries (Mermaid, KaTeX, MathJax, pdfmake, docx, mammoth, pdf.js) are loaded on first use, so they don't slow down startup.
 
 ## 3. Layered architecture
 

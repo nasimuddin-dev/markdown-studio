@@ -326,7 +326,7 @@ test("long file names fit on one row in the tab", async ({ page }) => {
   expect(await label$.evaluate((el) => getComputedStyle(el).fontStyle)).toBe("italic");
 });
 
-test("display formulas and diagrams are exported to PDF as pictures", async ({ page }) => {
+test("display formulas and diagrams are drawn in the exported PDF", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);
   await page.locator(".tree-row", { hasText: /^docs$/ }).click();
@@ -337,10 +337,11 @@ test("display formulas and diagrams are exported to PDF as pictures", async ({ p
   const download = page.waitForEvent("download");
   await page.getByRole("option", { name: /^Export as PDF/ }).click();
   const pdf = Buffer.concat(await (await (await download).createReadStream()).toArray()).toString("latin1");
-  // The Mermaid diagram and the $$…$$ integral are images; the inline formula stays LaTeX text.
-  // Two pictures, each stored with its alpha mask (a second image object).
-  expect(pdf.match(/\/Subtype\s*\/Image/g)?.length).toBe(4);
-  expect(pdf.match(/\/SMask\s+\d+\s+0\s+R/g)?.length).toBe(2);
+  // The Mermaid diagram is a picture (stored with its alpha mask, a second image
+  // object); the $$…$$ integral is a vector drawing, so its LaTeX isn't in the text.
+  expect(pdf.match(/\/Subtype\s*\/Image/g)?.length).toBe(2);
+  expect(pdf.match(/\/SMask\s+\d+\s+0\s+R/g)?.length).toBe(1);
+  expect(pdf).not.toContain("\\int");
 });
 
 test("replace in files across the folder", async ({ page }) => {

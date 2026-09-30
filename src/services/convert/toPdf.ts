@@ -300,6 +300,15 @@ class PdfBuilder {
       case "footnoteDefinition":
         return []; // collected into the Footnotes section at the end
       case "math": {
+        // Vector (MathJax) in every web engine; the PNG route is the fallback.
+        if (this.renderMath) {
+          const { mathToSvg } = await import("../mathSvg");
+          const drawn = mathToSvg(node.value);
+          if (drawn) {
+            const scale = Math.min(1, this.contentWidth / drawn.width);
+            return [{ svg: drawn.svg, width: drawn.width * scale, alignment: "center", margin: [0, 4, 0, 10] }];
+          }
+        }
         const png = this.renderMath ? await this.renderMath(node.value).catch(() => null) : null;
         if (png) {
           let bin = "";

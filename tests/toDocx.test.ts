@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import JSZip from "jszip";
 import { imageSize, makeImageLoader, markdownToDocx } from "../src/services/convert/toDocx";
 import { docxToMarkdown } from "../src/services/convert/docx";
@@ -182,6 +182,17 @@ describe("math in Word export", () => {
     expect(xml).not.toContain("<m:oMath>");
     expect(xml).toContain("\\begin{pmatrix}");
     expect(xml).toContain("$x \\unknown y$");
+  });
+
+  it("draws display formulas it can't convert as pictures, with the LaTeX as alt text", async () => {
+    const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137]);
+    const renderMath = vi.fn(async () => ({ data: png, width: 120, height: 40 }));
+    const xml = await documentXml("$$\n\\begin{pmatrix} a & b \\end{pmatrix}\n$$\n\n$$\n\\sum_{k=1}^{n} k\n$$", { renderMath });
+    // Only the matrix needs a picture; the sum is a native equation.
+    expect(renderMath).toHaveBeenCalledTimes(1);
+    expect(xml).toContain("<m:oMath>");
+    expect(xml).toContain("<pic:pic");
+    expect(xml).toContain('descr="\\begin{pmatrix} a &amp; b \\end{pmatrix}"');
   });
 
   it("leaves dollar signs alone when math is turned off", async () => {

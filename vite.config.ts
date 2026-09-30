@@ -47,6 +47,18 @@ export default defineConfig({
     watch: { ignored: ["**/src-tauri/**"] },
   },
   envPrefix: ["VITE_", "TAURI_ENV_*"],
+  // MathJax (PDF/Word math) is CommonJS: pre-bundle it at start-up, or the dev
+  // server discovers it on the first export and reloads the page mid-export.
+  optimizeDeps: {
+    include: [
+      "mathjax-full/js/mathjax.js",
+      "mathjax-full/js/input/tex.js",
+      "mathjax-full/js/output/svg.js",
+      "mathjax-full/js/adaptors/liteAdaptor.js",
+      "mathjax-full/js/handlers/html.js",
+      "mathjax-full/js/input/tex/AllPackages.js",
+    ],
+  },
   build: {
     target: process.env.TAURI_ENV_PLATFORM === "windows" ? "chrome105" : "safari15",
     minify: !process.env.TAURI_ENV_DEBUG,
