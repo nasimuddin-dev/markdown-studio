@@ -577,6 +577,17 @@ function lintReferences(text: string): MarkdownProblem[] {
     }
   }
   if (!definitions.length) return out;
+  // A label defined twice: links use the first definition, the other is ignored.
+  const first = new Map<string, number>();
+  for (const d of definitions) {
+    const id = normalizeLabel(d.text);
+    const at = first.get(id);
+    if (at === undefined) first.set(id, d.from);
+    else {
+      const line = text.slice(0, at).split("\n").length;
+      out.push({ from: d.from, to: d.to, severity: "warning", rule: "reference", message: `Link definition [${d.text}] is defined again; links use the one on line ${line}.` });
+    }
+  }
   // Shortcut references (`[id]`), and labels inside other links' text.
   for (const m of masked.matchAll(/\[([^[\]\n]+)\](?![(:])/g)) used.add(normalizeLabel(m[1]));
   for (const d of definitions) {

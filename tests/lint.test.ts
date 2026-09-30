@@ -226,6 +226,10 @@ describe("markdown lint: tables, footnotes and link text", () => {
     expect(only("[![badge][b]](https://example.com)\n\n[b]: b.svg", "reference")).toEqual([]);
   });
 
+  it("flags a link label defined twice", () => {
+    expect(only("[a][x]\n\n[x]: one.md\n[X]: two.md", "reference").map((p) => p.message)).toEqual(["Link definition [X] is defined again; links use the one on line 3."]);
+  });
+
   it("adds a missing reference definition at the end, after other definitions", () => {
     const fix = (text: string) => {
       const p = only(text, "reference")[0];
