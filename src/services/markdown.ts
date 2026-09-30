@@ -74,21 +74,6 @@ const defaults = markdownPlugins();
 export const remarkPlugins = defaults.remarkPlugins;
 export const rehypePlugins = defaults.rehypePlugins;
 
-/** How a link clicked in the preview should be handled. */
-export type LinkTarget =
-  | { type: "anchor"; id: string }
-  | { type: "external"; url: string }
-  | { type: "document"; href: string }
-  | { type: "blocked" };
-
-export function classifyLink(href: string | undefined | null): LinkTarget {
-  if (!href) return { type: "blocked" };
-  const h = href.trim();
-  if (h.startsWith("#")) return { type: "anchor", id: decodeURIComponent(h.slice(1)) };
-  if (/^(https?:|mailto:)/i.test(h)) return { type: "external", url: h };
-  // Any other scheme (javascript:, file:, data:, custom) is refused.
-  if (/^[a-z][a-z0-9+.-]*:/i.test(h) && !/^[a-zA-Z]:[\\/]/.test(h)) return { type: "blocked" };
-  return { type: "document", href: h };
-}
+export { classifyLink, type LinkTarget } from "./linkTarget";
 
 export { countWords } from "./textStats";

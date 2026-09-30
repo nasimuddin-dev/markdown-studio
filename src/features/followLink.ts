@@ -5,7 +5,7 @@ import type { Extension, StateCommand } from "@codemirror/state";
 import GithubSlugger from "github-slugger";
 import { backend } from "../services";
 import { describeError } from "../services/errors";
-import { classifyLink } from "../services/markdown";
+import { classifyLink } from "../services/linkTarget";
 import { isMarkdownPath, resolveRelative } from "../services/paths";
 import { activeDoc } from "../stores/documentsStore";
 import { notify } from "../stores/uiStore";
