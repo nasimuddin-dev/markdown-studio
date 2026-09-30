@@ -930,3 +930,21 @@ test("completes reference link labels the document defines", async ({ page }) =>
   // The reference is defined, so the lint has nothing to report about it.
   await expect(page.locator(".cm-lintRange")).toHaveCount(0);
 });
+
+test("converts links to reference style and back from the Format menu", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("See [one](a.md) and [two](https://example.com).");
+  const format = async (item: string) => {
+    await page.getByRole("button", { name: "Format", exact: true }).click();
+    await page.getByRole("menuitem", { name: item }).click();
+  };
+  await format("Convert Links to Reference Style");
+  await expect(page.locator(".cm-content")).toHaveText("See [one][1] and [two][2].[1]: a.md[2]: https://example.com");
+  await expect(page.locator(".markdown-body a")).toHaveCount(2);
+  await format("Convert Links to Inline Style");
+  await expect(page.locator(".cm-line")).toHaveText(["See [one](a.md) and [two](https://example.com).", ""]);
+  await page.keyboard.press(`${mod}+Z`);
+  await expect(page.locator(".cm-line").first()).toHaveText("See [one][1] and [two][2].");
+});

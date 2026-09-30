@@ -71,6 +71,7 @@ The list commands work on all selected lines, and applying one again removes it.
 
 - **Autocompletion:** type `](` to get a list of the workspace's Markdown files, `![](` for images, and `](#` for the headings in the document. After `][`, as in `[text][`, you get the reference labels the document defines (`[label]: address` lines), with their addresses; after `[^` in text, the footnotes it defines. Picking one adds the closing `]` if it's missing. Type a colon and two letters, such as `:roc`, to pick an emoji shortcode (🚀 `:rocket:`); it isn't offered inside code or right after a letter or digit, so times like `10:30` are left alone.
 - **Paste a URL over a selection** to turn the selected text into a link.
+- **Format → Convert Links to Reference Style** turns inline links and images such as `[text](address "title")` into `[text][1]`, with a numbered `[1]: address "title"` line at the end of the document, so paragraphs with long addresses stay readable. Links to the same address (and title) share one definition, and existing definitions are reused. **Convert Links to Inline Style** does the opposite for `[text][label]`, `[label][]` and `[label]` references, and removes the definitions nothing uses anymore. Both work on the selection, or the whole document when nothing is selected, and **Ctrl+Z** undoes them in one step. Links in code are left alone.
 - **Link to a heading:** right-click it in the Outline and choose **Copy Link to Heading** or **Copy Markdown Link**.
 - The [link check](/guide/checking-documents) finds links that point nowhere.
 
