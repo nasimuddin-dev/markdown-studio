@@ -7,6 +7,22 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.19.0
+
+Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.19.0)
+
+### Added
+
+- **Rename a file from its tab** (right-click → **Rename…**), even when no folder is open. A document that was never saved offers **Save As…**.
+- **Open files in the Explorer:** without an open folder, the Explorer lists your open files (click to switch, **F2** to rename, right-click for more) and can open the current file's folder.
+- **Open Containing Folder…** in the tab menu for files outside the open folder.
+- **Table size picker:** the toolbar's Table button lets you choose the number of columns and rows.
+- **More quick fixes:** change a skipped heading level, and correct a link to a misspelled heading anchor. **Edit → Fix All Problems** applies every quick fix at once.
+
+### Fixed
+
+- The Recent list on the welcome screen was underlined and cramped, and its **Clear** button sat awkwardly against the heading.
+
 ## v0.18.0
 
 Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.18.0)

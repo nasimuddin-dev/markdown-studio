@@ -523,3 +523,17 @@ The user asked to keep the loop going, then to release once features were ready.
 - May I download msedgedriver (Microsoft) and `cargo install tauri-driver` for native end-to-end tests?
 - Local LLMs (SRS §19, for example Ollama) alongside Claude: wanted?
 - A redirect repository for the old website address?
+
+## 2026-09-29 (7:35–8:30 PM): 0.19.0, user-reported rename and Explorer issues
+
+After 0.18.0 was released and installed locally (the silent install worked), the loop continued.
+
+- **User-reported (b27ce2e):** a file saved without an open folder couldn't be renamed and didn't show in the Explorer. Added Rename… to the tab menu (Save As… for unsaved documents), an Open Files list in the Explorer when no folder is open (F2 to rename, context menu), and Open Containing Folder (the folder dialog starts in the file's folder). The native scope now lets a file approved on its own take a new name in its own folder (never overwriting; the approval moves with it; Rust tests). Also user-reported: the Recent list's Clear button looked awkward. The cause was a second `.link-button` rule that underlined and squeezed the whole Recent list; it's now `.text-link`, and Clear is a quiet button aligned with the heading.
+- **Features:** lint quick fixes for skipped heading levels and misspelled anchors (3124920), Edit → Fix All Problems (147ac6b), toolbar table size picker (ec37a70). DESIGN.md brought up to date (1f333e9).
+- **0.18.0 release:** all seven downloads (Windows standard/offline, macOS arm64/x64, Linux AppImage/deb/rpm) returned 200; the macOS/Linux workflow passed.
+
+**Version:** 0.19.0. **Tests:** Vitest 393 (64 files), Playwright 50, Rust 40 (+1 ignored), website check (50 pages).
+
+**Unverified:** renaming a single file in the native app (Rust scope tests and the in-browser flow cover it).
+
+**Next up:** unchanged from the 0.18.0 entry (tauri-driver e2e, per-workspace custom CSS).
