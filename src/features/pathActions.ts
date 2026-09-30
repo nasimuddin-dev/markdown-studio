@@ -5,7 +5,9 @@ import { isDirty, useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { notify } from "../stores/uiStore";
 import { isMac } from "./commands";
-import { closeDocument } from "./documents";
+import { closeDocument, saveDocument } from "./documents";
+import { openFolderDialog, renameEntry } from "./workspace";
+import { basename, dirname } from "../services/paths";
 
 export const revealLabel = isMac ? "Reveal in Finder" : /Win/i.test(navigator.platform) ? "Reveal in File Explorer" : "Open Containing Folder";
 
@@ -15,6 +17,25 @@ export async function revealInFolder(path: string) {
   } catch (e) {
     notify("error", describeError(e, "show the file"));
   }
+}
+
+/**
+ * Renames a document's file (from its tab or the File menu, with or without an
+ * open folder). A document that was never saved is saved under a new name.
+ */
+export async function renameDocument(id: string) {
+  const doc = useDocuments.getState().docs.find((d) => d.id === id);
+  if (!doc) return;
+  if (!doc.path) {
+    await saveDocument(id, { saveAs: true });
+    return;
+  }
+  await renameEntry({ name: basename(doc.path), path: doc.path, isDir: false });
+}
+
+/** Opens the folder that contains a document in the Explorer (the folder dialog starts there). */
+export function openContainingFolder(path: string) {
+  return openFolderDialog(dirname(path));
 }
 
 /** Copies text to the clipboard and confirms it with a toast. */

@@ -49,6 +49,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 
 - Atomic saves, detection of files changed on disk (Reload, Compare or Keep Mine), and clear errors with next steps. [Saving & recovery](/guide/saving-and-recovery)
 - Optional auto save after a delay or when switching tabs or windows.
+- Rename a file from its tab, or from the Explorer's list of open files when no folder is open. [Tabs](/guide/tabs#tab-context-menu)
 - Read-only files open locked, with Save As or Edit Anyway; View → Toggle Read-Only protects any document from accidental edits. [Saving](/guide/saving-and-recovery#read-only-files)
 - Local file history: the previous version is kept on every save (30 per file), with a line diff and restore; also your unsaved changes against the saved file, and the last commit for files in Git.
 - Crash recovery for unsaved documents, and session restore of the last folder and files.

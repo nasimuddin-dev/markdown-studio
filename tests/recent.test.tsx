@@ -18,7 +18,7 @@ describe("recent files and folders", () => {
     await screen.findByRole("button", { name: "Remove b.md from Recent" });
     expect(screen.queryByRole("button", { name: "Remove a.md from Recent" })).toBeNull();
 
-    await userEvent.click(screen.getByRole("button", { name: "Clear" }));
+    await userEvent.click(screen.getByRole("button", { name: "Clear recent files and folders" }));
     expect(await backend.listRecent()).toEqual([]);
     await act(async () => {});
     expect(screen.queryByRole("heading", { name: "Recent" })).toBeNull();

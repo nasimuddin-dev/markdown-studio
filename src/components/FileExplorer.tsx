@@ -11,7 +11,8 @@ import {
 import { Icon } from "./Icon";
 import { pathKey, useGit } from "../stores/gitStore";
 import { ContextMenu, type MenuEntry } from "./ContextMenu";
-import { copyPath, copyRelativePath, revealInFolder, revealLabel } from "../features/pathActions";
+import { copyPath, copyRelativePath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
+import { closeDocument } from "../features/documents";
 import { backend } from "../services";
 
 interface ContextMenu {
@@ -118,6 +119,7 @@ function TreeNode({ entry, depth, onContext, onDragStart, dropTarget }: {
 
 export function FileExplorer() {
   const root = useWorkspace((s) => s.root);
+  const activePath = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.path ?? null);
   const rootChildren = useWorkspace((s) => (s.root ? s.children[s.root] : undefined));
   const hasSelection = useWorkspace((s) => !!s.selected);
   const [menu, setMenu] = useState<ContextMenu | null>(null);
@@ -200,11 +202,17 @@ export function FileExplorer() {
         <div className="explorer-header">
           <span className="explorer-title">Explorer</span>
         </div>
+        <OpenFiles />
         <div className="explorer-empty">
           <p>No folder is open.</p>
           <button className="button primary" onClick={() => void openFolderDialog()}>
             <Icon name="folderOpen" /> Open Folder
           </button>
+          {activePath && (
+            <button className="button" onClick={() => void openContainingFolder(activePath)} title={dirname(activePath)}>
+              <Icon name="folder" /> Open “{basename(dirname(activePath))}”
+            </button>
+          )}
         </div>
       </aside>
     );
@@ -281,5 +289,71 @@ export function FileExplorer() {
         />
       )}
     </aside>
+  );
+}
+
+/**
+ * Without an open folder, the Explorer lists the open files, so a file opened
+ * or saved on its own can still be renamed (F2 or right-click), revealed or
+ * closed from here.
+ */
+function OpenFiles() {
+  const docs = useDocuments((s) => s.docs);
+  const activeId = useDocuments((s) => s.activeId);
+  const [menu, setMenu] = useState<{ x: number; y: number; id: string } | null>(null);
+  if (!docs.length) return null;
+  const menuDoc = menu && docs.find((d) => d.id === menu.id);
+  const openMenu = (id: string, x: number, y: number) => setMenu({ id, x, y });
+  return (
+    <section className="open-files" aria-label="Open files">
+      <h3 className="open-files-title">Open Files</h3>
+      <ul className="open-files-list">
+        {docs.map((d) => (
+          <li key={d.id}>
+            <button
+              className={`tree-row${d.id === activeId ? " active" : ""}`}
+              title={d.path ?? "Not saved yet"}
+              aria-current={d.id === activeId ? "true" : undefined}
+              onClick={() => useDocuments.getState().setActive(d.id)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                openMenu(d.id, e.clientX, e.clientY);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "F2") {
+                  e.preventDefault();
+                  void renameDocument(d.id);
+                } else if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) {
+                  e.preventDefault();
+                  const r = e.currentTarget.getBoundingClientRect();
+                  openMenu(d.id, r.left + 12, r.bottom);
+                }
+              }}
+            >
+              <Icon name="file" size={15} className="tree-file-icon" />
+              <span className="tree-label">{d.name}</span>
+              {isDirty(d) && <span className="dirty-dot" aria-label="unsaved changes" />}
+            </button>
+          </li>
+        ))}
+      </ul>
+      {menu && menuDoc && (
+        <ContextMenu
+          x={menu.x}
+          y={menu.y}
+          label={`Actions for ${menuDoc.name}`}
+          onClose={() => setMenu(null)}
+          items={[
+            { label: menuDoc.path ? "Rename…" : "Save As…", shortcut: menuDoc.path ? "F2" : undefined, run: () => renameDocument(menuDoc.id) },
+            ...(menuDoc.path ? [{ label: "Open Containing Folder…", run: () => openContainingFolder(menuDoc.path!) }] : []),
+            "separator" as const,
+            { label: "Copy Path", run: () => copyPath(menuDoc.path!), disabled: !menuDoc.path },
+            { label: revealLabel, run: () => revealInFolder(menuDoc.path!), disabled: !menuDoc.path || !backend().capabilities.revealInFolder },
+            "separator" as const,
+            { label: "Close", run: () => closeDocument(menuDoc.id) },
+          ]}
+        />
+      )}
+    </section>
   );
 }

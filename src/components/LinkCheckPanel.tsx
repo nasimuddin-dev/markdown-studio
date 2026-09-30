@@ -91,7 +91,7 @@ export function LinkCheckPanel() {
       {unsaved && !progress && (
         <div className="search-summary">
           Checks the saved files.{" "}
-          <button className="link-button" onClick={() => void saveAll().then(check)}>Save all and check again</button>
+          <button className="text-link" onClick={() => void saveAll().then(check)}>Save all and check again</button>
         </div>
       )}
       {report && total > 0 && (

@@ -190,8 +190,8 @@ export class MemoryBackend implements Backend {
     return p;
   }
 
-  async pickOpenFolder() {
-    const answer = this.promptFn("Open folder:", "/demo");
+  async pickOpenFolder(startDir?: string) {
+    const answer = this.promptFn("Open folder:", startDir ?? "/demo");
     if (!answer) return null;
     const p = this.validate(answer.trim());
     if (!this.dirs.has(p)) throw new AppError("notFound", "Folder not found");
@@ -401,11 +401,14 @@ export class MemoryBackend implements Backend {
 
   async renamePath(path: string, newName: string) {
     const from = this.check(path);
-    const to = this.check(join(dirname(from), this.validateName(newName)));
+    const target = join(dirname(from), this.validateName(newName));
+    // A file approved on its own may take a new name in its own folder (as in the native scope).
+    const to = this.allowedFiles.has(from) && this.files.has(from) ? this.validate(target) : this.check(target);
     if (to !== from && (this.files.has(to) || this.dirs.has(to))) {
       throw new AppError("alreadyExists", "A file or folder with that name already exists.");
     }
     this.relocate(from, to);
+    if (this.allowedFiles.delete(from)) this.allowedFiles.add(to);
     return to;
   }
 

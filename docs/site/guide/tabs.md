@@ -35,6 +35,8 @@ A dot on a tab marks unsaved changes, its name is shown in italics, and the tab'
 Right-click a tab for:
 
 - **Close**, **Close Others**, **Close to the Right** and **Close Saved**
+- **Rename…**: renames the file on disk, even when no folder is open (a document that was never saved offers **Save As…** instead). The new name stays in the same folder, and an existing file is never replaced.
+- **Open Containing Folder…** (for a file outside the open folder): opens the folder dialog in the file's folder, so you can open it in the Explorer
 - **File History…** (see [Saving & recovery](/guide/saving-and-recovery#file-history))
 - **Copy Path** and **Reveal in File Explorer** (**Reveal in Finder** on macOS)
 

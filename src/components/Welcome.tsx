@@ -37,7 +37,12 @@ export function Welcome() {
           <div className="welcome-recent">
             <div className="welcome-recent-header">
               <h2>Recent</h2>
-              <button className="link-button small" onClick={() => void clearRecent()}>
+              <button
+                className="welcome-recent-clear"
+                title="Clear the recent list (no files are deleted)"
+                aria-label="Clear recent files and folders"
+                onClick={() => void clearRecent()}
+              >
                 Clear
               </button>
             </div>

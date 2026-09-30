@@ -12,6 +12,10 @@ The file explorer shows the folder you're working in, your **workspace**. Open i
   <figcaption>The Explorer (top left) and Outline (bottom left), in the dark theme.</figcaption>
 </figure>
 
+### Without a folder
+
+When no folder is open, the Explorer lists your **open files**. Click one to switch to it, press **F2** to rename it, or right-click it for **Rename…**, **Open Containing Folder…**, **Copy Path**, **Reveal in File Explorer** and **Close**. Below the list, **Open Folder** opens any folder, and **Open “folder name”** starts the folder dialog in the current file's folder.
+
 ## What's shown
 
 - Folders and Markdown files (`.md` and `.markdown`), sorted with folders first.

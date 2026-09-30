@@ -126,6 +126,21 @@ impl Scope {
         }
     }
 
+    /// Where `from` may be renamed to: `to` must be in scope, except that a file
+    /// approved on its own (opened or saved without its folder) may take a new
+    /// name in its own folder. Renames never overwrite, and the approval moves
+    /// to the new name, so no other file becomes reachable.
+    pub fn check_rename_target(&self, from: &Path, to: &Path) -> AppResult<PathBuf> {
+        if let Ok(p) = self.check(to) {
+            return Ok(p);
+        }
+        let approved_file = self.files.lock().unwrap().contains(from);
+        match to.parent() {
+            Some(dir) if approved_file && from.parent() == Some(dir) && from.is_file() => resolve(to),
+            _ => self.check(to),
+        }
+    }
+
     /// Keeps the scope consistent after a rename inside the workspace.
     pub fn rename_file(&self, from: &Path, to: &Path) {
         let mut files = self.files.lock().unwrap();
@@ -188,6 +203,18 @@ mod tests {
         assert!(scope.check(&tmp.path().join("b.md")).is_err());
         // ...but sibling assets can be read for the preview.
         assert!(scope.check_asset(&tmp.path().join("b.md")).is_ok());
+
+        // An approved file may take a new name in its own folder, and nothing else.
+        let a = scope.check(&tmp.path().join("a.md")).unwrap();
+        let dir = a.parent().unwrap().to_path_buf();
+        assert!(scope.check_rename_target(&a, &dir.join("renamed.md")).is_ok());
+        fs::create_dir_all(dir.join("sub")).unwrap();
+        assert!(scope.check_rename_target(&a, &dir.join("sub").join("x.md")).is_err());
+        let b = resolve(&tmp.path().join("b.md")).unwrap();
+        assert!(scope.check_rename_target(&b, &dir.join("stolen.md")).is_err());
+        scope.rename_file(&a, &dir.join("renamed.md"));
+        assert!(scope.check(&dir.join("renamed.md")).is_ok());
+        assert!(scope.check(&a).is_err());
     }
 
     #[test]

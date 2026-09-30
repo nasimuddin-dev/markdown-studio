@@ -88,7 +88,7 @@ pub async fn rename_path(state: State<'_, AppState>, path: String, new_name: Str
     let parent = from
         .parent()
         .ok_or_else(|| AppError::InvalidPath("Cannot rename a root folder".into()))?;
-    let to = state.scope.check(&fs_ops::join_child(parent, &new_name))?;
+    let to = state.scope.check_rename_target(&from, &fs_ops::join_child(parent, &new_name))?;
     state.track("fs.rename", fs_ops::rename(&from, &to))?;
     state.scope.rename_file(&from, &to);
     Ok(fs_ops::path_string(&to))

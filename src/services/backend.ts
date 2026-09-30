@@ -55,7 +55,8 @@ export interface BackendCapabilities {
 /** Native pickers. Each approves the chosen location for the app's later use. */
 export interface DialogsApi {
   pickOpenFile(): Promise<string | null>;
-  pickOpenFolder(): Promise<string | null>;
+  /** `startDir` is only where the dialog opens; the picked folder is what gets approved. */
+  pickOpenFolder(startDir?: string): Promise<string | null>;
   pickSavePath(suggestedName: string, directory: string | null): Promise<string | null>;
   /** Asks for a folder to export into; approves it for writing without opening it. */
   pickExportFolder(): Promise<string | null>;

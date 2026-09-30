@@ -4,9 +4,17 @@ import { closeDocument, newDocument } from "../features/documents";
 import { commands, formatShortcut } from "../features/commands";
 import { Icon } from "./Icon";
 import { ContextMenu } from "./ContextMenu";
-import { closeOthers, closeSaved, closeToTheRight, copyPath, revealInFolder, revealLabel } from "../features/pathActions";
+import { closeOthers, closeSaved, closeToTheRight, copyPath, openContainingFolder, renameDocument, revealInFolder, revealLabel } from "../features/pathActions";
+import { useWorkspace } from "../stores/workspaceStore";
+import { isInside } from "../services/paths";
 import { backend } from "../services";
 import { useUi } from "../stores/uiStore";
+
+/** True when the file is inside the folder open in the Explorer. */
+const isInsideWorkspace = (path: string) => {
+  const root = useWorkspace.getState().root;
+  return !!root && isInside(path, root);
+};
 
 /** Document tabs (FR-040, FR-041). Dirty tabs show a dot *and* a text label (§15). */
 export function TabBar() {
@@ -140,6 +148,8 @@ export function TabBar() {
             { label: "Close to the Right", run: () => closeToTheRight(menuDoc.id), disabled: docs[docs.length - 1]?.id === menuDoc.id },
             { label: "Close Saved", run: () => closeSaved() },
             "separator",
+            { label: menuDoc.path ? "Rename…" : "Save As…", run: () => renameDocument(menuDoc.id) },
+            ...(menuDoc.path && !isInsideWorkspace(menuDoc.path) ? [{ label: "Open Containing Folder…", run: () => openContainingFolder(menuDoc.path!) }] : []),
             { label: "File History…", run: () => useUi.getState().setHistoryDocId(menuDoc.id), disabled: !menuDoc.path },
             { label: "Copy Path", run: () => copyPath(menuDoc.path!), disabled: !menuDoc.path },
             { label: revealLabel, run: () => revealInFolder(menuDoc.path!), disabled: !menuDoc.path || !backend().capabilities.revealInFolder },

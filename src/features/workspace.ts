@@ -26,9 +26,10 @@ export async function setWorkspace(root: string) {
   await refreshDir(root);
 }
 
-export async function openFolderDialog() {
+/** Asks for a folder and opens it; `startDir` is where the dialog starts (for example the current file's folder). */
+export async function openFolderDialog(startDir?: string) {
   try {
-    const path = await backend().pickOpenFolder();
+    const path = await backend().pickOpenFolder(startDir);
     if (path) await setWorkspace(path);
   } catch (e) {
     notify("error", describeError(e, "open the folder"));
@@ -116,8 +117,12 @@ export async function renameEntry(entry: DirEntry) {
       if (expanded[entry.path]) ws().setExpanded(to, true);
     }
     invalidateWorkspaceFiles();
-    await refreshDir(parent);
-    ws().select(to);
+    // Files renamed from a tab may be outside the open folder.
+    const root = ws().root;
+    if (root && isInside(parent, root)) {
+      await refreshDir(parent);
+      ws().select(to);
+    }
   } catch (e) {
     notify("error", describeError(e, `rename “${entry.name}”`));
     return;

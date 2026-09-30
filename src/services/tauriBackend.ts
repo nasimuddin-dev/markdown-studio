@@ -20,7 +20,7 @@ export const tauriBackend: Backend = {
   appInfo: () => call("app_info"),
 
   pickOpenFile: () => call("pick_open_file"),
-  pickOpenFolder: () => call("pick_open_folder"),
+  pickOpenFolder: (startDir) => call("pick_open_folder", { startDir: startDir ?? null }),
   pickExportFolder: () => call("pick_export_folder"),
   aiStatus: () => call("ai_status"),
   aiSetKey: (key) => call("ai_set_key", { key }),

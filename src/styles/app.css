@@ -512,6 +512,37 @@ select {
   padding: 16px;
   color: var(--text-muted);
 }
+.explorer-empty .button {
+  margin: 0 8px 8px 0;
+}
+.open-files-title {
+  margin: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.open-files-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.open-files-list .tree-row {
+  width: 100%;
+  padding-left: 12px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+.open-files-list .tree-row:hover {
+  background: var(--bg-hover);
+}
+.open-files-list .tree-row.active {
+  background: var(--bg-active);
+}
 
 .tree,
 .tree ul {
@@ -987,11 +1018,27 @@ select {
 }
 .welcome-recent-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  margin: 0 0 6px 8px;
 }
-.welcome-recent-header .link-button {
+.welcome-recent-header h2 {
+  margin: 0;
+}
+.welcome-recent-clear {
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
   font-size: 12px;
+  cursor: pointer;
+}
+.welcome-recent-clear:hover {
+  border-color: var(--border);
+  background: var(--bg-hover);
+  color: var(--text);
 }
 .welcome-recent li {
   display: flex;
@@ -1920,7 +1967,7 @@ select {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
-.link-button {
+.text-link {
   border: 0;
   padding: 0;
   background: none;

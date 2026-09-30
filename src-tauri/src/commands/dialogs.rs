@@ -19,8 +19,13 @@ pub async fn pick_open_file(app: AppHandle, state: State<'_, AppState>) -> AppRe
 }
 
 #[tauri::command]
-pub async fn pick_open_folder(app: AppHandle, state: State<'_, AppState>) -> AppResult<Option<String>> {
-    let picked = file_dialog(&app).set_title("Open Folder").blocking_pick_folder();
+pub async fn pick_open_folder(app: AppHandle, state: State<'_, AppState>, start_dir: Option<String>) -> AppResult<Option<String>> {
+    // `start_dir` only chooses where the dialog opens; the user still picks (and so approves) the folder.
+    let mut dialog = file_dialog(&app).set_title("Open Folder");
+    if let Some(dir) = start_dir.filter(|d| Path::new(d).is_dir()) {
+        dialog = dialog.set_directory(dir);
+    }
+    let picked = dialog.blocking_pick_folder();
     let Some(path) = picked.and_then(|p| p.into_path().ok()) else {
         return Ok(None);
     };
