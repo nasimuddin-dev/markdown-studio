@@ -249,3 +249,17 @@ describe("PDF export: a new page for each top-level heading", () => {
     expect(await pages(true)).toBe(3);
   }, 30_000);
 });
+
+describe("tags in PDF export", () => {
+  it("colours inline tags like the preview, not in headings", async () => {
+    const bytes = await markdownToPdf("# Plan #notatag\n\nFiled under #idea.");
+    const lib = await pdfjs();
+    const pdf = await lib.getDocument({ data: bytes.slice() }).promise;
+    const page = await pdf.getPage(1);
+    const text = (await page.getTextContent()).items.map((i) => ("str" in i ? i.str : "")).join("");
+    expect(text).toContain("#idea");
+    const ops = await page.getOperatorList();
+    const colours = ops.fnArray.flatMap((fn: number, i: number) => (fn === lib.OPS.setFillRGBColor ? [JSON.stringify(ops.argsArray[i])] : []));
+    expect(colours.filter((c: string) => /0969da|9,105,218/i.test(c))).toHaveLength(1);
+  }, 20000);
+});

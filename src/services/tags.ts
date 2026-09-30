@@ -1,6 +1,23 @@
 /** An inline tag: `#word` after a space, `(` or at a line start, with at least one letter (not `#1`, not a heading). */
 export const INLINE_TAG = /(?<=^|[\s(])#([\p{L}\p{N}_/-]*\p{L}[\p{L}\p{N}_/-]*)/gu;
 
+/** Splits text into plain parts and inline `#tags` (for exports that style tags). */
+export function splitTags(text: string): Array<{ text: string; tag: boolean }> {
+  if (!text.includes("#")) return [{ text, tag: false }];
+  const parts: Array<{ text: string; tag: boolean }> = [];
+  let last = 0;
+  for (const m of text.matchAll(INLINE_TAG)) {
+    if (m.index > last) parts.push({ text: text.slice(last, m.index), tag: false });
+    parts.push({ text: m[0], tag: true });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push({ text: text.slice(last), tag: false });
+  return parts;
+}
+
+/** The colour exports use for tags (the preview's note blue). */
+export const TAG_COLOR = "0969DA";
+
 interface HNode {
   type: string;
   tagName?: string;

@@ -8,6 +8,7 @@ import {
 } from "docx";
 import { unified } from "unified";
 import { remarkWikiLinks } from "../wikiLinks";
+import { splitTags, TAG_COLOR } from "../tags";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkGemoji from "remark-gemoji";
@@ -57,6 +58,10 @@ interface Style {
   strike?: boolean;
   code?: boolean;
   link?: boolean;
+  /** An inline #tag, coloured like the preview's labels. */
+  tag?: boolean;
+  /** Inside a heading, where `#words` aren't tags. */
+  noTags?: boolean;
 }
 
 /** Width/height from PNG, GIF, BMP or JPEG headers. */
@@ -145,6 +150,7 @@ class DocxBuilder {
       strike: s.strike,
       font: s.code ? MONO : undefined,
       style: s.link ? "Hyperlink" : undefined,
+      color: s.tag ? TAG_COLOR : undefined,
       shading: s.code ? { type: ShadingType.CLEAR, fill: "F2F3F5", color: "auto" } : undefined,
     });
   }
@@ -154,7 +160,7 @@ class DocxBuilder {
     for (const n of nodes) {
       switch (n.type) {
         case "text":
-          out.push(this.run(n.value.replace(/\n/g, " "), s));
+          for (const part of s.noTags || s.link ? [{ text: n.value, tag: false }] : splitTags(n.value)) out.push(this.run(part.text.replace(/\n/g, " "), { ...s, tag: part.tag }));
           break;
         case "strong":
           out.push(...(await this.inline(n.children, { ...s, bold: true })));
@@ -285,7 +291,7 @@ class DocxBuilder {
     switch (node.type) {
       case "heading": {
         const name = this.bookmarks.names[this.headingIndex++];
-        const children = await this.inline(node.children);
+        const children = await this.inline(node.children, { noTags: true });
         const pageBreakBefore = this.breakBeforeH1 && node.depth === 1 && this.h1Count++ > 0;
         return [new Paragraph({ heading: HEADINGS[node.depth - 1], pageBreakBefore, children: name ? [new Bookmark({ id: name, children })] : children })];
       }

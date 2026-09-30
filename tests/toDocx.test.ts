@@ -260,3 +260,11 @@ describe("Word export: wiki links", () => {
     expect(xml).not.toContain("[[");
   });
 });
+
+describe("Word export: tags", () => {
+  it("colours inline tags like the preview, not in headings", async () => {
+    const xml = await documentXml(await markdownToDocx("# Plan #notatag\n\nFiled under #idea.", { loadImage: makeImageLoader(null, async () => "") }));
+    expect(xml.match(/<w:color w:val="0969DA"\/>/g)).toHaveLength(1);
+    expect(xml).toContain("#idea");
+  });
+});

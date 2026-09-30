@@ -5,6 +5,7 @@ import { ALERT_KINDS, takeMdastAlert } from "../alerts";
 import { stripFrontMatter } from "../frontMatter";
 import { unified } from "unified";
 import { remarkWikiLinks } from "../wikiLinks";
+import { splitTags, TAG_COLOR } from "../tags";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -88,12 +89,29 @@ class PdfBuilder {
     private contentWidth = PAGE_POINTS.a4.width - 2 * SIDE_MARGIN,
   ) {}
 
+  /** True while rendering a heading, whose `#words` aren't tags. */
+  private inHeading = false;
+
+  private async headingInline(nodes: PhrasingContent[]): Promise<Inline[]> {
+    this.inHeading = true;
+    try {
+      return await this.inline(nodes);
+    } finally {
+      this.inHeading = false;
+    }
+  }
+
   private async inline(nodes: PhrasingContent[], style: Record<string, unknown> = {}): Promise<Inline[]> {
     const out: Inline[] = [];
     for (const n of nodes) {
       switch (n.type) {
         case "text":
-          out.push(Object.keys(style).length ? { text: n.value.replace(/\n/g, " "), ...style } : n.value.replace(/\n/g, " "));
+          for (const part of this.inHeading || style.link ? [{ text: n.value, tag: false }] : splitTags(n.value)) {
+            const text = part.text.replace(/\n/g, " ");
+            // Tags are coloured like the preview's labels.
+            if (part.tag) out.push({ text, ...style, color: `#${TAG_COLOR}` });
+            else out.push(Object.keys(style).length ? { text, ...style } : text);
+          }
           break;
         case "strong":
           out.push(...(await this.inline(n.children, { ...style, bold: true })));
@@ -218,7 +236,7 @@ class PdfBuilder {
         this.headingIds.push({ depth: node.depth, id });
         return [
           {
-            text: await this.inline(node.children),
+            text: await this.headingInline(node.children),
             style: `h${node.depth}`,
             id,
             outline: true,
