@@ -42,6 +42,15 @@ Markpion notices when a file you have open is changed by another program:
 
 Saving over a file that changed since you opened it is refused until you choose, so no one's work is overwritten silently.
 
+## Read-only files
+
+A file that's read-only on disk (the read-only attribute, or no write permission) opens **locked**: a bar above the editor says so, the status bar shows **Read-only**, and neither typing nor formatting commands change it. From the bar:
+
+- **Save As…** saves a copy you can edit.
+- **Edit Anyway** unlocks editing. Saving over the file still fails until its read-only flag is removed, and then offers **Save As** instead.
+
+To protect any document from accidental edits, for example a policy you're only reading, use **View → Toggle Read-Only**; **Allow Editing** in the bar (or the same command) unlocks it. Reloading a file from disk locks it again if it's still read-only.
+
 ## File history
 
 Every time you save a file, Markpion keeps the **previous version** in its app data folder, not next to your files. The last **30 versions** of each file are kept.

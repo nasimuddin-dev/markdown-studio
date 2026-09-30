@@ -25,6 +25,7 @@ export function StatusBar() {
     else if (doc.externalChange === "deleted") state = "Deleted on disk";
     else if (doc.externalChange === "modified") state = "Changed on disk";
     else if (isDirty(doc)) state = doc.path ? "Unsaved changes" : "Not saved";
+    else if (doc.readOnly) state = "Read-only";
     else state = doc.path ? "Saved" : "New file";
   }
 

@@ -133,6 +133,11 @@ for (const theme of ["light", "dark"] as const) {
       await audit(page, "unsaved changes");
       await page.keyboard.press("Escape");
 
+      await palette("toggle read-only");
+      await expect(page.getByRole("button", { name: "Allow Editing" })).toBeVisible();
+      await audit(page, "read-only banner");
+      await page.getByRole("button", { name: "Allow Editing" }).click();
+
       await palette("new from template");
       await expect(page.getByRole("dialog")).toBeVisible();
       await audit(page, "templates");

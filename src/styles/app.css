@@ -704,6 +704,10 @@ select {
   border-bottom: 1px solid var(--warning-border);
   flex: none;
 }
+.banner.info {
+  background: var(--bg-chrome);
+  border-bottom-color: var(--border);
+}
 .banner-text {
   flex: 1;
   min-width: 200px;

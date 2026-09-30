@@ -23,6 +23,8 @@ export interface FileContent {
   mtime: number;
   lineEnding: LineEnding;
   bom: boolean;
+  /** The file can't be written (read-only attribute or permissions). */
+  readOnly?: boolean;
 }
 
 export interface RecentEntry {
@@ -130,6 +132,11 @@ export interface Doc {
   mtime: number | null;
   externalChange: ExternalChange;
   saving: boolean;
+  /**
+   * Editing is locked: "file" when the file is read-only on disk, "user" when
+   * turned on with Toggle Read-Only. Unset when the document can be edited.
+   */
+  readOnly?: "file" | "user";
 }
 
 export interface RecoverySnapshot {

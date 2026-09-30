@@ -20,6 +20,8 @@ export interface MemoryBackendOptions {
   prompt?: (message: string, defaultValue: string) => string | null;
   /** What Git status reports (tests); the demo has none. */
   git?: GitStatus;
+  /** Files that are read-only "on disk" (tests). */
+  readOnly?: string[];
   /** Committed text per file path, as Git would report it (tests). */
   gitHead?: Record<string, string>;
   /** Folders that are pre-approved (as if opened via a dialog). */
@@ -68,6 +70,7 @@ export class MemoryBackend implements Backend {
   private readonly policy: unknown;
   private readonly git: GitStatus | null;
   private readonly gitHead: Record<string, string>;
+  private readonly readOnlyFiles: Set<string>;
   readonly logs: string[] = [];
 
   constructor(opts: MemoryBackendOptions = {}) {
@@ -77,6 +80,7 @@ export class MemoryBackend implements Backend {
     this.policy = opts.policy ?? null;
     this.git = opts.git ?? null;
     this.gitHead = opts.gitHead ?? {};
+    this.readOnlyFiles = new Set(opts.readOnly ?? []);
     this.capabilities = { desktop: false, trash: false, revealInFolder: false, selfUpdate: false, nativeImport: false, ai: !!opts.ai };
     if (!this.restore()) {
       for (const [path, content] of Object.entries(opts.files ?? {})) this.put(path, content);
@@ -322,6 +326,7 @@ export class MemoryBackend implements Backend {
       mtime: f.mtime,
       lineEnding: crlf ? ("crlf" as const) : ("lf" as const),
       bom: false,
+      readOnly: this.readOnlyFiles.has(p),
     };
   }
 
@@ -342,6 +347,7 @@ export class MemoryBackend implements Backend {
   async writeTextFile(req: WriteRequest) {
     const p = this.check(req.path);
     const existing = this.files.get(p);
+    if (this.readOnlyFiles.has(p)) throw new AppError("permissionDenied", "The file is read-only.");
     if (!req.force && existing && req.expectedMtime !== null && existing.mtime !== req.expectedMtime) {
       throw new AppError("conflict", "The file was changed by another program after it was opened.");
     }

@@ -30,6 +30,8 @@ pub struct FileContent {
     pub mtime: u64,
     pub line_ending: LineEnding,
     pub bom: bool,
+    /// The file can't be written (read-only attribute or permissions), so it opens locked.
+    pub read_only: bool,
 }
 
 pub fn is_markdown(path: &Path) -> bool {
@@ -112,6 +114,7 @@ pub fn read_text(path: &Path) -> AppResult<FileContent> {
         mtime: mtime(path)?,
         line_ending: decoded.line_ending,
         bom: decoded.bom,
+        read_only: meta.permissions().readonly(),
     })
 }
 
@@ -399,6 +402,14 @@ mod tests {
         let read = read_text(&file).unwrap();
         assert_eq!(read.content, "# Hi\n");
         assert_eq!(read.line_ending, LineEnding::Crlf);
+        assert!(!read.read_only);
+        let mut perms = fs::metadata(&file).unwrap().permissions();
+        perms.set_readonly(true);
+        fs::set_permissions(&file, perms.clone()).unwrap();
+        assert!(read_text(&file).unwrap().read_only);
+        #[allow(clippy::permissions_set_readonly_false)]
+        perms.set_readonly(false);
+        fs::set_permissions(&file, perms).unwrap();
 
         // Simulate an external edit with a different mtime.
         std::thread::sleep(std::time::Duration::from_millis(20));

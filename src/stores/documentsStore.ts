@@ -30,7 +30,8 @@ export const useDocuments = create<DocumentsState>((set, get) => ({
   },
   setContent(id, content) {
     const doc = get().docs.find((d) => d.id === id);
-    if (doc && doc.content !== content) get().update(id, { content });
+    // A read-only document isn't changed by edits (reloading from disk uses `update`).
+    if (doc && doc.content !== content && !doc.readOnly) get().update(id, { content });
   },
   remove(id) {
     set((s) => {

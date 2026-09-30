@@ -20,6 +20,7 @@ const PATHS = {
   files: "M9 3H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V10zM9 3v7h7M13 3h4l4 4v10",
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   warning: "M12 3l10 18H2zM12 10v4M12 17.5v.5",
+  lock: "M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3",
   logo: "M4 17V7h2.5l3 4 3-4H15v10h-2.5v-6l-3 4-3-4v6zM17 7h2.5v6H21l-3 4-3-4h2z",
   // Formatting toolbar
   undo: "M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3",

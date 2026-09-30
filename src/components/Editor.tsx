@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { EditorState, Compartment, type Extension } from "@codemirror/state";
+import { Annotation, EditorState, Compartment, type Extension } from "@codemirror/state";
 import {
   EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter,
   drawSelection, dropCursor, rectangularSelection, crosshairCursor, placeholder, highlightSpecialChars,
@@ -76,6 +76,13 @@ const wrapping = new Compartment();
 const tabs = new Compartment();
 const linting = new Compartment();
 const spelling = new Compartment();
+const locking = new Compartment();
+/** Marks changes that come from outside the editor (reload from disk), which a read-only document still takes. */
+const externalSync = Annotation.define<boolean>();
+/** Read-only documents: no typing, and commands (formatting, revert…) can't change the text either. */
+const lockExt = (locked: boolean): Extension =>
+  locked ? [EditorState.readOnly.of(true), EditorState.changeFilter.of((tr) => !!tr.annotation(externalSync))] : [];
+const isLocked = (docId: string) => !!useDocuments.getState().docs.find((d) => d.id === docId)?.readOnly;
 const spellAttr = (on: boolean) => EditorView.contentAttributes.of({ spellcheck: on ? "true" : "false" });
 
 function appearanceExt(s: Settings): Extension {
@@ -109,6 +116,7 @@ export function Editor() {
   const viewRef = useRef<EditorView | null>(null);
   const currentId = useRef<string | null>(null);
   const activeId = useDocuments((s) => s.activeId);
+  const readOnly = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.readOnly);
   const content = useDocuments((s) => s.docs.find((d) => d.id === s.activeId)?.content);
   const settings = useSettings((s) => s.settings);
 
@@ -137,6 +145,7 @@ export function Editor() {
         placeholder("Start writing Markdown…"),
         EditorView.contentAttributes.of({ "aria-label": "Markdown editor" }),
         spelling.of(spellAttr(s.spellCheck)),
+        locking.of(lockExt(isLocked(docId))),
         // Pasted or dropped images are saved to assets/ and linked.
         EditorView.domEventHandlers({
           paste: (e, view) => {
@@ -271,8 +280,13 @@ export function Editor() {
     if (!view || !id || content === undefined || content === synced.get(id)) return;
     synced.set(id, content);
     const change = minimalChange(view.state.doc.toString(), content);
-    if (change) view.dispatch({ changes: change });
+    if (change) view.dispatch({ changes: change, annotations: externalSync.of(true) });
   }, [content]);
+
+  // Lock or unlock editing when the document's read-only state changes.
+  useEffect(() => {
+    viewRef.current?.dispatch({ effects: locking.reconfigure(lockExt(!!readOnly)) });
+  }, [readOnly, activeId]);
 
   // Apply settings changes (FR-025).
   useEffect(() => {

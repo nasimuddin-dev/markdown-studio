@@ -33,6 +33,7 @@ function docFromFile(file: FileContent): Doc {
     mtime: file.mtime,
     externalChange: null,
     saving: false,
+    ...(file.readOnly && { readOnly: "file" as const }),
   };
 }
 
@@ -325,10 +326,22 @@ export async function reloadDocument(id: string) {
       lineEnding: file.lineEnding,
       bom: file.bom,
       externalChange: null,
+      readOnly: file.readOnly ? "file" : doc.readOnly === "user" ? "user" : undefined,
     });
   } catch (e) {
     notify("error", describeError(e, `reload “${doc.name}”`));
   }
+}
+
+/**
+ * Locks or unlocks editing of a document. Unlocking a file that's read-only
+ * on disk allows editing, but saving it needs Save As (or the file's
+ * permissions changed).
+ */
+export function setReadOnly(id: string, on: boolean) {
+  const doc = findDoc(id);
+  if (!doc) return;
+  docs().update(id, { readOnly: on ? "user" : undefined });
 }
 
 /** Keeps the editor's version; the next save will overwrite the disk version. */

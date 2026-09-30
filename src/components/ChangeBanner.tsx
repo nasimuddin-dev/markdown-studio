@@ -1,11 +1,26 @@
 import { useDocuments, isDirty } from "../stores/documentsStore";
-import { closeDocument, keepMine, openDiskVersion, reloadDocument, saveDocument } from "../features/documents";
+import { closeDocument, keepMine, openDiskVersion, reloadDocument, saveDocument, setReadOnly } from "../features/documents";
 import { Icon } from "./Icon";
 
-/** Notifies the user about external changes to the active file (FR-018, SRS §12). */
+/** Notifies the user about external changes to the active file (FR-018, SRS §12), or that it's read-only. */
 export function ChangeBanner() {
   const doc = useDocuments((s) => s.docs.find((d) => d.id === s.activeId));
-  if (!doc?.externalChange) return null;
+  if (!doc) return null;
+  if (!doc.externalChange && doc.readOnly) {
+    return (
+      <div className="banner info" role="status">
+        <Icon name="lock" />
+        <span className="banner-text">
+          {doc.readOnly === "file"
+            ? `“${doc.name}” is read-only on disk, so editing is locked. Use Save As to keep a changed copy.`
+            : `“${doc.name}” is read-only (View → Toggle Read-Only).`}
+        </span>
+        {doc.readOnly === "file" && <button className="button" onClick={() => void saveDocument(doc.id, { saveAs: true })}>Save As…</button>}
+        <button className="button" onClick={() => setReadOnly(doc.id, false)}>{doc.readOnly === "file" ? "Edit Anyway" : "Allow Editing"}</button>
+      </div>
+    );
+  }
+  if (!doc.externalChange) return null;
 
   if (doc.externalChange === "deleted") {
     return (

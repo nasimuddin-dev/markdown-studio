@@ -6,7 +6,7 @@ import { backend } from "../services";
 import { notify } from "../stores/uiStore";
 import type { ViewMode } from "../types";
 import {
-  closeDocument, hasClosedDocuments, newDocument, openFileDialog, reopenClosedDocument, saveAll, saveDocument,
+  closeDocument, hasClosedDocuments, newDocument, openFileDialog, reopenClosedDocument, saveAll, saveDocument, setReadOnly,
 } from "./documents";
 import { closeWorkspace, createFileIn, openFolderDialog } from "./workspace";
 import { editorCommand, runOnEditor } from "./editorBridge";
@@ -328,6 +328,15 @@ export const commands: Record<string, Command> = {
       const { settings, update } = useSettings.getState();
       update({ showToolbar: !settings.showToolbar });
     },
+  },
+  toggleReadOnly: {
+    id: "toggleReadOnly",
+    label: "Toggle Read-Only",
+    run: () => {
+      const doc = activeDoc();
+      if (doc) setReadOnly(doc.id, !doc.readOnly);
+    },
+    enabled: hasActive,
   },
   presentSlides: {
     id: "presentSlides",

@@ -11,7 +11,7 @@ Markpion's error messages say what happened and what you can do next. They're ex
 
 **Problem:** saving fails with *"you don't have permission to write here. Use Save As to save a copy somewhere else."*
 
-**Symptoms:** the tab stays marked as unsaved; your text is still in the editor.
+**Symptoms:** the tab stays marked as unsaved; your text is still in the editor. A file that's read-only when you open it shows a **read-only** bar instead, before you start typing (see [Read-only files](/guide/saving-and-recovery#read-only-files)).
 
 **Possible cause:** the file or folder is read-only, belongs to another user or administrator, or is in a protected location such as `C:\Program Files`. On Windows, a sync or antivirus program can also lock the file for a moment.
 
