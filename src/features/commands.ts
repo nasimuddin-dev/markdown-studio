@@ -29,6 +29,7 @@ import { followLinkAtCursor } from "./followLink";
 import { renameHeading } from "./renameHeading";
 import { toggleComment } from "@codemirror/commands";
 import { foldToLevel } from "./foldLevel";
+import { focusPane } from "./panes";
 import { changeCase, convertSelectionToTable, joinLines, removeDuplicateLines, sortLines } from "./textTransforms";
 import { numberHeadingsCommand, removeHeadingNumbersCommand } from "./headingNumbers";
 import { nextChange, previousChange, revertChangeAtCursor, showChangeAtCursor } from "./gitGutter";
@@ -290,6 +291,8 @@ export const commands: Record<string, Command> = {
   exportHtml: { id: "exportHtml", label: "Export as HTML…", run: async () => (await exporting()).exportActiveAsHtml(), enabled: hasActive },
   exportPdf: { id: "exportPdf", label: "Export as PDF…", run: async () => (await exporting()).exportActiveAsPdf(), enabled: hasActive },
   exportDocx: { id: "exportDocx", label: "Export as Word (.docx)…", run: async () => (await exporting()).exportActiveAsDocx(), enabled: hasActive },
+  nextPane: { id: "nextPane", label: "Focus Next Pane", shortcut: "F6", run: () => void focusPane(1) },
+  previousPane: { id: "previousPane", label: "Focus Previous Pane", shortcut: "Shift+F6", run: () => void focusPane(-1) },
   moveToNewFile: {
     id: "moveToNewFile",
     label: "Move Selection to New File…",

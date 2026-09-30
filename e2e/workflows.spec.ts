@@ -1293,3 +1293,20 @@ test("Outline sections collapse and expand, with the mouse or Left/Right", async
   // Clicking the chevron doesn't jump to the heading.
   await expect(page.locator(".cm-activeLine")).not.toHaveText("## GitHub Flavored Markdown");
 });
+
+test("F6 and Shift+F6 move focus between the sidebar, editor and preview", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const editor = page.getByRole("textbox", { name: "Markdown editor" });
+  const preview = page.getByRole("document", { name: "Markdown preview" });
+  await editor.click();
+  await page.keyboard.press("F6");
+  await expect(preview).toBeFocused();
+  await page.keyboard.press("F6");
+  await expect(page.locator(".tree-row", { hasText: /^README\.md$/ })).toBeFocused();
+  await page.keyboard.press("F6");
+  await expect(editor).toBeFocused();
+  await page.keyboard.press("Shift+F6");
+  await expect(page.locator(".tree-row", { hasText: /^README\.md$/ })).toBeFocused();
+});

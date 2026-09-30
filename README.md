@@ -83,6 +83,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Markdown lint in the editor: broken links, missing images, broken anchors, duplicate headings, skipped heading levels, missing alt text and link text, `#Title` without a space, `---` that turns a line into a heading, `-item` without a space in a list, `** bold**` with inner spaces, link or image paths with spaces, table rows that don't match the header, and footnotes or reference links (`[text][id]`) without a definition (or definitions nothing uses), with a Problems panel, F8 / Shift+F8 to move between problems, Don't Show This Check per rule (re-enable in Settings), and quick fixes (Add Blank Line, Add Empty Cells, Add Definition, fix a skipped heading level, correct a misspelled #anchor) and Edit → Fix All Problems
 - Dim Other Paragraphs (View menu or Settings): fades all but the paragraph being written
 - Line length setting: keep the editor text about 72, 80, 100 or 120 characters wide, centered (Settings → Editor)
+- F6 / Shift+F6 move focus between the sidebar, editor and preview
 - Focus Mode (Ctrl/Cmd+Shift+Enter), Full Screen (F11) and a searchable Keyboard Shortcuts reference (Help menu)
 - Preview headings show a link icon on hover that copies their `#anchor`
 - Find in the preview (Ctrl/Cmd+F while the preview is shown alone or focused): highlights every match (CSS Custom Highlight API) with a count and next/previous

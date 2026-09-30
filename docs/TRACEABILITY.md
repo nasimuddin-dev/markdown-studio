@@ -58,7 +58,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.20.0. **Done** means im
 | NFR-007 | Done | Scope enforced in Rust ([scope.rs](../src-tauri/src/scope.rs)) |
 | NFR-008 | Done | No telemetry; content never leaves the machine |
 | NFR-009 | Done | Modular services and stores; Vitest and Rust tests |
-| NFR-010 | Done | Keyboard menus, tree, tabs and dialogs; focus rings; automated axe-core WCAG 2.1 AA audit (light and dark) in e2e, covering the editor gutters, menus, context menus, find/replace, Problems, Links, Go to File, templates, About, unsaved-changes and File History dialogs, slides and the Git pop-up |
+| NFR-010 | Done | Keyboard menus, tree, tabs and dialogs; F6 / Shift+F6 between the sidebar, editor and preview (`features/panes.ts`); focus rings; automated axe-core WCAG 2.1 AA audit (light and dark) in e2e, covering the editor gutters, menus, context menus, find/replace, Problems, Links, Go to File, templates, About, unsaved-changes and File History dialogs, slides and the Git pop-up |
 | NFR-011 | Done | Documented in [INSTALL.md](INSTALL.md): Windows 10 1803+ and 11 (x64), macOS 10.15+ (Apple Silicon and Intel), Linux x86_64 distributions from 2022 (Ubuntu 22.04+, Debian 12+, Fedora 36+). ARM64 Windows/Linux are not built yet |
 | SEC-001 | Done | The capability grants only `core:default`, set-title, destroy and full-screen; no filesystem, dialog or shell permissions ([default.json](../src-tauri/capabilities/default.json)) |
 | SEC-002/003 | Done | Absolute paths only, `..` rejected, canonicalised scope check |
