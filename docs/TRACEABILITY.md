@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-Status of each [SRS](SRS.md) requirement as of version 0.21.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
+Status of each [SRS](SRS.md) requirement as of version 0.22.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
 
 ## Functional requirements
 
@@ -112,6 +112,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.21.0. **Done** means im
 | YAML front matter table, GitHub alerts | `services/frontMatter.ts`, `services/alerts.ts` | §10.1 front-matter-aware documents; §18 v0.3 enhanced Markdown |
 | Wiki links (`[[Page]]`, `[[Page\|text]]`, `[[Page#Heading]]`; `remarkWikiLinks` in the preview, HTML, PDF and Word pipelines; completion after `[[`; Ctrl/Cmd+click). Checked by lint and Check Links (`findWikiLinks` in `findAllLinks`) and rewritten by link updates after renames and moves (page style, heading and text kept) | `services/wikiLinks.ts`, `features/completion.ts`, `features/followLink.ts` | §19 linking |
 | Open Today's Note (`journal/YYYY-MM-DD.md`, created from the Daily journal template or the folder's own) | `features/templates.ts` (`openTodaysNote`) | §18 templates |
+| Explorer filter box (fuzzy match on the relative path, up to 200 files, Enter opens the first) | `components/FileExplorer.tsx` (`FilteredFiles`) | §5 power user needs |
 | Document statistics popover: sentences, speaking time (130 words/min) and Flesch reading ease for English (an estimate: syllables from spelling, null under 30 words or for non-Latin text) | `services/textStats.ts`, `components/StatusBar.tsx` | §5 writer needs |
 | Insert Front Matter (title from the first heading, today's date, tags; moves to existing front matter) | `features/formatting.ts` (`insertFrontMatter`) | §18 front matter |
 | Insert Snippet (built-ins plus the workspace's `snippets/`, placeholders via `fillTemplate`; palette mode) | `features/templates.ts` (`listSnippets`, `insertSnippet`), `components/CommandPalette.tsx` | §18 templates |
@@ -141,15 +142,15 @@ Status of each [SRS](SRS.md) requirement as of version 0.21.0. **Done** means im
 
 ## Test coverage
 
-| Level | Where | Count (0.21.0) |
+| Level | Where | Count (0.22.0) |
 | --- | --- | --- |
-| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 522 tests in 99 files |
-| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 93 tests |
+| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 560 tests in 104 files |
+| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 100 tests |
 | Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 41 tests (plus 1 ignored live API test) |
 
 ## Known gaps and next improvements
 
-- Updating links after a rename or move covers inline links, images, reference-style definitions and HTML `<a href>`/`<img src>`; absolute paths aren't rewritten (Check Links in Folder finds broken ones), nor are links after renames made outside the app.
+- Updating links after a rename or move covers inline links, images, reference-style definitions, wiki links, HTML `<a href>`/`<img src>` and absolute paths (kept absolute); links after renames made outside the app aren't updated (Check Links in Folder finds broken ones).
 - Upgrading from Markdown Studio (the old name) on Windows can't remove an all-users install when Markpion is installed for the current user only (removing it needs administrator rights), so both stay installed until the old one is uninstalled by hand. A taskbar pin of Markdown Studio is lost on upgrade (Windows doesn't let installers pin apps). The GitHub Pages site moved to nasimuddin-dev.github.io/markpion; the old address doesn't redirect.
 - PDF export sets inline math as text (italic variables, superscripts and subscripts; `services/convert/mathText.ts`), keeping the LaTeX for formulas that need symbols the built-in font lacks (arrows, set notation), nested scripts or matrices. It draws display math as pictures only where the web engine allows it (Windows/WebView2; WebKit on macOS refuses). Word export converts a common subset to native equations (matrices and environments stay as LaTeX). HTML export and Print → Save as PDF render all math. Documented on the website.
 - Code-sign the Windows installer (Authenticode) so SmartScreen doesn't warn; updates are already signature-verified.

@@ -581,3 +581,31 @@ The user asked to keep developing until 8:30 AM and to create the release build 
 - Local LLMs (SRS §19, for example Ollama) alongside Claude: wanted?
 - A redirect repository for the old website address?
 - Pictures now show in the Explorer by default (Settings → Files turns them off). Keep that default?
+
+## 2026-09-30 (6:00 AM – 10:00 AM), morning session: 0.22.0
+
+The user asked to keep developing until 10 AM and to release at the end, without installing the release on this machine.
+
+- **Writing:** close brackets automatically, off by default (6fa348a); Insert Snippet, and the palette gives focus back where it was (a6d8c24); Insert Front Matter (7d06e4b); ask for a name when pasting a screenshot (609cf91); a check for front matter without its closing `---` (c9605a8); Open Today's Note (a489f57); sentences, speaking time and Flesch readability in the statistics popover (7024502).
+- **Wiki links:** `[[Page]]`, `[[Page|text]]`, `[[Page#Heading]]` in the preview and exports (db2a9cc); link checks and Links to this document (14a2fe4); updated on renames and moves (e968fac) and on Rename Heading (93b7169); heading completion after `[[page#` (8514983).
+- **Links:** hover a link to another document to see its start (65a4d01); Mentions without a link in the Links tab (5d63705).
+- **Tags:** Go to Tag (e23d946); completion after `#` (d632b70) and in the front matter (5e28f12); labels in the preview and HTML export (f0e5c1e), clickable (d35c970); Rename Tag with F2 (f898ae1); the sidebar's Tags tab (23c6e2d), refreshed on save (7cc0301); each tag shown as most often written (b0c3ec2); a check for a tag in two capitalisations, and lines of tags are no longer "headings without a space" (ed57ef6); coloured in PDF and Word (f9edfec).
+- **Files:** a Filter files box in the Explorer; renames and moves update absolute paths too (both committed just before the release commit).
+- **Process:** every commit went through the gated check script. One full e2e run failed three tests under load (two were the long accessibility audits); they passed alone and in two full reruns.
+
+**Version:** 0.22.0. **Tests:** Vitest 560 (104 files), Playwright 100, Rust 41 (+1 ignored), website check (50 pages).
+
+**Unverified:** tag labels and the Tags tab weren't looked at in a browser (the dev server couldn't be started from this session); they are covered by unit and e2e tests. The readability score is an estimate (syllables guessed from spelling) and was checked only against one easy and one hard sample. The release was not installed locally, as asked.
+
+**Next up:**
+
+1. Run the new ARM64 build check workflow and, once it passes, add Linux and Windows ARM64 to the release.
+2. Tauri-driver e2e against the native build (see questions).
+
+**Questions for the user:**
+
+- May I download msedgedriver (Microsoft) and `cargo install tauri-driver` for native end-to-end tests?
+- Local LLMs (SRS §19, for example Ollama) alongside Claude: wanted?
+- A redirect repository for the old website address?
+- Pictures show in the Explorer by default (Settings → Files turns them off). Keep that default?
+- Which languages should the app be translated into?

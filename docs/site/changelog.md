@@ -7,6 +7,51 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.22.0
+
+Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.22.0)
+
+### Added
+
+**Wiki links**
+
+- `[[Page]]`, `[[Page|shown text]]` and `[[folder/Page#Heading]]` link to other documents in the folder. The preview, HTML, PDF and Word exports show them as links.
+- Type `[[` to pick a document, and `#` after the page (or `[[#`) to pick one of its headings. **Ctrl+click** opens a wiki link.
+- Wiki links are checked like other links (missing pages and headings), count in **Links to this document**, and are updated when a file is renamed or moved, or a heading is renamed.
+
+**Tags**
+
+- Write `#tag` in the text or list `tags` in the front matter. **Edit → Go to Tag…** lists the folder's tags, and the new **Tags** tab in the sidebar lists them with the files using each.
+- Typing `#` (or a name in the front matter `tags`) suggests the tags already in use.
+- The preview shows tags as labels; click one to see where else it's used. HTML export shows the labels too, and PDF and Word exports colour tags.
+- **Rename Tag** (**F2** on a tag, or the Edit menu) renames it in the document and, after asking, across the folder, including nested tags and front matter.
+- A new check flags a tag written in two capitalisations in one document, with a fix.
+
+**Links and notes**
+
+- Hovering a link to another document in the editor shows the start of it (or of the linked section).
+- The Links tab lists **Mentions without a link**: places in other files that name the open document without linking to it.
+- **File → Open Today's Note** opens `journal/YYYY-MM-DD.md`, created from the Daily journal template the first time each day.
+- A **Filter files** box at the top of the Explorer lists the files whose name or path matches, from every folder.
+
+**Writing**
+
+- **Format → Insert Snippet…**: built-in snippets and your own from the folder's `snippets` folder.
+- **Format → Insert Front Matter**: title, date and tags, or jumps to the existing front matter.
+- The statistics popover (click the word count) adds sentences, speaking time and a Flesch readability score for English.
+- Settings: **Close brackets automatically** (off by default) and **Ask for a name when pasting a screenshot**.
+- A new check flags front matter without its closing `---`, with a fix.
+
+### Changed
+
+- A line of tags such as `#idea #work` is no longer reported as a heading without a space.
+- Renaming or moving a file also updates absolute paths to it (`/home/me/notes/a.md`, `C:/notes/a.md`), which stay absolute.
+- Sidebar tabs show only their icons below 320 px wide (was 250 px), to make room for the Tags tab.
+
+### Fixed
+
+- The command palette gives the focus back to where it was when it closes.
+
 ## v0.21.0
 
 Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.21.0)

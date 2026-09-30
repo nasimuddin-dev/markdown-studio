@@ -23,6 +23,10 @@ When no folder is open, the Explorer lists your **open files**, and below them y
 - Folders load when you expand them, so large folders open quickly.
 - The file in the active tab is highlighted.
 
+## Filter files
+
+Type in **Filter files** at the top of the Explorer to list only the files whose name or path matches, from every folder, best matches first (up to 200). The letters don't need to be next to each other: `setgd` finds `docs/setup-guide.md`. Click a file, or press **Enter** for the first one, to open it; **Down** moves into the list. **Escape** clears the filter and shows the tree again.
+
 ## Create, rename and delete
 
 | Action | How |
@@ -49,7 +53,7 @@ When you rename or move a file or folder, Markpion looks through the Markdown fi
 - Anchors (`#section`), a leading `./` and `<…>` brackets are kept; spaces and brackets in new names are written as `%20`, `%28` and `%29`.
 - Files open with unsaved changes are skipped (the dialog names them). Open tabs without changes reload with the new links.
 - The previous version of each rewritten file is kept in [File History](/guide/saving-and-recovery#file-history).
-- Inline links and images (`[text](path)`, `![alt](path)`), reference-style link definitions (`[id]: path`), wiki links (`[[path]]`) and HTML `<a href>` and `<img src>` tags are updated. Absolute paths aren't; [Check Links in Folder](/guide/checking-documents) finds any that broke.
+- Inline links and images (`[text](path)`, `![alt](path)`), reference-style link definitions (`[id]: path`), wiki links (`[[path]]`) and HTML `<a href>` and `<img src>` tags are updated. Absolute paths (`/home/me/notes/a.md`, `C:\notes\a.md`) are updated too when the file they name moves, and stay absolute with the same kind of slashes. Links in files outside the folder aren't updated; [Check Links in Folder](/guide/checking-documents) finds any that broke.
 - Renaming or moving files outside Markpion (in your file manager or with Git) doesn't update links.
 
 ## Changes made by other programs
