@@ -26,7 +26,8 @@
     "docs:test": "playwright test --config playwright.website.config.ts",
     "docs:screenshots": "playwright test --config playwright.screenshots.config.ts",
     "check:unused": "npx --yes knip@5",
-    "test:fixtures": "node scripts/make-fixtures.mjs"
+    "test:fixtures": "node scripts/make-fixtures.mjs",
+    "test:native": "node scripts/test-native.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.3",

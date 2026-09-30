@@ -12,7 +12,7 @@ This file is the single source of project rules; `CLAUDE.md` imports it.
 | `src/features/` | Behaviour: commands and shortcuts (`commands.ts`), editor helpers, save/close lifecycle, export, AI actions (`ai.ts`). Calls `backend()`, never Tauri directly. |
 | `src/components/` | React UI. Reads stores, calls features. |
 | `src-tauri/src/` | Rust. `commands/` holds the Tauri commands by domain; `scope.rs` limits file access to what the user opened; `ai.rs` calls the Claude API (the API key stays in Rust and the OS credential store). |
-| `tests/`, `e2e/` | Vitest unit tests; Playwright flows with axe accessibility audits (run against `MemoryBackend`). |
+| `tests/`, `e2e/`, `e2e-native/` | Vitest unit tests; Playwright flows with axe accessibility audits (run against `MemoryBackend`); a few tauri-driver tests against the real Windows app. |
 | `docs/` | SRS, TRACEABILITY, DESIGN (architecture diagrams), INSTALL, DEV_LOG; `docs/site/` is the documentation website's content (built by VitePress from `website/`). |
 | `scripts/` | Versioning, installers, GitHub release, test fixtures. |
 
@@ -23,6 +23,7 @@ To support a new host (for example a cloud version), implement `Backend` and cho
 | Task | Command |
 | --- | --- |
 | Type check / unit tests / e2e | `npm run typecheck`, `npm test`, `npm run test:e2e` |
+| Native e2e (Windows, real app) | `npm run test:native` (needs `cargo install tauri-driver --locked`; close Markpion first) |
 | Rust tests | `cargo test --manifest-path src-tauri/Cargo.toml` |
 | Unused files, exports and dependencies | `npm run check:unused` |
 | Run the app | `npm run tauri:dev` (browser only: `npm run dev`) |

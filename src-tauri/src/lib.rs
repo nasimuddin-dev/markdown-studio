@@ -32,9 +32,21 @@ fn window_background(theme: Option<&str>, os_dark: bool) -> tauri::window::Color
     }
 }
 
+/// Debug builds only: `MARKPION_TEST_DATA_DIR` moves settings, recent files,
+/// history, logs and the web view's storage into that folder, so the native
+/// end-to-end tests never touch the real profile. Release builds ignore it.
+fn test_data_dir() -> Option<std::path::PathBuf> {
+    if cfg!(debug_assertions) {
+        std::env::var_os("MARKPION_TEST_DATA_DIR").map(std::path::PathBuf::from)
+    } else {
+        None
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let test_data = test_data_dir();
+    let builder = tauri::Builder::default()
         // Must be registered first: a second launch forwards its arguments here
         // and exits, so files double-clicked in the OS open in the running app.
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
@@ -46,18 +58,25 @@ pub fn run() {
             }
         }))
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_opener::init())
-        // Restores window size/position between launches (FR-003).
-        .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(tauri_plugin_opener::init());
+    // Restores window size/position between launches (FR-003); not in tests,
+    // where it would save into the real profile.
+    let builder = if test_data.is_none() { builder.plugin(tauri_plugin_window_state::Builder::default().build()) } else { builder };
+    builder
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .setup(|app| {
+        .setup(move |app| {
             let paths = app.path();
-            let config_dir = paths.app_config_dir()?;
-            let data_dir = paths.app_data_dir()?;
+            let (config_dir, data_dir) = match &test_data {
+                Some(dir) => (dir.join("config"), dir.join("data")),
+                None => (paths.app_config_dir()?, paths.app_data_dir()?),
+            };
             // Keep settings, recent files and history from Markdown Studio (the old name).
             storage::migrate_legacy_dir(&config_dir);
             storage::migrate_legacy_dir(&data_dir);
-            let log_dir = paths.app_log_dir()?;
+            let log_dir = match &test_data {
+                Some(dir) => dir.join("logs"),
+                None => paths.app_log_dir()?,
+            };
             let logger = storage::Logger::new(log_dir, paths.home_dir().ok());
             logger.log(
                 "info",
@@ -79,7 +98,11 @@ pub fn run() {
             // web view starts (slow on a first run, when WebView2 creates its
             // profile), a dark-theme user sees a dark window, not a white one.
             let theme = storage::read_json(&state.config_dir.join("settings.json"));
-            let window = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::default())
+            let mut window = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::default());
+            if let Some(dir) = &test_data {
+                window = window.data_directory(dir.join("webview"));
+            }
+            let window = window
                 .title("Markpion")
                 .inner_size(1280.0, 800.0)
                 .min_inner_size(720.0, 480.0)

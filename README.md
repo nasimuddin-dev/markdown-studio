@@ -157,6 +157,7 @@ That runs the desktop app with hot reload. Other scripts:
 | `npm run dev` | UI only, in a browser, using an in-memory demo workspace (no Rust needed) |
 | `npm test` | Frontend unit/component tests (Vitest + Testing Library) |
 | `npm run test:e2e` | End-to-end tests (Playwright) against the browser demo; uses the installed Microsoft Edge on Windows |
+| `npm run test:native` | End-to-end tests against the real desktop app (Windows): builds a debug app, then drives it through tauri-driver (`cargo install tauri-driver --locked`); the matching Edge WebDriver is downloaded on first use. The app keeps its data in a temporary folder, not your profile |
 | `npm run typecheck` | TypeScript type check |
 | `cargo test --manifest-path src-tauri/Cargo.toml` | Rust tests (scope, safe save, encoding, settings, history, search, watcher) |
 | `npm run build` | Type check and production build of the frontend (`dist/`) |
@@ -198,6 +199,7 @@ src-tauri/
   windows/      NSIS installer hooks (Explorer "Open with Markpion")
 tests/          Vitest unit and component tests
 e2e/            Playwright workflows and axe-core accessibility audits
+e2e-native/     tauri-driver tests against the real desktop app (Windows)
 scripts/        Versioning and release scripts
 downloads/      The latest standard Windows installer and its checksum
 docs/           All documentation: design, SRS, requirement traceability, installation guide, development log,
