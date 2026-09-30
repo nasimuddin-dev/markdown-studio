@@ -1168,3 +1168,17 @@ test("hovering a heading in the preview offers to copy a link to it", async ({ p
   await expect(page.getByText("Link copied.")).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("#github-flavored-markdown");
 });
+
+test("the diagram starters in the Format menu render in the preview", async ({ page }) => {
+  test.setTimeout(60_000);
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  for (const item of ["Insert Flowchart (Mermaid)", "Insert Sequence Diagram (Mermaid)", "Insert Gantt Chart (Mermaid)", "Insert Pie Chart (Mermaid)"]) {
+    await page.keyboard.press(`${mod}+End`);
+    await page.getByRole("button", { name: "Format", exact: true }).click();
+    await page.getByRole("menuitem", { name: item }).click();
+  }
+  await expect(page.locator(".preview .mermaid-diagram svg")).toHaveCount(4, { timeout: 20_000 });
+  await expect(page.locator(".preview .mermaid-error")).toHaveCount(0);
+});

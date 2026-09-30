@@ -7,6 +7,8 @@ description: Draw flowcharts, sequence diagrams, Gantt charts and more with Merm
 
 [Mermaid](https://mermaid.js.org) turns text into diagrams. Write the diagram in a code block with the language `mermaid`, and the preview draws it.
 
+To start from a working example, use **Format → Insert Flowchart**, **Insert Sequence Diagram**, **Insert Gantt Chart** or **Insert Pie Chart (Mermaid)**. The diagram's first line is selected, so you can change its type or direction right away.
+
 <figure>
   <img class="screenshot" src="../images/markpion-mermaid.webp" alt="A Mermaid flowchart written in the editor and drawn as a diagram with boxes and arrows in the preview" width="1440" height="900" loading="lazy">
   <figcaption>A Mermaid flowchart in the editor (left) and preview (right).</figcaption>

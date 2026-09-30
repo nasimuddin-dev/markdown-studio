@@ -70,6 +70,8 @@ The list commands work on all selected lines, and applying one again removes it.
 
 - **Code Block** (**Ctrl+Alt+C**) inserts a fenced code block. Type the language after the backticks.
 - **Insert Table** inserts a two-column table to fill in; the toolbar's Table button asks for the size first. **Format Table** (**Ctrl+Alt+T**) aligns it, the **Table: Insert/Delete Row and Column** commands change its shape, and **Sort Table by Column** sorts it. See [Tables](/markdown/tables).
+- **Insert Math Block** puts `$$` lines around the selection (or an empty formula), and **Inline Math** wraps the selection in `$…$`. See [Math](/markdown/math).
+- **Insert Flowchart**, **Sequence Diagram**, **Gantt Chart** or **Pie Chart (Mermaid)** inserts a small working diagram to edit, with its first line selected. See [Mermaid diagrams](/markdown/mermaid).
 - **Horizontal Rule** inserts `---`.
 - **Toggle Comment** (**Ctrl+/**) wraps the selected lines, or the cursor's line, in an HTML comment (`<!-- … -->`): the text stays in the file but doesn't appear in the preview or in exports. Press it again to remove the comment.
 - **Insert Footnote** (**Ctrl+Alt+R**) inserts the next numbered reference, such as `[^1]`, at the cursor and adds its definition at the end of the document, where the cursor moves so you can type the note. See [Footnotes](/markdown/extras#footnotes).

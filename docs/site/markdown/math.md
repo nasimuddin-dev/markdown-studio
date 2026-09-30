@@ -7,6 +7,8 @@ description: Write mathematical formulas in Markpion with LaTeX syntax, inline w
 
 Markpion renders mathematical formulas written in LaTeX syntax, using [KaTeX](https://katex.org). Formulas are converted to MathML, which the system's web engine displays.
 
+**Format → Inline Math** wraps the selection in `$…$`, and **Format → Insert Math Block** puts `$$` lines around it (or starts an empty formula).
+
 ## Inline math
 
 Put the formula between single dollar signs:

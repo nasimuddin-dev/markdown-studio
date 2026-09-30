@@ -61,6 +61,20 @@ describe("links", () => {
   });
 });
 
+describe("math and diagrams", () => {
+  it("wraps inline math and builds a math block around the selection", () => {
+    expect(run("area [a^2] here", fmt.toggleInlineMath)).toMatchObject({ doc: "area $a^2$ here", selected: "a^2" });
+    expect(run("[E = mc^2]", fmt.insertMathBlock)).toMatchObject({ doc: "$$\nE = mc^2\n$$\n", selected: "E = mc^2" });
+    expect(run("Text|", fmt.insertMathBlock).doc).toBe("Text\n\n$$\n\n$$\n");
+  });
+  it("inserts a Mermaid diagram with its first line selected", () => {
+    const r = run("|", fmt.insertDiagram("sequence"));
+    expect(r.doc.startsWith("```mermaid\nsequenceDiagram\n")).toBe(true);
+    expect(r.doc.endsWith("\n```\n")).toBe(true);
+    expect(r.selected).toBe("sequenceDiagram");
+  });
+});
+
 describe("headings", () => {
   it("sets, changes and removes heading levels", () => {
     expect(run("Ti|tle", fmt.setHeading(2)).doc).toBe("## Title");

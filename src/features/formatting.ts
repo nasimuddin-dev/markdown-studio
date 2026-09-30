@@ -52,6 +52,7 @@ export const toggleBold = toggleInline("**");
 export const toggleItalic = toggleInline("*");
 export const toggleStrikethrough = toggleInline("~~");
 export const toggleInlineCode = toggleInline("`");
+export const toggleInlineMath = toggleInline("$");
 
 /** Wraps the selection as `[text](url)` and selects the placeholder that needs editing. */
 export const insertLink: StateCommand = ({ state, dispatch }) => {
@@ -285,6 +286,28 @@ function insertBlock(build: (selected: string) => { text: string; cursorOffset: 
     );
     return true;
   };
+}
+
+/** A display formula block (`$$ … $$`) around the selection, which stays selected. */
+export const insertMathBlock = insertBlock((selected) => {
+  const body = selected.replace(/\n+$/, "");
+  return { text: "$$\n" + body + "\n$$", cursorOffset: 3, selectLength: body.length };
+});
+
+/** Starting points for Mermaid diagrams (Format → Insert … (Mermaid)). */
+const DIAGRAMS = {
+  flowchart: "flowchart TD\n    A[Start] --> B{Decision}\n    B -->|Yes| C[Do this]\n    B -->|No| D[Do that]",
+  sequence: "sequenceDiagram\n    participant A as Alice\n    participant B as Bob\n    A->>B: Hello, Bob\n    B-->>A: Hi, Alice",
+  gantt: "gantt\n    title Plan\n    dateFormat YYYY-MM-DD\n    section Design\n    Sketch      :a1, 2026-01-05, 7d\n    section Build\n    First version :after a1, 14d",
+  pie: 'pie title Share\n    "A" : 45\n    "B" : 35\n    "C" : 20',
+} as const;
+
+/** Inserts a Mermaid diagram to edit, with its first line selected. */
+export function insertDiagram(kind: keyof typeof DIAGRAMS): StateCommand {
+  return insertBlock(() => {
+    const head = "```mermaid\n";
+    return { text: head + DIAGRAMS[kind] + "\n```", cursorOffset: head.length, selectLength: DIAGRAMS[kind].indexOf("\n") };
+  });
 }
 
 export const insertCodeBlock = insertBlock((selected) => ({
