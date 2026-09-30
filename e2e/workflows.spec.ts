@@ -380,6 +380,31 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
+test("typing * or ` with text selected wraps it", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("make this bold and that code");
+  const line = page.locator(".cm-line").first();
+  await page.keyboard.press("Home");
+  for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowRight");
+  for (let i = 0; i < 4; i++) await page.keyboard.press("Shift+ArrowRight");
+  await page.keyboard.type("**");
+  await expect(line).toHaveText("make **this** bold and that code");
+  // Backticks wrap too.
+  await page.keyboard.press("End");
+  await page.keyboard.press("Shift+ArrowLeft");
+  await page.keyboard.press("Shift+ArrowLeft");
+  await page.keyboard.press("Shift+ArrowLeft");
+  await page.keyboard.press("Shift+ArrowLeft");
+  await page.keyboard.type("`");
+  await expect(line).toHaveText("make **this** bold and that `code`");
+  // Without a selection, the characters are typed normally.
+  await page.keyboard.press("End");
+  await page.keyboard.type(" *");
+  await expect(line).toHaveText("make **this** bold and that `code` *");
+});
+
 test("toolbar table button asks for the table size", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

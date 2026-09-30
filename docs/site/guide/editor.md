@@ -50,6 +50,7 @@ Markdown syntax is highlighted as you type: headings, emphasis, links, lists, qu
 - **Ctrl+click** (Cmd+click on macOS) adds another cursor.
 - **Alt+drag** selects a rectangular block, which is useful for editing table columns.
 - Matching text elsewhere in the document is highlighted when you select a word.
+- With text selected, typing `*`, `_`, `` ` ``, `~`, `"`, `(` or `[` wraps the selection instead of replacing it, and keeps it selected: select a word and type `**` to make it bold.
 
 ## Editing lines
 

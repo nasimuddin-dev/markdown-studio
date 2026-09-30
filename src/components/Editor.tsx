@@ -26,6 +26,7 @@ import { linkOverSelection, pasteHtmlAsMarkdown, pastePlainTable, pendingPastes 
 import { markdownLinter } from "../features/lintExtension";
 import { linkCompletion } from "../features/completion";
 import { gitChangeGutter, refreshGitBase } from "../features/gitGutter";
+import { surroundSelection } from "../features/surround";
 
 /**
  * Markdown-aware syntax colours (FR-020). Colours come from CSS variables so
@@ -161,6 +162,7 @@ export function Editor() {
         placeholder("Start writing Markdown…"),
         EditorView.contentAttributes.of({ "aria-label": "Markdown editor" }),
         EditorState.phrases.of(PHRASES),
+        surroundSelection,
         spelling.of(spellAttr(s.spellCheck)),
         locking.of(lockExt(isLocked(docId))),
         // Pasted or dropped images are saved to assets/ and linked.
