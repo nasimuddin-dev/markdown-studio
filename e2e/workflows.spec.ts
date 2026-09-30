@@ -380,6 +380,21 @@ test("duplicate a file from the explorer", async ({ page }) => {
   await expect(page.locator(".markdown-body h1")).toHaveText("Welcome to Markpion");
 });
 
+test("lint quick fixes in the Problems panel", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("| a | b |\n| - | - |\nText right after\n\nSee[^1].");
+  await page.getByRole("button", { name: /Show problems/ }).click();
+  const panel = page.locator(".cm-panel-lint");
+  await panel.getByRole("button", { name: "Add Blank Line" }).click();
+  await expect(page.locator(".cm-line").nth(3)).toHaveText("Text right after");
+  await page.getByRole("button", { name: /Show problems/ }).click();
+  await panel.getByRole("button", { name: "Add Definition" }).click();
+  await expect(page.locator(".cm-line").last()).toHaveText("[^1]: ");
+  await expect(page.getByRole("button", { name: /^0 warnings/ })).toBeVisible();
+});
+
 test("code blocks in the preview have a Copy button", async ({ page }) => {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await start(page);

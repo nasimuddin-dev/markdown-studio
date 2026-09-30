@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeEntities, findAllLinks, findHtmlLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
+import { decodeEntities, findAllLinks, fixChanges, findHtmlLinks, findLinks, lintLinks, lintMarkdown, maskCode } from "../src/features/lint";
 
 const rules = (text: string) => lintMarkdown(text).map((p) => p.rule);
 
@@ -108,6 +108,24 @@ describe("markdown lint: tables, footnotes and link text", () => {
     // Not tables: a setext heading, and tables inside code.
     expect(only("a | b\n---", "table-columns")).toEqual([]);
     expect(only("```\n| a | b |\n| - | - |\n| 1 |\n```", "table-columns")).toEqual([]);
+  });
+
+  it("offers quick fixes that resolve the problem", () => {
+    const applyFix = (text: string, rule: string) => {
+      const p = only(text, rule).find((x) => x.fix)!;
+      let out = text;
+      for (const c of [...fixChanges(p.fix!, p.from, text)].reverse()) out = out.slice(0, c.from) + c.insert + out.slice(c.from);
+      return out;
+    };
+    expect(applyFix("| a | b |\n| - | - |\nText", "table-columns")).toBe("| a | b |\n| - | - |\n\nText");
+    const padded = applyFix("| a | b | c |\n| - | - | - |\n| 1 |", "table-columns");
+    expect(padded).toBe("| a | b | c |\n| - | - | - |\n| 1 |  |  |");
+    expect(only(padded, "table-columns")).toEqual([]);
+    expect(applyFix("See[^x].", "footnote")).toBe("See[^x].\n\n[^x]: ");
+    expect(applyFix("See[^x].\n", "footnote")).toBe("See[^x].\n\n[^x]: ");
+    // Extra cells, or a row without a closing "|", need a person to decide.
+    expect(only("| a |\n| - |\n| 1 | 2 |", "table-columns")[0].fix).toBeUndefined();
+    expect(only("| a | b |\n| - | - |\n| 1", "table-columns")[0].fix).toBeUndefined();
   });
 
   it("flags footnotes without a definition and unused definitions", () => {

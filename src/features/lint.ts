@@ -11,6 +11,26 @@ export interface MarkdownProblem {
   severity: Severity;
   message: string;
   rule: string;
+  /** A quick fix, offered in the Problems panel and the problem's tooltip. */
+  fix?: ProblemFix;
+}
+
+/**
+ * Edits that fix a problem. `at` is relative to the problem's start (so the fix
+ * still applies after edits elsewhere), or "end" for the end of the document.
+ */
+export interface ProblemFix {
+  label: string;
+  edits: Array<{ at: number | "end"; insert: string }>;
+}
+
+/** The changes for a fix whose problem now starts at `from` in `text`. Text for the end goes on its own line after a blank one. */
+export function fixChanges(fix: ProblemFix, from: number, text: string): Array<{ from: number; insert: string }> {
+  return fix.edits.map(({ at, insert }) => {
+    if (at !== "end") return { from: Math.min(from + at, text.length), insert };
+    const gap = text.endsWith("\n\n") ? "" : text.endsWith("\n") ? "\n" : "\n\n";
+    return { from: text.length, insert: gap + insert };
+  });
 }
 
 export interface LinkRef {
@@ -216,13 +236,23 @@ function lintTables(text: string, starts: number[]): MarkdownProblem[] {
     for (; j < lines.length && masked[j].trim() && !BLOCK_START.test(masked[j]); j++) {
       const cells = countCells(lines[j]);
       if (!lines[j].includes("|")) {
-        out.push({ ...range(j), severity: "warning", rule: "table-columns", message: "This line becomes a row of the table above. Add a blank line to end the table." });
+        out.push({
+          ...range(j),
+          severity: "warning",
+          rule: "table-columns",
+          message: "This line becomes a row of the table above. Add a blank line to end the table.",
+          fix: { label: "Add Blank Line", edits: [{ at: 0, insert: "\n" }] },
+        });
       } else if (cells !== columns) {
         out.push({
           ...range(j),
           severity: "warning",
           rule: "table-columns",
           message: `This row has ${cells} cell${cells === 1 ? "" : "s"} but the table has ${columns} columns: ${cells > columns ? "the extra cells aren't shown" : "the missing cells are left empty"}. (A | inside a cell needs a backslash: \\|.)`,
+          // Missing cells can be added after a closing "|"; extra ones need a person to decide.
+          ...(cells < columns && lines[j].trimEnd().endsWith("|") && {
+            fix: { label: "Add Empty Cells", edits: [{ at: lines[j].trimEnd().length, insert: "  |".repeat(columns - cells) }] },
+          }),
         });
       }
     }
@@ -242,7 +272,14 @@ function lintFootnotes(text: string): MarkdownProblem[] {
     const id = m[1].toLowerCase();
     used.add(id);
     if (!defined.has(id)) {
-      out.push({ from: m.index!, to: m.index! + m[0].length, severity: "warning", rule: "footnote", message: `Footnote [^${m[1]}] has no definition, so it's shown as plain text. Add a line “[^${m[1]}]: …”.` });
+      out.push({
+        from: m.index!,
+        to: m.index! + m[0].length,
+        severity: "warning",
+        rule: "footnote",
+        message: `Footnote [^${m[1]}] has no definition, so it's shown as plain text. Add a line “[^${m[1]}]: …”.`,
+        fix: { label: "Add Definition", edits: [{ at: "end", insert: `[^${m[1]}]: ` }] },
+      });
     }
   }
   for (const [id, at] of defined) {

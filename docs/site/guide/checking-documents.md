@@ -18,7 +18,7 @@ While you type, Markpion checks the document for common problems and underlines 
 - Table rows with more or fewer cells than the header (extra cells aren't shown; a `|` inside a cell, even in code, needs a backslash: `|`), a text line right after a table (it becomes a row; add a blank line), and a header whose divider row has a different number of cells (it isn't shown as a table)
 - Footnote references such as `[^1]` without a definition (they're shown as plain text), and definitions nothing refers to
 
-The status bar shows the count of warnings and suggestions. Click it to open the **Problems** panel, then click a problem to jump to it. Turn the checks off with **Settings → Editor → Check Markdown for problems**.
+The status bar shows the count of warnings and suggestions. Click it to open the **Problems** panel, then click a problem to jump to it. Some problems have a quick fix, as a button in the panel and in the problem's tooltip: **Add Blank Line** after a table, **Add Empty Cells** to a short table row, and **Add Definition** for a footnote (it goes at the end of the document, ready for its text). Turn the checks off with **Settings → Editor → Check Markdown for problems**.
 
 ## Link check
 

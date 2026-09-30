@@ -57,7 +57,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 
 ## Checking documents
 
-- Markdown lint in the editor: broken links, missing images, broken anchors, duplicate headings, skipped heading levels, missing alt text and link text, table rows that don't match the header, and footnotes without a definition, with a Problems panel. [Checking documents](/guide/checking-documents)
+- Markdown lint in the editor: broken links, missing images, broken anchors, duplicate headings, skipped heading levels, missing alt text and link text, table rows that don't match the header, and footnotes without a definition, with a Problems panel and quick fixes (Add Blank Line, Add Empty Cells, Add Definition). [Checking documents](/guide/checking-documents)
 - A link check across the whole folder, including `file.md#heading` anchors.
 
 ## Import and export
