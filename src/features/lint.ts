@@ -25,6 +25,8 @@ export interface LinkRef {
   definition?: boolean;
   /** True for an HTML `<a href>` or `<img src>`. */
   html?: boolean;
+  /** Length of the destination in the text when it differs from `target` (HTML entities decoded). */
+  sourceLength?: number;
 }
 
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
@@ -76,6 +78,17 @@ export function findLinkDefinitions(text: string): LinkRef[] {
   return out;
 }
 
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+
+/** Decodes the character references used in attribute values (`&amp;`, `&#39;`, `&#x20;`). Unknown ones are kept. */
+export function decodeEntities(value: string): string {
+  return value.replace(/&(#[xX][0-9a-fA-F]+|#\d+|[a-zA-Z]+);/g, (whole, ref: string) => {
+    if (ref[0] !== "#") return ENTITIES[ref.toLowerCase()] ?? whole;
+    const code = ref[1] === "x" || ref[1] === "X" ? parseInt(ref.slice(2), 16) : Number(ref.slice(1));
+    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : whole;
+  });
+}
+
 const HTML_LINK = /<(a|img)\b[^>]*?\s(href|src)\s*=\s*("[^"]*"|'[^']*')[^>]*>/dgi;
 
 /** `href` of HTML `<a>` tags and `src` of `<img>` tags, outside code. */
@@ -86,7 +99,9 @@ export function findHtmlLinks(text: string): LinkRef[] {
     if ((m[2].toLowerCase() === "src") !== image) continue;
     const value = m[3].slice(1, -1);
     const targetFrom = m.indices![3]![0] + 1;
-    out.push({ from: m.index!, to: m.index! + m[0].length, image, text: "", target: value.trim(), targetFrom: targetFrom + (value.length - value.trimStart().length), html: true });
+    const raw = value.trim();
+    const target = decodeEntities(raw);
+    out.push({ from: m.index!, to: m.index! + m[0].length, image, text: "", target, targetFrom: targetFrom + (value.length - value.trimStart().length), html: true, ...(target !== raw && { sourceLength: raw.length }) });
   }
   return out;
 }

@@ -43,8 +43,10 @@ export function rewriteLinks(text: string, oldDocPath: string, newDocPath: strin
     const prefix = link.target.startsWith("./") && !rel.startsWith("..") ? "./" : "";
     const start = link.targetFrom;
     const bracketed = text[start - 1] === "<";
-    const insert = prefix + (bracketed ? rel : escapeTarget(rel)) + suffix;
-    edits.push({ from: start, to: start + link.target.length, insert });
+    let insert = prefix + (bracketed ? rel : escapeTarget(rel)) + suffix;
+    // An HTML attribute written with entities keeps them.
+    if (link.sourceLength !== undefined) insert = insert.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+    edits.push({ from: start, to: start + (link.sourceLength ?? link.target.length), insert });
   }
   let out = text;
   for (const e of edits.reverse()) out = out.slice(0, e.from) + e.insert + out.slice(e.to);

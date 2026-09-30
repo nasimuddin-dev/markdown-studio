@@ -54,6 +54,13 @@ describe("rewriteLinks", () => {
     expect(out).toBe('<img alt="logo" src="assets/img/logo.png" width="80">\n<a href="assets/img/logo.png">full size</a>');
   });
 
+  it("updates HTML links written with entities and keeps them encoded", () => {
+    const text = '<a href="Q&amp;A.md?x=1&amp;y=2">FAQ</a> after';
+    const { text: out, count } = rewriteLinks(text, "/ws/i.md", "/ws/i.md", moved("/ws/Q&A.md", "/ws/docs/Q&A.md"));
+    expect(count).toBe(1);
+    expect(out).toBe('<a href="docs/Q&amp;A.md?x=1&amp;y=2">FAQ</a> after');
+  });
+
   it("leaves links between files that moved together unchanged, and escapes spaces", () => {
     const inside = rewriteLinks("[n](n2.md)", "/ws/notes/n1.md", "/ws/archive/notes/n1.md", moved("/ws/notes", "/ws/archive/notes"));
     expect(inside.count).toBe(0);
