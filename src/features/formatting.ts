@@ -268,6 +268,18 @@ export const insertCodeBlock = insertBlock((selected) => ({
   cursorOffset: 3,
 }));
 
+/**
+ * Inserts a GitHub alert (callout): `> [!NOTE]` and a quoted line, or the
+ * selected text quoted under it. The cursor goes to where the text is typed.
+ */
+export function insertCallout(kind: "NOTE" | "TIP" | "IMPORTANT" | "WARNING" | "CAUTION"): StateCommand {
+  return insertBlock((selected) => {
+    const head = `> [!${kind}]\n`;
+    const body = selected.trim() ? selected.replace(/\n+$/, "").split("\n").map((l) => (l.trim() ? `> ${l}` : ">")).join("\n") : "> ";
+    return { text: head + body, cursorOffset: head.length + body.length };
+  });
+}
+
 /** Inserts a table with `columns` columns and `rows` body rows; the first header cell is selected. */
 export function insertTableOf(columns: number, rows: number): StateCommand {
   return insertBlock(() => {

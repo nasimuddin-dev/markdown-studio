@@ -140,3 +140,15 @@ describe("tasks and footnotes", () => {
     expect(run("Text|\n", fmt.insertFootnote).doc).toBe("Text[^1]\n\n[^1]: ");
   });
 });
+
+describe("callouts", () => {
+  it("inserts an alert, with the cursor ready for its text", () => {
+    const r = run("|", fmt.insertCallout("NOTE"));
+    expect(r.doc).toBe("> [!NOTE]\n> \n");
+    expect(r.cursor).toBe("> [!NOTE]\n> ".length);
+  });
+
+  it("quotes the selected text under the alert", () => {
+    expect(run("[Back up first.\n\nThen update.]", fmt.insertCallout("WARNING")).doc).toBe("> [!WARNING]\n> Back up first.\n>\n> Then update.\n");
+  });
+});

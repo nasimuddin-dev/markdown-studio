@@ -27,7 +27,7 @@ date: 2026-09-25
 
 ## Alerts
 
-Alerts are GitHub's highlighted callouts. Start a quote with one of five markers:
+Alerts are GitHub's highlighted callouts. **Format → Insert Callout: Note** (or Tip, Important, Warning, Caution) inserts one, quoting the selected text under it. Or start a quote with one of five markers:
 
 ```markdown
 > [!NOTE]
