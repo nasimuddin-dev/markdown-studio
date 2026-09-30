@@ -4,7 +4,7 @@ import { describeError, toAppError } from "../services/errors";
 import { activeDoc, useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { notify, promptText } from "../stores/uiStore";
-import { newDocument } from "./documents";
+import { newDocument, openPath } from "./documents";
 import { refreshDir } from "./workspace";
 import { getEditorView, requestReveal } from "./editorBridge";
 
@@ -273,6 +273,40 @@ export async function saveAsTemplate() {
     notify("success", `Saved as the template “${fileName.replace(/\.(md|markdown)$/i, "")}”.`);
   } catch (e) {
     notify("error", toAppError(e).kind === "alreadyExists" ? `A template named “${fileName}” already exists.` : describeError(e, "save the template"));
+  }
+}
+
+/**
+ * File → Open Today's Note: `journal/YYYY-MM-DD.md` in the open folder,
+ * created from the Daily journal template (or the folder's own
+ * `templates/Daily journal.md`) the first time.
+ */
+export async function openTodaysNote(now = new Date()) {
+  const root = useWorkspace.getState().root;
+  if (!root) {
+    notify("info", "Open a folder first: daily notes go in its “journal” folder.");
+    return;
+  }
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const name = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}.md`;
+  const dir = join(root, "journal");
+  const path = join(dir, name);
+  const b = backend();
+  try {
+    if ((await b.fileMtime(path).catch(() => null)) === null) {
+      const template = (await listTemplates()).find((t) => t.name.toLowerCase() === "daily journal");
+      const body = template?.path ? await b.readTextFile(template.path).then((f) => f.content) : (template?.body ?? "# {{date}}\n\n{{cursor}}\n");
+      await b.createFolder(root, "journal").catch((e) => {
+        if (toAppError(e).kind !== "alreadyExists") throw e;
+      });
+      await b.createFile(dir, name);
+      const { text } = fillTemplate(body, name.replace(/\.md$/, ""), now);
+      await b.writeTextFile({ path, content: text.replace(/\{\{\s*cursor\s*\}\}/gi, ""), lineEnding: "lf", bom: false, expectedMtime: null, force: true });
+      await refreshDir(root);
+    }
+    await openPath(path);
+  } catch (e) {
+    notify("error", describeError(e, "open today's note"));
   }
 }
 

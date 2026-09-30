@@ -114,6 +114,10 @@ It lists the top two heading levels below the title (a single H1 at the top is l
 
 **Format → Insert Front Matter** adds a front matter block at the top of the document with a `title` (its first heading, else the file name), today's `date` and empty `tags`, with the title selected so you can change it. If the document already has front matter, the cursor moves to its end instead. See [Front matter](/markdown/extras#front-matter).
 
+## Today's note
+
+**File → Open Today's Note** opens today's note in the `journal` folder of the open folder, named by the date (`journal/2026-09-30.md`). The first time each day it's created from the **Daily journal** template, or from `templates/Daily journal.md` in your folder if you have one.
+
 ## Snippets
 
 **Format → Insert Snippet…** inserts a piece of text at the cursor: a collapsible section (`<details>`), a keyboard key (`<kbd>`) or a task list, plus any Markdown file in a folder named `snippets` at the top of your open workspace. Snippets can use the same placeholders as templates (below), such as `{{date}}`, and `{{cursor}}` marks where the cursor goes. The selected text, if any, is replaced.

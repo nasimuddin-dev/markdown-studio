@@ -94,6 +94,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Live GitHub Flavored Markdown preview (tables, task lists, strikethrough, autolinks, emoji shortcodes such as `:tada:`, fenced code with highlighting) with a configurable debounce. Click a task checkbox in the preview to check or uncheck it in the source (undoable)
 - YAML front matter (`---` metadata at the top, as used by Jekyll, Hugo and Obsidian) is shown as a tidy metadata table in the preview, left out of HTML, PDF and Word exports, and its `title` names exported documents
 - GitHub alerts (Format → Insert Callout): `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` render as coloured callouts with icons in the preview and HTML export, and as labelled callouts in PDF and Word
+- Open Today's Note (File menu): `journal/YYYY-MM-DD.md`, created from the Daily journal template
 - Insert Front Matter (Format menu): title, date and tags at the top
 - Insert Snippet… (Format menu): built-in snippets and the folder's `snippets/`, with template placeholders
 - Save as Template… (File menu) copies the document into the folder's `templates/`
