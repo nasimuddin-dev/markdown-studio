@@ -64,4 +64,17 @@ describe("wiki links", () => {
     expect(result?.from).toBe(6);
     expect(result?.options.map((o) => [o.label, o.apply])).toEqual([["docs/Setup Guide", "docs/Setup Guide]]"]]);
   });
+
+  it("complete a page's headings after [[page#, and this document's after [[#", async () => {
+    invalidateWorkspaceFiles();
+    setupBackend({ "/ws/a.md": "", "/ws/docs/Setup Guide.md": "# Setup\n\n## Install it\n" });
+    await setWorkspace("/ws");
+    await openPath("/ws/a.md");
+    const complete = async (doc: string) => {
+      const r = await wikiLinkCompletionSource(new CompletionContext(EditorState.create({ doc }), doc.length, false));
+      return r && { from: r.from, labels: r.options.map((o) => o.apply) };
+    };
+    expect(await complete("[[docs/Setup Guide#ins")).toEqual({ from: 19, labels: ["Setup]]", "Install it]]"] });
+    expect(await complete("# Here\n\n[[#")).toEqual({ from: 11, labels: ["Here]]"] });
+  });
 });

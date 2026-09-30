@@ -159,6 +159,8 @@ export async function emojiCompletionSource(ctx: CompletionContext): Promise<Com
 
 /** Completes wiki links after `[[`: the folder's documents, by path relative to this one and without `.md`. */
 export async function wikiLinkCompletionSource(ctx: CompletionContext): Promise<CompletionResult | null> {
+  const heading = ctx.matchBefore(/\[\[[^[\]|#\n]*#[^[\]|#\n]*/);
+  if (heading) return wikiHeadingCompletions(ctx, heading.from, heading.text.slice(2));
   const m = ctx.matchBefore(/\[\[[^[\]|#\n]*/);
   if (!m) return null;
   const doc = activeDoc();
@@ -172,6 +174,24 @@ export async function wikiLinkCompletionSource(ctx: CompletionContext): Promise<
     return { ...o, label: page, apply: page + close };
   });
   return options.length ? { from: m.from + 2, options, validFor: /^[^[\]|#\n]*$/ } : null;
+}
+
+/** `[[page#`: the headings of that page (this document for `[[#`), by their text. */
+async function wikiHeadingCompletions(ctx: CompletionContext, start: number, typed: string): Promise<CompletionResult | null> {
+  const hash = typed.indexOf("#");
+  const page = typed.slice(0, hash).trim();
+  let text: string | null = ctx.state.doc.toString();
+  if (page) {
+    const doc = activeDoc();
+    const target = doc?.path ? resolveRelative(doc.path, /\.[a-z0-9]+$/i.test(page) ? page : `${page}.md`) : null;
+    if (!target) return null;
+    const open = useDocuments.getState().docs.find((d) => d.path === target);
+    text = open ? open.content : await backend().readTextFile(target).then((f) => f.content, () => null);
+    if (ctx.aborted || text === null) return null;
+  }
+  const close = ctx.state.sliceDoc(ctx.pos, ctx.pos + 2) === "]]" ? "" : "]]";
+  const options = extractHeadings(text).map((h) => ({ label: h.text, detail: `H${h.level}`, apply: h.text + close, type: "constant" }));
+  return options.length ? { from: start + 2 + hash + 1, options, validFor: /^[^[\]|#\n]*$/ } : null;
 }
 
 export function linkCompletion(): Extension {
