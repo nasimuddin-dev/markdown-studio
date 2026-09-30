@@ -102,6 +102,8 @@ export interface Settings {
   newFileLineEnding: "auto" | LineEnding;
   /** Paper size for PDF and Word export; "auto" follows the system region. */
   exportPageSize: "auto" | "a4" | "letter";
+  /** Extra CSS for rendered documents (preview, print, slides, HTML export), scoped to the document. */
+  customCss: string;
   /** The optional AI assistant (off until turned on and given an API key). */
   aiEnabled: boolean;
   aiModel: string;

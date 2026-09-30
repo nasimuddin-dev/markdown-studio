@@ -1,5 +1,6 @@
 import { backend } from "../services";
 import { describeError } from "../services/errors";
+import { scopeCustomCss } from "../services/customCss";
 import { buildHtmlDocument, exportFileName, renderHtml } from "../services/exportHtml";
 import { activeDoc } from "../stores/documentsStore";
 import { notify } from "../stores/uiStore";
@@ -37,7 +38,7 @@ export async function exportActiveAsHtml() {
   const doc = activeDoc();
   if (!doc) return;
   try {
-    const html = await buildHtmlDocument({ markdown: doc.content, name: doc.name, docPath: doc.path, loadImage, features: features() });
+    const html = await buildHtmlDocument({ markdown: doc.content, name: doc.name, docPath: doc.path, loadImage, features: features(), css: scopeCustomCss(useSettings.getState().settings.customCss) });
     const saved = await backend().exportFile(exportFileName(doc.name, "html"), html, "html");
     if (saved) notify("success", `Exported to ${saved}`);
   } catch (e) {

@@ -115,6 +115,15 @@ export function SettingsDialog() {
           <label className="check"><input type="checkbox" checked={settings.renderMath} disabled={isLocked("renderMath")} onChange={(e) => update({ renderMath: e.target.checked })} /> Render LaTeX math ($…$ and $$…$$)</label>
           <label className="check"><input type="checkbox" checked={settings.renderDiagrams} disabled={isLocked("renderDiagrams")} onChange={(e) => update({ renderDiagrams: e.target.checked })} /> Render Mermaid diagrams</label>
           <label className="check"><input type="checkbox" checked={settings.syncScroll} disabled={isLocked("syncScroll")} onChange={(e) => update({ syncScroll: e.target.checked })} /> Sync editor and preview scrolling</label>
+          <label htmlFor="setting-customCss">Custom CSS for documents</label>
+          <textarea
+            className="text-input code-input" rows={5} spellCheck={false} placeholder="h1 { color: #0b4f8a; }"
+            aria-describedby="setting-customCss-hint" {...field("customCss")}
+            onChange={(e) => update({ customCss: e.target.value })}
+          />
+          <p className="muted small" id="setting-customCss-hint">
+            Styles the preview, printing, slides and HTML export (not PDF or Word export). Rules apply only inside the document; <code>body</code> means the whole document.
+          </p>
         </section>
 
         <section>

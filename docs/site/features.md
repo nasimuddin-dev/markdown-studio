@@ -71,6 +71,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Keyboard-first: every command has a menu entry, many have [shortcuts](/reference/keyboard-shortcuts), and the command palette finds them all.
 - Export and import settings and shortcuts as a file, to move to another computer or share a team setup. [Settings](/guide/settings#export-and-import)
 - Customizable keyboard shortcuts for every command (Help → Keyboard Shortcuts), with conflict detection. [Keyboard shortcuts](/reference/keyboard-shortcuts#change-a-shortcut)
+- Custom CSS for your documents (preview, printing, slides and HTML export), for example your organization's colours and fonts; it never changes the app itself. [Settings](/guide/settings#preview)
 - Accessibility: keyboard navigation and visible focus throughout; the UI is audited automatically against WCAG 2.1 AA in light and dark themes; in Windows High Contrast (and other forced-colour modes), selections, the active tab, focus and unsaved-change markers stay visible.
 - Automatic updates on Windows, verified with a signature before installing. macOS and Linux are notified of new versions.
 - Diagnostic logs you can export for support. They never contain document text.

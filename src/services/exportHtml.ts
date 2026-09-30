@@ -107,6 +107,8 @@ export async function buildHtmlDocument(opts: {
   docPath: string | null;
   loadImage?: ImageLoader;
   features?: MarkdownFeatures & { diagrams?: boolean };
+  /** Custom CSS for the document, already scoped (see `scopeCustomCss`); `</` is escaped so it can't end the style element. */
+  css?: string;
 }) {
   const body = await renderHtml(opts.markdown, opts.docPath, opts.loadImage, opts.features);
   const title = escapeHtml(documentTitle(opts.markdown, opts.name));
@@ -125,7 +127,7 @@ export async function buildHtmlDocument(opts: {
 <meta name="generator" content="Markpion">
 ${metaTags}<title>${title}</title>
 <style>${EXPORT_TOKENS}
-${markdownCss}</style>
+${markdownCss}${opts.css ? `\n/* Custom CSS */\n${opts.css.replace(/<\//g, "<\\/")}` : ""}</style>
 </head>
 <body>
 <article class="markdown-body">

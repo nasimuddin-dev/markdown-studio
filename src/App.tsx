@@ -75,6 +75,7 @@ import { Welcome } from "./components/Welcome";
 import { CommandPalette } from "./components/CommandPalette";
 import { useAi } from "./stores/aiStore";
 import { useSettings } from "./stores/settingsStore";
+import { CustomDocumentCss } from "./components/CustomDocumentCss";
 import { useDocuments } from "./stores/documentsStore";
 
 /** Panel sizes are a per-machine convenience, so browser storage is enough. */
@@ -242,6 +243,7 @@ export default function App() {
       <OnDemandDialogs />
       <DialogHost />
       <Toasts />
+      <CustomDocumentCss />
     </div>
   );
 }

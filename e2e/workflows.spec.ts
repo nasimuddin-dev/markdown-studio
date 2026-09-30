@@ -551,6 +551,19 @@ test("Git change bars: see the committed lines and revert a change", async ({ pa
   await expect(peek).toBeHidden();
 });
 
+test("custom CSS styles the document, not the app", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await page.getByRole("treeitem", { name: /README\.md/ }).click();
+  await page.keyboard.press(`${mod}+,`);
+  await page.getByLabel("Custom CSS for documents").fill("h1 { color: rgb(200, 0, 0) } button { visibility: hidden } } body { display: none }");
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".markdown-body h1").first()).toHaveCSS("color", "rgb(200, 0, 0)");
+  // The app's own buttons and layout are untouched, even by the stray brace.
+  await expect(page.getByRole("button", { name: "File", exact: true })).toBeVisible();
+  await expect(page.locator(".markdown-body")).toBeVisible();
+});
+
 test("formatting toolbar reflects and applies formatting", async ({ page }) => {
   await start(page);
   await page.keyboard.press(`${mod}+N`);

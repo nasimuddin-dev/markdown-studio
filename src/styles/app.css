@@ -438,6 +438,11 @@ select {
   border-radius: 6px;
   background: var(--bg-input);
 }
+.code-input {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  resize: vertical;
+}
 
 .link-button {
   display: flex;

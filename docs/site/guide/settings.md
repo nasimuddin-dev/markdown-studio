@@ -50,6 +50,9 @@ Existing files always keep their own line endings. Untitled documents are never 
 | Render LaTeX math (`$…$` and `$$…$$`) | | On |
 | Render Mermaid diagrams | | On |
 | Sync editor and preview scrolling | | On |
+| Custom CSS for documents | Your own CSS | Empty |
+
+**Custom CSS** styles your documents, for example with your organization's colours and fonts. It applies to the preview, printing, slides, **Export as HTML** and **Export Folder as HTML Site**, but not to PDF or Word export, which have their own layout. Rules only affect the document, never Markpion itself: `h1 { color: #0b4f8a; }` styles the document's headings, and `body` means the whole document. `@media`, `@font-face` and `@page` rules work; `@import` is ignored, so styles can't load other files. Managed settings can preset or lock it for everyone in an organization (see [Configuration](/reference/configuration)).
 
 ## Export
 

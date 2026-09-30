@@ -3,6 +3,7 @@ import { buildHtmlDocument, documentTitle, exportFileName, renderHtml } from "..
 import { exportActiveAsHtml } from "../src/features/exporting";
 import { openPath } from "../src/features/documents";
 import { setupBackend } from "./helpers";
+import { DEFAULT_SETTINGS, useSettings } from "../src/stores/settingsStore";
 
 describe("HTML export", () => {
   it("renders GFM with highlighting and heading ids", async () => {
@@ -53,5 +54,17 @@ describe("HTML export", () => {
     await exportActiveAsHtml();
     expect(backend.lastExport?.name).toBe("readme.html");
     expect(backend.lastExport?.content).toContain("<h1 id=\"readme\">Readme</h1>");
+  });
+
+  it("adds the custom CSS, scoped to the document, and can't end the style element", async () => {
+    const backend = setupBackend({ "/ws/readme.md": "# Readme" });
+    useSettings.setState({ settings: { ...DEFAULT_SETTINGS, customCss: 'h1 { color: rebeccapurple } p::after { content: "</style><script>x</script>" }' } });
+    await openPath("/ws/readme.md");
+    await exportActiveAsHtml();
+    const html = backend.lastExport!.content;
+    expect(html).toContain(".markdown-body h1 { color: rebeccapurple; }");
+    expect(html).toContain("<\\/style><script>"); // inert text inside the CSS string
+    expect(html.match(/<\/style>/g)).toHaveLength(1);
+    useSettings.setState({ settings: { ...DEFAULT_SETTINGS } });
   });
 });

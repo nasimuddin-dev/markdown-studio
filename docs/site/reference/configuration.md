@@ -47,6 +47,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `updateTocOnSave` | `true` | |
 | `newFileLineEnding` | `"lf"` | `"lf"`, `"crlf"`, `"auto"` |
 | `exportPageSize` | `"auto"` | `"auto"`, `"a4"`, `"letter"` |
+| `customCss` | `""` | CSS for rendered documents (preview, print, slides, HTML export), up to 100,000 characters; scoped to the document |
 | `restoreSession` | `true` | |
 | `checkForUpdates` | `true` | |
 | `aiEnabled` | `false` | Turns on the [AI assistant](/guide/ai-assistant) |

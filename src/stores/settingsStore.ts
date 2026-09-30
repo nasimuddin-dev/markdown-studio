@@ -31,6 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
   insertFinalNewline: false,
   newFileLineEnding: "lf",
   exportPageSize: "auto",
+  customCss: "",
   aiEnabled: false,
   aiModel: "claude-opus-5-5",
   aiConsent: false,
@@ -53,6 +54,9 @@ function sanitizeKeybindings(raw: unknown): Record<string, string | null> {
 
 const clamp = (n: unknown, min: number, max: number, fallback: number) =>
   typeof n === "number" && Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback;
+
+/** Custom CSS beyond this is cut off. */
+export const MAX_CUSTOM_CSS = 100_000;
 
 /**
  * Merges stored settings over defaults, dropping anything invalid so a damaged
@@ -94,6 +98,7 @@ export function sanitizeSettings(raw: unknown): Settings {
         ? s.newFileLineEnding
         : d.newFileLineEnding,
     exportPageSize: s.exportPageSize === "a4" || s.exportPageSize === "letter" || s.exportPageSize === "auto" ? s.exportPageSize : d.exportPageSize,
+    customCss: typeof s.customCss === "string" ? s.customCss.slice(0, MAX_CUSTOM_CSS) : d.customCss,
     aiEnabled: bool(s.aiEnabled, d.aiEnabled),
     aiModel: typeof s.aiModel === "string" && /^claude-[a-z0-9-]{3,60}$/.test(s.aiModel) ? s.aiModel : d.aiModel,
     aiConsent: bool(s.aiConsent, d.aiConsent),

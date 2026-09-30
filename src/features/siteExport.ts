@@ -1,5 +1,6 @@
 import { backend } from "../services";
 import { describeError } from "../services/errors";
+import { scopeCustomCss } from "../services/customCss";
 import { buildHtmlDocument, documentTitle } from "../services/exportHtml";
 import { basename, isInside, join, relativePath } from "../services/paths";
 import { useDocuments } from "../stores/documentsStore";
@@ -118,6 +119,7 @@ export async function exportFolderAsHtmlSite() {
 
     const s = useSettings.getState().settings;
     const features = { math: s.renderMath, diagrams: s.renderDiagrams };
+    const css = scopeCustomCss(s.customCss);
     // Unsaved edits in open tabs are exported as shown in the editor.
     const key = (p: string) => p.replace(/\\/g, "/").toLowerCase();
     const open = new Map(useDocuments.getState().docs.filter((d) => d.path).map((d) => [key(d.path!), d.content]));
@@ -130,7 +132,7 @@ export async function exportFolderAsHtmlSite() {
       try {
         const markdown = open.get(key(page.source)) ?? (await backend().readTextFile(page.source)).content;
         const name = basename(page.source);
-        const html = await buildHtmlDocument({ markdown, name, docPath: page.source, loadImage, features });
+        const html = await buildHtmlDocument({ markdown, name, docPath: page.source, loadImage, features, css });
         const depth = page.href.split("/").length - 1;
         await writeSiteFile(out, page.href, addSiteNav(rewriteMarkdownLinks(html), depth));
         written.push({ ...page, title: documentTitle(markdown, name) });
@@ -139,7 +141,7 @@ export async function exportFolderAsHtmlSite() {
       }
     }
     if (!hasIndex && written.length) {
-      const index = await buildHtmlDocument({ markdown: siteIndexMarkdown(basename(root), written), name: "index.md", docPath: null, features });
+      const index = await buildHtmlDocument({ markdown: siteIndexMarkdown(basename(root), written), name: "index.md", docPath: null, features, css });
       await writeSiteFile(out, "index.html", index);
     }
     if (failed.length) {

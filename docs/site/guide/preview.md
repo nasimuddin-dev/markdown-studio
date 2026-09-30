@@ -59,4 +59,4 @@ Above **1 MB** of text, the live preview pauses so typing stays fast. A bar at t
 
 ## Printing and exporting
 
-What you see in the preview is what **Export as HTML**, **Export as PDF**, **Export as Word** and **Print / Save as PDF** produce, without the front matter table. See [Import & export](/guide/import-export#export).
+What you see in the preview is what **Export as HTML**, **Export as PDF**, **Export as Word** and **Print / Save as PDF** produce, without the front matter table. See [Import & export](/guide/import-export#export). To change how documents look (colours, fonts, spacing), add [custom CSS](/guide/settings#preview) in Settings.
