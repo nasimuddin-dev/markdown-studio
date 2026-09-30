@@ -712,7 +712,78 @@ select {
 .editor-host {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+}
+.editor-column {
+  flex: 1;
+  min-width: 0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Formatting toolbar above the editor */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 0;
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-chrome);
+}
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 0 6px;
+  border-left: 1px solid var(--border);
+}
+.toolbar-group:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+.toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.toolbar-button:hover {
+  background: var(--bg-hover);
+}
+.toolbar-button.pressed {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.toolbar-button:focus-visible,
+.toolbar-select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.toolbar-text {
+  font-size: 12px;
+  font-weight: 600;
+}
+.toolbar-select {
+  height: 26px;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-input);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
 }
 .editor-host .cm-editor {
   height: 100%;
@@ -1920,6 +1991,10 @@ body.dragging-entry * {
  * or a shadow get an outline or a border (drawn in system colours) instead.
  */
 @media (forced-colors: active) {
+  .toolbar-button.pressed {
+    border-color: Highlight;
+    outline: 1px solid Highlight;
+  }
   :focus-visible,
   .resize-handle:focus-visible,
   .preview:focus-visible {

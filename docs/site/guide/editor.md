@@ -79,6 +79,23 @@ Copy, cut and paste use the system clipboard. Markpion adds some smart behaviour
 
 The **Format** menu has commands for bold, italic, links, headings, lists, tables and more. They're described in [Writing tools](/guide/writing-tools).
 
+### Formatting toolbar
+
+The toolbar above the editor puts the common commands one click away, like a word processor:
+
+| Group | Buttons |
+| --- | --- |
+| History | Undo, Redo, and the **paragraph style** list (Normal text, Heading 1–3) |
+| Text | Bold, Italic, Strikethrough, Inline code |
+| Paragraphs | Bulleted list, Numbered list, Task list, Quote |
+| Insert | Link, Image, Table, Code block, Horizontal rule, Footnote, Table of contents |
+| AI | A menu of the [AI assistant](/guide/ai-assistant)'s actions (only when the assistant is turned on) |
+
+- Buttons light up for the formatting at the cursor: **Bold** inside `**bold**`, **Bulleted list** in a bulleted list, and so on. The paragraph style list shows the current heading level.
+- Clicking a button keeps your selection and the cursor in the editor. Hover over a button to see its keyboard shortcut.
+- From the keyboard, **Tab** into the toolbar and use **←** / **→**, **Home** and **End** to move between its controls.
+- Hide or show it with **View → Toggle Formatting Toolbar**. It's hidden in Focus Mode.
+
 ## Spelling and statistics
 
 - Spelling is checked with your operating system's dictionary, and misspelled words are underlined. Turn it off in Settings.

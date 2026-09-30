@@ -517,3 +517,45 @@ test("resize the outline against the explorer, and close the folder from the exp
   // The open document stays open; only the folder left the Explorer.
   await expect(page.getByRole("tab", { name: /README\.md/ })).toBeVisible();
 });
+
+test("formatting toolbar reflects and applies formatting", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  const editor = page.getByRole("textbox", { name: "Markdown editor" });
+  await editor.click();
+  await page.keyboard.insertText("Some **bold** words\nplain line");
+  const toolbar = page.getByRole("toolbar", { name: "Formatting" });
+  const bold = toolbar.getByRole("button", { name: "Bold" });
+
+  // The pressed state follows the cursor.
+  await page.locator(".cm-line").filter({ hasText: "bold" }).click();
+  await page.keyboard.press("Home");
+  for (let i = 0; i < 9; i++) await page.keyboard.press("ArrowRight");
+  await expect(bold).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("End");
+  await expect(bold).toHaveAttribute("aria-pressed", "false");
+
+  // Buttons format the selection and keep the editor focused.
+  await page.locator(".cm-line").filter({ hasText: "plain line" }).click();
+  await page.keyboard.press("End");
+  await page.keyboard.press("Shift+Home");
+  await toolbar.getByRole("button", { name: "Italic" }).click();
+  await expect(page.locator(".cm-line").filter({ hasText: "*plain line*" })).toHaveCount(1);
+  await expect(editor).toBeFocused();
+
+  // The paragraph style list sets headings and shows the current one.
+  await toolbar.getByRole("combobox", { name: "Paragraph style" }).selectOption("Heading 2");
+  await expect(page.locator(".cm-line").filter({ hasText: "## *plain line*" })).toHaveCount(1);
+  await expect(toolbar.getByRole("combobox", { name: "Paragraph style" })).toHaveValue("heading2");
+
+  // One tab stop; arrow keys move between the controls.
+  await toolbar.getByRole("button", { name: "Undo" }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(toolbar.getByRole("button", { name: "Redo" })).toBeFocused();
+  await page.keyboard.press("End");
+  await expect(toolbar.getByRole("button", { name: /Table of Contents/ })).toBeFocused();
+
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Toggle Formatting Toolbar" }).click();
+  await expect(toolbar).toBeHidden();
+});

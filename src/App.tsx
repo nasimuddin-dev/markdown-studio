@@ -9,6 +9,7 @@ import { useUi } from "./stores/uiStore";
 import { commands, formatShortcut } from "./features/commands";
 import { TabBar } from "./components/TabBar";
 import { Editor } from "./components/Editor";
+import { Toolbar } from "./components/Toolbar";
 import { lazy, Suspense } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
@@ -55,9 +56,14 @@ function PreviewPane() {
 
 function EditorPane() {
   const activeId = useDocuments((s) => s.activeId);
+  const toolbar = useSettings((s) => s.settings.showToolbar);
+  const focusMode = useUi((s) => s.focusMode);
   return (
     <ErrorBoundary area="editor" resetKey={activeId}>
-      <Editor />
+      <div className="editor-column">
+        {toolbar && !focusMode && activeId && <Toolbar />}
+        <Editor />
+      </div>
     </ErrorBoundary>
   );
 }

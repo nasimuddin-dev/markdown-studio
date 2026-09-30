@@ -295,6 +295,14 @@ export const commands: Record<string, Command> = {
     run: () => useUi.getState().setPaletteOpen(!useUi.getState().paletteOpen),
   },
   settings: { id: "settings", label: "Settings…", shortcut: "Mod+,", run: () => useUi.getState().setSettingsOpen(true) },
+  toggleToolbar: {
+    id: "toggleToolbar",
+    label: "Toggle Formatting Toolbar",
+    run: () => {
+      const { settings, update } = useSettings.getState();
+      update({ showToolbar: !settings.showToolbar });
+    },
+  },
   presentSlides: {
     id: "presentSlides",
     label: "Present as Slides",

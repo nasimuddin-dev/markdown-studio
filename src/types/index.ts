@@ -82,6 +82,8 @@ export interface Settings {
   viewMode: ViewMode;
   showExplorer: boolean;
   showOutline: boolean;
+  /** The formatting toolbar above the editor. */
+  showToolbar: boolean;
   /** Show Git branch and file status (runs `git status` in the open folder). */
   showGitStatus: boolean;
   syncScroll: boolean;
