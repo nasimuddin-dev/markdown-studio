@@ -634,3 +634,25 @@ The user asked to work through the whole backlog.
 - **Redirect for the old website address:** not needed (the user).
 - **Local AI models** (the user said yes): Settings → AI Assistant lets you choose Claude or a local model through Ollama. It uses `src-tauri/src/ai_local.rs` (loopback addresses only, no proxy, `/api/tags` and streamed `/api/chat`), and the frontend sends `localUrl`. With a local model there's no key and no consent prompt. Unverified: Ollama isn't installed here, so this is tested with unit tests (Rust: address check, parsing, request; UI: settings list, request shape, missing model), not against a running Ollama.
 - **Math in PDF and Word:** display formulas in PDF are now typeset by MathJax (`services/mathSvg.ts`, loaded only for exports with math) as vector SVG, on every web engine. Before, they were pictures on Windows only and LaTeX elsewhere, and matrices, arrows and set symbols stayed as LaTeX. Word draws display formulas it can't make native (matrices, environments) as pictures from the same SVG, with the LaTeX as alt text. Checked visually by rendering a sample PDF with pdf.js, and the production bundle loads MathJax in the browser. MathJax is CommonJS: `services/mathjaxEnv.ts` provides the `PACKAGE_VERSION` global it expects, and Vite pre-bundles it. `katex` is no longer a direct dependency (rehype-katex brings its own). Unverified: macOS (WebKit) wasn't tried; the picture route there now uses plain SVG, which WebKit allows on a canvas.
+
+## 2026-09-30 (afternoon): refactoring and UI design, 0.23.0
+
+The user asked to analyse the application and refactor it to be more scalable and robust, and to make the UI more professional and user-friendly.
+
+**Analysis.** The biggest structural risk was the stylesheet: one 2,650-line `app.css` with 17 font sizes, 9 corner radii, 9 shadows and ad-hoc z-index values. Earlier UI bugs came from selectors defined twice in it. The menus lived inside the MenuBar component (File had 45 items, taller than a small window). The command palette gave no hint of where a command lives, and the formatting toolbar wrapped onto two rows in split view.
+
+- **Menus** (c46ae7d): one model in `features/menus.ts` for the in-app menu bar, the macOS menu bar (Rust `menu.rs` builds nested submenus) and the palette's location hints. There are 18 submenus, one level deep, opened by hover, click or →/←. On/off commands have check marks (`Command.checked`, `menuitemcheckbox`). Tests keep every menu at 30 items or fewer and every item pointing at a real command. The docs were updated to the new menu paths (about 40 places).
+- **Toolbar** (3f557e9): one row; controls that don't fit (measured on resize, one by one) go into a More menu. At 1280 px in split view link, image and table stay visible.
+- **Design system** (fc3efc8): `app.css` is now an index of 16 area files under `src/styles/app/`, with tokens for type, radii, shadows, layers and the remaining overlay colours. `tests/styles.test.ts` rejects literal values, repeated selectors, undefined custom properties and theme colours without a dark value; it was checked by injecting violations. The split was verified pixel for pixel against 28 screens (`e2e-shots/visual.spec.ts`, a local baseline). Normalising near-duplicate values changed only the outline's level labels (9 → 10 px) and 1-pixel corners.
+- **Polish** (350b84f): Settings footer (secondary actions left, Done right); Reset to Defaults asks first; narrow Explorer header; eased hover colours with duration tokens.
+- **Process:** every commit went through the gated check script (typecheck, Vitest, Playwright, docs check). Two e2e tests failed once each under full-suite load: slides ("session closed") and File History's word diff. Both passed 3–4 times alone and in the next full run. The File History one looks timing-dependent and is worth a look.
+
+**Version:** 0.23.0. **Tests:** Vitest 588 (108 files), Playwright 101, Rust 45 (+1 ignored), visual regression 28 screens (local), website check (50 pages).
+
+**Unverified:** the macOS native submenus compile and their JSON is unit-tested, but weren't run on a Mac. The release was not installed locally, as asked; the in-app updater delivers it.
+
+**Next up:**
+
+1. Look into the File History e2e test that is timing-dependent under load.
+2. `commands.ts` (750 lines) could be split by domain the way the menus now are.
+3. Spacing tokens: padding and margins still use about 95 literal values.

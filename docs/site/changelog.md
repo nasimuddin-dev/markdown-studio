@@ -7,6 +7,26 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.23.0
+
+Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.23.0)
+
+### Added
+
+- **Local AI models:** Settings → AI Assistant can use a model running on your computer through Ollama instead of Claude, so your text never leaves the computer. No API key or consent prompt is needed for a local model.
+- **Menus with submenus and check marks.** Long menus are grouped into short submenus: **File → Open Recent, Import, Export, Copy As**; **Edit → Go To, Git Changes, Lines, Change Case**; **Format → Link Style, Heading, Callout, Math, Diagram, Insert**; **View → Editor, Fold, Font Size, Slides**. Point at a submenu, click it or press **→** to open it. Settings that are on or off (Word Wrap, Line Numbers, the view mode, the sidebar panels) show a check mark.
+- The command palette shows where each command is in the menus (for example *Format › Heading*).
+- **macOS:** the menus are in the system menu bar, with the standard Markpion and Window menus.
+- **ARM64 installers** for Windows and Linux.
+
+### Changed
+
+- The **formatting toolbar** stays on one row. When the editor is too narrow for every button, the ones that don't fit move into a **More** (**⋯**) menu at the end instead of wrapping onto a second row.
+- **PDF export** draws display formulas as vector graphics on every system, including matrices, arrows and set symbols; **Word export** draws display formulas it can't make into Word equations as pictures (with the LaTeX as alt text).
+- **Settings:** Import, Export and **Reset to Defaults…** are on the left and **Done** is on the right. Reset now asks first, because it also clears custom keyboard shortcuts and word count goals.
+- In a narrow sidebar, the Explorer's header shows the folder name in full; its buttons appear when you point at the header or reach it with **Tab**.
+- A consistent look: one set of type sizes, corner radii, shadows and layers across the app, and hover colours that ease in (not when the system asks for reduced motion). The outline's heading-level labels are slightly larger.
+
 ## v0.22.0
 
 Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.22.0)

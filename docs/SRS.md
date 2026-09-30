@@ -14,7 +14,7 @@
 | Desktop Framework | Tauri |
 | Frontend | React + TypeScript |
 | Initial Release | MVP / v0.1 |
-| Current Product Version | 0.22.0 |
+| Current Product Version | 0.23.0 |
 
 ### Revision History
 
