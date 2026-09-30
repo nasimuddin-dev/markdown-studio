@@ -427,6 +427,17 @@ export function onPathRenamed(from: string, to: string) {
       docs().update(d.id, { path: newPath, name: basename(newPath) });
     }
   }
+  // Word count goals follow their files.
+  const { settings, update } = useSettings.getState();
+  const moved = Object.keys(settings.wordGoals).filter((p) => p === from || isInside(p, from));
+  if (moved.length) {
+    const goals = { ...settings.wordGoals };
+    for (const p of moved) {
+      goals[to + p.slice(from.length)] = goals[p];
+      delete goals[p];
+    }
+    update({ wordGoals: goals });
+  }
 }
 
 export function onPathDeleted(path: string) {
