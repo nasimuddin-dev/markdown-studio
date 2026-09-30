@@ -1,4 +1,5 @@
 import { AiSettings } from "./AiSettings";
+import { SettingsLayout } from "./SettingsLayout";
 import { useEffect, useState } from "react";
 import { useUi } from "../stores/uiStore";
 import { DEFAULT_SETTINGS, useSettings } from "../stores/settingsStore";
@@ -29,11 +30,11 @@ export function SettingsDialog() {
           Some settings are managed by your organization and can't be changed here.
         </p>
       )}
-      <div className="settings-grid">
+      <SettingsLayout>
         <section>
           <h3>Appearance</h3>
           <label htmlFor="setting-theme">Theme</label>
-          <select {...field("theme")} onChange={(e) => update({ theme: e.target.value as Settings["theme"] })}>
+          <select data-autofocus {...field("theme")} onChange={(e) => update({ theme: e.target.value as Settings["theme"] })}>
             <option value="system">Match system</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
@@ -143,7 +144,7 @@ export function SettingsDialog() {
           <label className="check"><input type="checkbox" checked={settings.restoreSession} disabled={isLocked("restoreSession")} onChange={(e) => update({ restoreSession: e.target.checked })} /> Reopen last folder and files</label>
           <label className="check"><input type="checkbox" checked={settings.checkForUpdates} disabled={isLocked("checkForUpdates")} onChange={(e) => update({ checkForUpdates: e.target.checked })} /> Check for updates when Markpion starts (asks GitHub for the latest version; nothing else is sent)</label>
         </section>
-      </div>
+      </SettingsLayout>
       <div className="modal-buttons">
         <button
           className="button"

@@ -1103,11 +1103,60 @@ select {
 }
 
 .settings-modal {
-  width: min(560px, 100%);
+  width: min(780px, 100%);
+}
+.settings-layout {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 18px;
+  min-height: 0;
+}
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
+}
+.settings-nav button {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.settings-nav button:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.settings-nav button.current {
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
 }
 .settings-grid {
+  position: relative;
   display: grid;
-  gap: 18px;
+  gap: 22px;
+  max-height: min(62vh, 560px);
+  overflow: auto;
+  padding-right: 6px;
+}
+@media (max-width: 700px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-nav {
+    display: none;
+  }
+}
+@media (forced-colors: active) {
+  .settings-nav button.current {
+    outline: 2px solid Highlight;
+  }
 }
 .settings-grid section {
   display: grid;
