@@ -1310,3 +1310,17 @@ test("F6 and Shift+F6 move focus between the sidebar, editor and preview", async
   await page.keyboard.press("Shift+F6");
   await expect(page.locator(".tree-row", { hasText: /^README\.md$/ })).toBeFocused();
 });
+
+test("clicking a picture in the preview opens it at full size", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  const picture = page.locator(".preview img.preview-local-image").first();
+  await picture.scrollIntoViewIfNeeded();
+  await picture.click();
+  const dialog = page.getByRole("dialog", { name: "logo.svg" });
+  await expect(dialog.locator("img")).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Insert Link in Document" })).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+});

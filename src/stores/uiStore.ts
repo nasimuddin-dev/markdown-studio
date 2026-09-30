@@ -58,7 +58,9 @@ interface UiState {
   compare: { docId: string; path: string } | null;
   /** A picture opened from the Explorer. */
   imagePreview: string | null;
-  setImagePreview(path: string | null): void;
+  /** The picture came from the Explorer, so the dialog offers to link it. */
+  imagePreviewInsert: boolean;
+  setImagePreview(path: string | null, insert?: boolean): void;
   setCompare(compare: { docId: string; path: string } | null): void;
   setProblems(p: UiState["problems"]): void;
   /** Incremented to move focus into the search box. */
@@ -110,7 +112,8 @@ export const useUi = create<UiState>((set, get) => ({
   setHistoryDocId: (historyDocId) => set({ historyDocId }),
   compare: null,
   imagePreview: null,
-  setImagePreview: (imagePreview) => set({ imagePreview }),
+  imagePreviewInsert: true,
+  setImagePreview: (imagePreview, insert = true) => set({ imagePreview, imagePreviewInsert: insert }),
   setCompare: (compare) => set({ compare }),
   setProblems: (problems) => set({ problems }),
   searchFocusToken: 0,

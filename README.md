@@ -85,7 +85,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Line length setting: keep the editor text about 72, 80, 100 or 120 characters wide, centered (Settings → Editor)
 - F6 / Shift+F6 move focus between the sidebar, editor and preview
 - Focus Mode (Ctrl/Cmd+Shift+Enter), Full Screen (F11) and a searchable Keyboard Shortcuts reference (Help menu)
-- Preview headings show a link icon on hover that copies their `#anchor`
+- Preview headings show a link icon on hover that copies their `#anchor`; clicking a local picture shows it at full size
 - Find in the preview (Ctrl/Cmd+F while the preview is shown alone or focused): highlights every match (CSS Custom Highlight API) with a count and next/previous
 - Command palette (Ctrl/Cmd+Shift+P), Go to File (Ctrl/Cmd+Alt+O: open any Markdown file in the folder by typing part of its name or path), Go to Heading (Ctrl/Cmd+Alt+H: jump to a heading by typing part of it) and Go to Heading in Folder (Ctrl/Cmd+Shift+Alt+H: headings of every Markdown file in the folder), document outline (collapse sections with the arrows or Left/Right; drag headings to reorder sections; right-click a heading to copy a link to it or move its section; Alt+Up/Down moves the focused section), and Find in Files across the workspace (Ctrl/Cmd+Shift+F; match case, whole word, regex; files to include/exclude such as `docs, *.draft.md`) with Replace All in Files (confirmation with counts, unsaved files skipped, previous versions kept in File History)
 - Mermaid diagrams (lazy-loaded, strict security mode) and LaTeX math (`$…$`, `$$…$$`, rendered as MathML) in the preview and exports

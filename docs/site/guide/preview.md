@@ -20,6 +20,7 @@ Choose **Editor Only** (**Ctrl+1**), **Split View** (**Ctrl+2**) or **Preview On
 
 - The preview updates shortly after you stop typing. The delay is set by **Settings → Preview → Update delay after typing** (instant to 1 second; 150 ms by default).
 - In split view, the editor and preview scroll together, line by line: the paragraph, heading, table or code block at the top of one is at the top of the other, even when pictures, diagrams or long source lines make one side much taller. Turn this off with **Sync editor and preview scrolling**.
+- Click a picture in the preview to see it at full size (pictures inside links follow the link instead).
 - Hover a heading in the preview and click the link icon beside it to copy its `#anchor`, ready to paste into a link. (From the keyboard, right-click the heading in the Outline → **Copy Link to Heading**.)
 - **Ctrl+F** (**Cmd+F**) finds text in the preview when it's shown alone or has focus; see [Find in the preview](/guide/search-replace#find-in-the-preview).
 - In split view, double-click a block in the preview to put the cursor on its first line in the editor, at the same height on screen.

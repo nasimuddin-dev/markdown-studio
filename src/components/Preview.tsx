@@ -81,7 +81,7 @@ function LocalImage({ src, alt, title, docPath }: { src?: string; alt?: string; 
       </span>
     );
   }
-  return url ? <img src={url} alt={alt ?? ""} title={title} /> : <span className="preview-missing-image">Loading image…</span>;
+  return url ? <img src={url} alt={alt ?? ""} title={title} data-path={resolved} className="preview-local-image" /> : <span className="preview-missing-image">Loading image…</span>;
 }
 
 /** Returns the text of a mermaid code block if this <pre> holds one. */
@@ -346,6 +346,11 @@ export function Preview() {
       e.preventDefault();
       const index = taskIndex(ref.current, clicked);
       if (index >= 0) toggleTaskInDocument(doc.id, index);
+      return;
+    }
+    // A local picture (not inside a link) opens at full size.
+    if (clicked instanceof HTMLImageElement && clicked.dataset.path && !clicked.closest("a")) {
+      useUi.getState().setImagePreview(clicked.dataset.path, false);
       return;
     }
     const anchor = (e.target as HTMLElement).closest("a");

@@ -788,6 +788,11 @@ select {
   color: var(--text);
 }
 
+/* A picture in the preview opens at full size on click. */
+.preview .preview-local-image {
+  cursor: zoom-in;
+}
+
 /* A picture opened from the Explorer. */
 .image-preview-modal {
   width: min(760px, 92vw);

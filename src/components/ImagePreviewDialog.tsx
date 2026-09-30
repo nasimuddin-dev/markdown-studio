@@ -6,9 +6,10 @@ import { useUi } from "../stores/uiStore";
 import { insertFileLink } from "../features/pathActions";
 import { Modal } from "./Dialogs";
 
-/** A picture opened from the Explorer, with a button to link it in the document. */
+/** A picture opened from the Explorer (with a button to link it in the document) or from the preview. */
 export function ImagePreviewDialog() {
   const path = useUi((s) => s.imagePreview);
+  const offerInsert = useUi((s) => s.imagePreviewInsert);
   const [url, setUrl] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -37,18 +38,20 @@ export function ImagePreviewDialog() {
         <button className="button" onClick={close}>
           Close
         </button>
-        <button
-          className="button primary"
-          disabled={!doc?.path}
-          title={doc?.path ? undefined : "Open a saved document to link the picture in it"}
-          onClick={() => {
-            close();
-            insertFileLink(path);
-          }}
-          data-autofocus
-        >
-          Insert Link in Document
-        </button>
+        {offerInsert && (
+          <button
+            className="button primary"
+            disabled={!doc?.path}
+            title={doc?.path ? undefined : "Open a saved document to link the picture in it"}
+            onClick={() => {
+              close();
+              insertFileLink(path);
+            }}
+            data-autofocus
+          >
+            Insert Link in Document
+          </button>
+        )}
       </div>
     </Modal>
   );
