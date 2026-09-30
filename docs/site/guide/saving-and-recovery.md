@@ -57,7 +57,9 @@ Every time you save a file, Markpion keeps the **previous version** in its app d
 
 Open **File → File History…** (or right-click a tab → **File History…**) to see the versions with their dates and a line-by-line diff against the current text. **Restore** puts an old version into the editor as a normal edit, so you can undo it or save it.
 
-When the file is committed to Git, the list also starts with **Last commit**: compare the whole file with its committed version, or restore it. (For single changes, use the [change bars](/guide/file-explorer#changed-lines-in-the-editor) in the editor.) This needs Git installed and **Settings → Files → Show Git branch, changed files and changed lines** on.
+While you have unsaved changes, the list starts with **Saved file**, selected first: the diff shows exactly what saving would change, and **Restore** discards your unsaved changes (undo brings them back).
+
+When the file is committed to Git, the list also has **Last commit**: compare the whole file with its committed version, or restore it. (For single changes, use the [change bars](/guide/file-explorer#changed-lines-in-the-editor) in the editor.) This needs Git installed and **Settings → Files → Show Git branch, changed files and changed lines** on.
 
 ## Crash recovery
 

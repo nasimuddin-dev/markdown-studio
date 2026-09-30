@@ -69,6 +69,20 @@ describe("file history", () => {
     expect(await screen.findByText(/No earlier versions yet/)).toBeInTheDocument();
   });
 
+  it("shows unsaved changes against the saved file, and can discard them", async () => {
+    setupBackend({ "/ws/a.md": "saved line\n" });
+    const id = (await openPath("/ws/a.md"))!;
+    useDocuments.getState().setContent(id, "unsaved line\n");
+    render(<HistoryDialog />);
+    act(() => useUi.getState().setHistoryDocId(id));
+    const entry = await screen.findByRole("button", { name: /Saved file/ });
+    expect(entry).toHaveAttribute("aria-current", "true");
+    await waitFor(() => expect(document.querySelector(".diff-del")?.textContent).toContain("saved line"));
+    expect(document.querySelector(".diff-add")?.textContent).toContain("unsaved line");
+    await userEvent.click(screen.getByRole("button", { name: "Restore This Version" }));
+    expect(docs()[0].content).toBe("saved line\n");
+  });
+
   it("offers the last Git commit to compare with and restore", async () => {
     setupBackend();
     setBackend(new MemoryBackend({ files: { "/ws/a.md": "edited line\n" }, approved: ["/ws"], gitHead: { "/ws/a.md": "committed line\n" } }));

@@ -20,10 +20,13 @@ export function relativeTime(ms: number, now = Date.now()): string {
 
 const formatSize = (n: number) => (n < 1024 ? `${n} B` : n < 1024 * 1024 ? `${(n / 1024).toFixed(1)} KB` : `${(n / 1048576).toFixed(1)} MB`);
 
-/** A saved version (its time) or the last Git commit. */
-type VersionId = number | "git";
+/** A previous version (its time), the file as saved now, or the last Git commit. */
+type VersionId = number | "saved" | "git";
 
-/** Local history for the active document, plus its last Git commit: browse, compare, restore. */
+/**
+ * Local history for the active document, plus the saved file (while there are
+ * unsaved changes) and its last Git commit: browse, compare, restore.
+ */
 export function HistoryDialog() {
   const docId = useUi((s) => s.historyDocId);
   const close = () => useUi.getState().setHistoryDocId(null);
@@ -34,6 +37,7 @@ export function HistoryDialog() {
   /** The committed text, or null when the file isn't in Git. */
   const [gitText, setGitText] = useState<string | null>(null);
   const showGit = useSettings((s) => s.settings.showGitStatus);
+  const dirty = !!doc && doc.content !== doc.savedContent;
 
   useEffect(() => {
     setVersions(null);
@@ -46,7 +50,10 @@ export function HistoryDialog() {
       .then(([v, committed]) => {
         setGitText(committed);
         setVersions(v);
-        setSelected(v[0]?.id ?? (committed !== null ? "git" : null));
+        // With unsaved changes, start with them: what would saving change?
+        const current = useDocuments.getState().docs.find((d) => d.id === docId);
+        const unsaved = !!current && current.content !== current.savedContent;
+        setSelected(unsaved ? "saved" : (v[0]?.id ?? (committed !== null ? "git" : null)));
       })
       .catch((e) => {
         setVersions([]);
@@ -57,8 +64,8 @@ export function HistoryDialog() {
   useEffect(() => {
     setText(null);
     if (!doc?.path || selected === null) return;
-    if (selected === "git") {
-      setText(gitText);
+    if (selected === "git" || selected === "saved") {
+      setText(selected === "git" ? gitText : (useDocuments.getState().docs.find((d) => d.id === docId)?.savedContent ?? null));
       return;
     }
     let cancelled = false;
@@ -69,7 +76,7 @@ export function HistoryDialog() {
     return () => {
       cancelled = true;
     };
-  }, [doc?.path, selected, gitText]);
+  }, [doc?.path, selected, gitText, docId]);
 
   const diff = useMemo(() => (text !== null && doc ? diffLines(text, doc.content) : null), [text, doc?.content]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -78,7 +85,8 @@ export function HistoryDialog() {
   const restore = () => {
     if (text === null || selected === null) return;
     useDocuments.getState().setContent(doc.id, text);
-    const which = selected === "git" ? "the last committed version" : `the version from ${new Date(selected).toLocaleString()}`;
+    const which =
+      selected === "git" ? "the last committed version" : selected === "saved" ? "the saved version" : `the version from ${new Date(selected).toLocaleString()}`;
     notify("success", `Restored ${which}. Save to keep it, or undo to go back.`);
     close();
   };
@@ -89,13 +97,26 @@ export function HistoryDialog() {
     <Modal title={`File History — ${doc.name}`} onClose={close} className="history-modal">
       {versions === null ? (
         <p className="muted">Loading…</p>
-      ) : versions.length === 0 && gitText === null ? (
+      ) : versions.length === 0 && gitText === null && !dirty ? (
         <p className="modal-message">
           No earlier versions yet. Each time you save, the previous version is kept here (up to 30 per file).
         </p>
       ) : (
         <div className="history-body">
           <ul className="history-list" aria-label="Versions">
+            {dirty && (
+              <li>
+                <button
+                  aria-current={selected === "saved" ? "true" : undefined}
+                  className={`history-item${selected === "saved" ? " active" : ""}`}
+                  onClick={() => setSelected("saved")}
+                  title="The file as it was last saved: see your unsaved changes"
+                >
+                  <span>Saved file</span>
+                  <span className="muted small">Your unsaved changes</span>
+                </button>
+              </li>
+            )}
             {gitText !== null && (
               <li>
                 <button
@@ -156,7 +177,7 @@ export function HistoryDialog() {
       )}
       <div className="modal-buttons">
         <button className="button" onClick={close}>Close</button>
-        {versions && (versions.length > 0 || gitText !== null) && (
+        {versions && (versions.length > 0 || gitText !== null || dirty) && (
           <button className="button primary" onClick={restore} disabled={text === null}>
             Restore This Version
           </button>
