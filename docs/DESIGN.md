@@ -79,7 +79,7 @@ flowchart TB
     WA["watcher.rs<br/>external changes"]
     UP["updater.rs<br/>signed updates"]
     OP["open_paths.rs<br/>files from the OS"]
-    AI["ai.rs<br/>Claude API, key in OS store"]
+    AI["ai.rs / ai_local.rs<br/>Claude API (key in OS store) or local Ollama"]
     MN["menu.rs<br/>macOS menu bar"]
     CMD --> SC
     SC --> FS
@@ -365,7 +365,7 @@ flowchart LR
 | `WorkspaceApi` | Folder listing, search (Rust, with include/exclude globs), file watcher, read-only Git (status, and a file's committed text for change bars and File History) | Server-side listing and search; change notifications over a WebSocket |
 | `StorageApi` | Settings, recents, recovery and history in app-data folders | Per-account settings and server-side version history |
 | `PlatformApi` | Window title, full screen, the close guard (Save / Don't Save when the window closes), reveal in folder, OS "Open with", signed self-update, the native menu bar on macOS (`setNativeMenu` returns false elsewhere; chosen items come back through `onMenuCommand`) | The page title, the browser's Fullscreen API and a "leave page?" warning; the rest is absent (`capabilities` switches those UI features off) |
-| `AiApi` | The Rust core calls Anthropic with the user's key from the OS credential store | A server endpoint calls Anthropic with an organisation key, applying quotas and policies |
+| `AiApi` | The Rust core calls Anthropic with the user's key from the OS credential store, or a local Ollama server (`localUrl`; loopback addresses only; `aiLocalModels` lists its models) | A server endpoint calls Anthropic with an organisation key, applying quotas and policies |
 
 Design rules that keep this path open:
 

@@ -44,6 +44,9 @@ export const DEFAULT_SETTINGS: Settings = {
   askImageName: false,
   aiEnabled: false,
   aiModel: "claude-opus-5-5",
+  aiProvider: "claude",
+  aiLocalUrl: "http://localhost:11434",
+  aiLocalModel: "",
   aiConsent: false,
   keybindings: {},
   wordGoals: {},
@@ -146,6 +149,11 @@ export function sanitizeSettings(raw: unknown): Settings {
     pageBreakBeforeH1: bool(s.pageBreakBeforeH1, d.pageBreakBeforeH1),
     aiEnabled: bool(s.aiEnabled, d.aiEnabled),
     aiModel: typeof s.aiModel === "string" && /^claude-[a-z0-9-]{3,60}$/.test(s.aiModel) ? s.aiModel : d.aiModel,
+    aiProvider: s.aiProvider === "ollama" ? "ollama" : "claude",
+    // Local models run on this computer only (the native side checks it too).
+    aiLocalUrl:
+      typeof s.aiLocalUrl === "string" && /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?\/?$/.test(s.aiLocalUrl) ? s.aiLocalUrl : d.aiLocalUrl,
+    aiLocalModel: typeof s.aiLocalModel === "string" && /^[\w.:/-]{0,100}$/.test(s.aiLocalModel) ? s.aiLocalModel : d.aiLocalModel,
     aiConsent: bool(s.aiConsent, d.aiConsent),
     keybindings: sanitizeKeybindings(s.keybindings),
     wordGoals: sanitizeWordGoals(s.wordGoals),

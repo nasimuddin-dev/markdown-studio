@@ -60,9 +60,54 @@ describe("AI assistant: in the editor", () => {
     useUi.setState({ dialogs: [], toasts: [], settingsOpen: false });
     useAi.setState({ busy: null, review: null });
     useSettings.setState({ locked: [], managedDefaults: {} });
-    useSettings.getState().update({ aiEnabled: true, aiConsent: true, aiModel: "claude-opus-5-5" });
+    useSettings.getState().update({ aiEnabled: true, aiConsent: true, aiModel: "claude-opus-5-5", aiProvider: "claude", aiLocalModel: "" });
     return { backend, claude };
   }
+
+  it("uses a local model without an API key or the consent prompt", async () => {
+    const { claude } = setup("Local answer.");
+    useSettings.getState().update({ aiProvider: "ollama", aiConsent: false, aiLocalModel: "llama3.2:latest" });
+    render(<App />);
+    act(() => {
+      newDocument("Some text.");
+    });
+    await waitFor(() => expect(getEditorView()).toBeTruthy());
+    await act(() => runAiAction("improve"));
+    expect(claude).toHaveBeenCalledWith({
+      model: "llama3.2:latest",
+      system: AI_SYSTEM_PROMPT,
+      prompt: expect.stringContaining("Some text."),
+      localUrl: "http://localhost:11434",
+    });
+    expect(await screen.findByRole("dialog", { name: /AI: Improve Writing/ })).toHaveTextContent("Local answer.");
+    expect(useSettings.getState().settings.aiConsent).toBe(false);
+  });
+
+  it("asks for a local model to be chosen first", async () => {
+    const { claude } = setup();
+    useSettings.getState().update({ aiProvider: "ollama" });
+    render(<App />);
+    act(() => {
+      newDocument("Some text.");
+    });
+    await waitFor(() => expect(getEditorView()).toBeTruthy());
+    await act(() => runAiAction("improve"));
+    expect(useUi.getState().toasts.at(-1)?.message).toBe("Choose a local model in Settings → AI Assistant.");
+    expect(claude).not.toHaveBeenCalled();
+  });
+
+  it("lists the local models in Settings and picks the first one", async () => {
+    const { backend } = setup();
+    backend.localModels = ["qwen3:8b", "llama3.2:latest"];
+    useSettings.getState().update({ aiProvider: "ollama" });
+    const { AiSettings } = await import("../src/components/AiSettings");
+    render(<AiSettings />);
+    const select = await screen.findByRole("combobox", { name: "Local model" });
+    await waitFor(() => expect(select).toHaveValue("qwen3:8b"));
+    expect(useSettings.getState().settings.aiLocalModel).toBe("qwen3:8b");
+    await userEvent.click(screen.getByRole("radio", { name: /Claude, by Anthropic/ }));
+    expect(useSettings.getState().settings.aiProvider).toBe("claude");
+  });
 
   it("shows the answer for review and replaces the selection only when asked", async () => {
     const { backend, claude } = setup();

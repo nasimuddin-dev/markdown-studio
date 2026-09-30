@@ -11,7 +11,7 @@ Markpion is a local-first app. This page describes what it actually does with yo
 
 - Markpion reads and writes the files you open, where they are on your disk. It doesn't upload, sync or copy them anywhere.
 - There's **no account**, **no sign-in**, and **no cloud service**.
-- The optional [AI assistant](/guide/ai-assistant) is off by default. When you turn it on, add your own Anthropic API key and run an AI command, that command's text is sent to Anthropic (see the table below).
+- The optional [AI assistant](/guide/ai-assistant) is off by default. When you turn it on, add your own Anthropic API key and run an AI command, that command's text is sent to Anthropic (see the table below). If you choose a local model (Ollama) instead, the text goes to Ollama on your own computer and nowhere else.
 - Import and export (Word, PDF, HTML, CSV) run entirely on your computer.
 
 ## No telemetry

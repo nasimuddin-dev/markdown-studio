@@ -5,17 +5,22 @@ import { applyAiReview, cancelAiRequest } from "../features/ai";
 import { diffLines } from "../features/diff";
 import { Modal } from "./Dialogs";
 import { DiffRows } from "./DiffView";
+import { useSettings } from "../stores/settingsStore";
+
+/** Who writes the answer: Claude, or the local model. */
+const useWriter = () => useSettings((s) => (s.settings.aiProvider === "ollama" ? "The local model" : "Claude"));
 
 /** "Claude is working…" while an AI request runs, with Cancel. */
 function AiBusy() {
   const busy = useAi((s) => s.busy);
   const reviewing = useAi((s) => !!s.review);
+  const writer = useWriter();
   // Once the review opens, it shows the progress itself.
   if (!busy || reviewing) return null;
   return (
     <div className="ai-busy" role="status" aria-live="polite">
       <span className="ai-spinner" aria-hidden="true" />
-      <span>Claude is working on “{busy.label}”…</span>
+      <span>{writer} is working on “{busy.label}”…</span>
       <button className="button small" onClick={cancelAiRequest}>
         Cancel
       </button>
@@ -31,6 +36,7 @@ function AiReviewDialog() {
   const [text, setText] = useState("");
   // For a replacement, the left side can show what would change instead of the original.
   const [showChanges, setShowChanges] = useState(true);
+  const writer = useWriter();
   useEffect(() => setText(review?.suggestion ?? ""), [review]);
   const original = review?.placement === "replace" ? review.original : "";
   const changes = useMemo(() => (original && text ? diffLines(original, text) : null), [original, text]);
@@ -80,7 +86,7 @@ function AiReviewDialog() {
         )}
         <section>
           <h3>
-            <label htmlFor="ai-suggestion">{streaming ? "Claude is writing…" : "Suggestion (you can edit it before applying)"}</label>
+            <label htmlFor="ai-suggestion">{streaming ? `${writer} is writing…` : "Suggestion (you can edit it before applying)"}</label>
           </h3>
           <textarea
             id="ai-suggestion"

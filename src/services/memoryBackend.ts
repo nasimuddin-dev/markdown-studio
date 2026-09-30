@@ -215,9 +215,17 @@ export class MemoryBackend implements Backend {
     return this.aiStatus();
   }
 
+  /** Local models "installed" for tests. */
+  localModels: string[] = [];
+
+  async aiLocalModels(_url: string) {
+    if (!this.aiFn) throw new AppError("ai", AI_DESKTOP_ONLY);
+    return this.localModels;
+  }
+
   async aiComplete(request: AiRequest, onText?: (text: string) => void, signal?: AbortSignal) {
     if (!this.aiFn) throw new AppError("ai", AI_DESKTOP_ONLY);
-    if (!this.aiKey) throw new AppError("ai", "Add your Anthropic API key in Settings → AI Assistant first.");
+    if (!this.aiKey && !request.localUrl) throw new AppError("ai", "Add your Anthropic API key in Settings → AI Assistant first.");
     const answer = await this.aiFn(request);
     if (signal?.aborted) return null;
     // Streams the stand-in answer word by word, like the real one.

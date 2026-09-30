@@ -80,6 +80,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.22.0. **Done** means im
 | Windows High Contrast / forced colours: states shown by colour or shadow get outlines and borders in system colours (selection, active tab, focus, editor selection, unsaved dots); e2e test checks outlines and runs axe in forced colours | `styles/app.css` (`@media (forced-colors: active)`), `e2e/accessibility.spec.ts` | §15 accessibility |
 | Managed settings for IT: a machine-wide `policy.json` presets defaults and locks settings (shown as managed, can't be changed); invalid policies are logged and ignored | `src-tauri/src/storage.rs` (`read_policy`, `policy_path`), `commands/app_data.rs` (`load_policy`), `stores/policy.ts`, `settingsStore.ts`, `SettingsDialog.tsx` | §11 enterprise deployment |
 | Optional AI assistant (Claude): improve, fix grammar, shorten, summarize, continue, translate, ask; review before applying (replacements show a Changes diff with changed words marked, or the Original); own API key in the OS credential store, requests from the native process only, consent before the first request | `src-tauri/src/ai.rs`, `commands.rs` (`ai_status`, `ai_set_key`, `ai_complete`), `features/ai.ts`, `stores/aiStore.ts`, `components/AiPanel.tsx`, `AiSettings.tsx` | §19 AI writing assistant (optional, with consent) |
+| Local AI models through Ollama (Settings → AI Assistant → A local model): same commands and review, no key, no consent prompt; loopback addresses only (checked in the settings sanitizer and in Rust), no proxy; `/api/tags` lists the models, `/api/chat` streams the answer | `src-tauri/src/ai_local.rs`, `commands/ai.rs` (`ai_local_models`, `ai_complete` with `local_url`), `features/ai.ts`, `AiSettings.tsx` | §19 local LLM integration |
 | Move files and folders in the explorer: drag onto a folder or Move To… (keyboard); never replaces; open tabs follow | `components/FileExplorer.tsx`, `features/workspace.ts` (`moveEntry`, `moveEntryTo`), Rust `move_path` (`fs_ops::move_into`, scope-checked) | FR-017 file management |
 | Table rows and columns (also align and move columns): Tab/Shift+Tab between cells (a new row after the last), insert above/below and left/right, delete row/column at the cursor (Format menu), reformatting the table | `features/tables.ts` | §19 table editing |
 | Window background matches the theme from the first frame (the main window is created in `setup` with a dark or light background), so a slow first start isn't a white window | `src-tauri/src/lib.rs` (`window_background`) | NFR-001 perceived startup |
@@ -146,7 +147,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.22.0. **Done** means im
 | --- | --- | --- |
 | Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 560 tests in 104 files |
 | End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 100 tests |
-| Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 41 tests (plus 1 ignored live API test) |
+| Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 45 tests (plus 1 ignored live API test) |
 | Native end-to-end (Windows) | `e2e-native/` (tauri-driver, `npm run test:native`), not in CI | 3 tests |
 
 ## Known gaps and next improvements

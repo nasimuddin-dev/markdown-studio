@@ -420,7 +420,7 @@ The product website shall provide OS-specific download options. The site may det
 | Will the first release support x64 only or x64 + ARM64? | **Partly answered:** Windows and Linux x64; macOS both Intel and Apple Silicon. Windows/Linux ARM64 are open. |
 | Should the product use a permissive open-source license, a proprietary license, or a dual-license model? | Open: needs a decision by the product owner. |
 | Will AI functionality be part of v1.0 or a later release? | Open. |
-| Should AI features support local models, cloud providers, or both? | Open. |
+| Should AI features support local models, cloud providers, or both? | **Answered (2026-09-30):** both. Claude (cloud, with the user's key and consent) or a local model through Ollama on the same computer; the user chooses in Settings. |
 | Should Markdown HTML be fully supported, partially supported, or sanitized to a strict subset? | **Answered:** raw HTML is parsed, then sanitized to GitHub's allow-list (FR-034, SEC-004). |
 | Should the application include Git integration in the first major release? | Open. |
 | What product name, domain, logo, and application identifier will be used for signing and releases? | **Partly answered:** "Markpion", identifier `com.markpion.app`, releases on GitHub. Domain and signing identity are open. |

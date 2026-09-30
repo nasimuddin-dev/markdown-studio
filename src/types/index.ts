@@ -129,6 +129,12 @@ export interface Settings {
   /** The optional AI assistant (off until turned on and given an API key). */
   aiEnabled: boolean;
   aiModel: string;
+  /** Claude (Anthropic, with an API key) or a local model through Ollama. */
+  aiProvider: "claude" | "ollama";
+  /** The local Ollama server (this computer only). */
+  aiLocalUrl: string;
+  /** The Ollama model to use, e.g. "llama3.2:latest". */
+  aiLocalModel: string;
   /** Set once the user has accepted that AI commands send text to Anthropic. */
   aiConsent: boolean;
   /** Changed keyboard shortcuts: command id → shortcut ("Mod+Shift+K"), or null for none. */

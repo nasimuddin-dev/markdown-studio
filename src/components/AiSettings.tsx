@@ -11,7 +11,61 @@ const MODEL_NAMES: Record<string, string> = {
   "claude-haiku-4-5": "Claude Haiku 4.5 (fastest, lowest cost)",
 };
 
-/** Settings → AI Assistant: turn it on, manage the API key, choose the model. */
+/** Settings → AI Assistant → a local model: the Ollama address and which installed model to use. */
+function LocalModelSettings() {
+  const settings = useSettings((s) => s.settings);
+  const update = useSettings((s) => s.update);
+  const [url, setUrl] = useState(settings.aiLocalUrl);
+  const [models, setModels] = useState<string[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = async (address: string) => {
+    setError(null);
+    try {
+      const found = await backend().aiLocalModels(address);
+      setModels(found);
+      // The first installed model, until one is chosen.
+      if (!useSettings.getState().settings.aiLocalModel && found[0]) update({ aiLocalModel: found[0] });
+    } catch (e) {
+      setModels(null);
+      setError(describeError(e, "list the local models"));
+    }
+  };
+  useEffect(() => {
+    void load(settings.aiLocalUrl);
+    // Only when the saved address changes.
+  }, [settings.aiLocalUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const valid = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?\/?$/.test(url.trim());
+  return (
+    <>
+      <label htmlFor="setting-aiLocalUrl">Ollama address</label>
+      <div className="inline-row">
+        <input id="setting-aiLocalUrl" type="url" spellCheck={false} value={url} onChange={(e) => setUrl(e.target.value)} />
+        <button className="button" disabled={!valid} onClick={() => (url.trim() === settings.aiLocalUrl ? void load(url.trim()) : update({ aiLocalUrl: url.trim() }))}>
+          {url.trim() === settings.aiLocalUrl ? "Refresh" : "Connect"}
+        </button>
+      </div>
+      {!valid && <p className="muted small">Use an address on this computer, such as http://localhost:11434.</p>}
+      {error && <p className="small" role="alert">{error}</p>}
+      <label htmlFor="setting-aiLocalModel">Local model</label>
+      <select id="setting-aiLocalModel" value={settings.aiLocalModel} onChange={(e) => update({ aiLocalModel: e.target.value })} disabled={!models?.length}>
+        {!models?.length && <option value={settings.aiLocalModel}>{settings.aiLocalModel || "No models found"}</option>}
+        {models?.map((m) => (
+          <option key={m} value={m}>
+            {m}
+          </option>
+        ))}
+      </select>
+      <p className="muted small">
+        Install Ollama from ollama.com and download a model (for example <code>ollama pull llama3.2</code>). Your text goes to Ollama on this computer and
+        nowhere else. Local models are usually slower and less accurate than Claude.
+      </p>
+    </>
+  );
+}
+
+/** Settings → AI Assistant: turn it on, choose Claude or a local model, manage the API key, choose the model. */
 export function AiSettings() {
   const settings = useSettings((s) => s.settings);
   const update = useSettings((s) => s.update);
@@ -46,13 +100,27 @@ export function AiSettings() {
         Anthropic)
       </label>
       <p className="muted small">
-        Improve, fix, shorten, summarize, translate or continue text from the AI menu. Text is sent to Anthropic only when you run a command, using your own
-        API key.
+        Improve, fix, shorten, summarize, translate or continue text from the AI menu. With Claude, text is sent to Anthropic only when you run a command,
+        using your own API key; with a local model it stays on this computer.
       </p>
       {settings.aiEnabled && !backend().capabilities.ai && (
         <p className="muted small">The AI assistant is available in the Markpion desktop app, which keeps your API key in the system's credential store.</p>
       )}
       {settings.aiEnabled && backend().capabilities.ai && (
+        <fieldset className="settings-choice">
+          <legend>Answers come from</legend>
+          <label className="check">
+            <input type="radio" name="aiProvider" checked={settings.aiProvider === "claude"} disabled={locked.includes("aiProvider")} onChange={() => update({ aiProvider: "claude" })} />{" "}
+            Claude, by Anthropic (needs an API key; text is sent to Anthropic)
+          </label>
+          <label className="check">
+            <input type="radio" name="aiProvider" checked={settings.aiProvider === "ollama"} disabled={locked.includes("aiProvider")} onChange={() => update({ aiProvider: "ollama" })} />{" "}
+            A local model with Ollama (text stays on this computer)
+          </label>
+        </fieldset>
+      )}
+      {settings.aiEnabled && backend().capabilities.ai && settings.aiProvider === "ollama" && <LocalModelSettings />}
+      {settings.aiEnabled && backend().capabilities.ai && settings.aiProvider === "claude" && (
         <>
           {status?.hasKey ? (
             <p className="small">

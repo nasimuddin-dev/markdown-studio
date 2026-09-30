@@ -35,7 +35,7 @@ Wherever you save them. Markpion edits files in place in your folders; there's n
 
 ## Does Markpion upload my documents?
 
-No. There's no cloud service, account or telemetry. Import and export run on your computer. The only exception is the optional [AI assistant](/guide/ai-assistant): when you turn it on and run an AI command, the selected text is sent to Anthropic's Claude API under your own key. See [Privacy](/privacy).
+No. There's no cloud service, account or telemetry. Import and export run on your computer. The only exception is the optional [AI assistant](/guide/ai-assistant): when you turn it on and run an AI command, the selected text is sent to Anthropic's Claude API under your own key, unless you choose a local model with Ollama, which keeps it on your computer. See [Privacy](/privacy).
 
 ## Does it support GitHub Flavored Markdown?
 

@@ -53,16 +53,23 @@ pub async fn ai_complete(
     model: String,
     system: String,
     prompt: String,
+    local_url: Option<String>,
 ) -> AppResult<Option<String>> {
     use tauri::Emitter;
-    let key = crate::ai::load_key(&state.config_dir)?
-        .ok_or_else(|| AppError::Ai("Add your Anthropic API key in Settings → AI Assistant first.".into()))?;
     let started = std::time::Instant::now();
     let cancelled = || state.ai_cancelled.lock().map(|c| c.contains(&request_id)).unwrap_or(false);
-    let result = crate::ai::complete_stream(&key, &model, &system, &prompt, cancelled, |text| {
+    let emit = |text: &str| {
         let _ = app.emit("ai-stream", AiStreamChunk { request_id, text: text.to_string() });
-    })
-    .await;
+    };
+    let result = match &local_url {
+        // A local model (Ollama): no key, and the text stays on this computer.
+        Some(url) => crate::ai_local::complete_stream(url, &model, &system, &prompt, cancelled, emit).await,
+        None => {
+            let key = crate::ai::load_key(&state.config_dir)?
+                .ok_or_else(|| AppError::Ai("Add your Anthropic API key in Settings → AI Assistant first.".into()))?;
+            crate::ai::complete_stream(&key, &model, &system, &prompt, cancelled, emit).await
+        }
+    };
     if let Ok(mut c) = state.ai_cancelled.lock() {
         c.remove(&request_id);
     }
@@ -77,6 +84,12 @@ pub async fn ai_complete(
         &format!("{model}: {} chars in, {} ms, {outcome}", prompt.chars().count(), started.elapsed().as_millis()),
     );
     result
+}
+
+/// The models installed in the local Ollama at `url` (this computer only).
+#[tauri::command]
+pub async fn ai_local_models(url: String) -> AppResult<Vec<String>> {
+    crate::ai_local::models(&url).await
 }
 
 /// Stops a running AI request (its answer is discarded).

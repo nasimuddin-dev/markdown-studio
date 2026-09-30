@@ -24,7 +24,8 @@ export const tauriBackend: Backend = {
   pickExportFolder: () => call("pick_export_folder"),
   aiStatus: () => call("ai_status"),
   aiSetKey: (key) => call("ai_set_key", { key }),
-  aiComplete: async ({ model, system, prompt }, onText, signal) => {
+  aiLocalModels: (url) => call("ai_local_models", { url }),
+  aiComplete: async ({ model, system, prompt, localUrl }, onText, signal) => {
     const requestId = nextAiRequestId++;
     const { listen } = await import("@tauri-apps/api/event");
     const unlisten = await listen<{ requestId: number; text: string }>("ai-stream", (e) => {
@@ -33,7 +34,7 @@ export const tauriBackend: Backend = {
     const cancel = () => void call("ai_cancel", { requestId });
     signal?.addEventListener("abort", cancel);
     try {
-      return await call<string | null>("ai_complete", { requestId, model, system, prompt });
+      return await call<string | null>("ai_complete", { requestId, model, system, prompt, localUrl: localUrl ?? null });
     } finally {
       unlisten();
       signal?.removeEventListener("abort", cancel);

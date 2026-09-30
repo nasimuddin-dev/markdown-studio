@@ -179,6 +179,8 @@ export interface AiRequest {
   model: string;
   system: string;
   prompt: string;
+  /** Sends the request to a local Ollama server at this address instead of Claude. */
+  localUrl?: string;
 }
 
 /** The optional AI assistant. The API key never passes through the UI after it's saved. */
@@ -192,6 +194,8 @@ export interface AiApi {
    * aborted the request (which stops it, so the rest isn't generated).
    */
   aiComplete(request: AiRequest, onText?: (text: string) => void, signal?: AbortSignal): Promise<string | null>;
+  /** The models installed in the local Ollama at `url` (this computer only). */
+  aiLocalModels(url: string): Promise<string[]>;
 }
 
 export interface Backend extends DialogsApi, FilesApi, WorkspaceApi, StorageApi, PlatformApi, AiApi {

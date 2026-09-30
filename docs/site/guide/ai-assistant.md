@@ -1,6 +1,6 @@
 ---
 title: AI Assistant
-description: Use Claude, by Anthropic, in Markpion to improve, fix, shorten, summarize, translate or continue text. Opt-in, with your own API key and a review before anything changes.
+description: Use Claude, by Anthropic, or a local model through Ollama in Markpion to improve, fix, shorten, summarize, translate or continue text. Opt-in, with a review before anything changes.
 ---
 
 # AI Assistant
@@ -17,6 +17,16 @@ The assistant is part of the desktop app. The browser demo on this website doesn
 4. Optionally choose the **model**: Claude Opus 5.5 (most capable, the default), Claude Sonnet 5.5 (faster and cheaper), or Claude Haiku 4.5 (fastest and cheapest).
 
 To stop using it, turn **AI commands** off, or choose **Remove Key**.
+
+## Use a local model instead
+
+Instead of Claude, the commands can use a model running on your own computer through [Ollama](https://ollama.com). Your text then stays on your computer, and no API key or account is needed.
+
+1. Install Ollama and download a model, for example `ollama pull llama3.2` in a terminal. Ollama runs in the background at `http://localhost:11434`.
+2. In **Settings → AI Assistant**, turn on **AI commands** and choose **A local model with Ollama**.
+3. Markpion lists the models Ollama has; pick one. If Ollama runs on another port, change the **Ollama address** and choose **Connect**. Only addresses on this computer (`localhost`, `127.0.0.1`, `[::1]`) are accepted.
+
+The same commands, review and **Stop** work as with Claude. Local models are usually slower (the first request also loads the model) and their answers less reliable, depending on the model and your computer.
 
 ## Commands
 
@@ -51,6 +61,7 @@ AI can make mistakes: always check the suggestion before you use it.
 
 ## Privacy
 
+- **With a local model, nothing leaves your computer:** the text goes to Ollama at the address you set, which must be on this computer, and there is no consent prompt. The rest of this section is about Claude.
 - **Nothing is sent until you run an AI command.** The first time, Markpion asks you to confirm. After that, running a command is your consent to send that text.
 - **What's sent:** the selected text or paragraph (or, for Continue Writing, the text before the cursor; for Write, nothing but your instruction) and the command's instruction, directly from your computer to Anthropic's API (`api.anthropic.com`), under your key. Nothing else from your documents or your computer is sent.
 - **How Anthropic handles it** is set by your agreement with Anthropic and its [privacy policy](https://www.anthropic.com/legal/privacy).

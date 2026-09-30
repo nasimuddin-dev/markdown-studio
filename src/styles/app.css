@@ -1431,6 +1431,19 @@ select {
 .check input {
   accent-color: var(--accent);
 }
+/* A group of radio choices in Settings. */
+.settings-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+  padding: 0;
+  border: none;
+}
+.settings-choice legend {
+  padding: 0;
+  margin-bottom: 4px;
+}
 .inline-field {
   display: flex;
   align-items: center;

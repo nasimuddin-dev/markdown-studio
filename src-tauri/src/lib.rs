@@ -1,4 +1,5 @@
 mod ai;
+mod ai_local;
 mod commands;
 mod error;
 mod fs_ops;
@@ -169,6 +170,7 @@ pub fn run() {
             commands::ai::ai_set_key,
             commands::ai::ai_complete,
             commands::ai::ai_cancel,
+            commands::ai::ai_local_models,
             updater::check_app_update,
             updater::install_app_update,
         ])

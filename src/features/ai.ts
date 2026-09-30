@@ -181,6 +181,13 @@ async function ensureReady(): Promise<boolean> {
     if (choice === "settings") useUi.getState().setSettingsOpen(true);
     return false;
   }
+  // A local model: no key, and nothing leaves this computer, so no consent prompt.
+  if (settings.settings.aiProvider === "ollama") {
+    if (settings.settings.aiLocalModel) return true;
+    notify("info", "Choose a local model in Settings → AI Assistant.");
+    useUi.getState().setSettingsOpen(true);
+    return false;
+  }
   const status = await backend().aiStatus();
   if (!status.hasKey) {
     notify("info", "Add your Anthropic API key in Settings → AI Assistant to use AI commands.");
@@ -206,6 +213,14 @@ async function ensureReady(): Promise<boolean> {
 
 let requestSeq = 0;
 
+/** A request for the chosen provider: Claude, or the local model. */
+function aiRequest(prompt: string) {
+  const s = useSettings.getState().settings;
+  return s.aiProvider === "ollama"
+    ? { model: s.aiLocalModel, system: AI_SYSTEM_PROMPT, prompt, localUrl: s.aiLocalUrl }
+    : { model: s.aiModel, system: AI_SYSTEM_PROMPT, prompt };
+}
+
 /** Runs an AI command on the active document and opens the answer for review. */
 export async function runAiAction(id: AiActionId): Promise<void> {
   const action = AI_ACTIONS[id];
@@ -216,7 +231,7 @@ export async function runAiAction(id: AiActionId): Promise<void> {
     return;
   }
   if (useAi.getState().busy) {
-    notify("info", "Claude is still working on the previous request.");
+    notify("info", "The AI assistant is still working on the previous request.");
     return;
   }
   try {
@@ -255,7 +270,7 @@ export async function runAiAction(id: AiActionId): Promise<void> {
   const current = () => useAi.getState().busy?.seq === seq;
   try {
     const answer = await backend().aiComplete(
-      { model: useSettings.getState().settings.aiModel, system: AI_SYSTEM_PROMPT, prompt: buildAiPrompt(action, target.text, input) },
+      aiRequest(buildAiPrompt(action, target.text, input)),
       (text) => {
         const review = useAi.getState().review;
         if (current() && review) useAi.getState().setReview({ ...review, suggestion: review.suggestion + text });
