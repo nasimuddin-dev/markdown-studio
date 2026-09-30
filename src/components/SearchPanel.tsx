@@ -40,6 +40,9 @@ export function SearchPanel() {
   const [caseSensitive, setCase] = useState(false);
   const [wholeWord, setWord] = useState(false);
   const [regex, setRegex] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [include, setInclude] = useState("");
+  const [exclude, setExclude] = useState("");
   const [result, setResult] = useState<SearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -66,7 +69,7 @@ export function SearchPanel() {
     const t = setTimeout(async () => {
       setBusy(true);
       try {
-        const r = await backend().searchWorkspace(root, { query, caseSensitive, wholeWord, regex });
+        const r = await backend().searchWorkspace(root, { query, caseSensitive, wholeWord, regex, include, exclude });
         if (id === run.current) {
           setResult(r);
           setError(null);
@@ -81,13 +84,13 @@ export function SearchPanel() {
       }
     }, 250);
     return () => clearTimeout(t);
-  }, [root, query, caseSensitive, wholeWord, regex, searchAgain]);
+  }, [root, query, caseSensitive, wholeWord, regex, include, exclude, searchAgain]);
 
   const replaceAll = async () => {
     if (!root || !query || replacing) return;
     setReplacing(true);
     try {
-      await replaceInWorkspace(root, { query, caseSensitive, wholeWord, regex }, replacement);
+      await replaceInWorkspace(root, { query, caseSensitive, wholeWord, regex, include, exclude }, replacement);
     } finally {
       setReplacing(false);
       setSearchAgain((n) => n + 1);
@@ -130,8 +133,27 @@ export function SearchPanel() {
           <Toggle label="Aa" title="Match case" on={caseSensitive} set={setCase} />
           <Toggle label="ab" title="Match whole word" on={wholeWord} set={setWord} />
           <Toggle label=".*" title="Use regular expression" on={regex} set={setRegex} />
+          <button
+            type="button"
+            className={`search-toggle${include || exclude ? " on" : ""}`}
+            title="File filters: include or exclude files"
+            aria-label="File filters"
+            aria-expanded={showFilters}
+            aria-controls="search-filters"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            …
+          </button>
         </div>
       </div>
+      {showFilters && (
+        <div className="search-filters" id="search-filters">
+          <label htmlFor="search-include">Files to include</label>
+          <input id="search-include" className="text-input" placeholder="e.g. docs, *.md, guide/**" value={include} onChange={(e) => setInclude(e.target.value)} spellCheck={false} />
+          <label htmlFor="search-exclude">Files to exclude</label>
+          <input id="search-exclude" className="text-input" placeholder="e.g. drafts, archive/**" value={exclude} onChange={(e) => setExclude(e.target.value)} spellCheck={false} />
+        </div>
+      )}
       <div className="search-box replace-box">
         <input
           className="text-input"

@@ -155,6 +155,8 @@ for (const theme of ["light", "dark"] as const) {
       await page.keyboard.press(`${mod}+Shift+F`);
       await page.getByRole("textbox", { name: "Search in files" }).fill("markdown");
       await expect(page.locator(".search-match").first()).toBeVisible();
+      await page.getByRole("button", { name: "File filters" }).click();
+      await expect(page.getByLabel("Files to include")).toBeVisible();
       await audit(page, "search");
     });
   });

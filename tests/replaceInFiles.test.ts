@@ -56,4 +56,16 @@ describe("replace in workspace", () => {
     answered.stop();
     expect((await backend.readTextFile("/ws/a.md")).content).toBe("Acme");
   });
+
+  it("only touches the files the search filters allow", async () => {
+    const backend = setupBackend({ "/ws/a.md": "Acme", "/ws/docs/b.md": "Acme", "/ws/docs/old/c.md": "Acme" });
+    useWorkspace.getState().setRoot("/ws");
+    const answered = autoAnswer("replace");
+    const result = await replaceInWorkspace("/ws", { ...opts("Acme"), include: "docs", exclude: "old" }, "Globex");
+    answered.stop();
+    expect(result).toMatchObject({ replaced: 1, files: 1 });
+    expect((await backend.readTextFile("/ws/docs/b.md")).content).toBe("Globex");
+    expect((await backend.readTextFile("/ws/a.md")).content).toBe("Acme");
+    expect((await backend.readTextFile("/ws/docs/old/c.md")).content).toBe("Acme");
+  });
 });

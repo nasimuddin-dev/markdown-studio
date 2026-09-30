@@ -33,14 +33,28 @@ Press **Ctrl+H** (**Cmd+Option+F** on macOS) to open the search bar with the rep
 - Results are grouped by file, with the matching lines.
 - Click a result to open the file with the match selected.
 - Unsaved changes in open tabs are not searched; the search reads the files on disk.
+- Hidden files and folders (starting with `.`) and `node_modules`, `target`, `dist` and `build` folders are skipped.
 
 Find in Files needs an open folder.
+
+### Files to include and exclude
+
+Click **…** (**File filters**) next to the search options to limit the search to some files. Both fields take patterns separated by commas:
+
+| Pattern | Matches |
+| --- | --- |
+| `docs` | a file or folder named `docs` anywhere, and everything in it |
+| `*.draft.md` | files ending in `.draft.md` in any folder |
+| `docs/api` | the `api` folder inside the top-level `docs` folder (a pattern with `/` starts at the open folder) |
+| `guide/**/*.md` | Markdown files anywhere under `guide` (`**` crosses folders, `*` and `?` don't) |
+
+**Files to include** searches only files that match one of its patterns (all files when it's empty); **Files to exclude** skips files that match any of its patterns. Matching ignores upper and lower case. The **…** button stays highlighted while a filter is set. Replace All uses the same filters.
 
 ## Replace in Files
 
 To replace text in every Markdown file of the folder:
 
-1. Search for the text in **Find in Files**, with the options you need.
+1. Search for the text in **Find in Files**, with the options and file filters you need.
 2. Type the new text in **Replace with**. With **Use regular expression** on, `$1`, `$2`… insert the matching groups, `$<name>` a named group, `$&` the whole match and `$$` a dollar sign.
 3. Click **Replace All** (or press **Ctrl+Enter** in the field). Markpion counts the matches in every file and asks you to confirm, for example "Replace 12 matches in 4 files".
 

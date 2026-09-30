@@ -1,5 +1,6 @@
 import { backend } from "../services";
 import { buildSearchRegex } from "../services/search";
+import { pathFilter, relativeTo } from "../services/pathFilter";
 import { describeError } from "../services/errors";
 import { basename, isMarkdownPath } from "../services/paths";
 import { isDirty, useDocuments } from "../stores/documentsStore";
@@ -58,7 +59,8 @@ export async function replaceInWorkspace(root: string, opts: SearchOptions, repl
   const b = backend();
   const docs = useDocuments.getState().docs;
   const unsaved = new Set(docs.filter((d) => d.path && isDirty(d)).map((d) => d.path!));
-  const paths = (await b.listWorkspaceFiles(root)).filter(isMarkdownPath);
+  const allowed = pathFilter(opts.include, opts.exclude);
+  const paths = (await b.listWorkspaceFiles(root)).filter((p) => isMarkdownPath(p) && allowed(relativeTo(root, p)));
 
   const planned: Array<{ file: FileContent; text: string; count: number }> = [];
   const skippedUnsaved: string[] = [];

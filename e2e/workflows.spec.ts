@@ -100,6 +100,20 @@ test("find in files opens the matching document at the match", async ({ page }) 
   await page.locator(".search-match").first().click();
   await expect(page.getByRole("tab", { name: /guide\.md/ })).toHaveAttribute("aria-selected", "true");
   await expect(page.locator(".status-right")).toContainText("selected");
+
+  // Files to include / exclude narrow the search.
+  await page.keyboard.press(`${mod}+Shift+F`);
+  await box.fill("markdown");
+  const results = page.getByRole("list", { name: "Search results" });
+  await expect(results).toContainText("README.md");
+  await page.getByRole("button", { name: "File filters" }).click();
+  await page.getByLabel("Files to include").fill("docs");
+  await expect(results).not.toContainText("README.md");
+  await expect(results).toContainText("diagrams-and-math.md");
+  await page.getByLabel("Files to include").fill("");
+  await page.getByLabel("Files to exclude").fill("docs, notes");
+  await expect(results).toContainText("README.md");
+  await expect(results).not.toContainText("diagrams-and-math.md");
 });
 
 test("command palette runs commands", async ({ page }) => {

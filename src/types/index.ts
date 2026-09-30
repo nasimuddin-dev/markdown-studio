@@ -149,6 +149,10 @@ export interface SearchOptions {
   wholeWord: boolean;
   regex: boolean;
   maxResults?: number;
+  /** Comma-separated globs: only matching files are searched (see `services/pathFilter.ts`). */
+  include?: string;
+  /** Comma-separated globs: matching files are skipped. */
+  exclude?: string;
 }
 
 /** Positions are UTF-16 offsets (JavaScript string indices). */

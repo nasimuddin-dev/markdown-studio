@@ -3,6 +3,7 @@ import { AppError } from "./errors";
 import { basename, dirname, isMarkdownPath, join } from "./paths";
 import type { AppUpdate, DirEntry, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
 import { buildSearchRegex, searchText } from "./search";
+import { pathFilter, relativeTo } from "./pathFilter";
 import { DEMO_FILES } from "./demoContent";
 
 interface MemFile {
@@ -473,8 +474,10 @@ export class MemoryBackend implements Backend {
     const re = buildSearchRegex(options);
     const limit = Math.min(Math.max(options.maxResults ?? 2000, 1), 10000);
     const result: SearchResult = { files: [], totalMatches: 0, filesSearched: 0, truncated: false };
+    const allowed = pathFilter(options.include, options.exclude);
     const paths = [...this.files.keys()]
       .filter((p) => p.startsWith(dir + "/") && isMarkdownPath(p) && !p.slice(dir.length).split("/").some((s) => s.startsWith(".")))
+      .filter((p) => allowed(relativeTo(dir, p)))
       .sort();
     for (const path of paths) {
       if (result.totalMatches >= limit) {

@@ -24,6 +24,12 @@ pub struct SearchOptions {
     pub regex: bool,
     #[serde(default = "default_max")]
     pub max_results: usize,
+    /// Comma-separated globs: only files matching one of them are searched (empty: all).
+    #[serde(default)]
+    pub include: String,
+    /// Comma-separated globs: files matching any of them are skipped.
+    #[serde(default)]
+    pub exclude: String,
 }
 
 fn default_max() -> usize {
@@ -75,6 +81,58 @@ pub fn build_matcher(opts: &SearchOptions) -> AppResult<Regex> {
         .size_limit(1 << 20)
         .build()
         .map_err(|e| AppError::InvalidPath(format!("Invalid regular expression: {e}")))
+}
+
+/// Converts one glob to a regex over folder-relative paths with `/` separators
+/// (mirrored in `src/services/pathFilter.ts`). `**` crosses folders, `*` and `?`
+/// don't. A glob without `/` matches a file or folder name anywhere; one with
+/// `/` is anchored at the folder. A match on a folder covers everything in it.
+fn glob_regex(glob: &str) -> Option<Regex> {
+    let g = glob.trim().replace('\\', "/");
+    let g = g.strip_prefix("./").unwrap_or(&g).trim_end_matches('/');
+    if g.is_empty() {
+        return None;
+    }
+    let (prefix, g) = if g.contains('/') { ("^", g.trim_start_matches('/')) } else { ("(?:^|/)", g) };
+    let mut body = String::new();
+    let chars: Vec<char> = g.chars().collect();
+    let mut i = 0;
+    while i < chars.len() {
+        match chars[i] {
+            '*' if chars.get(i + 1) == Some(&'*') => {
+                if chars.get(i + 2) == Some(&'/') {
+                    body.push_str("(?:.*/)?");
+                    i += 1;
+                } else {
+                    body.push_str(".*");
+                }
+                i += 1;
+            }
+            '*' => body.push_str("[^/]*"),
+            '?' => body.push_str("[^/]"),
+            c => body.push_str(&regex::escape(&c.to_string())),
+        }
+        i += 1;
+    }
+    RegexBuilder::new(&format!("{prefix}{body}(?:/|$)")).case_insensitive(true).build().ok()
+}
+
+/// Include and exclude globs for Find in Files.
+pub struct PathFilter {
+    include: Vec<Regex>,
+    exclude: Vec<Regex>,
+}
+
+impl PathFilter {
+    pub fn new(include: &str, exclude: &str) -> Self {
+        let parse = |list: &str| list.split(',').filter_map(glob_regex).collect();
+        PathFilter { include: parse(include), exclude: parse(exclude) }
+    }
+
+    /// `rel` is the path relative to the searched folder, with `/` separators.
+    pub fn allows(&self, rel: &str) -> bool {
+        (self.include.is_empty() || self.include.iter().any(|r| r.is_match(rel))) && !self.exclude.iter().any(|r| r.is_match(rel))
+    }
 }
 
 fn utf16_len(s: &str) -> usize {
@@ -185,7 +243,11 @@ fn walk(root: &Path, keep: &dyn Fn(&Path) -> bool) -> Vec<PathBuf> {
 pub fn search_workspace(root: &Path, opts: &SearchOptions) -> AppResult<SearchResult> {
     let re = build_matcher(opts)?;
     let limit = opts.max_results.clamp(1, 10_000);
-    let files = collect_files(root);
+    let filter = PathFilter::new(&opts.include, &opts.exclude);
+    let files = collect_files(root).into_iter().filter(|p| {
+        let rel = p.strip_prefix(root).unwrap_or(p).to_string_lossy().replace('\\', "/");
+        filter.allows(&rel)
+    });
     let mut result = SearchResult { files: Vec::new(), total_matches: 0, files_searched: 0, truncated: false };
     for path in files {
         if result.total_matches >= limit {
@@ -215,7 +277,7 @@ mod tests {
     use super::*;
 
     fn opts(q: &str) -> SearchOptions {
-        SearchOptions { query: q.into(), case_sensitive: false, whole_word: false, regex: false, max_results: 100 }
+        SearchOptions { query: q.into(), case_sensitive: false, whole_word: false, regex: false, max_results: 100, include: String::new(), exclude: String::new() }
     }
 
     #[test]
@@ -302,5 +364,34 @@ mod tests {
         let r = search_workspace(tmp.path(), &SearchOptions { max_results: 1, ..opts("needle") }).unwrap();
         assert_eq!(r.total_matches, 1);
         assert!(r.truncated);
+
+        let only_docs = SearchOptions { include: "docs".into(), ..opts("needle") };
+        assert_eq!(search_workspace(tmp.path(), &only_docs).unwrap().files.len(), 1);
+        let no_docs = SearchOptions { exclude: "docs/**, c.txt".into(), ..opts("needle") };
+        let r = search_workspace(tmp.path(), &no_docs).unwrap();
+        assert_eq!(r.files.len(), 1);
+        assert!(r.files[0].path.ends_with("a.md"));
+    }
+
+    #[test]
+    fn path_filters_follow_glob_rules() {
+        // The same cases as tests/pathFilter.test.ts.
+        let f = |inc: &str, exc: &str, path: &str| PathFilter::new(inc, exc).allows(path);
+        assert!(f("", "", "a.md"));
+        assert!(f("docs", "", "docs/a.md"));
+        assert!(f("docs", "", "x/docs/a.md"));
+        assert!(!f("docs", "", "docsy/a.md"));
+        assert!(f("docs/**", "", "docs/deep/a.md"));
+        assert!(!f("/docs", "", "x/docs/a.md"));
+        assert!(f("*.draft.md", "", "notes/x.DRAFT.md"));
+        assert!(!f("*.draft.md", "", "notes/x.md"));
+        assert!(f("**/api/*.md", "", "a/b/api/x.md"));
+        assert!(!f("**/api/*.md", "", "a/b/api/v1/x.md"));
+        assert!(f("guide?.md", "", "guide1.md"));
+        assert!(!f("", "drafts, archive/", "drafts/a.md"));
+        assert!(!f("", "drafts, archive/", "archive/old/a.md"));
+        assert!(f("", "drafts, archive/", "docs/a.md"));
+        assert!(!f("docs", "*.draft.md", "docs/x.draft.md"));
+        assert!(f(" , ", "", "a.md"));
     }
 }
