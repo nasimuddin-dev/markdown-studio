@@ -23,6 +23,7 @@ By default the window shows the sidebar (Explorer and Outline), the tabs, the ed
 Drag the dividers between panels to resize them. The sizes are remembered.
 
 - **Focus Mode** (**Ctrl+Shift+Enter**) hides everything except the editor and preview. Press **Esc** or the same shortcut to leave.
+- **Typewriter scrolling** (**View → Toggle Typewriter Scrolling**, or in Settings → Editor) keeps the line you're typing in the middle of the editor, so your eyes stay in one place. It pairs well with Focus Mode.
 - **Full Screen** (**F11**) fills the screen.
 
 ## Syntax highlighting

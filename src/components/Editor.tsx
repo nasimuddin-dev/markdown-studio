@@ -94,6 +94,14 @@ const PHRASES: Record<string, string> = {
   "No diagnostics": "No problems",
 };
 const locking = new Compartment();
+const typewriter = new Compartment();
+/** Typewriter scrolling: every edit or cursor move keeps the cursor's line in the middle of the editor. */
+const typewriterExt = (on: boolean): Extension =>
+  on
+    ? EditorState.transactionExtender.of((tr) =>
+        tr.docChanged || tr.selection ? { effects: EditorView.scrollIntoView(tr.newSelection.main.head, { y: "center" }) } : null,
+      )
+    : [];
 /** Marks changes that come from outside the editor (reload from disk), which a read-only document still takes. */
 const externalSync = Annotation.define<boolean>();
 /** Read-only documents: no typing, and commands (formatting, revert…) can't change the text either. */
@@ -119,6 +127,7 @@ function reconfigure(s: Settings) {
     tabs.reconfigure([EditorState.tabSize.of(s.tabSize), indentUnit.of(" ".repeat(s.tabSize))]),
     linting.reconfigure(s.lintMarkdown ? markdownLinter() : []),
     spelling.reconfigure(spellAttr(s.spellCheck)),
+    typewriter.reconfigure(typewriterExt(s.typewriterScrolling)),
     keys.reconfigure(editorKeys()),
   ];
 }
@@ -164,6 +173,7 @@ export function Editor() {
         EditorState.phrases.of(PHRASES),
         surroundSelection,
         spelling.of(spellAttr(s.spellCheck)),
+        typewriter.of(typewriterExt(s.typewriterScrolling)),
         locking.of(lockExt(isLocked(docId))),
         // Pasted or dropped images are saved to assets/ and linked.
         EditorView.domEventHandlers({
@@ -310,7 +320,7 @@ export function Editor() {
   // Apply settings changes (FR-025).
   useEffect(() => {
     viewRef.current?.dispatch({ effects: reconfigure(settings) });
-  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [settings.fontSize, settings.fontFamily, settings.lineNumbers, settings.lineWrapping, settings.tabSize, settings.lintMarkdown, settings.lintDisabledRules, settings.spellCheck, settings.typewriterScrolling]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <div className="editor-host" ref={host} />;
 }

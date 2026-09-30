@@ -20,6 +20,7 @@ export const DEFAULT_SETTINGS: Settings = {
   renderMath: true,
   renderDiagrams: true,
   lintMarkdown: true,
+  typewriterScrolling: false,
   lintDisabledRules: [],
   spellCheck: true,
   pasteRichTextAsMarkdown: true,
@@ -85,6 +86,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     renderMath: bool(s.renderMath, d.renderMath),
     renderDiagrams: bool(s.renderDiagrams, d.renderDiagrams),
     lintMarkdown: bool(s.lintMarkdown, d.lintMarkdown),
+    typewriterScrolling: bool(s.typewriterScrolling, d.typewriterScrolling),
     lintDisabledRules: Array.isArray(s.lintDisabledRules)
       ? [...new Set(s.lintDisabledRules.filter((r): r is string => typeof r === "string" && /^[a-z0-9-]{1,40}$/.test(r)))].slice(0, 50)
       : d.lintDisabledRules,

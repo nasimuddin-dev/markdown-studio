@@ -92,6 +92,8 @@ export interface Settings {
   renderMath: boolean;
   renderDiagrams: boolean;
   lintMarkdown: boolean;
+  /** Keep the cursor's line vertically centred while typing. */
+  typewriterScrolling: boolean;
   /** Lint checks (rule ids) turned off with "Don't Show This Check". */
   lintDisabledRules: string[];
   spellCheck: boolean;

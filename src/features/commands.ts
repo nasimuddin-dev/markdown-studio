@@ -384,6 +384,14 @@ export const commands: Record<string, Command> = {
       update({ lineWrapping: !settings.lineWrapping });
     },
   },
+  toggleTypewriter: {
+    id: "toggleTypewriter",
+    label: "Toggle Typewriter Scrolling",
+    run: () => {
+      const { settings, update } = useSettings.getState();
+      update({ typewriterScrolling: !settings.typewriterScrolling });
+    },
+  },
   toggleLineNumbers: {
     id: "toggleLineNumbers",
     label: "Toggle Line Numbers",

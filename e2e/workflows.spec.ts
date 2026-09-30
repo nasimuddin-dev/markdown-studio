@@ -431,6 +431,8 @@ test("F8 and Shift+F8 move between problems", async ({ page }) => {
   await page.keyboard.insertText("# Doc\n\nfine line\n\n#Oops\n\nfine\n\n![](pic.png)\n");
   await page.keyboard.press(`${mod}+Home`);
   await expect(page.getByRole("button", { name: /Show problems/ })).toBeVisible();
+  // The count can show a moment before the editor has the problems; wait for their underlines.
+  await expect(page.locator(".cm-lintRange").first()).toBeVisible();
   const position = page.locator(".status-right").getByTitle("Line and column");
   await page.keyboard.press("F8");
   await expect(position).toContainText("Ln 5,");
@@ -438,6 +440,25 @@ test("F8 and Shift+F8 move between problems", async ({ page }) => {
   await expect(position).toContainText("Ln 9,");
   await page.keyboard.press("Shift+F8");
   await expect(position).toContainText("Ln 5,");
+});
+
+test("typewriter scrolling keeps the current line in the middle", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.press(`${mod}+Shift+P`);
+  await page.keyboard.type("typewriter scrolling");
+  await page.keyboard.press("Enter");
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  for (let i = 0; i < 60; i++) {
+    await page.keyboard.insertText(`Line ${i}`);
+    await page.keyboard.press("Enter");
+  }
+  await page.keyboard.type("last");
+  const scroller = await page.locator(".cm-scroller").boundingBox();
+  const line = await page.locator(".cm-activeLine").boundingBox();
+  const middle = scroller!.y + scroller!.height / 2;
+  expect(Math.abs(line!.y + line!.height / 2 - middle)).toBeLessThan(scroller!.height * 0.15);
 });
 
 test("Alt+Z toggles word wrap", async ({ page }) => {
