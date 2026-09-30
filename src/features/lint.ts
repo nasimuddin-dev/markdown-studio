@@ -29,6 +29,7 @@ export const LINT_RULES: Record<string, string> = {
   "link-text": "Links without text",
   "table-columns": "Table rows that don't match the header",
   footnote: "Footnotes without a definition, or unused",
+  reference: "Reference links without a definition, or unused",
   "heading-space": "# without a space",
   "setext-heading": "--- under a line of text",
   "list-space": "List items without a space",
@@ -53,9 +54,11 @@ export function fixChanges(fix: ProblemFix, from: number, text: string): Array<{
       const start = Math.min(from + at, text.length);
       return { from: start, to: Math.min(start + remove, text.length), insert };
     }
-    // Right after another footnote definition, the next one follows on the next line.
-    const lastLine = text.slice(text.lastIndexOf("\n") + 1);
-    const gap = text.endsWith("\n\n") || !text ? "" : text.endsWith("\n") || /^ {0,3}\[\^[^\]]+\]:/.test(lastLine) ? "\n" : "\n\n";
+    // Right after another footnote or link definition, the next one follows on the next line.
+    const body = text.endsWith("\n") ? text.slice(0, -1) : text;
+    const afterDefinition = /^ {0,3}\[[^\]]+\]:/.test(body.slice(body.lastIndexOf("\n") + 1));
+    const newlines = text.endsWith("\n\n") || !text ? 0 : (afterDefinition ? 1 : 2) - (text.endsWith("\n") ? 1 : 0);
+    const gap = "\n".repeat(newlines);
     return { from: text.length, to: text.length, insert: gap + insert };
   });
 }
@@ -255,6 +258,7 @@ export function lintMarkdown(text: string): MarkdownProblem[] {
   problems.push(
     ...lintTables(text, starts),
     ...lintFootnotes(text),
+    ...lintReferences(text),
     ...lintHeadingSyntax(text, starts),
     ...lintListsAndEmphasis(text, starts),
     ...lintSpacesInDestinations(text),
@@ -534,6 +538,48 @@ function lintFootnotes(text: string): MarkdownProblem[] {
   }
   for (const [id, at] of defined) {
     if (!used.has(id)) out.push({ ...at, severity: "info", rule: "footnote", message: `Footnote [^${id}] is defined but never referenced.` });
+  }
+  return out;
+}
+
+/** How reference labels match: case-insensitive, with runs of whitespace as one space. */
+const normalizeLabel = (label: string) => label.trim().replace(/\s+/g, " ").toLowerCase();
+
+/**
+ * Reference-style links (`[text][id]`, `[id][]`) whose definition is missing,
+ * so they show as plain text, and definitions (`[id]: path`) that nothing uses.
+ * A bare `[id]` counts as a use but isn't flagged without a definition, since
+ * square brackets are also ordinary text (and task list boxes).
+ */
+function lintReferences(text: string): MarkdownProblem[] {
+  const masked = maskCode(text);
+  const definitions = findLinkDefinitions(text).filter((d) => !d.text.startsWith("^"));
+  const defined = new Set(definitions.map((d) => normalizeLabel(d.text)));
+  const used = new Set<string>();
+  const out: MarkdownProblem[] = [];
+  for (const m of masked.matchAll(/(!?)\[((?:[^[\]\n]|\[[^\]\n]*\])*)\]\[([^\]\n]*)\]/g)) {
+    if (masked[m.index! - 1] === "\\") continue;
+    const label = (m[3].trim() ? m[3] : m[2]).trim();
+    const id = normalizeLabel(label);
+    if (!id || id.startsWith("^")) continue;
+    used.add(id);
+    if (!defined.has(id)) {
+      out.push({
+        from: m.index!,
+        to: m.index! + m[0].length,
+        severity: "warning",
+        rule: "reference",
+        message: `Link reference [${label}] has no definition, so it's shown as plain text. Add a line “[${label}]: address”.`,
+        fix: { label: "Add Definition", edits: [{ at: "end", insert: `[${label}]: ` }] },
+      });
+    }
+  }
+  // Shortcut references (`[id]`), and labels inside other links' text.
+  for (const m of masked.matchAll(/\[([^[\]\n]+)\](?![(:])/g)) used.add(normalizeLabel(m[1]));
+  for (const d of definitions) {
+    if (!used.has(normalizeLabel(d.text))) {
+      out.push({ from: d.from, to: d.to, severity: "info", rule: "reference", message: `Link definition [${d.text}] is never used.` });
+    }
   }
   return out;
 }

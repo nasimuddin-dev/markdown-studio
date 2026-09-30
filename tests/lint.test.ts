@@ -60,7 +60,7 @@ describe("markdown lint: document rules", () => {
   });
 
   it("flags reference definitions to missing files and anchors", async () => {
-    expect(rules("# A\n\n[x]: #nope")).toEqual(["broken-anchor"]);
+    expect(rules("# A\n\n[y][x]\n\n[x]: #nope")).toEqual(["broken-anchor"]);
     const problems = await lintLinks("[ok]: a.md\n[bad]: missing.md", "/ws/p.md", async (p) => p === "/ws/a.md");
     expect(problems.map((p) => p.message)).toEqual(["Linked file not found: missing.md"]);
   });
@@ -192,6 +192,29 @@ describe("markdown lint: tables, footnotes and link text", () => {
       "Footnote [^spare] is defined but never referenced.",
     ]);
     expect(only("`[^x]` in code", "footnote")).toEqual([]);
+  });
+
+  it("flags reference links without a definition and unused definitions", () => {
+    const text = "See [the guide][Guide], [Home][] and [short], ![logo][img] and [bad][nope].\n\n[guide]: guide.md\n[home]: /\n[Short]: s.md\n[img]: logo.png\n[spare]: x.md";
+    expect(only(text, "reference").map((p) => p.message)).toEqual([
+      "Link reference [nope] has no definition, so it's shown as plain text. Add a line “[nope]: address”.",
+      "Link definition [spare] is never used.",
+    ]);
+    // Whitespace in labels matches loosely; code, escapes, footnotes, task boxes and plain brackets aren't references.
+    expect(only("[a][two  words]\n\n[Two words]: a.md", "reference")).toEqual([]);
+    expect(only("`[a][b]` and \\[a][b] and [^1][^2] and - [x] done and [plain] text", "reference")).toEqual([]);
+    // A link inside link text counts as a use.
+    expect(only("[![badge][b]](https://example.com)\n\n[b]: b.svg", "reference")).toEqual([]);
+  });
+
+  it("adds a missing reference definition at the end, after other definitions", () => {
+    const fix = (text: string) => {
+      const p = only(text, "reference")[0];
+      const changes = fixChanges(p.fix!, p.from, text);
+      return changes.reduceRight((t, c) => t.slice(0, c.from) + c.insert + t.slice(c.to), text);
+    };
+    expect(fix("See [x][Docs].")).toBe("See [x][Docs].\n\n[Docs]: ");
+    expect(fix("See [x][b] [y][a].\n\n[a]: a.md\n")).toBe("See [x][b] [y][a].\n\n[a]: a.md\n[b]: ");
   });
 
   it("flags links without text, but not code or images as text", () => {

@@ -21,7 +21,7 @@ function markdownFiles(dir: string, out: string[] = []) {
  */
 describe("lint on the project's documentation", () => {
   it("finds no Markdown syntax mistakes", () => {
-    const rules = ["list-space", "emphasis-space", "heading-space", "setext-heading", "table-columns", "footnote", "link-text", "destination-spaces"];
+    const rules = ["list-space", "emphasis-space", "heading-space", "setext-heading", "table-columns", "footnote", "reference", "link-text", "destination-spaces"];
     const found: string[] = [];
     for (const file of [...markdownFiles("docs"), "README.md", "AGENTS.md"]) {
       const text = readFileSync(file, "utf8").replace(/\r\n/g, "\n");
