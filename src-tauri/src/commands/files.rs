@@ -91,6 +91,7 @@ pub async fn rename_path(state: State<'_, AppState>, path: String, new_name: Str
     let to = state.scope.check_rename_target(&from, &fs_ops::join_child(parent, &new_name))?;
     state.track("fs.rename", fs_ops::rename(&from, &to))?;
     state.scope.rename_file(&from, &to);
+    state.rename_recents(&from, &to);
     Ok(fs_ops::path_string(&to))
 }
 
@@ -103,6 +104,7 @@ pub async fn move_path(state: State<'_, AppState>, path: String, directory: Stri
     // destination inside it is in scope too.
     let to = state.track("fs.move", fs_ops::move_into(&from, &dir))?;
     state.scope.rename_file(&from, &to);
+    state.rename_recents(&from, &to);
     Ok(fs_ops::path_string(&to))
 }
 

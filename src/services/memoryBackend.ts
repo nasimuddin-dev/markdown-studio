@@ -408,7 +408,6 @@ export class MemoryBackend implements Backend {
       throw new AppError("alreadyExists", "A file or folder with that name already exists.");
     }
     this.relocate(from, to);
-    if (this.allowedFiles.delete(from)) this.allowedFiles.add(to);
     return to;
   }
 
@@ -438,6 +437,8 @@ export class MemoryBackend implements Backend {
         [...this.files].map(([k, v]) => [k.startsWith(from + "/") ? move(k) : k, v] as [string, MemFile]),
       );
     } else throw new AppError("notFound", "Not found");
+    // Recent entries follow the rename (as in the native backend).
+    this.recents = this.recents.map((r) => (r.path === from || r.path.startsWith(from + "/") ? { ...r, path: to + r.path.slice(from.length) } : r));
     this.persist();
   }
 

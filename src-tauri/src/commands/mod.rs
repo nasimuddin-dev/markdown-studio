@@ -78,12 +78,59 @@ impl AppState {
         }
     }
 
+    /// Keeps recent entries pointing at a file or folder after it was renamed or moved in the app.
+    pub(crate) fn rename_recents(&self, from: &Path, to: &Path) {
+        let snapshot = {
+            let mut list = self.recents.lock().unwrap();
+            if !renamed_recents(&mut list, &fs_ops::path_string(from), &fs_ops::path_string(to)) {
+                return;
+            }
+            list.clone()
+        };
+        if let Err(e) = storage::write_json(&self.recents_path(), &serde_json::to_value(snapshot).unwrap_or(Value::Null)) {
+            self.logger.log("warn", "recent.save", &e.to_string());
+        }
+    }
+
     /// Logs the operation name and error category only — never document content.
     pub(crate) fn track<T>(&self, op: &str, result: AppResult<T>) -> AppResult<T> {
         if let Err(e) = &result {
             self.logger.log("error", op, &e.to_string());
         }
         result
+    }
+}
+
+/// Rewrites entries for `from` (and, for a folder, everything inside it) to `to`. Returns whether any changed.
+fn renamed_recents(list: &mut [RecentEntry], from: &str, to: &str) -> bool {
+    let mut changed = false;
+    for entry in list.iter_mut() {
+        let rest = entry.path.strip_prefix(from).filter(|r| r.is_empty() || r.starts_with(['/', '\\']));
+        if let Some(rest) = rest {
+            entry.path = format!("{to}{rest}");
+            changed = true;
+        }
+    }
+    changed
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn recents_follow_renames() {
+        let mut list = vec![
+            RecentEntry { path: "C:\\notes\\a.md".into(), kind: RecentKind::File },
+            RecentEntry { path: "C:\\notes\\ab.md".into(), kind: RecentKind::File },
+            RecentEntry { path: "C:\\docs\\x.md".into(), kind: RecentKind::File },
+            RecentEntry { path: "C:\\docs".into(), kind: RecentKind::Folder },
+        ];
+        assert!(renamed_recents(&mut list, "C:\\notes\\a.md", "C:\\notes\\b.md"));
+        assert!(renamed_recents(&mut list, "C:\\docs", "C:\\guides"));
+        let paths: Vec<&str> = list.iter().map(|r| r.path.as_str()).collect();
+        assert_eq!(paths, ["C:\\notes\\b.md", "C:\\notes\\ab.md", "C:\\guides\\x.md", "C:\\guides"]);
+        assert!(!renamed_recents(&mut list, "C:\\other", "C:\\else"));
     }
 }
 

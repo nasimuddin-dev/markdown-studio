@@ -40,6 +40,8 @@ describe("renaming a file opened on its own", () => {
     // The approval moved with it; the rest of the folder is still out of reach.
     await expect(b.readTextFile("/notes/a.md")).rejects.toMatchObject({ kind: "outOfScope" });
     await expect(b.readTextFile("/notes/other.md")).rejects.toMatchObject({ kind: "outOfScope" });
+    // The recent list follows the new name.
+    expect((await b.listRecent()).map((r) => r.path)).toEqual(["/notes/renamed.md"]);
   });
 
   it("lists open files in the Explorer when no folder is open", async () => {
