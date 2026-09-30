@@ -1,9 +1,11 @@
 import { backend } from "../services";
 import { basename, isInside, isMarkdownPath, join } from "../services/paths";
-import { useDocuments } from "../stores/documentsStore";
+import { describeError, toAppError } from "../services/errors";
+import { activeDoc, useDocuments } from "../stores/documentsStore";
 import { useWorkspace } from "../stores/workspaceStore";
-import { notify } from "../stores/uiStore";
+import { notify, promptText } from "../stores/uiStore";
 import { newDocument } from "./documents";
+import { refreshDir } from "./workspace";
 import { requestReveal } from "./editorBridge";
 
 export interface Template {
@@ -234,6 +236,44 @@ export async function listTemplates(): Promise<Template[]> {
     path,
   }));
   return [...own, ...BUILT_IN_TEMPLATES];
+}
+
+/**
+ * File → Save as Template…: copies the active document into the open folder's
+ * `templates/` folder (created if needed), so File → New from Template
+ * offers it. Placeholders such as {{title}}, {{date}} and {{cursor}} work in it.
+ */
+export async function saveAsTemplate() {
+  const doc = activeDoc();
+  const root = useWorkspace.getState().root;
+  if (!doc) return;
+  if (!root) {
+    notify("info", "Open a folder first: templates are kept in its “templates” folder.");
+    return;
+  }
+  const suggested = doc.name.replace(/\.(md|markdown)$/i, "") || "template";
+  const name = await promptText({
+    title: "Save as Template",
+    message: "Save this document in the folder's “templates” folder, to start new documents from it (File → New from Template). You can use {{title}}, {{date}} and {{cursor}} in it.",
+    value: `${suggested}.md`,
+    okLabel: "Save",
+    selectUntil: suggested.length,
+  });
+  if (!name) return;
+  const fileName = /\.(md|markdown)$/i.test(name) ? name : `${name}.md`;
+  const b = backend();
+  const dir = join(root, "templates");
+  try {
+    await b.createFolder(root, "templates").catch((e) => {
+      if (toAppError(e).kind !== "alreadyExists") throw e;
+    });
+    const path = await b.createFile(dir, fileName);
+    await b.writeTextFile({ path, content: doc.content, lineEnding: doc.lineEnding, bom: false, expectedMtime: null, force: true });
+    await refreshDir(root);
+    notify("success", `Saved as the template “${fileName.replace(/\.(md|markdown)$/i, "")}”.`);
+  } catch (e) {
+    notify("error", toAppError(e).kind === "alreadyExists" ? `A template named “${fileName}” already exists.` : describeError(e, "save the template"));
+  }
 }
 
 /** Opens a new, unsaved document from a template with the cursor at {{cursor}}. */

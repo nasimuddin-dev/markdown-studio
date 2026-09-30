@@ -117,7 +117,7 @@ It lists the top two heading levels below the title (a single H1 at the top is l
 - Changelog
 - Daily journal
 
-Any Markdown file in a folder named `templates` at the top of your open workspace appears in the list too, so a team can share its own templates.
+Any Markdown file in a folder named `templates` at the top of your open workspace appears in the list too, so a team can share its own templates. **File → Save as Template…** saves the document you're editing there (the folder is created if needed).
 
 ::: v-pre
 Templates can contain placeholders, which are filled in when the document is created:

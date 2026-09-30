@@ -293,6 +293,12 @@ export const commands: Record<string, Command> = {
   exportDocx: { id: "exportDocx", label: "Export as Word (.docx)…", run: async () => (await exporting()).exportActiveAsDocx(), enabled: hasActive },
   nextPane: { id: "nextPane", label: "Focus Next Pane", shortcut: "F6", run: () => void focusPane(1) },
   previousPane: { id: "previousPane", label: "Focus Previous Pane", shortcut: "Shift+F6", run: () => void focusPane(-1) },
+  saveAsTemplate: {
+    id: "saveAsTemplate",
+    label: "Save as Template…",
+    run: async () => (await import("./templates")).saveAsTemplate(),
+    enabled: hasActive,
+  },
   moveToNewFile: {
     id: "moveToNewFile",
     label: "Move Selection to New File…",
