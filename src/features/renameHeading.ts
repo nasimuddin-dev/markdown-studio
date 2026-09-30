@@ -6,6 +6,8 @@ import { getEditorView } from "./editorBridge";
 import { findAllLinks, localTargets } from "./lint";
 import { extractHeadings, headingSlugs } from "./outline";
 import type { TextChange } from "./referenceLinks";
+import { labelAt, planLabelRename, type LabelTarget } from "./renameLabel";
+import type { EditorView } from "@codemirror/view";
 
 /**
  * Renaming a heading keeps links to it working: `#anchor` links in the same
@@ -86,6 +88,25 @@ export function rewriteAnchorLinks(text: string, path: string, docPath: string, 
   return { text: out, count: edits.length };
 }
 
+async function renameLabel(view: EditorView, target: LabelTarget) {
+  const footnote = target.kind === "footnote";
+  const value = await promptText({
+    title: footnote ? "Rename Footnote" : "Rename Link Label",
+    message: footnote ? "Every reference to this footnote, and its definition, get the new label." : "Every link that uses this label, and its definition, get the new label.",
+    value: target.label,
+    okLabel: "Rename",
+  });
+  if (value === null || !value.trim() || value.trim() === target.label) return;
+  if (/[[\]]/.test(value) || (footnote && /\s/.test(value.trim()))) {
+    notify("info", footnote ? "A footnote label can't contain spaces or square brackets." : "A link label can't contain square brackets.");
+    return;
+  }
+  const changes = planLabelRename(view.state.doc.toString(), target, value);
+  if (!changes.length) return;
+  view.dispatch(view.state.update({ changes, userEvent: "input.rename", scrollIntoView: true }));
+  view.focus();
+}
+
 /** Asks for a new name for the heading at the cursor (or on `line`) and renames it, updating links to it. */
 export async function renameHeading(line?: number) {
   const view = getEditorView();
@@ -93,7 +114,10 @@ export async function renameHeading(line?: number) {
   if (!view || !doc) return;
   const target = headingAt(view.state.doc.toString(), line ?? view.state.doc.lineAt(view.state.selection.main.head).number);
   if (!target) {
-    notify("info", "Put the cursor on a heading to rename it.");
+    // Not a heading: a footnote or link reference label is renamed everywhere in the document.
+    const label = line === undefined ? labelAt(view.state.doc.toString(), view.state.selection.main.head) : null;
+    if (label) return renameLabel(view, label);
+    notify("info", "Put the cursor on a heading, a footnote or a link reference to rename it.");
     return;
   }
   const value = await promptText({

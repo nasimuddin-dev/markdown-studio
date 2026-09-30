@@ -1230,3 +1230,19 @@ test("Copy as Plain Text copies the selection without Markdown syntax", async ({
   // The Windows clipboard uses CRLF line breaks.
   expect((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, "\n")).toBe("Title\n\nSome bold and a link.\n");
 });
+
+test("F2 on a footnote renames its label everywhere", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("Claim[^1] and again[^1].\n\n[^1]: Source.");
+  await page.keyboard.press(`${mod}+Home`);
+  await page.keyboard.press("End");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("F2");
+  const dialog = page.getByRole("dialog", { name: "Rename Footnote" });
+  await dialog.getByRole("textbox").fill("src");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".cm-line")).toHaveText(["Claim[^src] and again[^src].", "", "[^src]: Source."]);
+});
