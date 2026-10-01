@@ -567,7 +567,13 @@ export class MemoryBackend implements Backend {
   async exportBinaryFile(suggestedName: string, bytes: Uint8Array, kind: string) {
     this.lastExport = { name: suggestedName, content: "", bytes };
     if (typeof URL.createObjectURL !== "function") return suggestedName;
-    const type = kind === "pdf" ? "application/pdf" : kind === "zip" ? "application/zip" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const types: Record<string, string> = {
+      pdf: "application/pdf",
+      zip: "application/zip",
+      epub: "application/epub+zip",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    };
+    const type = types[kind] ?? "application/octet-stream";
     downloadBlob(suggestedName, new Blob([bytes as BlobPart], { type }));
     return suggestedName;
   }

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { CompletionContext } from "@codemirror/autocomplete";
-import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree } from "@codemirror/language";
 import * as full from "@codemirror/lang-html";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { html, htmlCompletionSource } from "../src/services/markdownHtml";
@@ -57,8 +57,10 @@ describe("the light HTML language for Markdown", () => {
     const positions = [3, 22, 26, 32];
     const nodes = (factory: HtmlFactory) => {
       const state = EditorState.create({ doc, extensions: markdown({ base: markdownLanguage, htmlTagLanguage: factory({ matchClosingTags: false }) }) });
-      ensureSyntaxTree(state, state.doc.length, 5000);
-      return positions.map((p) => syntaxTree(state).resolveInner(p, 1).name);
+      // The parsed tree itself (the state's copy can lag behind on a busy machine).
+      const tree = ensureSyntaxTree(state, state.doc.length, 30_000);
+      expect(tree?.length).toBe(state.doc.length);
+      return positions.map((p) => tree!.resolveInner(p, 1).name);
     };
     expect(nodes(html)).toEqual(["TagName", "TagName", "AttributeName", "AttributeValue"]);
     expect(nodes(html)).toEqual(nodes(full.html as HtmlFactory));

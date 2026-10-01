@@ -233,7 +233,7 @@ pub(crate) fn percent_decode(value: &str) -> Option<String> {
     String::from_utf8(out).ok()
 }
 
-/// Exports binary content (Word .docx, PDF, .zip) to a path chosen in a
+/// Exports binary content (Word .docx, PDF, .zip, .epub) to a path chosen in a
 /// native Save dialog. Written atomically; the dialog confirms any overwrite.
 /// The bytes arrive as the request's raw body (not base64 in JSON); the kind
 /// and the suggested file name come in the `x-export-kind` and
@@ -252,6 +252,7 @@ pub async fn export_binary_file(app: AppHandle, state: State<'_, AppState>, requ
         "docx" => ("Word document", "docx"),
         "pdf" => ("PDF document", "pdf"),
         "zip" => ("ZIP archive", "zip"),
+        "epub" => ("EPUB e-book", "epub"),
         _ => return Err(AppError::InvalidPath("Unsupported export type".into())),
     };
     scope::validate_file_name(&suggested_name)?;

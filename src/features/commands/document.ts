@@ -281,6 +281,12 @@ export const documentCommands: Record<string, Command> = {
     run: async () => (await import("../lineEndings")).setBom(true),
     enabled: hasActive,
   },
+  exportEpub: {
+    id: "exportEpub",
+    label: "Export as EPUB (E-book)…",
+    run: async () => (await exporting()).exportActiveAsEpub(),
+    enabled: hasActive,
+  },
   exportZip: {
     id: "exportZip",
     label: "Export as Markdown with Images (.zip)…",

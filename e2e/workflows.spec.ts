@@ -1390,6 +1390,33 @@ test("File > Export as Markdown with Images makes a .zip with the pictures", asy
   expect(await zip.file("images/logo.svg")!.async("string")).toContain("<svg");
 });
 
+test("File > Export > EPUB makes an e-book with its pictures, math and diagrams", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.insertText("\n\n## Diagram\n\n```mermaid\nflowchart LR\n  A[Start<br>here] --> B{Done?}\n```\n\nEuler: $e^{i\\pi} + 1 = 0$\n");
+  const download = page.waitForEvent("download");
+  await chooseMenu(page, "File", "Export", "EPUB (E-book)…");
+  const file = await download;
+  expect(file.suggestedFilename()).toBe("README.epub");
+  const zip = await JSZip.loadAsync(Buffer.concat(await (await file.createReadStream()).toArray()));
+  expect(Object.keys(zip.files)[0]).toBe("mimetype");
+  expect(zip.file("OEBPS/images/image1.svg")).not.toBeNull();
+  const opf = await zip.file("OEBPS/content.opf")!.async("string");
+  expect(opf).toContain('properties="mathml svg"');
+  // Every document in the book is well-formed XML (as e-readers require).
+  for (const name of ["OEBPS/content.xhtml", "OEBPS/nav.xhtml", "OEBPS/content.opf", "META-INF/container.xml"]) {
+    const text = await zip.file(name)!.async("string");
+    const errors = await page.evaluate((s) => new DOMParser().parseFromString(s, "application/xml").getElementsByTagName("parsererror").length, text);
+    expect(errors, name).toBe(0);
+  }
+  const content = await zip.file("OEBPS/content.xhtml")!.async("string");
+  expect(content).toContain("<svg");
+  expect(content).toContain("<math");
+});
+
 test("Move Selection to New File creates the file and links to it", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

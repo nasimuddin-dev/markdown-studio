@@ -47,6 +47,20 @@ export async function exportActiveAsHtml() {
   }
 }
 
+/** Exports the active document as an EPUB e-book. */
+export async function exportActiveAsEpub() {
+  const doc = activeDoc();
+  if (!doc) return;
+  try {
+    const { markdownToEpub } = await import("../services/convert/toEpub");
+    const bytes = await markdownToEpub(doc.content, { name: doc.name, docPath: doc.path, loadImage, features: features(), css: scopeCustomCss(useSettings.getState().settings.customCss) });
+    const saved = await backend().exportBinaryFile(exportFileName(doc.name, "epub"), bytes, "epub");
+    if (saved) notify("success", `Exported to ${saved}`);
+  } catch (e) {
+    notify("error", describeError(e, "export as an e-book"));
+  }
+}
+
 /** Markdown to export: a document, or a folder combined in memory. */
 interface ExportSource {
   content: string;

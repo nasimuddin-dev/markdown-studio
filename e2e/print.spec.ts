@@ -9,6 +9,8 @@ test("printing adds the document title and page numbers to each page", async ({ 
     window.print = () => {};
   });
   await page.goto("/");
+  // Keys pressed before the app has rendered are lost.
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
   await page.keyboard.insertText("# Quarterly Report\n\n" + "Some text.\n\n".repeat(120));
@@ -38,6 +40,8 @@ test("Print Slides puts each slide on its own landscape page, without speaker no
     window.print = () => {};
   });
   await page.goto("/");
+  // Keys pressed before the app has rendered are lost.
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
   await page.keyboard.insertText("# One\n\nFirst slide.\n\nNote: secret words\n\n---\n\n# Two\n\n---\n\n# Three\n");
