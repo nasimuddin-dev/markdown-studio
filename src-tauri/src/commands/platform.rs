@@ -42,8 +42,18 @@ pub fn open_external(app: AppHandle, state: State<'_, AppState>, url: String) ->
     state.track("shell.openUrl", result)
 }
 
+/// A log line from the UI. The level is checked and the text capped, so a
+/// bug (or a stray loop) in the UI can't fill the log with one entry.
 #[tauri::command]
 pub fn log_event(state: State<'_, AppState>, level: String, category: String, message: String) {
+    const MAX_CATEGORY_CHARS: usize = 64;
+    const MAX_MESSAGE_CHARS: usize = 2000;
+    let category: String = category.chars().take(MAX_CATEGORY_CHARS).collect();
+    let message: String = if message.chars().count() > MAX_MESSAGE_CHARS {
+        message.chars().take(MAX_MESSAGE_CHARS).chain("…".chars()).collect()
+    } else {
+        message
+    };
     let level = match level.as_str() {
         "error" | "warn" | "info" | "debug" => level,
         _ => "info".into(),

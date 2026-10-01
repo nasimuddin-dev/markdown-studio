@@ -26,7 +26,7 @@ Markpion works fully offline. It connects to the internet in only these cases:
 | --- | --- | --- |
 | At startup, and when you choose **Help → Check for Updates…** | It asks GitHub (`api.github.com`) for the latest version number. Like any web request, this reveals your IP address to GitHub. No document data is sent. | Yes: **Settings → Startup → Check for updates when Markpion starts** |
 | When you choose **Update Now** (Windows) | It downloads the new installer from GitHub Releases. | Don't choose Update Now |
-| When a document you preview contains an `https://` image | The image is loaded from its web server, as in a browser. | Use local images |
+| When a document you preview contains an `https://` image | The image is loaded from its web server, as in a browser, which reveals your IP address to that server. | Yes: **Settings → Preview → Show pictures from the web in the preview** (off: a placeholder is shown instead) |
 | When you click a web link in the preview | The link opens in your browser. | |
 | When you save an Anthropic API key, or run an AI command (only if the [AI assistant](/guide/ai-assistant) is turned on) | Saving the key checks it with `api.anthropic.com`. An AI command sends the selected text (or the paragraph at the cursor, or up to 6,000 characters before it) and the instruction to Anthropic's Claude API, under your key. Markpion asks before the first one. | Yes: it's off by default; **Settings → AI Assistant** |
 

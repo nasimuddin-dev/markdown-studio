@@ -46,6 +46,7 @@ Settings are saved as JSON. Unknown keys are ignored and invalid values fall bac
 | `previewDebounceMs` | `150` | 0–1000 |
 | `renderMath` | `true` | |
 | `renderDiagrams` | `true` | |
+| `previewRemoteImages` | `true` | Off: pictures from the web are placeholders in the preview, so no request leaves the computer |
 | `syncScroll` | `true` | |
 | `viewMode` | `"split"` | `"editor"`, `"split"`, `"preview"` |
 | `showExplorer`, `showOutline` | `true` | |

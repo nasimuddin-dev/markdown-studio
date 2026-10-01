@@ -656,3 +656,24 @@ The user asked to analyse the application and refactor it to be more scalable an
 1. Look into the File History e2e test that is timing-dependent under load.
 2. `commands.ts` (750 lines) could be split by domain the way the menus now are.
 3. Spacing tokens: padding and margins still use about 95 literal values.
+
+## 2026-10-01: security, performance and scalability review
+
+The user asked for a review of the code for security, scalability and performance issues, with remedies.
+
+**Reviewed:** the Rust scope checks and every command, Git, AI (Claude and Ollama), updater, storage and logs, the watcher and search; the CSP and capabilities; the Markdown sanitizer and the plugins that run after it; and the per-keystroke paths in the UI.
+
+**Fixed in this commit:**
+
+- **Dependency:** `npm audit` reported a vulnerable `@xmldom/xmldom` (high) under `speech-rule-engine` (from MathJax; not in the app bundle). An override, scoped to that package, moves it to the patched version. A first, unscoped override broke the Word importer (mammoth needs the 0.8 API); the test gate caught it.
+- **Privacy:** new setting `previewRemoteImages` (Settings → Preview, lockable by policy). Off, the preview loads no web pictures.
+- **Memory:** the preview's picture cache was an unbounded map of data URLs; it's now least-recently-used with a 96 MB budget (`services/lruCache.ts`).
+- **Typing in large documents:** the status bar counted words and tasks over the whole text on every keystroke; counts are now deferred, and above 1 MB settle after a pause. The Markdown checks skip documents over 1 MB. One shared limit (`services/limits.ts`) replaces three copies.
+- **Logs:** log lines from the UI are capped (64-character category, 2,000-character message) and kept to one line.
+- **Bug found by the new tests:** the preview dropped pictures embedded as `data:image/…` (an import opened without saving); they now show.
+
+**Found sound (no change):** path scope and traversal checks; least-privilege capabilities; `git` run with fsmonitor off, no shell and a timeout; the API key stays in Rust and the OS credential store; Ollama limited to loopback; signed updates; sanitizing before any plugin adds markup; Mermaid strict mode; KaTeX without trust.
+
+**Open (documented in TRACEABILITY Known gaps):** preview assets under a lone document's folder tree (absolute paths); base64 IPC for imports. Recommended next: raw-bytes IPC, blocking file I/O off the async runtime, splitting `commands.ts`, and `cargo audit` in CI.
+
+**Tests:** Vitest 593 (109 files), Playwright 101, Rust 46 (+1 ignored). Not released yet.

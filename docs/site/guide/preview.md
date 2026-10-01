@@ -40,7 +40,7 @@ Raw HTML in Markdown is rendered, then **sanitized with GitHub's allow-list**. S
 
 Long documents (from about 150 paragraphs, headings, lists and other blocks) are rendered in parts: the parts near what you're looking at are built first, and the rest as you scroll to them. Jumping from the outline or following a `#link` builds the whole preview first. On macOS the preview can shift slightly while a part above the visible area is built.
 
-Above **1 MB** of text, the live preview pauses so typing stays fast. A bar at the top of the preview offers **Render Now** (and then **Refresh Preview**) to render on demand. The editor handles large files normally, and files up to 50 MB can be opened.
+Above **1 MB** of text, the live preview pauses so typing stays fast. A bar at the top of the preview offers **Render Now** (and then **Refresh Preview**) to render on demand. The Markdown checks, the Git change markers and the live word count also stop running on every keystroke at that size (the status bar's counts settle a couple of seconds after you stop typing). The editor handles large files normally, and files up to 50 MB can be opened.
 
 ## Presenting as slides
 

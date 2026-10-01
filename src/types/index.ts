@@ -93,6 +93,8 @@ export interface Settings {
   syncScroll: boolean;
   renderMath: boolean;
   renderDiagrams: boolean;
+  /** Show pictures from the web (http/https) in the preview. Off: a placeholder, so no request leaves the computer. */
+  previewRemoteImages: boolean;
   lintMarkdown: boolean;
   /** Keep the cursor's line vertically centred while typing. */
   typewriterScrolling: boolean;

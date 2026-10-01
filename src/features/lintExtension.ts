@@ -8,6 +8,10 @@ import { notify, useUi } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
 import { fixAllProblems, fixChanges, LINT_RULES, lintLinks, lintMarkdown, type ProblemFix } from "./lint";
 import { minimalChange } from "./saveTransforms";
+import { LARGE_DOCUMENT_CHARS } from "../services/limits";
+
+/** Whether a document of this length is checked (very large ones aren't, to keep typing fast). */
+export const lintsDocumentOf = (length: number) => length <= LARGE_DOCUMENT_CHARS;
 
 /** Turns a check off (Settings → Editor lists it, with Show Again). */
 function hideRule(rule: string): Action {
@@ -89,6 +93,10 @@ export function markdownLinter(): Extension {
   return [
     linter(
       async (view) => {
+        if (!lintsDocumentOf(view.state.doc.length)) {
+          useUi.getState().setProblems(null);
+          return [];
+        }
         const text = view.state.doc.toString();
         const doc = activeDoc();
         const hidden = new Set(useSettings.getState().settings.lintDisabledRules);

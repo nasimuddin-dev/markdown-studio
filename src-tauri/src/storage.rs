@@ -147,7 +147,8 @@ impl Logger {
             level.to_uppercase(),
             env!("CARGO_PKG_VERSION"),
             category,
-            self.redact(message).replace('\n', " ")
+            // One line per entry: line breaks in the text can't forge extra entries.
+            self.redact(message).replace(['\n', '\r'], " ")
         );
         if let Ok(mut f) = OpenOptions::new().create(true).append(true).open(&self.path) {
             let _ = f.write_all(line.as_bytes());
@@ -214,6 +215,16 @@ mod tests {
         let v = serde_json::json!({ "theme": "dark", "fontSize": 15 });
         write_json(&p, &v).unwrap();
         assert_eq!(read_json(&p), v);
+    }
+
+    #[test]
+    fn keeps_each_entry_on_one_line() {
+        let tmp = tempfile::tempdir().unwrap();
+        let logger = Logger::new(tmp.path().to_path_buf(), None);
+        logger.log("info", "test", "first\r\nsecond\nthird");
+        let text = fs::read_to_string(logger.path()).unwrap();
+        assert_eq!(text.lines().count(), 1);
+        assert!(text.contains("first  second third"));
     }
 
     #[test]

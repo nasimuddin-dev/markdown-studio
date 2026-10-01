@@ -1,3 +1,4 @@
+import { LARGE_DOCUMENT_CHARS } from "../services/limits";
 import { RangeSet, StateEffect, StateField, type EditorState, type Extension, type StateCommand, type Transaction } from "@codemirror/state";
 import { EditorView, GutterMarker, gutter, showTooltip, type Tooltip } from "@codemirror/view";
 import { backend } from "../services";
@@ -42,7 +43,7 @@ export interface Hunk {
 
 /** Keeps each comparison fast enough to run on every keystroke. */
 const MAX_CELLS = 1_000_000;
-const MAX_DOCUMENT_CHARS = 1_000_000;
+const MAX_DOCUMENT_CHARS = LARGE_DOCUMENT_CHARS;
 
 /** The changed regions between the committed text and the current one, or null when they differ too much to compare quickly. */
 export function changeHunks(base: string, current: string): Hunk[] | null {

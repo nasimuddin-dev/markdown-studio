@@ -1,10 +1,12 @@
 import { memo, useEffect, useMemo, useRef, useState, type ComponentProps, type MouseEvent } from "react";
-import ReactMarkdown, { type Components } from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform, type Components } from "react-markdown";
 import { markdownPlugins } from "../services/markdown";
 import { splitFrontMatter } from "../services/frontMatter";
 import { MermaidDiagram } from "./MermaidDiagram";
 import { backend } from "../services";
 import { resolveRelative } from "../services/paths";
+import { LruCache } from "../services/lruCache";
+import { IMAGE_CACHE_BYTES, LARGE_DOCUMENT_CHARS } from "../services/limits";
 import { useDocuments } from "../stores/documentsStore";
 import { useSettings } from "../stores/settingsStore";
 import { copyText } from "../features/pathActions";
@@ -44,11 +46,24 @@ function useDebounced<T>(value: T, ms: number): T {
   return debounced;
 }
 
-const imageCache = new Map<string, string>();
+/**
+ * react-markdown drops every `data:` address; pictures embedded as
+ * `data:image/…` (an import opened without saving, a pasted inline image) are
+ * safe in an <img> and are kept. Links and everything else keep the default rule.
+ */
+function previewUrl(url: string, key: string, node: { tagName?: string }): string {
+  if (key === "src" && node.tagName === "img" && /^data:image\/[a-z0-9.+-]+[;,]/i.test(url)) return url;
+  return defaultUrlTransform(url);
+}
+
+/** Decoded local pictures (data URLs), bounded so a long session with many pictures doesn't keep growing. */
+const imageCache = new LruCache<string>(IMAGE_CACHE_BYTES, (dataUrl) => dataUrl.length);
 
 /** Loads images referenced with a relative/local path through the backend. */
 function LocalImage({ src, alt, title, docPath }: { src?: string; alt?: string; title?: string; docPath: string | null }) {
   const remote = !src || /^(https?:|data:)/i.test(src);
+  const web = !!src && /^https?:/i.test(src);
+  const webImages = useSettings((s) => s.settings.previewRemoteImages);
   const resolved = !remote && docPath ? resolveRelative(docPath, src!) : null;
   const [url, setUrl] = useState<string | null>(() => (resolved ? imageCache.get(resolved) ?? null : null));
   const [failed, setFailed] = useState(false);
@@ -74,6 +89,14 @@ function LocalImage({ src, alt, title, docPath }: { src?: string; alt?: string; 
     };
   }, [resolved]);
 
+  if (web && !webImages) {
+    // No request leaves the computer for a document's web pictures (Settings → Preview).
+    return (
+      <span className="preview-missing-image" title={src}>
+        🖼 {alt || src} (pictures from the web are off in Settings → Preview)
+      </span>
+    );
+  }
   if (remote) return <img src={src} alt={alt ?? ""} title={title} loading="lazy" />;
   if (!resolved || failed) {
     return (
@@ -221,7 +244,7 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text
   return (
     <>
       {frontMatter && frontMatter.entries.length > 0 && <FrontMatterTable entries={frontMatter.entries} />}
-      <ReactMarkdown remarkPlugins={plugins.remarkPlugins} rehypePlugins={plugins.rehypePlugins} components={components}>
+      <ReactMarkdown remarkPlugins={plugins.remarkPlugins} rehypePlugins={plugins.rehypePlugins} components={components} urlTransform={previewUrl}>
         {frontMatter ? frontMatter.body : text}
       </ReactMarkdown>
     </>
@@ -229,7 +252,7 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text
 });
 
 /** Above this size the live preview pauses until the user asks for a render (NFR-002). */
-export const LARGE_DOCUMENT_CHARS = 1_000_000;
+export { LARGE_DOCUMENT_CHARS };
 
 /** Debounces preview updates (FR-031); keyed per document so tab switches render immediately. */
 function DebouncedMarkdown({ text, docPath }: { text: string; docPath: string | null }) {

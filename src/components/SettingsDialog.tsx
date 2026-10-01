@@ -150,6 +150,7 @@ export function SettingsDialog() {
           </select>
           <label className="check"><input type="checkbox" checked={settings.renderMath} disabled={isLocked("renderMath")} onChange={(e) => update({ renderMath: e.target.checked })} /> Render LaTeX math ($…$ and $$…$$)</label>
           <label className="check"><input type="checkbox" checked={settings.renderDiagrams} disabled={isLocked("renderDiagrams")} onChange={(e) => update({ renderDiagrams: e.target.checked })} /> Render Mermaid diagrams</label>
+          <label className="check"><input type="checkbox" checked={settings.previewRemoteImages} disabled={isLocked("previewRemoteImages")} onChange={(e) => update({ previewRemoteImages: e.target.checked })} /> Show pictures from the web in the preview (off: no request leaves the computer; exports keep the links)</label>
           <label className="check"><input type="checkbox" checked={settings.syncScroll} disabled={isLocked("syncScroll")} onChange={(e) => update({ syncScroll: e.target.checked })} /> Sync editor and preview scrolling</label>
           <label htmlFor="setting-customCss">Custom CSS for documents</label>
           <textarea

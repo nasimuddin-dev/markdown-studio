@@ -56,6 +56,7 @@ Existing files always keep their own line endings. Untitled documents are never 
 | Update delay after typing | Instant, 150 ms, 300 ms, 600 ms, 1 second | 150 ms |
 | Render LaTeX math (`$…$` and `$$…$$`) | | On |
 | Render Mermaid diagrams | | On |
+| Show pictures from the web in the preview | Off: an `https://` picture in a document is shown as a placeholder and no request leaves the computer. HTML export keeps the links either way | On |
 | Sync editor and preview scrolling | | On |
 | Custom CSS for documents | Your own CSS | Empty |
 

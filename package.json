@@ -92,6 +92,9 @@
     "vitest": "^5.0.1"
   },
   "overrides": {
-    "lodash-es": "^4.18.1"
+    "lodash-es": "^4.18.1",
+    "speech-rule-engine": {
+      "@xmldom/xmldom": "^0.9.12"
+    }
   }
 }

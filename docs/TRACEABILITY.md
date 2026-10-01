@@ -64,6 +64,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.23.0. **Done** means im
 | SEC-002/003 | Done | Absolute paths only, `..` rejected, canonicalised scope check |
 | SEC-004 | Done | Sanitisation tests in [markdown.test.tsx](../tests/markdown.test.tsx) |
 | SEC-005 | Done | `open_external` accepts only http, https and mailto |
+| SEC (privacy) | Done | `previewRemoteImages` (Settings → Preview, policy-lockable): off, the preview loads no web pictures. Log lines from the UI are capped (64-char category, 2,000-char message) and kept to one line (`commands/platform.rs`, `storage.rs`) |
 | SEC-006/007 | N/A | No AI or secrets in the MVP |
 | SEC-008 | Partial | Updates are minisign-signed and verified. Installers aren't code-signed yet: Windows needs an Authenticode certificate; macOS is ad-hoc signed until an Apple Developer ID is added as `APPLE_*` secrets (the workflow then signs and notarizes) |
 | UPD-001, UPD-002, UPD-004 | Done | `features/updates.ts`: a check on every startup (optional; Settings → Startup) and Help → Check for Updates. Shows the current and available versions, with Update Now, Later and Skip This Version. Where no in-place update exists for the platform (macOS, Linux), it offers the release page instead. Tests: `tests/updates.test.ts` |
@@ -154,6 +155,9 @@ Status of each [SRS](SRS.md) requirement as of version 0.23.0. **Done** means im
 | Visual regression (local) | `e2e-shots/visual.spec.ts` (Playwright, pixel-exact against a local baseline; not in CI because the pixels depend on the OS fonts) | 28 screens in 6 tests |
 
 ## Known gaps and next improvements
+
+- Preview assets: a document opened on its own may show pictures from anywhere under its folder (so a README finds its `images/`), including absolute paths; a document from an untrusted source that references a picture by absolute path can therefore show, and HTML export can embed, a picture from that tree. Pictures only; nothing is sent anywhere. A stricter rule (relative paths only) is under consideration.
+- Imports read the whole file as base64 through IPC (up to 100 MB, about four times that in memory while converting). A raw-bytes IPC response would halve it.
 
 - Updating links after a rename or move covers inline links, images, reference-style definitions, wiki links, HTML `<a href>`/`<img src>` and absolute paths (kept absolute); links after renames made outside the app aren't updated (Check Links in Folder finds broken ones).
 - Upgrading from Markdown Studio (the old name) on Windows can't remove an all-users install when Markpion is installed for the current user only (removing it needs administrator rights), so both stay installed until the old one is uninstalled by hand. A taskbar pin of Markdown Studio is lost on upgrade (Windows doesn't let installers pin apps). The GitHub Pages site moved to nasimuddin-dev.github.io/markpion; the old address doesn't redirect (not planned: the user decided on 2026-09-30 that no redirect is needed).

@@ -1,9 +1,29 @@
-import { useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { LARGE_DOCUMENT_CHARS } from "../services/limits";
 import { useGit } from "../stores/gitStore";
 import { useDocuments, isDirty } from "../stores/documentsStore";
 import { useUi } from "../stores/uiStore";
 import { useSettings } from "../stores/settingsStore";
 import { countWords, readingEaseLabel, textStats } from "../services/textStats";
+
+/**
+ * The text the live counts are computed from. Normally it follows the
+ * document at a lower priority than typing (React defers it); above
+ * LARGE_DOCUMENT_CHARS it updates at most every `ms`, so counting words in a
+ * huge document never runs on every keystroke.
+ */
+function useCountedText(text: string | undefined, ms = 2000): string | undefined {
+  const deferred = useDeferredValue(text);
+  const large = text !== undefined && text.length > LARGE_DOCUMENT_CHARS;
+  const [settled, setSettled] = useState(text);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (!large) return;
+    timer.current = setTimeout(() => setSettled(text), ms);
+    return () => clearTimeout(timer.current);
+  }, [text, large, ms]);
+  return large ? settled : deferred;
+}
 
 const ease = (score: number | null) => (score === null ? "—" : `${score} (${readingEaseLabel(score)})`);
 import { getEditorView, showProblems } from "../features/editorBridge";
@@ -22,7 +42,8 @@ export function StatusBar() {
   const lintOn = useSettings((s) => s.settings.lintMarkdown);
   const problems = useUi((s) => s.problems);
   const goals = useSettings((s) => s.settings.wordGoals);
-  const words = useMemo(() => (doc ? countWords(doc.content) : 0), [doc?.content]); // eslint-disable-line react-hooks/exhaustive-deps
+  const counted = useCountedText(doc?.content) ?? "";
+  const words = useMemo(() => countWords(counted), [counted]);
 
   let state = "";
   if (doc) {
@@ -64,8 +85,8 @@ export function StatusBar() {
               {cursor.selected > 0 && ` (${cursor.selected} selected)`}
             </button>
           )}
-          <TaskProgress content={doc.content} />
-          <WordCount words={words} content={doc.content} goal={doc.path ? goals[doc.path] : undefined} />
+          <TaskProgress content={counted} />
+          <WordCount words={words} content={counted} goal={doc.path ? goals[doc.path] : undefined} />
           {autoSave !== "off" && doc.path && <span className="status-item" title="Auto save is on">Auto save</span>}
           <button
             className="status-item status-button status-low"
