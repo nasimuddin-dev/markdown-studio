@@ -559,11 +559,7 @@ export class MemoryBackend implements Backend {
     this.lastExport = { name: suggestedName, content };
     if (typeof URL.createObjectURL !== "function") return suggestedName;
     const type = kind === "html" ? "text/html" : "text/plain";
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([content], { type }));
-    a.download = suggestedName;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    downloadBlob(suggestedName, new Blob([content], { type }));
     this.lastExport = { name: suggestedName, content };
     return suggestedName;
   }
@@ -572,11 +568,7 @@ export class MemoryBackend implements Backend {
     this.lastExport = { name: suggestedName, content: "", bytes };
     if (typeof URL.createObjectURL !== "function") return suggestedName;
     const type = kind === "pdf" ? "application/pdf" : kind === "zip" ? "application/zip" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([bytes as BlobPart], { type }));
-    a.download = suggestedName;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    downloadBlob(suggestedName, new Blob([bytes as BlobPart], { type }));
     return suggestedName;
   }
 
@@ -655,12 +647,7 @@ export class MemoryBackend implements Backend {
     this.logs.push(`[${level}] ${category}: ${message}`);
   }
   async exportLogs() {
-    const blob = new Blob([this.logs.join("\n")], { type: "text/plain" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "markpion-diagnostics.log";
-    a.click();
-    URL.revokeObjectURL(a.href);
+    if (typeof URL.createObjectURL === "function") downloadBlob("markpion-diagnostics.log", new Blob([this.logs.join("\n")], { type: "text/plain" }));
     return "markpion-diagnostics.log";
   }
 
@@ -674,6 +661,19 @@ export class MemoryBackend implements Backend {
     this.files.delete(path);
     this.notifyFs(path);
   }
+}
+
+/**
+ * Hands a file to the browser as a download. The object URL stays valid for a
+ * minute: the browser reads it after the click, which on a busy machine can take
+ * well over a second, and revoking it sooner cancels the download.
+ */
+function downloadBlob(name: string, blob: Blob) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
 }
 
 export function createDemoBackend() {
