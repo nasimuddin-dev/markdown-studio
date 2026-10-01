@@ -7,6 +7,24 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.24.0
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.24.0)
+
+### Added
+
+- **Breadcrumbs** above the editor show where the cursor is in the document's headings, for example **notes.md › Guide › Install**. Click a part to list the headings at that level and jump to one. Turn them off with **View → Breadcrumbs**.
+
+### Changed
+
+- **Long documents appear much faster.** A document over 100 KB is prepared section by section: the part you're looking at shows right away and the rest as you scroll to it, and an edit only re-prepares the section it touches. In our measurement an 800 KB document appeared in 1.6 seconds instead of 12.6.
+- Exporting to PDF, Word or a .zip uses less memory.
+- A more even look: spacing inside buttons, menus, lists and dialogs now follows one scale, so some elements moved by a pixel or two.
+
+### Fixed
+
+- Lines starting with `#` inside an HTML comment (`<!-- … -->`), a `<pre>` block or a `$$` math block were treated as headings: they appeared in the Outline, the table of contents and heading suggestions, and could shift the anchors of real headings after them.
+
 ## v0.23.1
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.23.1)

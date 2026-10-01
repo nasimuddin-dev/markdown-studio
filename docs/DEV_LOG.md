@@ -703,3 +703,27 @@ The user asked for every issue found to be fixed.
 1. Run the Linux watcher on a real Linux desktop.
 2. Send exports to the native side as raw bytes too.
 3. The File History e2e test that is timing-dependent under load.
+
+## 2026-09-30 (9:26 PM – midnight): development loop, 0.24.0
+
+The user asked to keep the development loop going until midnight.
+
+| Item | Commit |
+| --- | --- |
+| Exports (PDF, Word, zip) reach the native side as a raw request body, with name and kind in headers; a native e2e test exports 70,000 bytes through the real Save dialog (answered by `e2e-native/save-dialog.ps1`) and checks every byte | 34b37a8 |
+| The timing-dependent File History e2e test: the edited line wraps, and End goes to the end of a row, not the line; the test now clicks past the end of the last row (10/10 in parallel) | 624b004 |
+| Spacing scale `--space-1..10`: 238 values were exact (pixel-identical), 38 off-scale ones folded into the nearest step (1–2px, reviewed); guarded by `tests/styles.test.ts`. The visual check now uses soft assertions | 4957da7 |
+| Breadcrumbs above the editor (View → Breadcrumbs), with jumps to sibling headings | 8c53135 |
+| Long documents previewed section by section (800 KB: 1.6 s instead of 12.6 s to first display, dev build), with an equivalence test against the single pass | dd8f0bd |
+
+**Bug found by the equivalence test:** the outline's heading list counted `#` lines in HTML comments, `<pre>` and `$$` math as headings, unlike the preview; fixed in dd8f0bd.
+
+**Version:** 0.24.0. **Tests:** Vitest 606 (112 files), Playwright 103, Rust 50 (+1 ignored), native 5, visual regression 28 screens (local), website check.
+
+**Unverified:** the sectioned preview on macOS (WebKit) and Linux; the speed-up was measured in the development build on Windows.
+
+**Next up:**
+
+1. Sections below an edit re-parse when their line numbers shift; carrying the offset outside the parse would avoid that.
+2. A smaller startup bundle.
+3. The Linux watcher on a real Linux desktop.

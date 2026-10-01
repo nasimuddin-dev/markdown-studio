@@ -1,2 +1,2 @@
-9e8c23552993e4691aabbbce00a901f877c9e0b612f8f1e5f644a4e5838c426c  Markpion-0.23.1-windows-x64-setup.exe
-7cccc453989cf26d3a8d43f8622b204aabec17109cf801d84e40e215a3961bbf  Markpion-0.23.1-windows-x64-offline-setup.exe
+81093dfa5f6291d0e064153514f56bde700b750dbb13f42e4b88a0907b69f4f8  Markpion-0.24.0-windows-x64-setup.exe
+f9e9468c9582c2367058170099f2d66c9148d0cd511c700fea74df06d451c1c0  Markpion-0.24.0-windows-x64-offline-setup.exe
