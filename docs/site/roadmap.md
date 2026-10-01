@@ -26,7 +26,7 @@ Nothing is actively under development right now. The next items are chosen from 
 
 ## Planned
 
-- **All math in PDF export:** every inline formula. Display formulas are drawn on every system; inline formulas with symbols the built-in font lacks still keep their LaTeX. HTML export and Print → Save as PDF render all formulas.
+- **All math in PDF export:** every inline formula. Display formulas are drawn on every system, and inline formulas with arrows, set symbols and blackboard capitals are set as text in KaTeX's fonts; inline formulas with nested scripts, matrices or overlaid symbols (`\notin`) still keep their LaTeX. HTML export and Print → Save as PDF render all formulas.
 - **Performance:** keeping very large documents (several MB) responsive while every section is open in the preview, and trimming the start-up bundle further. (Long documents now appear section by section, and the start-up bundle lost 120 KB; see the [changelog](/changelog).)
 - **End-to-end tests of the native app** on macOS and Linux (Windows has a first set, run with `npm run test:native`), and testing the macOS and Linux builds on real hardware.
 

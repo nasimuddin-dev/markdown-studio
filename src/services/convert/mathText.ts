@@ -2,8 +2,9 @@
  * Inline formulas for PDF export, as styled text: PDF text can't flow around
  * pictures, so `$E = mc^2$` becomes text runs with italic variables and real
  * superscripts and subscripts. Formulas outside the LaTeX subset, with nested
- * scripts, or needing symbols the bundled Roboto font doesn't have (arrows,
- * set notation…) return null, and the caller keeps their LaTeX source.
+ * scripts, or with a symbol none of the fonts has, return null, and the caller
+ * keeps their LaTeX source. Symbols the bundled Roboto font lacks (arrows, set
+ * notation, logic…) are drawn in KaTeX's fonts, as in the preview.
  */
 import { parseLatex, type MathNode } from "./latex";
 
@@ -12,15 +13,27 @@ export interface MathRun {
   italics?: boolean;
   sup?: boolean;
   sub?: boolean;
+  /** Drawn in KaTeX's main font (`symbols`) or as a plain capital in its AMS font (`doubleStruck`: ℝ is "R"). */
+  font?: "symbols" | "doubleStruck";
 }
 
 /** Symbols Roboto lacks, replaced by a glyph it has that looks the same. */
-const SUBSTITUTES: Record<string, string> = { "ϵ": "ε", "ϕ": "φ", "⋅": "·", "∙": "·", "∗": "*", "∼": "~", "⋯": "…" };
+const SUBSTITUTES: Record<string, string> = { "ϵ": "ε", "ϕ": "φ", "⋅": "·", "∙": "·", "∗": "*", "∼": "~", "⋯": "…", "‖": "∥" };
 
 /** Characters beyond ASCII, Latin-1 and Greek that Roboto can draw (checked by a test). */
 export const EXTRA_GLYPHS = "ϑϖ−′″∑∫∏√∞∂≤≥≠≈…ℓ";
 
-const SPACED = new Set(["=", "<", ">", "≤", "≥", "≠", "≈", "+", "−", "×", "÷", "±", "~"]);
+/** Symbols Roboto lacks that KaTeX_Main-Regular has (checked by a test). */
+export const SYMBOL_GLYPHS = "∓⋆∘≃≡≅∝≪≫→←↔⇒⇐⇔↦⟹⟺↑↓∈∋⊂⊆⊃⊇∪∩∖∅∀∃∧∨⊕⊗⊥∥∠△∇ℏℜℑℵ⋮⋱⟨⟩∣⌊⌋⌈⌉";
+
+/** Double-struck capitals (\mathbb), which KaTeX draws as plain capitals in its AMS font. */
+export const DOUBLE_STRUCK_LETTERS: Record<string, string> = { "ℝ": "R", "ℕ": "N", "ℤ": "Z", "ℚ": "Q", "ℂ": "C", "ℙ": "P", "ℍ": "H" };
+
+/** Relations and binary operators, set with a space on each side (as TeX does). */
+const SPACED = new Set([
+  "=", "<", ">", "≤", "≥", "≠", "≈", "+", "−", "×", "÷", "±", "∓", "~", "≡", "≅", "≃", "∝", "≪", "≫",
+  "→", "←", "↔", "⇒", "⇐", "⇔", "↦", "⟹", "⟺", "∈", "∋", "⊂", "⊆", "⊃", "⊇", "∪", "∩", "∖", "∧", "∨", "⊕", "⊗", "∘",
+]);
 
 function hasGlyph(ch: string): boolean {
   const cp = ch.codePointAt(0)!;
@@ -124,6 +137,20 @@ export function mathTextRuns(latex: string): MathRun[] | null {
     merged[merged.length - 1].text = merged[merged.length - 1].text.replace(/ +$/, "");
   }
   const result = merged.filter((r) => r.text !== "").map((r) => ({ ...r, text: r.text.replace(/ {2,}/g, " ") }));
-  if (!result.length || !result.every((r) => [...r.text].every(hasGlyph))) return null;
-  return result;
+  if (!result.length) return null;
+  // Split runs where the font changes; a character no font has keeps the LaTeX.
+  const split: MathRun[] = [];
+  for (const r of result) {
+    for (const ch of r.text) {
+      const font = hasGlyph(ch) ? undefined : SYMBOL_GLYPHS.includes(ch) ? "symbols" : DOUBLE_STRUCK_LETTERS[ch] ? "doubleStruck" : null;
+      if (font === null) return null;
+      const text = font === "doubleStruck" ? DOUBLE_STRUCK_LETTERS[ch] : ch;
+      // The symbol fonts are upright.
+      const italics = !!r.italics && !font;
+      const last = split[split.length - 1];
+      if (last && last.font === font && !!last.italics === italics && !!last.sup === !!r.sup && !!last.sub === !!r.sub) last.text += text;
+      else split.push({ text, ...(italics ? { italics } : {}), ...(r.sup ? { sup: true } : {}), ...(r.sub ? { sub: true } : {}), ...(font ? { font } : {}) });
+    }
+  }
+  return split;
 }

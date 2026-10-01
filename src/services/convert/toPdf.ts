@@ -145,7 +145,11 @@ class PdfBuilder {
           // PDF text can't flow around pictures, so inline formulas are set as
           // text; ones the font can't draw keep their LaTeX source.
           const runs = mathTextRuns(n.value);
-          if (runs) out.push(...runs.map((r) => ({ ...style, ...r, ...(style.italics ? { italics: true } : {}) })));
+          if (runs) {
+            out.push(
+              ...runs.map(({ font, ...r }) => ({ ...style, ...r, ...(style.italics && !font ? { italics: true } : {}), ...(font ? { font: MATH_FONTS[font] } : {}) })),
+            );
+          }
           else out.push({ text: `$${n.value}$`, ...style, style: "inlineCode" });
           break;
         }
@@ -345,6 +349,9 @@ class PdfBuilder {
   }
 }
 
+/** pdfmake font families for formula symbols Roboto lacks (KaTeX's fonts, as in the preview). */
+const MATH_FONTS = { symbols: "KaTeXMain", doubleStruck: "KaTeXAMS" } as const;
+
 let fontsReady: Promise<typeof import("pdfmake/build/pdfmake")> | null = null;
 
 async function pdfmake() {
@@ -355,6 +362,17 @@ async function pdfmake() {
     const courierMod = (await import("pdfmake/build/standard-fonts/Courier")) as unknown as { default?: unknown };
     pm.addVirtualFileSystem((vfsMod.default ?? vfsMod) as Record<string, string>);
     pm.addFontContainer((courierMod.default ?? courierMod) as never);
+    // KaTeX's fonts (OFL), for symbols in inline formulas; only the glyphs used are embedded in the PDF.
+    const [main, ams] = await Promise.all([
+      import("katex/dist/fonts/KaTeX_Main-Regular.ttf?inline"),
+      import("katex/dist/fonts/KaTeX_AMS-Regular.ttf?inline"),
+    ]);
+    const base64 = (url: string) => url.slice(url.indexOf(",") + 1);
+    const family = (file: string) => ({ normal: file, bold: file, italics: file, bolditalics: file });
+    pm.addFontContainer({
+      vfs: { "KaTeX_Main-Regular.ttf": base64(main.default), "KaTeX_AMS-Regular.ttf": base64(ams.default) },
+      fonts: { [MATH_FONTS.symbols]: family("KaTeX_Main-Regular.ttf"), [MATH_FONTS.doubleStruck]: family("KaTeX_AMS-Regular.ttf") },
+    } as never);
     return pm;
   })();
   return fontsReady;

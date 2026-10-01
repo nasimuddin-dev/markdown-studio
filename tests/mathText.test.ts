@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EXTRA_GLYPHS, mathTextRuns } from "../src/services/convert/mathText";
+import { DOUBLE_STRUCK_LETTERS, EXTRA_GLYPHS, mathTextRuns, SYMBOL_GLYPHS } from "../src/services/convert/mathText";
 
 const text = (latex: string) => mathTextRuns(latex)?.map((r) => r.text).join("") ?? null;
 
@@ -36,11 +36,34 @@ describe("inline formulas as PDF text", () => {
   });
 
   it("returns null for glyphs the font lacks, nested scripts and unsupported LaTeX", () => {
-    expect(mathTextRuns("A \\subset B")).toBeNull();
-    expect(mathTextRuns("x \\to \\infty")).toBeNull();
+    expect(mathTextRuns("x \\notin A")).toBeNull();
     expect(mathTextRuns("e^{x^2}")).toBeNull();
     expect(mathTextRuns("\\begin{matrix} a \\end{matrix}")).toBeNull();
     expect(mathTextRuns("\\unknown")).toBeNull();
+  });
+
+  it("draws arrows, set notation and logic in KaTeX's font, and blackboard capitals in its AMS font", () => {
+    expect(mathTextRuns("x \\to \\infty")).toEqual([{ text: "x", italics: true }, { text: " " }, { text: "→", font: "symbols" }, { text: " ∞" }]);
+    expect(mathTextRuns("A \\subseteq B \\cup C")).toEqual([
+      { text: "A", italics: true }, { text: " " }, { text: "⊆", font: "symbols" }, { text: " " }, { text: "B", italics: true },
+      { text: " " }, { text: "∪", font: "symbols" }, { text: " " }, { text: "C", italics: true },
+    ]);
+    expect(mathTextRuns("\\forall x \\in \\mathbb{R}")).toEqual([
+      { text: "∀", font: "symbols" }, { text: "x", italics: true }, { text: " " }, { text: "∈", font: "symbols" }, { text: " " }, { text: "R", font: "doubleStruck" },
+    ]);
+    // In a superscript the symbol stays raised.
+    expect(mathTextRuns("e^{\\to}")).toEqual([{ text: "e", italics: true }, { text: "→", sup: true, font: "symbols" }]);
+  });
+
+  it("only uses symbols KaTeX's fonts can draw", async () => {
+    const fontkitName = "fontkit";
+    const fontkit = (await import(/* @vite-ignore */ fontkitName)) as unknown as { create(b: Uint8Array): { hasGlyphForCodePoint(c: number): boolean } };
+    const { readFileSync } = await import("node:fs");
+    const font = (name: string) => fontkit.create(readFileSync(`node_modules/katex/dist/fonts/${name}.ttf`));
+    const main = font("KaTeX_Main-Regular");
+    expect([...SYMBOL_GLYPHS].filter((c) => !main.hasGlyphForCodePoint(c.codePointAt(0)!))).toEqual([]);
+    const ams = font("KaTeX_AMS-Regular");
+    expect(Object.values(DOUBLE_STRUCK_LETTERS).filter((c) => !ams.hasGlyphForCodePoint(c.codePointAt(0)!))).toEqual([]);
   });
 
   it("only allows characters the bundled Roboto font can draw", async () => {
