@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { activeDoc, useDocuments } from "../stores/documentsStore";
 import { useUi } from "../stores/uiStore";
 import { splitNotes, splitSlides } from "../features/slides";
-import { getEditorView } from "../features/editorBridge";
+import { rememberFocus } from "../features/editorBridge";
 import { followPreviewLink, MarkdownView } from "./Preview";
 
 /**
@@ -24,10 +24,9 @@ export function SlideShow() {
   const slideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
+    const restore = rememberFocus();
     ref.current?.focus();
-    // Back to where the show was started from (the editor, if that was a menu that has closed).
-    return () => (previous?.isConnected ? previous.focus() : getEditorView()?.focus());
+    return restore;
   }, []);
 
   useEffect(() => {

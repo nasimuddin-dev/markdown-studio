@@ -738,6 +738,33 @@ test("present a document as slides", async ({ page }) => {
   await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
 });
 
+test("a slow first-use dialog still gives focus back to the editor when it closes", async ({ page }) => {
+  // Delay the on-demand modules, as on a busy machine: the menu has closed before they mount.
+  await page.route(/\/src\/components\/(SlideShow|SettingsDialog)\.tsx/, async (route) => {
+    await new Promise((r) => setTimeout(r, 800));
+    await route.continue();
+  });
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  const editor = page.getByRole("textbox", { name: "Markdown editor" });
+  await editor.click();
+  await page.keyboard.insertText("# One\n\n---\n\n# Two\n");
+  await chooseMenu(page, "View", "Slides", "Present as Slides");
+  const show = page.getByRole("dialog", { name: "Slide show" });
+  await expect(show).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(show).toBeHidden();
+  await expect(editor).toBeFocused();
+
+  await page.getByRole("button", { name: "File", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Settings…" }).click();
+  const settings = page.getByRole("dialog", { name: "Settings" });
+  await expect(settings).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(settings).toBeHidden();
+  await expect(editor).toBeFocused();
+});
+
 test("resize the outline against the explorer, and close the folder from the explorer", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

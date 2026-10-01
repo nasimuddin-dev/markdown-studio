@@ -12,7 +12,7 @@ import { useWorkspace } from "../stores/workspaceStore";
 import { backend } from "../services";
 import { isMarkdownPath } from "../services/paths";
 import { openPath } from "../features/documents";
-import { requestReveal } from "../features/editorBridge";
+import { rememberFocus, requestReveal } from "../features/editorBridge";
 import { collectFolderHeadings, type FolderHeading } from "../features/workspace";
 import { collectFolderTags, tagLabel } from "../features/tags";
 import { recentCommands, rememberCommand } from "../features/recentCommands";
@@ -175,9 +175,9 @@ function PaletteBody({ mode, onClose }: { mode: PaletteMode; onClose(): void }) 
 
   useEffect(() => {
     // Remember where focus was before the palette took it, to give it back on close.
-    const previous = document.activeElement as HTMLElement | null;
+    const restore = rememberFocus();
     input.current?.focus();
-    return () => previous?.focus?.();
+    return restore;
   }, []);
   useEffect(() => setActive(0), [query]);
   useEffect(() => {

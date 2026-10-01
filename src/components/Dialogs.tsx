@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useUi, type DialogRequest } from "../stores/uiStore";
+import { rememberFocus } from "../features/editorBridge";
 
 /** Accessible modal: traps focus, closes on Escape, restores focus afterwards. */
 export function Modal({ title, onClose, children, className, labelledBy }: {
@@ -11,11 +12,11 @@ export function Modal({ title, onClose, children, className, labelledBy }: {
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
+    const restore = rememberFocus();
     const el = ref.current!;
     const first = el.querySelector<HTMLElement>("[data-autofocus]") ?? el.querySelector<HTMLElement>("input, button.primary, button");
     first?.focus();
-    return () => previous?.focus?.();
+    return restore;
   }, []);
 
   return (

@@ -15,6 +15,18 @@ export function getEditorView() {
   return view;
 }
 
+/**
+ * The element to give focus back to when an overlay closes: what had focus when it
+ * opened, unless that was nothing (`<body>`, as when a menu closed before a dialog
+ * loaded on first use). Call when the overlay opens; call the result when it closes.
+ */
+export function rememberFocus(): () => void {
+  const active = document.activeElement as HTMLElement | null;
+  const previous = active && active !== document.body ? active : null;
+  // A menu item that started the overlay has gone by then; the editor is the place to return to.
+  return () => (previous?.isConnected ? previous.focus() : view?.focus());
+}
+
 /** Runs a CodeMirror command against the active editor and returns focus to it. */
 export function runOnEditor(command: StateCommand) {
   if (!view) return;
