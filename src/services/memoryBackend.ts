@@ -75,7 +75,16 @@ export class MemoryBackend implements Backend {
 
   constructor(opts: MemoryBackendOptions = {}) {
     this.storageKey = opts.storageKey ?? null;
-    this.promptFn = opts.prompt ?? ((m, d) => window.prompt(m, d));
+    // Where prompt() isn't available (embedded browsers, cross-origin frames), the default answer is used.
+    this.promptFn =
+      opts.prompt ??
+      ((m, d) => {
+        try {
+          return window.prompt(m, d);
+        } catch {
+          return d;
+        }
+      });
     this.aiFn = opts.ai;
     this.policy = opts.policy ?? null;
     this.git = opts.git ?? null;
