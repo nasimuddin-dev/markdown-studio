@@ -37,7 +37,7 @@ describe("inline formulas as PDF text", () => {
 
   it("returns null for glyphs the font lacks, nested scripts and unsupported LaTeX", () => {
     expect(mathTextRuns("x \\notin A")).toBeNull();
-    expect(mathTextRuns("e^{x^2}")).toBeNull();
+    expect(mathTextRuns("e^{x^y}")).toBeNull();
     expect(mathTextRuns("\\begin{matrix} a \\end{matrix}")).toBeNull();
     expect(mathTextRuns("\\unknown")).toBeNull();
   });
@@ -53,6 +53,12 @@ describe("inline formulas as PDF text", () => {
     ]);
     // In a superscript the symbol stays raised.
     expect(mathTextRuns("e^{\\to}")).toEqual([{ text: "e", italics: true }, { text: "→", sup: true, font: "symbols" }]);
+  });
+
+  it("sets digits and signs in a script inside a script as Unicode script characters", () => {
+    expect(mathTextRuns("e^{-x^2}")).toEqual([{ text: "e", italics: true }, { text: "−", sup: true }, { text: "x", italics: true, sup: true }, { text: "²", sup: true }]);
+    expect(mathTextRuns("a_{i_{10}}")).toEqual([{ text: "a", italics: true }, { text: "i", italics: true, sub: true }, { text: "₁₀", sub: true }]);
+    expect(mathTextRuns("2^{2^n}")).toEqual([{ text: "2" }, { text: "2ⁿ", sup: true }]);
   });
 
   it("only uses symbols KaTeX's fonts can draw", async () => {

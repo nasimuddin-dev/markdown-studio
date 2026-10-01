@@ -750,7 +750,7 @@ The user asked to keep the development loop going until 12 PM.
 
 **Version:** 0.25.0. **Tests:** Vitest 656 (119 files), Playwright 110, Rust 50 (+1 ignored), native 5 (now also exporting an EPUB and a LaTeX file through the real Save dialog; the start-up handover test timed out once right after the release build on the busy machine and passed on the rerun), website check. CI also runs EPUBCheck and pdflatex on sample output.
 
-**Released as 0.25.0** at 10:51 (release workflow, CI and documentation passed; all 11 download links and latest.json return 200). **After the release:** Copy as LaTeX (File → Copy As), the selection or document without the preamble; tests: Vitest 657, Playwright 111.
+**Released as 0.25.0** at 10:51 (release workflow, CI and documentation passed; all 11 download links and latest.json return 200). **After the release:** Copy as LaTeX (File → Copy As), the selection or document without the preamble; nested scripts of digits and signs in PDF inline formulas (`e^{-x^2}`) as Unicode script characters. Tests: Vitest 658, Playwright 111.
 
 **Unverified:** EPUB files in e-reader apps (only EPUBCheck and XML checks); LaTeX output with XeLaTeX/LuaLaTeX and on real documents beyond the CI samples; the KaTeX font fallback in PDFs opened outside pdf.js (the text extraction test reads the symbols back).
 
@@ -760,7 +760,7 @@ The user asked to keep the development loop going until 12 PM.
 
 1. Open exported EPUBs in e-reader apps (Apple Books, Calibre, Thorium) and record the results.
 2. The Linux watcher on a real Linux desktop.
-3. Nested scripts (`e^{x^2}`) in PDF inline formulas.
+3. Nested scripts with letters (`e^{x^y}`) in PDF inline formulas.
 
 **Questions for the user:**
 

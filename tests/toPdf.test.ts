@@ -190,7 +190,7 @@ describe("SVG size", () => {
 });
 
 describe("math in PDF export", () => {
-  const md = "Inline $e^{i\\pi}$ and $A \\subset B$ and $x \\notin A$ here.\n\n$$\n\\int_0^1 x^2 \\, dx\n$$";
+  const md = "Inline $e^{i\\pi}$ and $A \\subset B$ and $x \\notin A$ and $e^{-x^2}$ here.\n\n$$\n\\int_0^1 x^2 \\, dx\n$$";
 
   it("draws display formulas as vector drawings and sets inline ones as text", async () => {
     const png = Uint8Array.from(atob(PNG_B64), (c) => c.charCodeAt(0));
@@ -203,6 +203,9 @@ describe("math in PDF export", () => {
     // Symbols Roboto lacks are drawn in KaTeX's font; ∉ (an overlay in TeX) keeps its source.
     expect(text).toContain("A ⊂ B");
     expect(text).toContain("$x \\notin A$");
+    // A script inside a script uses Unicode superscript characters.
+    expect(text).toContain("x²");
+    expect(text).not.toContain("e^{-x^2}");
     expect(text).not.toContain("\\int_0^1");
   }, 30_000);
 

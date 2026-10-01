@@ -35,7 +35,7 @@ description: Fix Markpion import and export problems, including scanned PDFs, lo
 
 **Possible causes:**
 
-- **Export as PDF** draws display formulas (`$$…$$`) as vector drawings on every system; inline formulas (`$…$`) are set as text, including arrows and set symbols, except ones with nested scripts, matrices or overlaid symbols such as `\notin`, which stay LaTeX text.
+- **Export as PDF** draws display formulas (`$$…$$`) as vector drawings on every system; inline formulas (`$…$`) are set as text, including arrows and set symbols, except ones with nested scripts other than digits and signs, matrices or overlaid symbols such as `\notin`, which stay LaTeX text.
 - In **Export as Word**, formulas become Word equations, except those using something outside the supported subset, such as a matrix (`\begin{pmatrix}`), an `aligned` environment or a line break (`\\`). Those keep their LaTeX so nothing is converted wrongly. See [Math](/markdown/math#export).
 - **Settings → Preview → Render LaTeX math** is off, so `$` signs are treated as text.
 

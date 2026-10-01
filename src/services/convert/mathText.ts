@@ -21,7 +21,7 @@ export interface MathRun {
 const SUBSTITUTES: Record<string, string> = { "ϵ": "ε", "ϕ": "φ", "⋅": "·", "∙": "·", "∗": "*", "∼": "~", "⋯": "…", "‖": "∥" };
 
 /** Characters beyond ASCII, Latin-1 and Greek that Roboto can draw (checked by a test). */
-export const EXTRA_GLYPHS = "ϑϖ−′″∑∫∏√∞∂≤≥≠≈…ℓ";
+export const EXTRA_GLYPHS = "ϑϖ−′″∑∫∏√∞∂≤≥≠≈…ℓ⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎";
 
 /** Symbols Roboto lacks that KaTeX_Main-Regular has (checked by a test). */
 export const SYMBOL_GLYPHS = "∓⋆∘≃≡≅∝≪≫→←↔⇒⇐⇔↦⟹⟺↑↓∈∋⊂⊆⊃⊇∪∩∖∅∀∃∧∨⊕⊗⊥∥∠△∇ℏℜℑℵ⋮⋱⟨⟩∣⌊⌋⌈⌉";
@@ -30,6 +30,16 @@ export const SYMBOL_GLYPHS = "∓⋆∘≃≡≅∝≪≫→←↔⇒⇐⇔↦�
 export const DOUBLE_STRUCK_LETTERS: Record<string, string> = { "ℝ": "R", "ℕ": "N", "ℤ": "Z", "ℚ": "Q", "ℂ": "C", "ℙ": "P", "ℍ": "H" };
 
 /** Relations and binary operators, set with a space on each side (as TeX does). */
+/** Characters a script inside a script can use (Roboto has these). */
+const SUPERSCRIPT_CHARS: Record<string, string> = {
+  "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
+  "+": "⁺", "-": "⁻", "−": "⁻", "=": "⁼", "(": "⁽", ")": "⁾", n: "ⁿ",
+};
+const SUBSCRIPT_CHARS: Record<string, string> = {
+  "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄", "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
+  "+": "₊", "-": "₋", "−": "₋", "=": "₌", "(": "₍", ")": "₎",
+};
+
 const SPACED = new Set([
   "=", "<", ">", "≤", "≥", "≠", "≈", "+", "−", "×", "÷", "±", "∓", "~", "≡", "≅", "≃", "∝", "≪", "≫",
   "→", "←", "↔", "⇒", "⇐", "⇔", "↦", "⟹", "⟺", "∈", "∋", "⊂", "⊆", "⊃", "⊇", "∪", "∩", "∖", "∧", "∨", "⊕", "⊗", "∘",
@@ -52,7 +62,16 @@ function runs(nodes: MathNode[], pos: "sup" | "sub" | undefined): MathRun[] {
     return [{ ...inner[0], italics: false, text: "(" }, ...inner, { ...inner[0], italics: false, text: ")" }].map(clean);
   };
   const scripts = (sub?: MathNode[], sup?: MathNode[]) => {
-    if (pos && (sub || sup)) throw new Unrenderable("Nested scripts");
+    if (pos && (sub || sup)) {
+      // A script inside a script (e^{-x^2}): digits and signs as Unicode superscript or subscript characters.
+      for (const [body, chars] of [[sub, SUBSCRIPT_CHARS], [sup, SUPERSCRIPT_CHARS]] as const) {
+        if (!body) continue;
+        const text = runs(body, pos).map((r) => r.text).join("").replace(/\s+/g, "");
+        if (!text || ![...text].every((c) => c in chars)) throw new Unrenderable("Nested scripts");
+        push([...text].map((c) => chars[c]).join(""));
+      }
+      return;
+    }
     if (sub) out.push(...runs(sub, "sub"));
     if (sup) out.push(...runs(sup, "sup"));
   };
