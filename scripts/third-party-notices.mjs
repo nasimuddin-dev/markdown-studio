@@ -142,6 +142,14 @@ const content = render();
 if (process.argv.includes("--check")) {
   const current = existsSync(OUT) ? readFileSync(OUT, "utf8").replace(/\r\n/g, "\n") : "";
   if (current !== content) {
+    // Show what differs (lines only in one version), so a CI failure explains itself.
+    const had = new Set(current.split("\n"));
+    const has = new Set(content.split("\n"));
+    const removed = [...had].filter((l) => !has.has(l));
+    const added = [...has].filter((l) => !had.has(l));
+    for (const l of removed.slice(0, 15)) console.error(`- ${l.slice(0, 160)}`);
+    for (const l of added.slice(0, 15)) console.error(`+ ${l.slice(0, 160)}`);
+    console.error(`${removed.length} lines only in the committed file, ${added.length} only in the generated one.`);
     console.error(`${OUT} is out of date. Run \`npm run notices\` and commit the result.`);
     process.exit(1);
   }
