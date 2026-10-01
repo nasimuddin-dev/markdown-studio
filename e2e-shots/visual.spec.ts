@@ -33,7 +33,8 @@ async function openReadme(page: Page) {
 
 const snap = async (page: Page, name: string) => {
   await page.waitForTimeout(250);
-  await expect(page).toHaveScreenshot(`${name}.png`, exact);
+  // Soft: one run reports every screen that changed, not just the first.
+  await expect.soft(page).toHaveScreenshot(`${name}.png`, exact);
 };
 
 for (const theme of ["light", "dark"] as const) {

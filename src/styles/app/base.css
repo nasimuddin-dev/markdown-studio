@@ -64,8 +64,8 @@ kbd {
 .button {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 13px;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-6);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--bg);
@@ -98,7 +98,7 @@ kbd {
 .text-input,
 select {
   width: 100%;
-  padding: 6px 9px;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--bg-input);
@@ -112,9 +112,9 @@ select {
 .link-button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-4);
   width: 100%;
-  padding: 5px 8px;
+  padding: var(--space-3) var(--space-4);
   background: none;
   border: none;
   border-radius: var(--radius-md);

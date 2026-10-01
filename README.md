@@ -194,7 +194,7 @@ src/
     convert/    Word, PDF, HTML and CSV import; PDF and Word export
   stores/       Zustand stores: documents, workspace, settings, UI, AI
   styles/       app.css imports one file per UI area from app/ (tokens.css holds the colour,
-                type, radius, shadow and layer tokens); markdown.css styles documents
+                type, spacing, radius, shadow and layer tokens); markdown.css styles documents
                 (preview and exports)
   types/        Shared types
 src-tauri/

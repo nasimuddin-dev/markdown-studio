@@ -9,8 +9,8 @@
   z-index: var(--z-popover);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-6);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   background: var(--bg);
@@ -39,7 +39,7 @@
   width: min(760px, 92vw);
 }
 .ai-review h3 {
-  margin: 8px 0 4px;
+  margin: var(--space-4) 0 var(--space-2);
   font-size: var(--text-sm);
   font-weight: 600;
   text-transform: uppercase;
@@ -49,7 +49,7 @@
   max-height: 160px;
   overflow: auto;
   margin: 0;
-  padding: 8px 10px;
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   white-space: pre-wrap;
@@ -61,10 +61,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-4);
 }
 .segmented.small button {
-  padding: 2px 10px;
+  padding: var(--space-1) var(--space-5);
   border: 0;
   border-radius: var(--radius-sm);
   background: none;
@@ -83,7 +83,7 @@
   outline-offset: 1px;
 }
 .ai-original.ai-changes {
-  padding: 4px 0;
+  padding: var(--space-2) 0;
   opacity: 1;
 }
 .ai-suggestion {
@@ -91,7 +91,7 @@
   min-height: 180px;
   max-height: 45vh;
   box-sizing: border-box;
-  padding: 8px 10px;
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--bg);
@@ -102,18 +102,18 @@
 }
 .inline-row {
   display: flex;
-  gap: 8px;
+  gap: var(--space-4);
 }
 .inline-row input {
   flex: 1;
 }
 .button.small {
-  padding: 2px 8px;
+  padding: var(--space-1) var(--space-4);
   font-size: var(--text-sm);
 }
 .settings-managed {
-  margin: 0 0 12px;
-  padding: 8px 12px;
+  margin: 0 0 var(--space-6);
+  padding: var(--space-4) var(--space-6);
   border: 1px solid var(--border-strong);
   border-left: 4px solid var(--accent);
   border-radius: var(--radius-md);

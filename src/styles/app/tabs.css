@@ -25,10 +25,10 @@
 .tab {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-3);
   min-width: 90px;
   max-width: 220px;
-  padding: 0 6px 0 12px;
+  padding: 0 var(--space-3) 0 var(--space-6);
   border-right: 1px solid var(--border);
   color: var(--text-muted);
   cursor: default;
@@ -54,7 +54,7 @@
 .tab-main {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-3);
   flex: 1;
   min-width: 0;
   align-self: stretch;
@@ -73,7 +73,7 @@
   white-space: nowrap;
 }
 .tab-hint {
-  margin-left: 6px;
+  margin-left: var(--space-3);
   color: var(--text-muted);
   font-size: var(--text-xs);
   white-space: nowrap;
@@ -121,5 +121,5 @@
 
 .new-tab {
   align-self: center;
-  margin: 0 4px;
+  margin: 0 var(--space-2);
 }

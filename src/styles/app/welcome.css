@@ -7,32 +7,32 @@
   display: grid;
   place-items: center;
   overflow: auto;
-  padding: 24px;
+  padding: var(--space-9);
 }
 .welcome-inner {
   width: min(520px, 100%);
   text-align: center;
 }
 .welcome h1 {
-  margin: 12px 0 4px;
+  margin: var(--space-6) 0 var(--space-2);
   font-size: var(--text-3xl);
 }
 .welcome-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 24px auto 0;
+  gap: var(--space-4);
+  margin: var(--space-9) auto 0;
   width: min(300px, 100%);
 }
 .welcome-actions .button {
   justify-content: flex-start;
-  padding: 8px 14px;
+  padding: var(--space-4) var(--space-7);
 }
 .welcome-actions kbd {
   margin-left: auto;
 }
 .welcome-recent {
-  margin-top: 28px;
+  margin-top: var(--space-10);
   text-align: left;
 }
 .welcome-recent h2 {
@@ -40,7 +40,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin: 0 0 6px 8px;
+  margin: 0 0 var(--space-3) var(--space-4);
 }
 .welcome-recent ul {
   list-style: none;
@@ -51,13 +51,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 0 6px 8px;
+  margin: 0 0 var(--space-3) var(--space-4);
 }
 .welcome-recent-header h2 {
   margin: 0;
 }
 .welcome-recent-clear {
-  padding: 2px 8px;
+  padding: var(--space-1) var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   background: none;

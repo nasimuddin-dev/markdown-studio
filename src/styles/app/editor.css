@@ -6,8 +6,8 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 7px 12px;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
   background: var(--warning-bg);
   border-bottom: 1px solid var(--warning-border);
   flex: none;
@@ -21,7 +21,7 @@
   min-width: 200px;
 }
 .banner .button {
-  padding: 3px 10px;
+  padding: var(--space-2) var(--space-5);
 }
 
 /* ------------------------------------------------------------ editor */
@@ -44,7 +44,7 @@
 /* Hovering a link to another document shows the start of it. */
 .cm-link-preview {
   max-width: 360px;
-  padding: 8px 10px;
+  padding: var(--space-4) var(--space-5);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
   line-height: 1.45;
@@ -54,7 +54,7 @@
 
 /* Hovering an image link in the editor shows the picture. */
 .cm-image-preview {
-  padding: 6px;
+  padding: var(--space-3);
   font-size: var(--text-sm);
   color: var(--text-muted);
 }
@@ -74,14 +74,14 @@
 .search-results.incoming-links {
   flex: none;
   max-height: 40%;
-  padding-bottom: 4px;
+  padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--border);
 }
 .incoming-file {
   font-weight: 600;
 }
 .incoming-none {
-  margin: 2px 0 6px 34px;
+  margin: var(--space-1) 0 var(--space-3) 34px;
   color: var(--text-muted);
   font-size: var(--text-sm);
 }
@@ -91,8 +91,8 @@
   /* One row: groups that don't fit move into the More menu. */
   flex-wrap: nowrap;
   align-items: center;
-  gap: 2px 0;
-  padding: 3px 6px 3px 0;
+  gap: var(--space-1) 0;
+  padding: var(--space-2) var(--space-3) var(--space-2) 0;
   /* Each group's divider sits 1px left of it; clipping the left edge hides the
      first group's divider, so dividers only appear between groups. */
   overflow: hidden;
@@ -105,7 +105,7 @@
   align-items: center;
   gap: 1px;
   margin-left: -1px;
-  padding: 0 6px;
+  padding: 0 var(--space-3);
   border-left: 1px solid var(--border);
 }
 .toolbar-group[hidden],
@@ -119,10 +119,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--space-2);
   min-width: 28px;
   height: 28px;
-  padding: 0 5px;
+  padding: 0 var(--space-3);
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: none;
@@ -148,8 +148,8 @@
 }
 .toolbar-select {
   height: 26px;
-  margin-left: 4px;
-  padding: 0 4px;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg-input);
@@ -169,11 +169,11 @@
   line-height: 1.6;
 }
 .editor-host .cm-content {
-  padding: 16px 0 40vh;
+  padding: var(--space-7) 0 40vh;
   caret-color: var(--text);
 }
 .editor-host .cm-line {
-  padding: 0 20px 0 12px;
+  padding: 0 var(--space-8) 0 var(--space-6);
 }
 .editor-host .cm-gutters {
   background: var(--bg);
@@ -216,35 +216,35 @@
   border-color: var(--border);
 }
 .editor-host .cm-panel.cm-search {
-  padding: 8px 32px 8px 10px;
+  padding: var(--space-4) var(--space-10) var(--space-4) var(--space-5);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
 }
 .editor-host .cm-panel input[type="checkbox"] {
   accent-color: var(--accent);
-  margin: 0 4px 0 0;
+  margin: 0 var(--space-2) 0 0;
   vertical-align: -2px;
 }
 .editor-host .cm-panel.cm-search label {
-  margin-left: 10px;
+  margin-left: var(--space-5);
   white-space: nowrap;
 }
 .editor-host .cm-panel.cm-search .cm-button,
 .editor-host .cm-panel.cm-search .cm-textfield {
-  margin: 2px 4px 2px 0;
+  margin: var(--space-1) var(--space-2) var(--space-1) 0;
 }
 .editor-host .cm-button:hover {
   background: var(--bg-hover);
 }
 .editor-host .cm-textfield {
-  padding: 4px 7px;
+  padding: var(--space-2) var(--space-4);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--bg-input);
   font-size: var(--text-sm);
 }
 .editor-host .cm-button {
-  padding: 3px 9px;
+  padding: var(--space-2) var(--space-4);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--bg);
@@ -266,7 +266,7 @@
 .status-button {
   background: none;
   border: none;
-  padding: 0 4px;
+  padding: 0 var(--space-2);
   color: inherit;
   font-size: inherit;
   border-radius: var(--radius-sm);
@@ -328,7 +328,7 @@
 .table-picker {
   position: fixed;
   z-index: var(--z-popover);
-  padding: 10px;
+  padding: var(--space-5);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   background: var(--bg);
@@ -339,8 +339,8 @@
 .table-picker-grid {
   display: grid;
   grid-template-columns: repeat(8, 16px);
-  gap: 3px;
-  margin-bottom: 10px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
 }
 .table-picker-cell {
   height: 16px;
@@ -355,12 +355,12 @@
 .table-picker-fields {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: var(--space-4);
 }
 .table-picker-fields label {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-1);
 }
 .table-picker-fields .text-input {
   width: 58px;
@@ -375,15 +375,15 @@
 /* Git: the committed lines behind a change bar */
 .editor-host .cm-git-peek {
   max-width: min(560px, 80vw);
-  padding: 8px 10px;
+  padding: var(--space-4) var(--space-5);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
 }
 .editor-host .cm-git-peek-old {
   max-height: 200px;
   overflow: auto;
-  margin: 6px 0 8px;
-  padding: 6px 8px;
+  margin: var(--space-3) 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border-left: 3px solid var(--danger);
   background: var(--bg-code);
   font-family: var(--font-mono);
@@ -392,8 +392,8 @@
 .editor-host .cm-git-peek-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 6px;
-  margin-top: 6px;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
 }
 
 /* Over the editor, the drop inserts a link. */

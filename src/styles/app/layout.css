@@ -80,13 +80,13 @@
 .shortcuts-groups {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 6px 24px;
-  margin-top: 12px;
+  gap: var(--space-3) var(--space-9);
+  margin-top: var(--space-6);
   max-height: 60vh;
   overflow: auto;
 }
 .shortcuts-groups h3 {
-  margin: 10px 0 4px;
+  margin: var(--space-5) 0 var(--space-2);
   font-size: var(--text-sm);
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -97,7 +97,7 @@
   border-collapse: collapse;
 }
 .shortcuts-table td {
-  padding: 3px 0;
+  padding: var(--space-2) 0;
   border-bottom: 1px solid var(--border);
 }
 .shortcuts-table td:last-child {
@@ -105,7 +105,7 @@
   white-space: nowrap;
 }
 .shortcuts-table kbd {
-  padding: 1px 6px;
+  padding: 1px var(--space-3);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   background: var(--bg-code);

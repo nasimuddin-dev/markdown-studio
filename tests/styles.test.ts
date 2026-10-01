@@ -100,6 +100,16 @@ describe("UI stylesheets", () => {
     expect(bad.map(where)).toEqual([]);
   });
 
+  it("uses the spacing scale for padding, margins and gaps (1px hairlines and large layout offsets excepted)", () => {
+    const spacing = /^(padding|margin)(-(top|right|bottom|left|inline|block)(-(start|end))?)?$|^(row-|column-)?gap$/;
+    const bad = outsideTokens.filter(
+      (d) =>
+        spacing.test(d.property) &&
+        [...d.value.matchAll(/(-?)(\d+(?:\.\d+)?)px\b/g)].some(([, , n]) => Number(n) !== 1 && Number(n) < 34),
+    );
+    expect(bad.map(where)).toEqual([]);
+  });
+
   it("uses named layers for z-index (values under 10 are local to a component)", () => {
     const bad = outsideTokens.filter((d) => d.property === "z-index" && !/^(var\(--z-[\w-]+\)|[0-9]|-1|auto)$/.test(d.value));
     expect(bad.map(where)).toEqual([]);

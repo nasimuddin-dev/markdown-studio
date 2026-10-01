@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: space-between;
   height: 24px;
-  padding: 0 10px;
+  padding: 0 var(--space-5);
   background: var(--bg-chrome);
   border-top: 1px solid var(--border);
   color: var(--text-muted);
@@ -18,7 +18,7 @@
 .status-left,
 .status-right {
   display: flex;
-  gap: 16px;
+  gap: var(--space-7);
   min-width: 0;
   white-space: nowrap;
 }
@@ -48,7 +48,7 @@
   bottom: calc(100% + 8px);
   right: 0;
   z-index: var(--z-popover);
-  padding: 8px 12px;
+  padding: var(--space-4) var(--space-6);
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--border-strong);
@@ -62,7 +62,7 @@
 }
 .status-popover th,
 .status-popover td {
-  padding: 2px 8px;
+  padding: var(--space-1) var(--space-4);
   text-align: right;
 }
 .status-popover th[scope="row"] {

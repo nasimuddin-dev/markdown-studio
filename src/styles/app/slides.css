@@ -39,7 +39,7 @@
 .slide-notes {
   max-height: 28vh;
   overflow: auto;
-  padding: 10px 6vw;
+  padding: var(--space-5) 6vw;
   border-top: 1px solid var(--border);
   background: var(--bg-chrome);
   font-size: 15px;
@@ -50,10 +50,10 @@
 }
 .slideshow-bar {
   display: flex;
-  gap: 12px;
+  gap: var(--space-6);
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  padding: var(--space-4);
   color: var(--text-muted);
   font-size: 13px;
 }
