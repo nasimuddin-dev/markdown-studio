@@ -42,6 +42,23 @@ jobs:
           name: playwright-traces
           path: test-results/
 
+  epub:
+    name: EPUB validation (EPUBCheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: sudo apt-get update && sudo apt-get install -y epubcheck
+      # The EPUB export tests write sample books (plain, and one with everything) to EPUB_OUT.
+      - run: npx vitest run tests/toEpub.test.ts
+        env:
+          EPUB_OUT: epub-samples
+      - run: for f in epub-samples/*.epub; do echo "== $f"; epubcheck "$f" || exit 1; done
+
   audit:
     name: Dependency audit (npm, cargo)
     runs-on: ubuntu-latest

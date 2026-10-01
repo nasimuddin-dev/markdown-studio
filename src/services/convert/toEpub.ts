@@ -161,6 +161,13 @@ export async function markdownToEpub(markdown: string, opts: EpubOptions): Promi
     img.setAttribute("src", file);
   }
 
+  // Table cell alignment as CSS (the align attribute isn't valid in EPUB 3).
+  for (const cell of [...body.querySelectorAll("[align]")]) {
+    const align = cell.getAttribute("align");
+    cell.removeAttribute("align");
+    if (align && /^(left|right|center|justify)$/i.test(align)) cell.setAttribute("style", `text-align: ${align.toLowerCase()}`);
+  }
+
   // Table of contents from the headings; each gets an id to link to.
   const nav: NavEntry[] = [];
   const ids = new Set([...body.querySelectorAll("[id]")].map((el) => el.id));

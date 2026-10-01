@@ -67,6 +67,32 @@ function rehypeInlineImages(docPath: string | null, load: ImageLoader | undefine
 }
 
 /**
+ * Rehype plugin: links within the document (`#…`) point at the ids the
+ * sanitizer prefixed with "user-content-" (footnotes, raw HTML anchors), as
+ * the preview resolves them when clicked. Exported files have no script to.
+ */
+function rehypeFragmentLinks() {
+  return (tree: Root) => {
+    const ids = new Set<string>();
+    const links: Element[] = [];
+    visit(tree, "element", (node: Element) => {
+      const { id, href } = node.properties ?? {};
+      if (typeof id === "string") ids.add(id);
+      if (node.tagName === "a" && typeof href === "string" && href.startsWith("#")) links.push(node);
+    });
+    for (const a of links) {
+      let target = (a.properties.href as string).slice(1);
+      try {
+        target = decodeURIComponent(target);
+      } catch {
+        /* a malformed escape: compare as written */
+      }
+      if (!ids.has(target) && ids.has(`user-content-${target}`)) a.properties.href = `#user-content-${encodeURIComponent(target)}`;
+    }
+  };
+}
+
+/**
  * Renders Markdown to sanitized HTML using the same policy as the preview
  * (FR-034): raw HTML is parsed, then filtered through the GitHub allow-list.
  */
@@ -83,6 +109,7 @@ export async function renderHtml(
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypePlugins)
     .use(() => rehypeInlineImages(docPath, loadImage))
+    .use(rehypeFragmentLinks)
     .use(rehypeStringify)
     .process(stripFrontMatter(markdown));
   const html = String(file);

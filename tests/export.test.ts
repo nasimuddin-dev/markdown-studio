@@ -14,6 +14,19 @@ describe("HTML export", () => {
     expect(html).toContain('<span class="hljs-keyword">const</span>');
   });
 
+  it("links within the document reach their targets, including footnotes and HTML anchors", async () => {
+    const html = await renderHtml('Text[^1] and [jump](#spot) and [top](#title).\n\n# Title\n\n<a id="spot"></a>Here.\n\n[^1]: Note.');
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const links = [...doc.querySelectorAll('a[href^="#"]')];
+    expect(links.length).toBeGreaterThanOrEqual(4);
+    for (const a of links) {
+      const id = decodeURIComponent(a.getAttribute("href")!.slice(1));
+      expect(doc.getElementById(id), a.outerHTML).not.toBeNull();
+    }
+    // The sanitizer's prefix stays on ids from raw HTML (it keeps them from clobbering page globals).
+    expect(doc.getElementById("spot")).toBeNull();
+  });
+
   it("applies the same sanitization as the preview", async () => {
     const html = await renderHtml(
       ['<script>alert(1)</script>', '<img src="x.png" onerror="alert(1)">', "[x](javascript:alert(1))", "<iframe></iframe>"].join("\n\n"),

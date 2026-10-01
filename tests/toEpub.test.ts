@@ -10,7 +10,7 @@ async function book(markdown: string, loadImage = async (_path: string) => PNG) 
     docPath: "/docs/notes.md",
     loadImage,
     features: { math: true, diagrams: false },
-    id: "urn:uuid:test",
+    id: "urn:uuid:7d9c3b52-4c1e-4f7a-9a43-2f8e5b6d1c0a",
     now: new Date("2026-10-01T12:00:00.123Z"),
   });
   const zip = await JSZip.loadAsync(bytes);
@@ -42,7 +42,7 @@ describe("EPUB export", () => {
     expect(opf).toContain("<dc:language>fr</dc:language>");
     expect(opf).toContain("<dc:description>About things</dc:description>");
     expect(opf).toContain('<meta property="dcterms:modified">2026-10-01T12:00:00Z</meta>');
-    expect(opf).toContain('<dc:identifier id="book-id">urn:uuid:test</dc:identifier>');
+    expect(opf).toContain('<dc:identifier id="book-id">urn:uuid:7d9c3b52-4c1e-4f7a-9a43-2f8e5b6d1c0a</dc:identifier>');
   });
 
   it("writes well-formed XHTML, with math as MathML", async () => {
@@ -104,6 +104,32 @@ describe("EPUB export", () => {
     });
     expect(zip.file("OEBPS/cover.xhtml")).toBeNull();
     expect(await text("OEBPS/content.opf")).not.toContain("cover");
+  });
+
+  // CI validates these with EPUBCheck (the .github/workflows/ci.yml "epub" job sets EPUB_OUT).
+  it("writes sample books for validation", async () => {
+    const samples: Record<string, string> = {
+      plain: "Just a paragraph, no headings.",
+      rich: [
+        "---", "title: Sample Book", "author: Markpion", "lang: en-GB", "description: Everything at once", "keywords: [a, b]", "cover: cover.png", "---", "",
+        "# Part One", "", "Text with **bold**, *italic*, `code`, a [link](https://example.com), a footnote[^1] and math $a^2 + b^2 = c^2$.", "",
+        "## Lists", "", "- [x] done", "- [ ] to do", "  1. nested", "", "> [!NOTE]", "> An alert.", "",
+        "### Table", "", "| Left | Right |", "| :--- | ----: |", "| 1 | 2 |", "",
+        "```js", "const x = 1 < 2 && 3 > 2;", "```", "", "$$", "\\int_0^1 x\\,dx = \\frac{1}{2}", "$$", "",
+        "![Picture](pic.png) ![Web](https://example.com/x.png)", "", "Line<br>break and <kbd>Ctrl</kbd> &amp; <sup>sup</sup>.", "",
+        "# Part Two", "", "#### Deep heading", "", "Term", "", "---", "", "[^1]: The footnote.", "",
+      ].join("\n"),
+    };
+    const out = process.env.EPUB_OUT;
+    for (const [name, markdown] of Object.entries(samples)) {
+      const { bytes } = await book(markdown);
+      expect(bytes.length).toBeGreaterThan(0);
+      if (out) {
+        const { mkdirSync, writeFileSync } = await import("node:fs");
+        mkdirSync(out, { recursive: true });
+        writeFileSync(`${out}/${name}.epub`, bytes);
+      }
+    }
   });
 
   it("keeps the description of a picture that can't be read", async () => {
