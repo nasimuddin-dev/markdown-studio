@@ -228,6 +228,15 @@ export async function markdownToEpub(markdown: string, opts: EpubOptions): Promi
       const file = fileOf.get(target);
       if (file && file !== files[i]) a.setAttribute("href", `${file}#${fragment}`);
     }
+    // ARIA references must stay within one file (footnote references describe themselves by
+    // the "Footnotes" heading, which may now be in another chapter).
+    for (const attr of ["aria-describedby", "aria-labelledby", "aria-controls"]) {
+      for (const el of part.querySelectorAll(`[${attr}]`)) {
+        const kept = el.getAttribute(attr)!.split(/\s+/).filter((ref) => ref && fileOf.get(ref) === files[i]);
+        if (kept.length) el.setAttribute(attr, kept.join(" "));
+        else el.removeAttribute(attr);
+      }
+    }
   });
   for (const entry of nav) entry.file = fileOf.get(entry.id) ?? files[0];
   const chapters = parts.map((part, i) => ({

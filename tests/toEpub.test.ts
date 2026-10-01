@@ -97,6 +97,12 @@ describe("EPUB export", () => {
     expect(hrefs(two).find((h) => h.includes("fnref-1"))).toMatch(/^chapter-01\.xhtml#/);
     expect(hrefs(one)).toContain("chapter-02.xhtml#two");
     expect(hrefs(two)).toContain("chapter-01.xhtml#one");
+    // ARIA references only point within their own file (EPUBCheck requires it).
+    for (const doc of [one, two]) {
+      for (const el of doc.querySelectorAll("[aria-describedby]")) {
+        for (const ref of el.getAttribute("aria-describedby")!.split(" ")) expect(doc.getElementById(ref), ref).not.toBeNull();
+      }
+    }
   });
 
   it("packs local pictures once, and turns web pictures into links", async () => {
