@@ -95,6 +95,12 @@ for (const theme of ["light", "dark"] as const) {
       await page.getByRole("button", { name: /words/ }).first().click();
       await snap(page, `${theme}-stats`);
       await page.keyboard.press("Escape");
+      // Send Feedback, not Report a Problem: that one shows the version, which changes every release.
+      await page.getByRole("navigation", { name: "Application menu" }).getByRole("button", { name: "Help", exact: true }).click();
+      await page.getByRole("menuitem", { name: "Send Feedback…" }).click();
+      await expect(page.getByRole("dialog", { name: "Send Feedback" })).toBeVisible();
+      await snap(page, `${theme}-feedback`);
+      await page.keyboard.press("Escape");
     });
   });
 }
