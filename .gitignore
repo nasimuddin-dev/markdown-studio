@@ -8,6 +8,11 @@ src-tauri/gen/schemas/
 .vite/
 playwright-report/
 test-results/
+# Written by npm run test:regression when every step passed; release:installer checks it.
+.regression-pass.json
+regression-report/
+# Claude Code's per-machine settings (the shared skills in .claude/skills/ are committed).
+.claude/settings.local.json
 release-assets/
 # Never commit signing keys (the updater key lives in ~/.tauri/).
 *.key

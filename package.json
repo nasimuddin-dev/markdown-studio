@@ -29,7 +29,10 @@
     "check:startup": "node scripts/check-startup-size.mjs",
     "notices": "node scripts/third-party-notices.mjs",
     "test:fixtures": "node scripts/make-fixtures.mjs",
-    "test:native": "node scripts/test-native.mjs"
+    "test:native": "node scripts/test-native.mjs",
+    "test:visual": "playwright test -c e2e-shots/playwright.config.ts visual",
+    "test:visual:update": "playwright test -c e2e-shots/playwright.config.ts visual --update-snapshots",
+    "test:regression": "node scripts/regression.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.3",

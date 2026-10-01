@@ -18,6 +18,9 @@
 //   npm run release:installer                   standard installer
 //   npm run release:installer -- --offline      standard + offline installers
 //   npm run release:installer -- --skip-build   republish existing builds
+//
+// It refuses to build unless npm run test:regression passed in full for this
+// commit (--skip-regression overrides; don't use it for a real release).
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -36,6 +39,25 @@ if (conf.version !== version || cargoVersion !== version) {
   console.error(`Version mismatch: package.json ${version}, tauri.conf.json ${conf.version}, Cargo.toml ${cargoVersion}.`);
   console.error("Run: npm run version:set <version>");
   process.exit(1);
+}
+
+// No release without a full regression run (npm run test:regression) of this exact commit.
+if (!args.includes("--skip-regression")) {
+  const head = execSync("git rev-parse HEAD", { encoding: "utf8" }).trim();
+  const pass = existsSync(".regression-pass.json") ? JSON.parse(readFileSync(".regression-pass.json", "utf8")) : null;
+  const problem = !pass
+    ? "no regression run has passed yet"
+    : pass.commit !== head
+      ? `the last passing regression run tested ${pass.commit.slice(0, 7)}, not ${head.slice(0, 7)}`
+      : !pass.visual || !pass.native
+        ? "the last regression run left out the visual or native tests"
+        : null;
+  if (problem) {
+    console.error(`Release blocked: ${problem}.`);
+    console.error("Run: npm run test:regression   (all steps, with Markpion closed), then build the release again.");
+    process.exit(1);
+  }
+  console.log(`Regression run passed for ${head.slice(0, 7)} (${pass.date}).`);
 }
 
 const remote = execSync("git remote get-url origin").toString().trim();

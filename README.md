@@ -165,6 +165,8 @@ That runs the desktop app with hot reload. Other scripts:
 | `npm run dev` | UI only, in a browser, using an in-memory demo workspace (no Rust needed) |
 | `npm test` | Frontend unit/component tests (Vitest + Testing Library) |
 | `npm run test:e2e` | End-to-end tests (Playwright) against the browser demo; uses the installed Microsoft Edge on Windows |
+| `npm run test:regression` | The full regression run before a release: type check, unit tests, build and start-up budget, notices, end-to-end flows with accessibility audits (failures rerun once), the visual comparison, native tests (close Markpion first) and the docs check; writes `regression-report/report.md`. `release:installer` requires a full pass for the commit being released |
+| `npm run test:visual` / `test:visual:update` | Compares 30 screens (both themes) with the local baseline in `e2e-shots/out/visual/` / records a new baseline after reviewing an intended change |
 | `npm run test:native` | End-to-end tests against the real desktop app (Windows): builds a debug app, then drives it through tauri-driver (`cargo install tauri-driver --locked`); the matching Edge WebDriver is downloaded on first use. The app keeps its data in a temporary folder, not your profile |
 | `npm run typecheck` | TypeScript type check |
 | `cargo test --manifest-path src-tauri/Cargo.toml` | Rust tests (scope, safe save, encoding, settings, history, search, watcher) |
@@ -214,12 +216,13 @@ src-tauri/
 tests/          Vitest unit and component tests
 e2e/            Playwright workflows and axe-core accessibility audits
 e2e-native/     tauri-driver tests against the real desktop app (Windows)
-scripts/        Versioning and release scripts
+scripts/        Versioning, release, regression and notices scripts
 downloads/      The latest standard Windows installer and its checksum
 docs/           All documentation: design, SRS, requirement traceability, installation guide, development log,
                 website spec, and site/ (the pages of the documentation website)
 website/        Website tooling: VitePress config, theme and checks (deployed to GitHub Pages)
 .github/        CI, the macOS/Linux release workflow and the website deployment
+.claude/skills/ Workflows for coding agents: dev-loop, ui-regression, release
 ```
 
 ## Contributing
@@ -245,6 +248,14 @@ Every feature change updates the README feature list, TRACEABILITY and the match
 
 ## Releasing a new version
 
+First, with everything committed and Markpion closed:
+
+```bash
+npm run test:regression
+```
+
+Then:
+
 ```bash
 npm run version:set 0.13.0
 ```
@@ -258,7 +269,7 @@ npm run release:github
 ```
 
 1. `version:set` updates the version in `package.json` (and `package-lock.json`), `tauri.conf.json` and `Cargo.toml`.
-2. `release:installer -- --offline` builds two Windows installers:
+2. `release:installer -- --offline` checks that the regression run passed for this commit, then builds two Windows installers:
    - the **standard** installer (~7 MB) replaces the one in [`downloads/`](downloads/), where only the latest version is kept;
    - the **offline** installer (~210 MB, with the WebView2 runtime) goes to `release-assets/`. It's too large for git, so it's ignored.
 

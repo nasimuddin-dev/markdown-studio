@@ -22,6 +22,7 @@ To support a new host (for example a cloud version), implement `Backend` and cho
 
 | Task | Command |
 | --- | --- |
+| Full regression (before every release, after UI changes) | `npm run test:regression`: type check, unit, build and start-up budget, notices, e2e + accessibility (failures rerun once), visual comparison, native tests, docs; report in `regression-report/report.md`. `-- --quick` skips visual and native |
 | Type check / unit tests / e2e | `npm run typecheck`, `npm test`, `npm run test:e2e` |
 | Native e2e (Windows, real app) | `npm run test:native` (needs `cargo install tauri-driver --locked`; close Markpion first) |
 | Rust tests | `cargo test --manifest-path src-tauri/Cargo.toml` |
@@ -51,6 +52,7 @@ Then run `npm run docs:check` (and `npm run docs:test` for website UI changes) a
 
 ### At every release
 
+- `npm run test:regression` must pass in full (Markpion closed) for the commit being released; `release:installer` refuses to build otherwise.
 - `npm run version:set`, then `npm run release:installer -- --offline`. This regenerates the README download section and the INSTALL.md links; check them.
 - Add an entry at the top of `docs/site/changelog.md` (Added / Changed / Fixed / Security), written from the release's actual commits.
 - Update the TRACEABILITY "as of" version and test counts, and the SRS "Current Product Version".
@@ -60,6 +62,10 @@ Then run `npm run docs:check` (and `npm run docs:test` for website UI changes) a
 ### Accuracy
 
 Document only what the code actually does, and check the source when unsure. No invented features, versions, ratings, prices, user counts or performance claims. When you find a limitation, document it, and add it to TRACEABILITY's Known gaps and the website roadmap.
+
+## Skills
+
+Workflows for coding agents are kept as Claude Code skills in `.claude/skills/` (committed, so every session and contributor gets them): `dev-loop` (pick, build, test, document, commit, watch CI), `ui-regression` (run and review the regression suite, and extend it with each UI feature) and `release` (the full release procedure with its checks). Update a skill in the same commit when its workflow changes.
 
 ## Other conventions
 
