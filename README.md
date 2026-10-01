@@ -222,6 +222,12 @@ website/        Website tooling: VitePress config, theme and checks (deployed to
 .github/        CI, the macOS/Linux release workflow and the website deployment
 ```
 
+## Contributing
+
+Suggestions and bug reports are welcome: in the app, use **Help → Send Feedback…** or **Report a Problem…**, or open an [issue](https://github.com/nasimuddin-dev/markpion/issues).
+
+Code changes come in as pull requests. The `main` branch is protected by repository rulesets: a pull request can be merged only after the owner approves it (as code owner, see [.github/CODEOWNERS](.github/CODEOWNERS)) and CI passes, and nobody can force-push to `main` or delete it. Release tags (`v*`) can be created, moved or deleted only by the owner, and workflows from forks run only after the owner approves them.
+
 ## Documentation
 
 | Document | Contents |
