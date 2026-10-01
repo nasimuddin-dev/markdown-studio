@@ -140,7 +140,8 @@ select {
 .menu-button,
 .sidebar-tab,
 .tab,
-.tree-row {
+.tree-row,
+.breadcrumb {
   transition:
     background-color var(--duration-fast) ease-out,
     border-color var(--duration-fast) ease-out,

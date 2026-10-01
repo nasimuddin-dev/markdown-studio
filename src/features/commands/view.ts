@@ -139,6 +139,15 @@ export const viewCommands: Record<string, Command> = {
       update({ showToolbar: !settings.showToolbar });
     },
   },
+  toggleBreadcrumbs: {
+    id: "toggleBreadcrumbs",
+    label: "Toggle Breadcrumbs",
+    checked: () => useSettings.getState().settings.showBreadcrumbs,
+    run: () => {
+      const { settings, update } = useSettings.getState();
+      update({ showBreadcrumbs: !settings.showBreadcrumbs });
+    },
+  },
   toggleReadOnly: {
     id: "toggleReadOnly",
     label: "Toggle Read-Only",

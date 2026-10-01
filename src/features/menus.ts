@@ -99,7 +99,7 @@ export const MENUS: MenuDef[] = [
     items: [
       c("viewEditor"), c("viewSplit"), c("viewPreview"), c("toggleView"), sep,
       c("commandPalette"), sep,
-      c("toggleExplorer", "File Explorer"), c("toggleOutline", "Outline"), c("toggleToolbar", "Formatting Toolbar"), c("toggleTheme", "Dark Theme"),
+      c("toggleExplorer", "File Explorer"), c("toggleOutline", "Outline"), c("toggleToolbar", "Formatting Toolbar"), c("toggleBreadcrumbs", "Breadcrumbs"), c("toggleTheme", "Dark Theme"),
       sub("Editor", [c("toggleWordWrap", "Word Wrap"), c("toggleLineNumbers", "Line Numbers"), c("toggleTypewriter", "Typewriter Scrolling"), c("toggleDimParagraphs", "Dim Other Paragraphs"), c("toggleReadOnly", "Read-Only")]),
       sub("Fold", [c("foldAll"), c("unfoldAll"), sep, c("foldLevel1"), c("foldLevel2"), c("foldLevel3")]),
       sub("Font Size", [c("zoomIn", "Increase"), c("zoomOut", "Decrease"), c("zoomReset", "Reset")]), sep,

@@ -86,6 +86,8 @@ export interface Settings {
   showOutline: boolean;
   /** The formatting toolbar above the editor. */
   showToolbar: boolean;
+  /** The heading path of the cursor above the editor ("Guide › Install"). */
+  showBreadcrumbs: boolean;
   /** Show Git branch and file status (runs `git status` in the open folder). */
   showGitStatus: boolean;
   /** List pictures in the Explorer, besides Markdown files. */

@@ -858,6 +858,24 @@ test("formatting toolbar reflects and applies formatting", async ({ page }) => {
   await expect(toolbar).toBeHidden();
 });
 
+test("breadcrumbs show the cursor's headings and jump to others", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-line", { hasText: "Create a document" }).click();
+  const crumbs = page.getByRole("navigation", { name: "Breadcrumbs" }).getByRole("button");
+  await expect(crumbs).toHaveText(["README.md", "Welcome to Markpion", "GitHub Flavored Markdown", "Task list"]);
+  await crumbs.last().click();
+  await page.getByRole("menu", { name: "Headings at this level" }).getByRole("menuitem", { name: "Code" }).click();
+  // The editor moved to the Code heading, and the breadcrumbs followed.
+  await expect(page.locator(".cm-activeLine")).toHaveText("### Code");
+  await expect(crumbs.last()).toHaveText("Code");
+  await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
+  // Hidden from the View menu.
+  await chooseMenu(page, "View", "Breadcrumbs");
+  await expect(page.getByRole("navigation", { name: "Breadcrumbs" })).toBeHidden();
+});
+
 test("the formatting toolbar stays on one row and moves what doesn't fit into More", async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 800 });
   await start(page);

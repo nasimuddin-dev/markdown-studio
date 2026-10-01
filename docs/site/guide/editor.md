@@ -98,6 +98,10 @@ Copy, cut and paste use the system clipboard. Markpion adds some smart behaviour
 
 The **Format** menu has commands for bold, italic, links, headings, lists and more; the **Table** menu has everything for tables. They're described in [Writing tools](/guide/writing-tools).
 
+### Breadcrumbs
+
+The bar under the toolbar shows where the cursor is in the document's headings, for example **notes.md › Guide › Install › Windows**. Click a part to list the headings at that level (under the same parent heading, the current one marked with •) and pick one to jump to it; the file name lists the top-level headings. Turn the bar off with **View → Breadcrumbs**. It's hidden in Focus Mode.
+
 ### Formatting toolbar
 
 The toolbar above the editor puts the common commands one click away, like a word processor:
