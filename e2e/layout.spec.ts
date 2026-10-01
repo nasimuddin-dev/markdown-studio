@@ -1,0 +1,161 @@
+import { expect, test, type Page } from "@playwright/test";
+import { chooseMenu } from "./menu";
+
+/**
+ * Layout checks at the window sizes people use, down to the app's minimum
+ * (720×480, set in src-tauri/src/lib.rs): nothing makes the window scroll
+ * sideways, dialogs and menus fit, nothing in the window's controls overlaps,
+ * and no label is cut off without an ellipsis. Pixel comparisons
+ * (e2e-shots/visual.spec.ts) cover one size; these cover all of them.
+ */
+
+const mod = process.platform === "darwin" ? "Meta" : "Control";
+const SIZES = [
+  { width: 720, height: 480 },
+  { width: 1024, height: 640 },
+  { width: 1366, height: 768 },
+];
+
+/** The window's controls, where clipped or overlapping labels are bugs (not the document). */
+const CHROME = ".menubar, .toolbar, .format-toolbar, .tabbar, .breadcrumbs, .statusbar, .sidebar-tabs, .modal, [role=menu], .toasts";
+
+async function layoutProblems(page: Page, where: string): Promise<string[]> {
+  const problems = await page.evaluate((chrome) => {
+    const out: string[] = [];
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const doc = document.documentElement;
+    if (doc.scrollWidth > vw + 1) out.push(`the window scrolls sideways (${doc.scrollWidth}px wide in ${vw}px)`);
+    /** Shown on screen: has a size, isn't hidden, and isn't scrolled out of a scrolling ancestor. */
+    const visible = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      if (r.width <= 1 || r.height <= 1 || s.visibility === "hidden" || s.display === "none") return false;
+      for (let p = el.parentElement; p; p = p.parentElement) {
+        const ps = getComputedStyle(p);
+        if (!/(auto|scroll|hidden|clip)/.test(ps.overflowX + ps.overflowY)) continue;
+        const pr = p.getBoundingClientRect();
+        if (r.bottom <= pr.top + 1 || r.top >= pr.bottom - 1 || r.right <= pr.left + 1 || r.left >= pr.right - 1) return false;
+      }
+      return true;
+    };
+    /** The part of an element that's on screen: its box cut by every clipping or scrolling ancestor. */
+    const shownRect = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      let [left, top, right, bottom] = [r.left, r.top, r.right, r.bottom];
+      for (let p = el.parentElement; p; p = p.parentElement) {
+        const ps = getComputedStyle(p);
+        if (!/(auto|scroll|hidden|clip)/.test(ps.overflowX + ps.overflowY)) continue;
+        const pr = p.getBoundingClientRect();
+        [left, top, right, bottom] = [Math.max(left, pr.left), Math.max(top, pr.top), Math.min(right, pr.right), Math.min(bottom, pr.bottom)];
+      }
+      return { left, top, right, bottom };
+    };
+    /** Text for screen readers only (clipped to 1px on purpose). */
+    const screenReaderOnly = (el: Element) => el.clientWidth <= 1 || el.clientHeight <= 1;
+    const name = (el: Element) => `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).join(".") : ""} "${(el.textContent ?? "").trim().slice(0, 40)}"`;
+
+    // Dialogs and menus are entirely on screen.
+    for (const el of document.querySelectorAll(".modal, [role=menu], .palette, [role=dialog]")) {
+      if (!visible(el)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.left < -1 || r.top < -1 || r.right > vw + 1 || r.bottom > vh + 1) out.push(`off screen: ${name(el)} (${Math.round(r.left)},${Math.round(r.top)} to ${Math.round(r.right)},${Math.round(r.bottom)})`);
+    }
+
+    // A dialog's buttons (Close, Done…) are on screen without scrolling the dialog.
+    for (const buttons of document.querySelectorAll(".modal .modal-buttons")) {
+      const dialog = buttons.closest(".modal")!;
+      if (getComputedStyle(dialog).display === "none") continue;
+      const shown = shownRect(buttons);
+      const box = buttons.getBoundingClientRect();
+      if (shown.bottom - shown.top < box.height - 1 || box.bottom > window.innerHeight + 1) {
+        out.push(`dialog buttons need scrolling: ${name(dialog.querySelector(".modal-title") ?? dialog)}`);
+      }
+    }
+
+    for (const region of document.querySelectorAll(chrome)) {
+      if (!visible(region)) continue;
+      // Labels cut off without an ellipsis (text wider than its box, clipped).
+      for (const el of region.querySelectorAll("button, a, label, [role=tab], [role=menuitem], h1, h2, h3, legend, p, span, kbd")) {
+        if (!visible(el) || screenReaderOnly(el) || !el.textContent?.trim()) continue;
+        const s = getComputedStyle(el);
+        const clips = ["hidden", "clip"].includes(s.overflowX) && s.textOverflow !== "ellipsis";
+        if (clips && el.scrollWidth > el.clientWidth + 1) out.push(`cut off: ${name(el)} (${el.scrollWidth}px of text in ${el.clientWidth}px)`);
+      }
+      // Controls side by side don't overlap.
+      const controls = [...region.querySelectorAll("button, select, input, [role=tab]")].filter(visible);
+      for (let i = 0; i < controls.length; i++) {
+        for (let j = i + 1; j < controls.length; j++) {
+          const a = shownRect(controls[i]);
+          const b = shownRect(controls[j]);
+          if (controls[i].contains(controls[j]) || controls[j].contains(controls[i])) continue;
+          const overlapX = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+          const overlapY = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+          if (overlapX > 2 && overlapY > 2) out.push(`overlap: ${name(controls[i])} and ${name(controls[j])}`);
+        }
+      }
+    }
+    return [...new Set(out)];
+  }, CHROME);
+  return problems.map((p) => `${where}: ${p}`);
+}
+
+async function start(page: Page) {
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem("layout-started")) {
+      localStorage.clear();
+      sessionStorage.setItem("layout-started", "1");
+    }
+    window.prompt = (_m?: string, d?: string) => d ?? null;
+  });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
+}
+
+for (const theme of ["light", "dark"] as const) {
+  for (const size of SIZES) {
+    test(`layout at ${size.width}×${size.height} (${theme})`, async ({ page }) => {
+      test.slow();
+      await page.setViewportSize(size);
+      await page.emulateMedia({ colorScheme: theme });
+      await start(page);
+      const problems: string[] = [];
+      problems.push(...(await layoutProblems(page, "welcome")));
+
+      await page.getByRole("button", { name: "Open Folder" }).first().click();
+      await page.locator(".tree-row", { hasText: /^README\.md$/ }).click();
+      await expect(page.locator(".markdown-body h1")).toBeVisible();
+      problems.push(...(await layoutProblems(page, "editor")));
+
+      await page.keyboard.press(`${mod}+N`);
+      await page.keyboard.press(`${mod}+N`);
+      problems.push(...(await layoutProblems(page, "three tabs")));
+
+      await page.getByRole("navigation", { name: "Application menu" }).getByRole("button", { name: "File", exact: true }).click();
+      await expect(page.getByRole("menu")).toBeVisible();
+      problems.push(...(await layoutProblems(page, "File menu")));
+      await page.keyboard.press("Escape");
+
+      await page.keyboard.press(`${mod}+Shift+P`);
+      await expect(page.getByRole("dialog", { name: "Command palette" }).getByRole("combobox")).toBeFocused();
+      problems.push(...(await layoutProblems(page, "command palette")));
+      await page.keyboard.press("Escape");
+
+      await page.keyboard.press(`${mod}+,`);
+      await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Settings")));
+      await page.keyboard.press("Escape");
+
+      await chooseMenu(page, "Help", "Report a Problem…");
+      await expect(page.getByRole("dialog", { name: "Report a Problem" })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Report a Problem")));
+      await page.keyboard.press("Escape");
+
+      await chooseMenu(page, "Help", "Keyboard Shortcuts");
+      await expect(page.getByRole("dialog", { name: "Keyboard Shortcuts" })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Keyboard Shortcuts")));
+
+      expect(problems, problems.join("\n")).toEqual([]);
+    });
+  }
+}
