@@ -715,6 +715,14 @@ test("long documents render in chunks; the outline, anchors and tasks still work
 });
 
 test("present a document as slides", async ({ page }) => {
+  // Record links opened outside the app instead of loading a real page in a popup.
+  await page.addInitScript(() => {
+    (window as unknown as { opened: string[] }).opened = [];
+    window.open = (url?: string | URL) => {
+      (window as unknown as { opened: string[] }).opened.push(String(url));
+      return null;
+    };
+  });
   await start(page);
   await page.keyboard.press(`${mod}+N`);
   await page.getByRole("textbox", { name: "Markdown editor" }).click();
@@ -733,6 +741,7 @@ test("present a document as slides", async ({ page }) => {
   // Links open outside the app, never inside the window.
   await show.getByRole("link", { name: "the site" }).click();
   await expect(show).toContainText("Slide 3 of 3");
+  await expect.poll(() => page.evaluate(() => (window as unknown as { opened: string[] }).opened)).toEqual(["https://example.com"]);
   await page.keyboard.press("Escape");
   await expect(show).toBeHidden();
   await expect(page.getByRole("textbox", { name: "Markdown editor" })).toBeFocused();
@@ -1415,6 +1424,21 @@ test("File > Export > EPUB makes an e-book with its pictures, math and diagrams"
   const content = await zip.file("OEBPS/content.xhtml")!.async("string");
   expect(content).toContain("<svg");
   expect(content).toContain("<math");
+});
+
+test("File > Export > LaTeX makes a .tex document", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("# Notes\n\n## Result\n\nIt costs 50% of $x^2$.\n");
+  const download = page.waitForEvent("download");
+  await chooseMenu(page, "File", "Export", "LaTeX (.tex)…");
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/\.tex$/);
+  const tex = Buffer.concat(await (await file.createReadStream()).toArray()).toString("utf8");
+  expect(tex).toContain("\\title{Notes}");
+  expect(tex).toContain("\\section{Result}\\label{result}");
+  expect(tex).toContain("It costs 50\\% of $x^2$.");
 });
 
 test("Export Folder as One E-book puts every document in the book", async ({ page }) => {

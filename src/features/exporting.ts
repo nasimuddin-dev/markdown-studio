@@ -47,6 +47,20 @@ export async function exportActiveAsHtml() {
   }
 }
 
+/** Exports the active document as a LaTeX (.tex) file. */
+export async function exportActiveAsLatex() {
+  const doc = activeDoc();
+  if (!doc) return;
+  try {
+    const { markdownToLatex } = await import("../services/convert/toLatex");
+    const tex = markdownToLatex(doc.content, { name: doc.name, math: features().math });
+    const saved = await backend().exportFile(exportFileName(doc.name, "tex"), tex, "tex");
+    if (saved) notify("success", `Exported to ${saved}`);
+  } catch (e) {
+    notify("error", describeError(e, "export to LaTeX"));
+  }
+}
+
 /** Markdown to export: a document, or a folder combined in memory. */
 interface ExportSource {
   content: string;

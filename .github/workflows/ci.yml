@@ -59,6 +59,23 @@ jobs:
           EPUB_OUT: epub-samples
       - run: for f in epub-samples/*.epub; do echo "== $f"; epubcheck "$f" || exit 1; done
 
+  latex:
+    name: LaTeX export compiles (pdflatex)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-plain-generic
+      # The LaTeX export tests write sample documents (plain, and one with everything) to LATEX_OUT.
+      - run: npx vitest run tests/toLatex.test.ts
+        env:
+          LATEX_OUT: latex-samples
+      - run: cd latex-samples && for f in *.tex; do echo "== $f"; pdflatex -interaction=nonstopmode -halt-on-error "$f" > /dev/null || { tail -40 "${f%.tex}.log"; exit 1; }; done
+
   audit:
     name: Dependency audit (npm, cargo)
     runs-on: ubuntu-latest

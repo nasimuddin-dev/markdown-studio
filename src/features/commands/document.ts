@@ -288,6 +288,7 @@ export const documentCommands: Record<string, Command> = {
     run: async () => (await import("../lineEndings")).setBom(true),
     enabled: hasActive,
   },
+  exportLatex: { id: "exportLatex", label: "Export as LaTeX (.tex)…", run: async () => (await exporting()).exportActiveAsLatex(), enabled: hasActive },
   exportEpub: {
     id: "exportEpub",
     label: "Export as EPUB (E-book)…",

@@ -19,7 +19,7 @@ import type {
  * POSIX paths in the demo, and could be document IDs or URLs in a cloud backend.
  */
 
-export type ExportKind = "html" | "json";
+export type ExportKind = "html" | "json" | "tex";
 
 export interface WriteRequest {
   path: string;

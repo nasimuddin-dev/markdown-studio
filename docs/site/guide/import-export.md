@@ -1,6 +1,6 @@
 ---
 title: Import & Export
-description: Import Word, PDF, HTML, EPUB and CSV/TSV files as Markdown, and export Markdown to PDF, Word (.docx), EPUB e-books and standalone HTML in Markpion, one document or a whole folder at a time.
+description: Import Word, PDF, HTML, EPUB and CSV/TSV files as Markdown, and export Markdown to PDF, Word (.docx), EPUB e-books, LaTeX and standalone HTML in Markpion, one document or a whole folder at a time.
 ---
 
 # Import & export
@@ -56,6 +56,7 @@ Export commands are in the **File** menu. You choose where to save the file.
 | PDF | Export as PDF… | Selectable text, clickable links, heading bookmarks, tables, task checkboxes, images, footnotes in a section at the end, page numbers, and the document's title at the top of each page after the first |
 | Word | Export as Word (.docx)… | Real Word headings (so Word's navigation pane and table of contents work), numbered, bulleted and task lists, tables, code, links (links to headings in the document, like a table of contents, jump to the heading in Word), embedded images, real Word footnotes, page numbers in the footer, and the title in the header of each page after the first |
 | HTML | Export as HTML… | One standalone, styled `.html` file with images embedded, sanitized like the preview; printed from Chrome or Edge, its pages get the title and page numbers too |
+| LaTeX | Export as LaTeX (.tex)… | A complete LaTeX document for pdfLaTeX, XeLaTeX or LuaLaTeX: headings as sections (links to headings become cross-references), math exactly as you wrote it, tables with `booktabs`, code as verbatim blocks, footnotes as `\footnote`, task lists with boxes, and pictures as `\includegraphics` with their paths as written, so compile it in the document's folder. The title and author come from the front matter, or a lone top-level heading becomes the title. Mermaid diagrams stay as code. For text beyond Western European languages, compile with XeLaTeX or LuaLaTeX |
 | E-book | Export as EPUB (E-book)… | An EPUB 3 e-book for e-readers and apps such as Apple Books, Kobo, Calibre or Thorium: the document as one chapter, a table of contents from its headings (levels 1 to 3), its local pictures inside the book, math as MathML and Mermaid diagrams as drawings. The title, `author`, `description` and `lang` (or `language`) come from the front matter (English when there's no language), and a `cover` picture named there becomes the book's cover. Web pictures become links, since e-readers don't load them |
 | Markdown and pictures | Export as Markdown with Images (.zip)… | A `.zip` with the document and the local pictures it shows, in an `images` folder, with the links changed to point there. Unzipped anywhere, the document still shows its pictures. Web images stay links, and a picture that can't be read is left out (Markpion says which) |
 | Clipboard | Copy as Formatted Text | The rendered document as formatted text (headings, lists, tables, links, images), for pasting into Word, Outlook, Gmail or Google Docs. Plain-text editors receive the Markdown |
