@@ -21,9 +21,10 @@ date: 2026-09-25
 ```
 
 - In the **preview**, the front matter is shown as a small table of keys and values, like on GitHub.
-- It's **left out of exports** (HTML, PDF and Word).
+- It's **left out of exports** (HTML, PDF, Word and EPUB).
 - If it has a `title`, that becomes the title of the exported document.
-- `author` (or `authors`), `description` (or `summary`, `subject`) and `keywords` (or `tags`) become the exported file's document properties: the Author, Subject and Keywords of a PDF, the Author, Subject, Comments and Tags of a Word document, and `<meta>` tags in HTML. Lists are joined with commas.
+- `author` (or `authors`), `description` (or `summary`, `subject`) and `keywords` (or `tags`) become the exported file's document properties: the Author, Subject and Keywords of a PDF, the Author, Subject, Comments and Tags of a Word document, and `<meta>` tags in HTML, and the creator, description and subject of an EPUB e-book. Lists are joined with commas.
+- For EPUB export, `lang` (or `language`, such as `fr` or `pt-BR`) sets the book's language, and `cover` (or `cover-image`) names a picture, relative to the document, that becomes the book's cover.
 
 ## Alerts
 

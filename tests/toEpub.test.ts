@@ -82,6 +82,30 @@ describe("EPUB export", () => {
     expect(await text("OEBPS/content.opf")).toContain('<item id="image1" href="images/image1.png" media-type="image/png" />');
   });
 
+  it("makes the front matter's cover picture the book's cover, on a page before the text", async () => {
+    const asked: string[] = [];
+    const { zip, text } = await book("---\ntitle: Story\ncover: art/front.png\n---\n\nOnce upon a time.", async (path) => {
+      asked.push(path);
+      return PNG;
+    });
+    expect(asked).toEqual(["/docs/art/front.png"]);
+    expect(zip.file("OEBPS/images/cover.png")).not.toBeNull();
+    const opf = await text("OEBPS/content.opf");
+    xml(opf);
+    expect(opf).toContain('<item id="cover-image" href="images/cover.png" media-type="image/png" properties="cover-image" />');
+    expect(opf).toMatch(/<itemref idref="cover" \/>\s*<itemref idref="content" \/>/);
+    const page = xml(await text("OEBPS/cover.xhtml"));
+    expect(page.querySelector("img")!.getAttribute("src")).toBe("images/cover.png");
+  });
+
+  it("has no cover when the picture can't be read", async () => {
+    const { zip, text } = await book("---\ncover: missing.png\n---\n\nText.", async () => {
+      throw new Error("not found");
+    });
+    expect(zip.file("OEBPS/cover.xhtml")).toBeNull();
+    expect(await text("OEBPS/content.opf")).not.toContain("cover");
+  });
+
   it("keeps the description of a picture that can't be read", async () => {
     const { text } = await book("![Missing picture](gone.png)", async () => {
       throw new Error("not found");
