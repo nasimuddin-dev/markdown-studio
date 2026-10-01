@@ -78,7 +78,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Automatic updates: at startup, the app checks GitHub for a newer version and offers **Update Now**. It downloads the update, verifies its signature, installs it over the current version and restarts. You can also use Help → Check for Updates, or turn the startup check off in Settings. Nothing else is sent
 - Table of contents: Format → Insert / Update Table of Contents builds a linked, nested TOC that stays up to date on save (Settings → Files)
 - Change a file's line endings or byte order mark (click LF/CRLF or UTF-8 in the status bar, or the Change Line Endings / Change Encoding commands)
-- Copy as Plain Text (File → Copy As): the selection or document without Markdown syntax
+- Copy as Plain Text (File → Copy As): the selection or document without Markdown syntax; Copy as LaTeX: the selection or document as LaTeX text for pasting into a paper
 - Export as Markdown with Images (.zip): the document plus its local pictures in `images/`, links rewritten
 - Export as LaTeX (.tex): a complete document with sections and cross-references, math as written, booktabs tables, verbatim code, footnotes and figures; title and author from the front matter
 - Export as EPUB (e-book): an EPUB 3 file with a table of contents from the headings, the local pictures inside, math as MathML and Mermaid diagrams as pictures; title, author, description, language and a cover picture come from the front matter

@@ -104,6 +104,10 @@ describe("LaTeX export", () => {
     }
   });
 
+  it("gives just the converted text for pasting (Copy as LaTeX)", () => {
+    expect(markdownToLatex("# Results\n\nIt is **$x^2$**.", { bodyOnly: true })).toBe("\\section{Results}\\label{results}\n\nIt is \\textbf{$x^2$}.\n");
+  });
+
   it("leaves math alone when math is off", () => {
     expect(markdownToLatex("Price: $5 and $6", { math: false })).toContain("Price: \\$5 and \\$6");
   });

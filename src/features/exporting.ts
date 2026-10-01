@@ -247,6 +247,21 @@ export async function copyActiveAsPlainText() {
   }
 }
 
+/** Copies the selection, or the document, as LaTeX body text (for pasting into a paper or Overleaf). */
+export async function copyActiveAsLatex() {
+  const doc = activeDoc();
+  if (!doc) return;
+  try {
+    const view = getEditorView();
+    const selected = view && editorDocId() === doc.id ? view.state.selection.ranges.map((r) => view.state.sliceDoc(r.from, r.to)).join("\n\n").trim() : "";
+    const { markdownToLatex } = await import("../services/convert/toLatex");
+    await navigator.clipboard.writeText(markdownToLatex(selected || doc.content, { math: features().math, bodyOnly: true }));
+    notify("success", selected ? "Selection copied as LaTeX." : "Document copied as LaTeX.");
+  } catch (e) {
+    notify("error", describeError(e, "copy the text"));
+  }
+}
+
 export async function copyActiveAsHtml() {
   const doc = activeDoc();
   if (!doc) return;

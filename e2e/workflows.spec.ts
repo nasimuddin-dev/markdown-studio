@@ -607,6 +607,21 @@ test("code blocks in the preview have a Copy button", async ({ page }) => {
   expect(copied.replace(/\r\n/g, "\n")).toBe("const answer = 42;\nconsole.log(answer);");
 });
 
+test("Copy as LaTeX copies the selection as LaTeX", async ({ page }) => {
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.insertText("Intro line\n\nSo **50%** of $x_1$.");
+  // Select the last line only.
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Shift+End");
+  await chooseMenu(page, "File", "Copy As", "LaTeX");
+  await expect(page.getByText("Selection copied as LaTeX.")).toBeVisible();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied.replace(/\r\n/g, "\n")).toBe("So \\textbf{50\\%} of $x_1$.\n");
+});
+
 test("copy as formatted text puts HTML and Markdown on the clipboard", async ({ page }) => {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await start(page);

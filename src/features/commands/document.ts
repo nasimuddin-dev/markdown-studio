@@ -308,6 +308,7 @@ export const documentCommands: Record<string, Command> = {
     enabled: hasActive,
   },
   copyPlainText: { id: "copyPlainText", label: "Copy as Plain Text", run: async () => (await exporting()).copyActiveAsPlainText(), enabled: hasActive },
+  copyLatex: { id: "copyLatex", label: "Copy as LaTeX", run: async () => (await exporting()).copyActiveAsLatex(), enabled: hasActive },
   copyHtml: { id: "copyHtml", label: "Copy as HTML", run: async () => (await exporting()).copyActiveAsHtml(), enabled: hasActive },
   copyFormatted: { id: "copyFormatted", label: "Copy as Formatted Text", run: async () => (await exporting()).copyActiveAsFormattedText(), enabled: hasActive },
   printSlides: { id: "printSlides", label: "Print Slides…", run: async () => (await exporting()).printSlides(), enabled: hasActive },

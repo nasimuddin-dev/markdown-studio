@@ -188,7 +188,11 @@ function block(node: RootContent, ctx: Context, slugger = new GithubSlugger()): 
   }
 }
 
-export function markdownToLatex(markdown: string, opts: { name?: string; math?: boolean } = {}): string {
+/**
+ * `bodyOnly` returns just the converted text, for pasting into an existing
+ * document: no preamble, and a top heading stays a section.
+ */
+export function markdownToLatex(markdown: string, opts: { name?: string; math?: boolean; bodyOnly?: boolean } = {}): string {
   const parser = unified().use(remarkParse).use(remarkGfm);
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
   const tree = parser.parse(stripFrontMatter(markdown)) as Root;
@@ -207,7 +211,7 @@ export function markdownToLatex(markdown: string, opts: { name?: string; math?: 
   let nodes = tree.children;
   const h1s = nodes.filter((n) => n.type === "heading" && n.depth === 1);
   const first = nodes.find((n) => n.type !== "html" && n.type !== "definition");
-  if (!title && h1s.length === 1 && first === h1s[0]) {
+  if (!opts.bodyOnly && !title && h1s.length === 1 && first === h1s[0]) {
     title = plainText(h1s[0]);
     nodes = nodes.filter((n) => n !== h1s[0]);
   }
@@ -226,6 +230,7 @@ export function markdownToLatex(markdown: string, opts: { name?: string; math?: 
   const slugger = new GithubSlugger();
   if (nodes !== tree.children) slugger.slug(plainText(h1s[0]));
   const body = nodes.map((n) => block(n, ctx, slugger)).filter(Boolean).join("\n\n");
+  if (opts.bodyOnly) return `${body}\n`;
 
   const meta = frontMatterMetadata(markdown);
   const packages = ["amsmath", "amssymb", ...["graphicx", "longtable", "booktabs", "caption"].filter((p) => ctx.packages.has(p)), ...(ctx.packages.has("ulem") ? ["[normalem]ulem"] : []), "hyperref"];

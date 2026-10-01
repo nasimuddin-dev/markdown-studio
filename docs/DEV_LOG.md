@@ -750,6 +750,8 @@ The user asked to keep the development loop going until 12 PM.
 
 **Version:** 0.25.0. **Tests:** Vitest 656 (119 files), Playwright 110, Rust 50 (+1 ignored), native 5 (now also exporting an EPUB and a LaTeX file through the real Save dialog; the start-up handover test timed out once right after the release build on the busy machine and passed on the rerun), website check. CI also runs EPUBCheck and pdflatex on sample output.
 
+**Released as 0.25.0** at 10:51 (release workflow, CI and documentation passed; all 11 download links and latest.json return 200). **After the release:** Copy as LaTeX (File → Copy As), the selection or document without the preamble; tests: Vitest 657, Playwright 111.
+
 **Unverified:** EPUB files in e-reader apps (only EPUBCheck and XML checks); LaTeX output with XeLaTeX/LuaLaTeX and on real documents beyond the CI samples; the KaTeX font fallback in PDFs opened outside pdf.js (the text extraction test reads the symbols back).
 
 **Notes:** full local e2e runs were slowed by other processes on this machine (CPU at about 60% between runs); single failures under that load passed when rerun, and CI passed throughout. The project has no third-party notices file; the KaTeX fonts embedded in PDFs are OFL-licensed, which a notices file should list once the license question (SRS §21) is settled.
