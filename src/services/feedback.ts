@@ -25,6 +25,8 @@ export const FEEDBACK_KINDS: Record<FeedbackKind, { label: string; title: string
 };
 
 export const NEW_ISSUE_URL = "https://github.com/nasimuddin-dev/markpion/issues/new";
+/** Where emailed feedback goes (for people without a GitHub account). */
+export const FEEDBACK_EMAIL = "nasim.uddinbd02@gmail.com";
 
 /** An error worth mentioning in a report: where it happened and what it said. */
 export interface ReportedError {
@@ -59,6 +61,21 @@ export function feedbackReport(input: { kind: FeedbackKind; summary: string; det
 /** GitHub doesn't open issue links much longer than about 8,000 characters. */
 const MAX_URL = 7500;
 
+/** Mail apps on Windows don't accept mailto links much longer than about 2,000 characters. */
+const MAX_MAILTO = 1900;
+
+/** Builds a link with `make`, cutting the body until the link fits in `max` characters. */
+function fitLink(body: string, max: number, make: (body: string) => string, note: string): { url: string; shortened: boolean } {
+  let url = make(body);
+  if (url.length <= max) return { url, shortened: false };
+  let keep = body.length;
+  while (keep > 0 && url.length > max) {
+    keep = Math.floor(keep * 0.9);
+    url = make(body.slice(0, keep) + note);
+  }
+  return { url, shortened: true };
+}
+
 /**
  * A link that opens a new GitHub issue with this title and body filled in. A
  * long body is shortened to fit (`shortened`), and the caller puts the full
@@ -66,13 +83,12 @@ const MAX_URL = 7500;
  */
 export function issueUrl(title: string, body: string): { url: string; shortened: boolean } {
   const make = (b: string) => `${NEW_ISSUE_URL}?${new URLSearchParams({ title, body: b }).toString()}`;
-  let url = make(body);
-  if (url.length <= MAX_URL) return { url, shortened: false };
-  const note = "\n\n_(Shortened to fit in a link: paste the full text from the clipboard here.)_";
-  let keep = body.length;
-  while (keep > 0 && url.length > MAX_URL) {
-    keep = Math.floor(keep * 0.9);
-    url = make(body.slice(0, keep) + note);
-  }
-  return { url, shortened: true };
+  return fitLink(body, MAX_URL, make, "\n\n_(Shortened to fit in a link: paste the full text from the clipboard here.)_");
+}
+
+/** A mailto link to the feedback address with this subject and body (shortened like `issueUrl`). */
+export function emailUrl(title: string, body: string): { url: string; shortened: boolean } {
+  // encodeURIComponent, not URLSearchParams: mail apps read "+" as a plus sign, not a space.
+  const make = (b: string) => `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(`Markpion: ${title}`)}&body=${encodeURIComponent(b)}`;
+  return fitLink(body, MAX_MAILTO, make, "\n\n(Shortened to fit in an email link: paste the full text from the clipboard here.)");
 }

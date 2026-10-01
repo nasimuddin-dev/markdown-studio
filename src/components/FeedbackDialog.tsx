@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { backend } from "../services";
-import { FEEDBACK_KINDS, feedbackReport, issueUrl, technicalDetails, type FeedbackKind } from "../services/feedback";
+import { emailUrl, FEEDBACK_EMAIL, FEEDBACK_KINDS, feedbackReport, issueUrl, technicalDetails, type FeedbackKind } from "../services/feedback";
 import { recentErrors } from "../features/errorReports";
 import { notify, useUi } from "../stores/uiStore";
 import { Modal } from "./Dialogs";
@@ -8,7 +8,8 @@ import { Modal } from "./Dialogs";
 /**
  * Help → Send Feedback / Report a Problem. The user writes a suggestion, a
  * problem or an opinion, sees exactly what will be included, and opens it as a
- * new GitHub issue in the browser (or copies it). Nothing is sent by Markpion.
+ * new GitHub issue in the browser or an email in their mail app (or copies it).
+ * Nothing is sent by Markpion.
  */
 export function FeedbackDialog() {
   const request = useUi((s) => s.feedback);
@@ -38,16 +39,18 @@ export function FeedbackDialog() {
     return `${title}\n\n${body}`;
   };
 
-  const openOnGitHub = async () => {
+  /** Opens the report in the browser (GitHub) or the mail app; a shortened one also goes to the clipboard in full. */
+  const send = async (via: "github" | "email") => {
     const { title, body } = report();
-    const { url, shortened } = issueUrl(title, body);
+    const { url, shortened } = via === "github" ? issueUrl(title, body) : emailUrl(title, body);
+    const where = via === "github" ? "on GitHub" : "in your mail app";
     try {
       if (shortened) await navigator.clipboard.writeText(fullText());
       await backend().openExternal(url);
-      notify("success", shortened ? "Opened on GitHub, shortened to fit. The full text is on the clipboard." : "Opened on GitHub. Review it there and submit it.");
+      notify("success", shortened ? `Opened ${where}, shortened to fit. The full text is on the clipboard.` : `Opened ${where}. Review it there and send it.`);
       close();
     } catch (e) {
-      notify("error", `Couldn't open the browser: ${(e as Error).message}`);
+      notify("error", `Couldn't open ${via === "github" ? "the browser" : "the mail app"}: ${(e as Error).message}`);
     }
   };
 
@@ -63,7 +66,7 @@ export function FeedbackDialog() {
   return (
     <Modal title={request.kind === "problem" ? "Report a Problem" : "Send Feedback"} onClose={close} className="feedback-modal">
       <p className="modal-message">
-        Thank you for helping improve Markpion. Your feedback opens as a new issue on GitHub in your browser, where you can review it before submitting (a free GitHub account is needed). Nothing is sent from Markpion itself.
+        Thank you for helping improve Markpion. Your feedback opens as a new issue on GitHub in your browser (a free GitHub account is needed), or as an email to {FEEDBACK_EMAIL} in your mail app. You review it there before sending; nothing is sent from Markpion itself.
       </p>
       <fieldset className="settings-choice">
         <legend>What kind of feedback?</legend>
@@ -93,7 +96,8 @@ export function FeedbackDialog() {
           <button className="button" onClick={() => void copy()} disabled={!summary.trim()}>Copy Text</button>
         </div>
         <button className="button" onClick={close}>Cancel</button>
-        <button className="button primary" onClick={() => void openOnGitHub()} disabled={!summary.trim()}>Open on GitHub</button>
+        <button className="button" onClick={() => void send("email")} disabled={!summary.trim()}>Send by Email</button>
+        <button className="button primary" onClick={() => void send("github")} disabled={!summary.trim()}>Open on GitHub</button>
       </div>
     </Modal>
   );

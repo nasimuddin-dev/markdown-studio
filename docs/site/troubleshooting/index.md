@@ -26,7 +26,7 @@ To attach the log to a bug report, choose **Help → Export Diagnostic Logs…**
 
 ## Report an issue
 
-If the articles don't help, choose **Help → Report a Problem…** in Markpion (or **Report…** on the error message, or **Report Problem…** where part of the window failed). It fills in your version, operating system and recent errors, which you can edit, and opens a new GitHub issue in your browser for you to review and submit. **Copy Text** copies the report instead. Nothing is sent automatically.
+If the articles don't help, choose **Help → Report a Problem…** in Markpion (or **Report…** on the error message, or **Report Problem…** where part of the window failed). It fills in your version, operating system and recent errors, which you can edit, and opens a new GitHub issue in your browser for you to review and submit. **Send by Email** opens it as an email to nasim.uddinbd02@gmail.com in your mail app instead, for those without a GitHub account, and **Copy Text** copies it. Nothing is sent automatically.
 
 Or [open an issue on GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) yourself, with:
 

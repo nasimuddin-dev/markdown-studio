@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { feedbackReport, issueUrl, technicalDetails } from "../src/services/feedback";
+import { emailUrl, feedbackReport, issueUrl, technicalDetails } from "../src/services/feedback";
 import { clearRecentErrors, recentErrors, recordError } from "../src/features/errorReports";
 import { FeedbackDialog } from "../src/components/FeedbackDialog";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
@@ -44,6 +44,16 @@ describe("feedback reports", () => {
     expect(new URL(long.url).searchParams.get("body")).toMatch(/Shortened to fit/);
   });
 
+  it("makes an email link to the feedback address, with spaces encoded for mail apps, shortened to fit", () => {
+    const { url, shortened } = emailUrl("[Problem] It broke", "Line one\nA & B + C");
+    expect(shortened).toBe(false);
+    expect(url).toBe("mailto:nasim.uddinbd02@gmail.com?subject=Markpion%3A%20%5BProblem%5D%20It%20broke&body=Line%20one%0AA%20%26%20B%20%2B%20C");
+    const long = emailUrl("t", "word ".repeat(2000));
+    expect(long.shortened).toBe(true);
+    expect(long.url.length).toBeLessThanOrEqual(1900);
+    expect(decodeURIComponent(long.url)).toMatch(/Shortened to fit in an email link/);
+  });
+
   it("keeps only the last five errors", () => {
     for (let i = 1; i <= 7; i++) recordError(new Error(`error ${i}`), "test");
     expect(recentErrors().map((e) => e.message)).toEqual(["error 3", "error 4", "error 5", "error 6", "error 7"]);
@@ -67,6 +77,16 @@ describe("Send Feedback dialog", () => {
     expect(url.searchParams.get("body")).toContain("In the outline.");
     expect(url.searchParams.get("body")).not.toContain("Technical details");
     expect(useUi.getState().feedback).toBeNull();
+  });
+
+  it("sends the report by email through the mail app", async () => {
+    const open = vi.spyOn(backend(), "openExternal").mockResolvedValue();
+    useUi.getState().openFeedback({ kind: "design" });
+    render(<FeedbackDialog />);
+    fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Bigger toolbar icons" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send by Email" }));
+    await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    expect(open.mock.calls[0][0]).toMatch(/^mailto:nasim\.uddinbd02@gmail\.com\?subject=Markpion%3A%20%5BDesign%5D%20Bigger%20toolbar%20icons&body=/);
   });
 
   it("starts a problem report with the error in the editable technical details", async () => {

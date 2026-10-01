@@ -82,7 +82,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 - Accessibility: keyboard navigation and visible focus throughout (F6 moves between the sidebar, editor and preview); the UI is audited automatically against WCAG 2.1 AA in light and dark themes; in Windows High Contrast (and other forced-colour modes), selections, the active tab, focus and unsaved-change markers stay visible.
 - Automatic updates on Windows, verified with a signature before installing. macOS and Linux are notified of new versions.
 - Diagnostic logs you can export for support. They never contain document text.
-- **Help → Send Feedback… / Report a Problem…**: suggestions, problems and opinions on the design, opened as a GitHub issue in your browser for you to review (or copied), with optional technical details you can edit. Error messages and failed parts of the window offer **Report…**. Nothing is sent automatically. [Troubleshooting](/troubleshooting/#report-an-issue)
+- **Help → Send Feedback… / Report a Problem…**: suggestions, problems and opinions on the design, opened as a GitHub issue in your browser or an email in your mail app for you to review (or copied), with optional technical details you can edit. Error messages and failed parts of the window offer **Report…**. Nothing is sent automatically. [Troubleshooting](/troubleshooting/#report-an-issue)
 
 ## AI assistant (optional)
 
