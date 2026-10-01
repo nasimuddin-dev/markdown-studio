@@ -13,9 +13,13 @@ import { copyText } from "../features/pathActions";
 import { scrollSync } from "../features/scrollSync";
 import { openLink } from "../features/followLink";
 import { revealLineAt } from "../features/editorBridge";
-import { lineForTop, rehypeSourceLines, topForLine } from "../services/sourceLines";
+import { lineForTop, rehypeHeadingIds, rehypeSourceLines, topForLine } from "../services/sourceLines";
+import { hasFootnotes, referenceDefinitions, splitSections } from "../services/markdownSections";
+import { extractHeadings, headingSlugs } from "../features/outline";
+import { taskCounts } from "../features/taskCount";
+import rehypeSlug from "rehype-slug";
 import { toggleTaskInDocument } from "../features/tasks";
-import { mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
+import { estimateHeight, mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
 import { PreviewFind } from "./PreviewFind";
 import { useUi } from "../stores/uiStore";
 import { useWorkspace } from "../stores/workspaceStore";
@@ -172,15 +176,12 @@ function FrontMatterTable({ entries }: { entries: Array<[string, string]> }) {
   );
 }
 
-export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text: string; docPath: string | null }) {
-  const renderMath = useSettings((s) => s.settings.renderMath);
+/** Documents longer than this (without footnotes) are parsed section by section, as they scroll into view. */
+export const SECTIONED_PREVIEW_CHARS = 100_000;
+
+function usePreviewComponents(docPath: string | null): Components {
   const renderDiagrams = useSettings((s) => s.settings.renderDiagrams);
-  const plugins = useMemo(() => {
-    const base = markdownPlugins({ math: renderMath });
-    return { ...base, rehypePlugins: [...base.rehypePlugins, rehypeSourceLines, rehypeChunks] };
-  }, [renderMath]);
-  const frontMatter = useMemo(() => splitFrontMatter(text), [text]);
-  const components = useMemo<Components>(
+  return useMemo<Components>(
     () => ({
       pre: ({ node, children, ...rest }) => {
         const source = renderDiagrams ? mermaidSource(node) : null;
@@ -241,13 +242,100 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath }: { text
     }),
     [docPath, renderDiagrams],
   );
+}
+
+export const MarkdownView = memo(function MarkdownView({ text, docPath, sectionAt = SECTIONED_PREVIEW_CHARS }: {
+  text: string;
+  docPath: string | null;
+  /** Length above which the document is rendered section by section (tests set it to compare both ways). */
+  sectionAt?: number;
+}) {
+  const renderMath = useSettings((s) => s.settings.renderMath);
+  const plugins = useMemo(() => {
+    const base = markdownPlugins({ math: renderMath });
+    return { ...base, rehypePlugins: [...base.rehypePlugins, rehypeSourceLines, rehypeChunks] };
+  }, [renderMath]);
+  const components = usePreviewComponents(docPath);
+  const frontMatter = useMemo(() => splitFrontMatter(text), [text]);
+  const body = frontMatter ? frontMatter.body : text;
+  const sectioned = body.length > sectionAt && !hasFootnotes(body);
   return (
     <>
       {frontMatter && frontMatter.entries.length > 0 && <FrontMatterTable entries={frontMatter.entries} />}
-      <ReactMarkdown remarkPlugins={plugins.remarkPlugins} rehypePlugins={plugins.rehypePlugins} components={components} urlTransform={previewUrl}>
-        {frontMatter ? frontMatter.body : text}
-      </ReactMarkdown>
+      {sectioned ? (
+        <SectionedMarkdown text={body} docPath={docPath} />
+      ) : (
+        <ReactMarkdown remarkPlugins={plugins.remarkPlugins} rehypePlugins={plugins.rehypePlugins} components={components} urlTransform={previewUrl}>
+          {body}
+        </ReactMarkdown>
+      )}
     </>
+  );
+});
+
+/**
+ * A long document, section by section (markdownSections.ts): each section is
+ * a placeholder until it nears the visible area, and only then parsed. A
+ * section's result is kept (memo) until its own text, position or heading ids
+ * change, so an edit re-parses only the sections it affects.
+ */
+function SectionedMarkdown({ text, docPath }: { text: string; docPath: string | null }) {
+  const sections = useMemo(() => {
+    const parts = splitSections(text);
+    const definitions = referenceDefinitions(text);
+    // Heading ids numbered across the whole document, then handed to each section in order.
+    const ids = headingSlugs(extractHeadings(text));
+    let heading = 0;
+    let tasks = 0;
+    return parts.map((part) => {
+      const count = extractHeadings(part.source).length;
+      const section = {
+        ...part,
+        definitions,
+        ids: ids.slice(heading, heading + count).join("\u0000"),
+        tasksBefore: tasks,
+        height: estimateHeight(part.source, part.source.split("\n\n").length),
+      };
+      heading += count;
+      tasks += taskCounts(part.source).total;
+      return section;
+    });
+  }, [text]);
+  return (
+    <>
+      {sections.map((s, i) => (
+        <PreviewChunk key={i} index={String(i)} height={String(s.height)} tasksBefore={String(s.tasksBefore)} line={String(s.startLine)}>
+          <SectionMarkdown source={s.source} definitions={s.definitions} offset={s.startLine - 1} ids={s.ids} docPath={docPath} />
+        </PreviewChunk>
+      ))}
+    </>
+  );
+}
+
+const SectionMarkdown = memo(function SectionMarkdown({ source, definitions, offset, ids, docPath }: {
+  source: string;
+  definitions: string;
+  offset: number;
+  /** The section's heading ids, joined with NUL (a string, so the memo can compare it). */
+  ids: string;
+  docPath: string | null;
+}) {
+  const renderMath = useSettings((s) => s.settings.renderMath);
+  const components = usePreviewComponents(docPath);
+  const plugins = useMemo(() => {
+    const base = markdownPlugins({ math: renderMath });
+    // The document-wide heading ids go first; rehype-slug only fills in any it didn't know about.
+    const rehype = base.rehypePlugins.flatMap((p) =>
+      p === rehypeSlug ? [[rehypeHeadingIds, { ids: ids ? ids.split("\u0000") : [] }], rehypeSlug] : [p],
+    ) as typeof base.rehypePlugins;
+    return { ...base, rehypePlugins: [...rehype, [rehypeSourceLines, { offset }]] as typeof base.rehypePlugins };
+  }, [renderMath, ids, offset]);
+  // Reference-style links can point at definitions anywhere in the document.
+  const text = definitions ? `${source}\n\n${definitions}\n` : source;
+  return (
+    <ReactMarkdown remarkPlugins={plugins.remarkPlugins} rehypePlugins={plugins.rehypePlugins} components={components} urlTransform={previewUrl}>
+      {text}
+    </ReactMarkdown>
   );
 });
 

@@ -5,7 +5,7 @@ import base from "../playwright.config";
 export default defineConfig({
   ...base,
   testDir: ".",
-  testMatch: ["ui-audit.spec.ts", "visual.spec.ts"],
+  testMatch: ["ui-audit.spec.ts", "visual.spec.ts", "perf.spec.ts"],
   snapshotPathTemplate: "{testDir}/out/visual/{arg}{ext}",
   fullyParallel: false,
   workers: 1,

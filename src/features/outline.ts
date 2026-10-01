@@ -1,4 +1,5 @@
 import GithubSlugger from "github-slugger";
+import { protectedLines } from "../services/markdownSections";
 
 export interface Heading {
   level: number;
@@ -8,7 +9,6 @@ export interface Heading {
 }
 
 const ATX = /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?(?:[ \t]+#+)?[ \t]*$/;
-const FENCE = /^ {0,3}(`{3,}|~{3,})/;
 const SETEXT_H1 = /^ {0,3}=+[ \t]*$/;
 const SETEXT_H2 = /^ {0,3}-+[ \t]*$/;
 
@@ -25,12 +25,13 @@ export function plainHeadingText(raw: string): string {
 
 /**
  * Extracts ATX (`## Title`) and setext (`Title\n===`) headings, ignoring
- * fenced code blocks and front matter.
+ * front matter and what the preview doesn't treat as headings: fenced code,
+ * `$$` math blocks and multi-line HTML such as comments and `<pre>`.
  */
 export function extractHeadings(text: string): Heading[] {
   const lines = text.split("\n");
   const headings: Heading[] = [];
-  let fence: string | null = null;
+  const shielded = protectedLines(lines);
   let start = 0;
 
   // YAML front matter at the very top.
@@ -41,14 +42,7 @@ export function extractHeadings(text: string): Heading[] {
 
   for (let i = start; i < lines.length; i++) {
     const line = lines[i];
-    const f = FENCE.exec(line);
-    if (f) {
-      const marker = f[1];
-      if (!fence) fence = marker;
-      else if (marker[0] === fence[0] && marker.length >= fence.length) fence = null;
-      continue;
-    }
-    if (fence) continue;
+    if (shielded[i]) continue;
 
     const atx = ATX.exec(line);
     if (atx) {

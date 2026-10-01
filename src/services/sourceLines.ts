@@ -6,12 +6,35 @@ import type { Root } from "hast";
  * and a double-click in the preview can find its source. Runs after
  * sanitizing, so the attribute isn't stripped.
  */
-export function rehypeSourceLines() {
+export function rehypeSourceLines(options: { offset?: number } = {}) {
+  // A section of a long document (see markdownSections.ts) is parsed on its own; `offset` is the lines before it.
+  const offset = options.offset ?? 0;
   return (tree: Root) => {
     for (const child of tree.children) {
       const line = child.type === "element" ? child.position?.start.line : undefined;
-      if (child.type === "element" && line) child.properties = { ...child.properties, dataLine: String(line) };
+      if (child.type === "element" && line) child.properties = { ...child.properties, dataLine: String(line + offset) };
     }
+  };
+}
+
+/**
+ * Rehype plugin for a section of a long document: gives its headings, in
+ * order, the ids they have in the whole document (`ids`, numbered across all
+ * sections as GitHub does: "install", "install-1"…). Headings beyond the list
+ * are left to rehype-slug.
+ */
+export function rehypeHeadingIds(options: { ids: string[] }) {
+  return (tree: Root) => {
+    let next = 0;
+    const visit = (node: Root | Root["children"][number]) => {
+      if (node.type === "element" && /^h[1-6]$/.test(node.tagName)) {
+        if (next < options.ids.length && node.properties.id === undefined) node.properties = { ...node.properties, id: options.ids[next] };
+        next++;
+        return;
+      }
+      if ("children" in node) for (const child of node.children) visit(child);
+    };
+    visit(tree);
   };
 }
 

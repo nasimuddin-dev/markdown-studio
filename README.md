@@ -96,6 +96,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Menus with one level of submenus (Open Recent, Import, Export, Copy As, Go To, Heading, Callout, Insert, Fold, Slides…) and check marks for on/off settings; one menu model (`src/features/menus.ts`) drives the in-app menu bar, the macOS menu bar and the command palette's "where is it" hints
 - Mermaid diagrams (lazy-loaded, strict security mode) and LaTeX math (`$…$`, `$$…$$`, rendered as MathML) in the preview and exports
 - Live GitHub Flavored Markdown preview (tables, task lists, strikethrough, autolinks, emoji shortcodes such as `:tada:`, fenced code with highlighting) with a configurable debounce. Click a task checkbox in the preview to check or uncheck it in the source (undoable)
+- Long documents (over 100 KB) are previewed section by section: each part is parsed as it scrolls into view, so an 800 KB document appears in about 1.6 s instead of 12.6 s (measured in the development build)
 - YAML front matter (`---` metadata at the top, as used by Jekyll, Hugo and Obsidian) is shown as a tidy metadata table in the preview, left out of HTML, PDF and Word exports, and its `title` names exported documents
 - GitHub alerts (Format → Callout): `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` render as coloured callouts with icons in the preview and HTML export, and as labelled callouts in PDF and Word
 - Open Today's Note (File menu): `journal/YYYY-MM-DD.md`, created from the Daily journal template

@@ -858,6 +858,34 @@ test("formatting toolbar reflects and applies formatting", async ({ page }) => {
   await expect(toolbar).toBeHidden();
 });
 
+test("a long document is previewed section by section, and jumps reach the end", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  const filler = "Some more words to make this a long document, the kind that took seconds to appear. ".repeat(3);
+  const sections = Array.from({ length: 400 }, (_, i) => `## Part ${i}\n\nParagraph ${i} with a [link to the end](#the-end). ${filler}\n\n- [ ] Task ${i}\n`);
+  const doc = `# Long\n\n${sections.join("\n")}\n## The end\n\nLast words.\n`;
+  // Over the 100 KB at which the preview parses section by section.
+  expect(doc.length).toBeGreaterThan(100_000);
+  // Set straight into the document: typing 120 KB through simulated key input is too slow for a test.
+  await page.evaluate(async (text) => {
+    const modulePath = "/src/stores/documentsStore.ts"; // the dev server's module (a variable, so TypeScript leaves it)
+    const { useDocuments } = await import(/* @vite-ignore */ modulePath);
+    const { activeId, setContent } = useDocuments.getState();
+    setContent(activeId, text);
+  }, doc);
+  const preview = page.locator(".markdown-body");
+  await expect(preview.locator("h1")).toHaveText("Long");
+  // Later sections wait as placeholders until they come near the visible area.
+  await expect(preview.locator(".preview-chunk.pending").first()).toBeAttached();
+  await expect(preview.locator("#the-end")).toHaveCount(0);
+  // The outline jumps to a heading in a section that wasn't rendered yet.
+  await page.getByRole("region", { name: "Outline" }).getByRole("button", { name: "The end" }).click();
+  await expect(preview.locator("#the-end")).toBeInViewport();
+  // Task checkboxes in later sections still toggle the right line.
+  await preview.locator("li", { hasText: "Task 399" }).locator("input").click();
+  await expect(page.locator(".cm-line", { hasText: "Task 399" })).toHaveText("- [x] Task 399");
+});
+
 test("breadcrumbs show the cursor's headings and jump to others", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);
