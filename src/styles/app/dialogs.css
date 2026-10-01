@@ -212,6 +212,14 @@
 .feedback-technical {
   margin-top: var(--space-5);
 }
+.field-error {
+  margin: var(--space-2) 0 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+.feedback-modal .text-input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
 .feedback-modal textarea:not(.code-input) {
   font: inherit;
   resize: vertical;

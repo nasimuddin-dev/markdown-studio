@@ -94,6 +94,12 @@ kbd {
   background: var(--danger);
   color: var(--on-danger);
 }
+/* A button that can't be used now must look it: faded, no hover, no pointer. */
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 .text-input,
 select {

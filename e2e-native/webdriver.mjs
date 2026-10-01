@@ -69,6 +69,16 @@ export class Session {
     return el[ELEMENT];
   }
 
+  /** The first element matching `css` whose text is exactly `text`, waiting for it to appear. */
+  async findByText(css, text, timeout) {
+    const el = await this.waitFor(
+      () => this.exec("return [...document.querySelectorAll(arguments[0])].find((e) => e.textContent.trim() === arguments[1]) ?? null", css, text),
+      `${css} "${text}"`,
+      timeout,
+    );
+    return el[ELEMENT];
+  }
+
   click(el) {
     return this.cmd("POST", `/element/${el}/click`, {});
   }

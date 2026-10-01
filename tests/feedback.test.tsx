@@ -66,7 +66,13 @@ describe("Send Feedback dialog", () => {
     useUi.getState().openFeedback({ kind: "suggestion" });
     render(<FeedbackDialog />);
     const send = screen.getByRole("button", { name: "Open on GitHub" });
-    expect(send).toBeDisabled();
+    // Without a summary the button says what's missing (it doesn't silently do nothing).
+    expect(send).toBeEnabled();
+    fireEvent.click(send);
+    expect(screen.getByRole("alert")).toHaveTextContent("Write a short summary first.");
+    expect(screen.getByLabelText("Summary")).toHaveFocus();
+    expect(screen.getByLabelText("Summary")).toHaveAttribute("aria-invalid", "true");
+    expect(open).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Word count per section" } });
     fireEvent.change(screen.getByLabelText("Details"), { target: { value: "In the outline." } });
     expect(screen.queryByLabelText("Technical details")).toBeNull();
@@ -76,6 +82,13 @@ describe("Send Feedback dialog", () => {
     expect(url.searchParams.get("title")).toBe("[Suggestion] Word count per section");
     expect(url.searchParams.get("body")).toContain("In the outline.");
     expect(url.searchParams.get("body")).not.toContain("Technical details");
+    expect(useUi.getState().feedback).toBeNull();
+  });
+
+  it("Cancel closes the dialog", () => {
+    useUi.getState().openFeedback({ kind: "suggestion" });
+    render(<FeedbackDialog />);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(useUi.getState().feedback).toBeNull();
   });
 

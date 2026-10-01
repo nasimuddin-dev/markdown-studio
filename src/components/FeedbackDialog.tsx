@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { backend } from "../services";
 import { emailUrl, FEEDBACK_EMAIL, FEEDBACK_KINDS, feedbackReport, issueUrl, technicalDetails, type FeedbackKind } from "../services/feedback";
 import { recentErrors } from "../features/errorReports";
@@ -19,6 +19,16 @@ export function FeedbackDialog() {
   const [details, setDetails] = useState("");
   const [includeTechnical, setIncludeTechnical] = useState(request?.kind === "problem");
   const [technical, setTechnical] = useState("");
+  /** Shown when a button is used before there's a summary. */
+  const [missingSummary, setMissingSummary] = useState(false);
+  const summaryRef = useRef<HTMLInputElement>(null);
+  /** The buttons stay usable; without a summary they say what's missing instead of doing nothing. */
+  const hasSummary = () => {
+    if (summary.trim()) return true;
+    setMissingSummary(true);
+    summaryRef.current?.focus();
+    return false;
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -41,6 +51,7 @@ export function FeedbackDialog() {
 
   /** Opens the report in the browser (GitHub) or the mail app; a shortened one also goes to the clipboard in full. */
   const send = async (via: "github" | "email") => {
+    if (!hasSummary()) return;
     const { title, body } = report();
     const { url, shortened } = via === "github" ? issueUrl(title, body) : emailUrl(title, body);
     const where = via === "github" ? "on GitHub" : "in your mail app";
@@ -55,6 +66,7 @@ export function FeedbackDialog() {
   };
 
   const copy = async () => {
+    if (!hasSummary()) return;
     try {
       await navigator.clipboard.writeText(fullText());
       notify("success", "Feedback copied.");
@@ -81,7 +93,26 @@ export function FeedbackDialog() {
         ))}
       </fieldset>
       <label htmlFor="feedback-summary">Summary</label>
-      <input id="feedback-summary" className="text-input" data-autofocus value={summary} maxLength={120} onChange={(e) => setSummary(e.target.value)} placeholder="In a few words" />
+      <input
+        id="feedback-summary"
+        ref={summaryRef}
+        className="text-input"
+        data-autofocus
+        value={summary}
+        maxLength={120}
+        onChange={(e) => {
+          setSummary(e.target.value);
+          if (e.target.value.trim()) setMissingSummary(false);
+        }}
+        placeholder="In a few words"
+        aria-invalid={missingSummary || undefined}
+        aria-describedby={missingSummary ? "feedback-summary-missing" : undefined}
+      />
+      {missingSummary && (
+        <p id="feedback-summary-missing" className="field-error" role="alert">
+          Write a short summary first.
+        </p>
+      )}
       <label htmlFor="feedback-details">Details</label>
       <textarea id="feedback-details" className="text-input" rows={6} value={details} onChange={(e) => setDetails(e.target.value)} placeholder={FEEDBACK_KINDS[kind].placeholder} />
       <label className="check feedback-technical">
@@ -93,11 +124,11 @@ export function FeedbackDialog() {
       )}
       <div className="modal-buttons">
         <div className="modal-buttons-start">
-          <button className="button" onClick={() => void copy()} disabled={!summary.trim()}>Copy Text</button>
+          <button className="button" onClick={() => void copy()}>Copy Text</button>
         </div>
         <button className="button" onClick={close}>Cancel</button>
-        <button className="button" onClick={() => void send("email")} disabled={!summary.trim()}>Send by Email</button>
-        <button className="button primary" onClick={() => void send("github")} disabled={!summary.trim()}>Open on GitHub</button>
+        <button className="button" onClick={() => void send("email")}>Send by Email</button>
+        <button className="button primary" onClick={() => void send("github")}>Open on GitHub</button>
       </div>
     </Modal>
   );

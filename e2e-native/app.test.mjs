@@ -55,6 +55,39 @@ describe("the desktop app", () => {
     }
   });
 
+  // Open on GitHub and Send by Email aren't clicked here: they'd open the real browser and mail app
+  // (the IPC can't be stubbed in the real web view). Their links are covered by tests/feedback.test.tsx.
+  it("Send Feedback: the buttons respond (a missing summary is explained, Copy Text, Cancel)", async () => {
+    const s = await Session.start(APP);
+    try {
+      await s.find("h1");
+      const openDialog = async () => {
+        await s.click(await s.findByText('nav[aria-label="Application menu"] button', "Help"));
+        await s.click(await s.findByText('[role="menuitem"]', "Send Feedback…"));
+        return s.find(".feedback-modal");
+      };
+      const button = (name) => s.findByText(".feedback-modal button", name);
+      const dialogOpen = () => s.exec("return !!document.querySelector('.feedback-modal')");
+
+      // Without a summary, a button says what's missing.
+      await openDialog();
+      // An empty summary: the button says what's missing, and nothing opens (the dialog stays).
+      await s.click(await button("Open on GitHub"));
+      assert.match(await s.text(await s.find(".feedback-modal .field-error")), /Write a short summary first/);
+      await s.click(await button("Send by Email"));
+      assert.equal(await dialogOpen(), true);
+
+      // Copy Text puts the report on the clipboard; Cancel closes.
+      await s.type(await s.find("#feedback-summary"), "Copied");
+      await s.click(await button("Copy Text"));
+      await s.waitFor(() => s.exec("return [...document.querySelectorAll('.toast')].some((t) => t.textContent.includes('Feedback copied'))"), "the copied message");
+      await s.click(await button("Cancel"));
+      await s.waitFor(async () => !(await dialogOpen()), "Cancel to close the dialog");
+    } finally {
+      await s.quit();
+    }
+  });
+
   it("opens a file handed over by the OS, then saves an edit to disk", async () => {
     const file = join(dir, "note.md");
     writeFileSync(file, "# Note\n\nFirst line.\n");
