@@ -71,3 +71,29 @@ test("pastes rich text from the clipboard as Markdown", async ({ page, context }
   await expect(page.locator(".cm-content")).toContainText("[link](https://example.com)");
   await expect(page.locator(".markdown-body h2")).toHaveText("From the web");
 });
+
+test("imports an e-book (.epub) as Markdown with its pictures", async ({ page }) => {
+  const { default: JSZip } = await import("jszip");
+  const zip = new JSZip();
+  zip.file("mimetype", "application/epub+zip");
+  zip.file("META-INF/container.xml", '<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OPS/book.opf" media-type="application/oebps-package+xml"/></rootfiles></container>');
+  zip.file("OPS/book.opf", '<?xml version="1.0"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>Field Notes</dc:title></metadata><manifest><item id="a" href="one.xhtml" media-type="application/xhtml+xml"/><item id="b" href="two.xhtml" media-type="application/xhtml+xml"/><item id="p" href="pic.png" media-type="image/png"/></manifest><spine><itemref idref="a"/><itemref idref="b"/></spine></package>');
+  const page1 = (body: string) => `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>x</title></head><body>${body}</body></html>`;
+  zip.file("OPS/one.xhtml", page1('<h1>Morning</h1><p>Birds at <a href="two.xhtml">dusk</a>.</p><p><img src="pic.png" alt="Heron"/></p>'));
+  zip.file("OPS/two.xhtml", page1("<h1>Dusk</h1><ul><li>Owl</li><li>Bat</li></ul>"));
+  zip.file("OPS/pic.png", "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", { base64: true });
+  const buffer = await zip.generateAsync({ type: "nodebuffer" });
+
+  await start(page);
+  const chooser = page.waitForEvent("filechooser");
+  await chooseMenu(page, "File", "Import", "E-book (.epub)…");
+  await (await chooser).setFiles({ name: "notes.epub", mimeType: "application/epub+zip", buffer });
+
+  await expect(page.getByRole("tab", { name: /notes\.md/ })).toHaveAttribute("aria-selected", "true");
+  const preview = page.locator(".markdown-body");
+  await expect(preview.locator("h1")).toHaveText(["Morning", "Dusk"]);
+  await expect(preview.locator("li")).toHaveText(["Owl", "Bat"]);
+  await expect(preview.locator("img")).toHaveAttribute("src", /^data:image\/png;base64,/);
+  await expect(preview.getByRole("link", { name: "dusk" })).toHaveAttribute("href", "#dusk");
+  await expect(page.locator(".toast")).toContainText(/Imported “notes\.epub” \(1 image saved to assets\//);
+});

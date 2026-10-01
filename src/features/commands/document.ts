@@ -131,6 +131,7 @@ export const documentCommands: Record<string, Command> = {
   importDocx: { id: "importDocx", label: "Import Word Document (.docx)…", run: async () => (await importing()).importDocument("docx") },
   importPdf: { id: "importPdf", label: "Import PDF (.pdf)…", run: async () => (await importing()).importDocument("pdf") },
   importCsv: { id: "importCsv", label: "Import CSV as Table…", run: async () => (await importing()).importDocument("csv") },
+  importEpub: { id: "importEpub", label: "Import E-book (.epub)…", run: async () => (await importing()).importDocument("epub") },
   insertImage: {
     id: "insertImage",
     label: "Insert Image…",

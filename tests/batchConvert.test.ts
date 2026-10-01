@@ -12,6 +12,7 @@ describe("convert folder to Markdown", () => {
     expect(kindForPath("C:\a\b.DOCX")).toBe("docx");
     expect(kindForPath("/x/page.htm")).toBe("html");
     expect(kindForPath("/x/data.tsv")).toBe("csv");
+    expect(kindForPath("/x/novel.EPUB")).toBe("epub");
     expect(kindForPath("/x/notes.md")).toBeNull();
   });
 

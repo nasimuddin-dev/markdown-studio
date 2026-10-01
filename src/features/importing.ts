@@ -10,15 +10,16 @@ import { newDocument, openPath } from "./documents";
 import { defaultLineEnding } from "./saveTransforms";
 import { refreshDir } from "./workspace";
 
-export type ImportKind = "docx" | "html" | "pdf" | "csv";
+export type ImportKind = "docx" | "html" | "pdf" | "csv" | "epub";
 
 const ACCEPT: Record<ImportKind, string> = {
   docx: ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   html: ".html,.htm,text/html",
   pdf: ".pdf,application/pdf",
   csv: ".csv,.tsv,text/csv,text/tab-separated-values",
+  epub: ".epub,application/epub+zip",
 };
-const LABEL: Record<ImportKind, string> = { docx: "Word document", html: "web page", pdf: "PDF", csv: "CSV file" };
+const LABEL: Record<ImportKind, string> = { docx: "Word document", html: "web page", pdf: "PDF", csv: "CSV file", epub: "e-book" };
 
 interface Source {
   name: string;
@@ -60,6 +61,8 @@ export async function convertSource(kind: ImportKind, data: ArrayBuffer, name: s
       return (await import("../services/convert/docx")).htmlFileToMarkdown(new TextDecoder().decode(data), stem);
     case "pdf":
       return (await import("../services/convert/pdf")).pdfToMarkdown(data);
+    case "epub":
+      return (await import("../services/convert/epub")).epubToMarkdown(data, stem);
     case "csv": {
       const { csvToMarkdownTable } = await import("../services/convert/csv");
       const table = csvToMarkdownTable(new TextDecoder().decode(data));
@@ -71,7 +74,7 @@ export async function convertSource(kind: ImportKind, data: ArrayBuffer, name: s
 /** Import kind for a file name, by extension. */
 export function kindForPath(path: string): ImportKind | null {
   const ext = /\.([^./\\]+)$/.exec(path)?.[1]?.toLowerCase();
-  if (ext === "docx" || ext === "pdf" || ext === "csv") return ext;
+  if (ext === "docx" || ext === "pdf" || ext === "csv" || ext === "epub") return ext;
   if (ext === "tsv") return "csv";
   if (ext === "html" || ext === "htm") return "html";
   return null;
@@ -108,7 +111,7 @@ function inlineImages(result: ConversionResult) {
 }
 
 /**
- * Import → Markdown: converts a Word document, web page or PDF, asks where to
+ * Import → Markdown: converts a Word document, web page, PDF or e-book, asks where to
  * save the new .md file (images go to an assets/ folder beside it) and opens
  * it. Cancelling the save dialog opens the result as an unsaved document.
  */

@@ -78,6 +78,7 @@ fn import_filter(kind: &str) -> AppResult<(&'static str, &'static [&'static str]
         "html" => Ok(("Web page", &["html", "htm"])),
         "pdf" => Ok(("PDF document", &["pdf"])),
         "csv" => Ok(("Spreadsheet data (CSV/TSV)", &["csv", "tsv"])),
+        "epub" => Ok(("EPUB e-book", &["epub"])),
         "json" => Ok(("Markpion settings", &["json"])),
         "image" => Ok(("Image", &["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "avif"])),
         _ => Err(AppError::InvalidPath("Unsupported import type".into())),
@@ -105,7 +106,7 @@ mod tests {
 
     #[test]
     fn import_filters_cover_each_kind_and_reject_others() {
-        for kind in ["docx", "html", "pdf", "csv", "json", "image"] {
+        for kind in ["docx", "html", "pdf", "csv", "epub", "json", "image"] {
             let (_, exts) = import_filter(kind).unwrap();
             assert!(!exts.is_empty());
         }

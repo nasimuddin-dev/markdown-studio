@@ -195,7 +195,7 @@ pub fn workspace_files(root: &Path) -> Vec<String> {
 
 /// Documents under `root` that can be converted to Markdown (batch conversion).
 pub fn convertible_files(root: &Path) -> Vec<String> {
-    const EXTS: &[&str] = &["docx", "pdf", "html", "htm", "csv", "tsv"];
+    const EXTS: &[&str] = &["docx", "pdf", "html", "htm", "csv", "tsv", "epub"];
     walk(root, &|p| {
         p.extension()
             .and_then(|e| e.to_str())
@@ -333,7 +333,7 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         fs::create_dir_all(tmp.path().join("sub")).unwrap();
         fs::create_dir_all(tmp.path().join("node_modules")).unwrap();
-        for name in ["a.DOCX", "b.pdf", "sub/c.htm", "sub/d.tsv", "e.md", "f.doc", "node_modules/g.pdf"] {
+        for name in ["a.DOCX", "b.pdf", "sub/c.htm", "sub/d.tsv", "sub/h.epub", "e.md", "f.doc", "node_modules/g.pdf"] {
             fs::write(tmp.path().join(name), "").unwrap();
         }
         let mut names: Vec<String> = convertible_files(tmp.path())
@@ -341,7 +341,7 @@ mod tests {
             .map(|p| Path::new(p).file_name().unwrap().to_string_lossy().into_owned())
             .collect();
         names.sort();
-        assert_eq!(names, ["a.DOCX", "b.pdf", "c.htm", "d.tsv"]);
+        assert_eq!(names, ["a.DOCX", "b.pdf", "c.htm", "d.tsv", "h.epub"]);
     }
 
     #[test]

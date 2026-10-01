@@ -484,7 +484,7 @@ export class MemoryBackend implements Backend {
   async listConvertibleFiles(root: string) {
     const dir = this.check(root);
     return [...this.files.keys()]
-      .filter((p) => p.startsWith(dir + "/") && /\.(docx|pdf|html?|csv|tsv)$/i.test(p))
+      .filter((p) => p.startsWith(dir + "/") && /\.(docx|pdf|html?|csv|tsv|epub)$/i.test(p))
       .filter((p) => !p.slice(dir.length).split("/").some((s) => s.startsWith(".")))
       .sort();
   }

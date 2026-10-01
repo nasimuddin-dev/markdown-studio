@@ -1,6 +1,6 @@
 ---
 title: Import & Export
-description: Import Word, PDF, HTML and CSV/TSV files as Markdown, and export Markdown to PDF, Word (.docx) and standalone HTML in Markpion, one document or a whole folder at a time.
+description: Import Word, PDF, HTML, EPUB and CSV/TSV files as Markdown, and export Markdown to PDF, Word (.docx), EPUB e-books and standalone HTML in Markpion, one document or a whole folder at a time.
 ---
 
 # Import & export
@@ -31,6 +31,10 @@ PDFs store positioned text rather than structure, so Markpion reconstructs the d
 
 **File → Import → Web Page (.html)…** converts a saved HTML page to GitHub Flavored Markdown. Headings, lists, links, images, code and tables are kept. Scripts, styles and other non-content elements are dropped.
 
+### E-book (.epub)
+
+**File → Import → E-book (.epub)…** turns an EPUB e-book into one Markdown document: the chapters in reading order, separated by horizontal rules, with the book's title, author and language as front matter. Pictures, including a cover page's, are saved to an `assets/` folder and linked, and links between chapters become links within the document. Books protected with DRM can't be read; Markpion says so instead of importing them. Fonts, page styles and the book's own table of contents page aren't carried over.
+
 ### CSV and TSV
 
 **File → Import → CSV as Table…** turns a `.csv` or `.tsv` file into an aligned Markdown table. The reverse, **Copy Table as CSV**, copies the table at the cursor for pasting into a spreadsheet. Cells copied from Excel or Google Sheets can be pasted straight into the editor as a table.
@@ -41,7 +45,7 @@ Content copied from a web page or Word is converted to Markdown when you paste i
 
 ### A whole folder
 
-**File → Import → Convert Folder to Markdown…** converts every Word, PDF, HTML and CSV/TSV file in the open folder (including subfolders) to a `.md` file beside it. Files that already have a Markdown version are skipped, and the originals are not changed.
+**File → Import → Convert Folder to Markdown…** converts every Word, PDF, HTML, EPUB and CSV/TSV file in the open folder (including subfolders) to a `.md` file beside it. Files that already have a Markdown version are skipped, and the originals are not changed.
 
 ## Export
 

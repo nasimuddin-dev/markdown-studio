@@ -61,7 +61,7 @@ export interface DialogsApi {
   /** Asks for a folder to export into; approves it for writing without opening it. */
   pickExportFolder(): Promise<string | null>;
   /** Native Open dialog for a document to import (desktop only). */
-  pickImportFile(kind: "docx" | "html" | "pdf" | "csv" | "json" | "image"): Promise<string | null>;
+  pickImportFile(kind: "docx" | "html" | "pdf" | "csv" | "epub" | "json" | "image"): Promise<string | null>;
 }
 
 /** Reading and writing documents, folders and assets in approved locations. */

@@ -35,7 +35,7 @@ export const MENUS: MenuDef[] = [
       c("save"), c("saveAs"), c("saveAll"), c("renameFile"), c("moveToNewFile"), c("saveAsTemplate"), sep,
       c("fileHistory"), c("compareWithFile"), sep,
       sub("Import", [
-        c("importDocx", "Word Document (.docx)…"), c("importPdf", "PDF (.pdf)…"), c("importHtml", "Web Page (.html)…"), c("importCsv", "CSV as Table…"), sep,
+        c("importDocx", "Word Document (.docx)…"), c("importPdf", "PDF (.pdf)…"), c("importHtml", "Web Page (.html)…"), c("importEpub", "E-book (.epub)…"), c("importCsv", "CSV as Table…"), sep,
         c("convertFolder"),
       ]),
       sub("Export", [

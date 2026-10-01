@@ -14,7 +14,7 @@ export interface BatchResult {
 const mdPathFor = (path: string) => path.replace(/\.[^./\\]+$/, ".md");
 
 /**
- * Converts every Word, PDF, HTML and CSV/TSV file in the open folder to a
+ * Converts every Word, PDF, HTML, CSV/TSV and EPUB file in the open folder to a
  * Markdown file beside it. Files that already have a same-named .md are left
  * alone, so running it again only converts new documents.
  */
