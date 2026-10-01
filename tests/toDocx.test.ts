@@ -106,7 +106,7 @@ describe("Markdown → Word (.docx)", () => {
     await openPath("/ws/plan.md");
     await exportActiveAsDocx();
     expect(backend.lastExport?.name).toBe("plan.docx");
-    expect(atob(backend.lastExport!.content).slice(0, 2)).toBe("PK");
+    expect(new TextDecoder().decode(backend.lastExport!.bytes!.slice(0, 2))).toBe("PK");
   }, 20_000);
 });
 

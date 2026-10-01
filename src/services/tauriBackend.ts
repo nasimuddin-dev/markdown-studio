@@ -75,7 +75,16 @@ export const tauriBackend: Backend = {
   openExternal: (url) => call("open_external", { url }),
   revealInFolder: (path) => call("reveal_in_folder", { path }),
   exportFile: (suggestedName, content, kind) => call("export_file", { suggestedName, content, kind }),
-  exportBinaryFile: (suggestedName, dataBase64, kind) => call("export_binary_file", { suggestedName, dataBase64, kind }),
+  // A raw request body: the file's bytes travel as they are (no base64 in JSON); name and kind go in headers.
+  exportBinaryFile: async (suggestedName, data, kind) => {
+    try {
+      return await invoke<string | null>("export_binary_file", data, {
+        headers: { "x-export-name": encodeURIComponent(suggestedName), "x-export-kind": kind },
+      });
+    } catch (e) {
+      throw toAppError(e);
+    }
+  },
 
   listHistory: (path) => call("list_history", { path }),
   readHistory: (path, id) => call("read_history", { path, id }),

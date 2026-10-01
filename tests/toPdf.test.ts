@@ -103,7 +103,7 @@ describe("Markdown → PDF", () => {
     await openPath("/ws/en.md");
     await exportActiveAsPdf();
     expect(backend.lastExport?.name).toBe("en.pdf");
-    expect(atob(backend.lastExport!.content).slice(0, 5)).toBe("%PDF-");
+    expect(new TextDecoder().decode(backend.lastExport!.bytes!.slice(0, 5))).toBe("%PDF-");
   }, 30_000);
 });
 
@@ -127,8 +127,8 @@ describe("export a folder as one document", () => {
     useWorkspace.getState().setRoot("/ws");
     await exportFolder("pdf");
     expect(backend.lastExport?.name).toBe("ws.pdf");
-    const bytes = Uint8Array.from(atob(backend.lastExport!.content), (c) => c.charCodeAt(0));
-    const md = (await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown;
+    const bytes = backend.lastExport!.bytes!;
+    const md = (await pdfToMarkdown(bytes.slice().buffer as ArrayBuffer)).markdown;
     expect(md).toContain("Start with");
     expect(md).toContain("Follow these steps.");
     expect(md.indexOf("Home")).toBeLessThan(md.indexOf("Follow these steps."));

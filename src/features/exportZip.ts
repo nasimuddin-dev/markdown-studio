@@ -13,12 +13,6 @@ function dataUrlBytes(url: string): Uint8Array {
   return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
-  let bin = "";
-  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return btoa(bin);
-}
-
 /**
  * The document's text with its local images renamed into `images/` (unique
  * names), and which file each name comes from. Web images are left alone.
@@ -70,7 +64,7 @@ export async function exportActiveAsZip() {
     }
     zip.file(`${stem}.md`, plan.text);
     const bytes = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE" });
-    const saved = await backend().exportBinaryFile(`${stem}.zip`, bytesToBase64(bytes), "zip");
+    const saved = await backend().exportBinaryFile(`${stem}.zip`, bytes, "zip");
     if (!saved) return;
     if (missing.length) notify("warning", `Exported to ${saved}, without ${missing.length === 1 ? "an image that" : `${missing.length} images that`} couldn't be read: ${missing.slice(0, 3).join(", ")}.`);
     else notify("success", `Exported to ${saved}`);

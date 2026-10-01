@@ -95,8 +95,8 @@ export interface FilesApi {
    * writes it there. Returns the chosen path, or `null` if cancelled.
    */
   exportFile(suggestedName: string, content: string, kind: ExportKind): Promise<string | null>;
-  /** Like exportFile, for binary formats (Word .docx, PDF). */
-  exportBinaryFile(suggestedName: string, dataBase64: string, kind: "docx" | "pdf" | "zip"): Promise<string | null>;
+  /** Like exportFile, for binary formats (Word .docx, PDF, .zip). The bytes are sent as they are, not as base64. */
+  exportBinaryFile(suggestedName: string, data: Uint8Array, kind: "docx" | "pdf" | "zip"): Promise<string | null>;
 }
 
 /** Folder-wide operations for the open workspace. */

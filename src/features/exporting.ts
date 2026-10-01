@@ -47,12 +47,6 @@ export async function exportActiveAsHtml() {
   }
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
-  let bin = "";
-  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return btoa(bin);
-}
-
 /** Markdown to export: a document, or a folder combined in memory. */
 interface ExportSource {
   content: string;
@@ -78,7 +72,7 @@ async function exportAsDocx(src: ExportSource) {
       ...frontMatterMetadata(src.content),
       renderMath: await mathRenderer(src.content),
     });
-    const saved = await backend().exportBinaryFile(exportFileName(src.name, "docx"), bytesToBase64(bytes), "docx");
+    const saved = await backend().exportBinaryFile(exportFileName(src.name, "docx"), bytes, "docx");
     if (saved) notify("success", `Exported to ${saved}`);
   } catch (e) {
     notify("error", describeError(e, "export to Word"));
@@ -123,7 +117,7 @@ async function exportAsPdf(src: ExportSource, onPrint?: () => Promise<void>) {
       ...frontMatterMetadata(src.content),
       renderMath: await mathRenderer(src.content),
     });
-    const saved = await backend().exportBinaryFile(exportFileName(src.name, "pdf"), bytesToBase64(bytes), "pdf");
+    const saved = await backend().exportBinaryFile(exportFileName(src.name, "pdf"), bytes, "pdf");
     if (saved) notify("success", `Exported to ${saved}`);
   } catch (e) {
     notify("error", describeError(e, "export to PDF"));

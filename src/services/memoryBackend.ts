@@ -568,13 +568,12 @@ export class MemoryBackend implements Backend {
     return suggestedName;
   }
 
-  async exportBinaryFile(suggestedName: string, dataBase64: string, kind: string) {
-    this.lastExport = { name: suggestedName, content: dataBase64 };
+  async exportBinaryFile(suggestedName: string, bytes: Uint8Array, kind: string) {
+    this.lastExport = { name: suggestedName, content: "", bytes };
     if (typeof URL.createObjectURL !== "function") return suggestedName;
-    const bytes = Uint8Array.from(atob(dataBase64), (c) => c.charCodeAt(0));
     const type = kind === "pdf" ? "application/pdf" : kind === "zip" ? "application/zip" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([bytes], { type }));
+    a.href = URL.createObjectURL(new Blob([bytes as BlobPart], { type }));
     a.download = suggestedName;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -582,7 +581,8 @@ export class MemoryBackend implements Backend {
   }
 
   /** Test hook: the most recent export. */
-  lastExport: { name: string; content: string } | null = null;
+  /** The last export (tests): text in `content`, binary formats in `bytes`. */
+  lastExport: { name: string; content: string; bytes?: Uint8Array } | null = null;
 
   async loadSettings() {
     return this.settings;

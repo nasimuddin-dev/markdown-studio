@@ -6,7 +6,7 @@
  */
 import { afterEach, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -140,6 +140,37 @@ describe("the desktop app", () => {
       assert.deepEqual(await invoke("read_image", { path: outside }), { ok: false, kind: "outOfScope" });
       // A file that was never opened can't be read at all.
       assert.deepEqual(await invoke("read_binary_file", { path: outside }), { ok: false, kind: "outOfScope" });
+
+      // Exports arrive as a raw body with the name and kind in headers; bad requests are refused
+      // before any Save dialog opens (a good one would open the dialog, which WebDriver can't drive).
+      const exportWith = async (body, headers) => {
+        await s.exec(
+          `window.__native = undefined;
+           window.__TAURI_INTERNALS__.invoke("export_binary_file", arguments[0] === null ? {} : new Uint8Array(arguments[0]), { headers: arguments[1] }).then(
+             (r) => { window.__native = { ok: true, r }; },
+             (e) => { window.__native = { ok: false, kind: e && e.kind, message: e && e.message }; });`,
+          body,
+          headers,
+        );
+        return s.waitFor(() => s.exec("return window.__native"), "the export answer");
+      };
+      const pdf = [37, 80, 68, 70, 45];
+      assert.deepEqual(await exportWith(pdf, { "x-export-name": "a.pdf", "x-export-kind": "exe" }), { ok: false, kind: "invalidPath", message: "Unsupported export type" });
+      assert.deepEqual(await exportWith(pdf, { "x-export-name": "bad%zz.pdf", "x-export-kind": "pdf" }), { ok: false, kind: "invalidPath", message: "Invalid export file name" });
+      assert.equal((await exportWith(pdf, { "x-export-name": encodeURIComponent("..\\up.pdf"), "x-export-kind": "pdf" })).kind, "invalidPath");
+      // A JSON body (the old base64 form) isn't accepted.
+      assert.deepEqual(await exportWith(null, { "x-export-name": "a.pdf", "x-export-kind": "pdf" }), { ok: false, kind: "invalidPath", message: "Invalid export data" });
+
+      // A real export: every byte value survives the trip to disk, through the native Save dialog.
+      const target = join(dir, "exported résumé.zip");
+      const payload = Array.from({ length: 70000 }, (_, i) => (i * 31 + 7) % 256);
+      const answer = spawn("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", join(import.meta.dirname, "save-dialog.ps1"), "-Path", target], { stdio: "pipe" });
+      const answered = new Promise((resolve) => answer.on("exit", resolve));
+      const saved = await exportWith(payload, { "x-export-name": encodeURIComponent("résumé.zip"), "x-export-kind": "zip" });
+      assert.equal(await answered, 0, "the Save dialog should be answered");
+      assert.equal(saved.ok, true, `export failed: ${saved.message}`);
+      assert.equal(saved.r.toLowerCase(), target.toLowerCase());
+      assert.deepEqual([...readFileSync(target)], payload);
     } finally {
       await s.quit();
     }

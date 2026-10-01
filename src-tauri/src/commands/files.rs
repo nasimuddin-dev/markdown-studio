@@ -213,27 +213,49 @@ pub async fn export_file(
     Ok(Some(fs_ops::path_string(&path)))
 }
 
-/// Exports binary content (Word .docx, PDF) to a path chosen in a native
-/// Save dialog. Written atomically; the dialog confirms any overwrite.
+/// Decodes a `%XX`-encoded header value (the UI sends file names with
+/// `encodeURIComponent`, since header values must be ASCII). `None` if the
+/// encoding is broken or the result isn't UTF-8.
+pub(crate) fn percent_decode(value: &str) -> Option<String> {
+    let bytes = value.as_bytes();
+    let mut out = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' {
+            let hex = std::str::from_utf8(bytes.get(i + 1..i + 3)?).ok()?;
+            out.push(u8::from_str_radix(hex, 16).ok()?);
+            i += 3;
+        } else {
+            out.push(bytes[i]);
+            i += 1;
+        }
+    }
+    String::from_utf8(out).ok()
+}
+
+/// Exports binary content (Word .docx, PDF, .zip) to a path chosen in a
+/// native Save dialog. Written atomically; the dialog confirms any overwrite.
+/// The bytes arrive as the request's raw body (not base64 in JSON); the kind
+/// and the suggested file name come in the `x-export-kind` and
+/// `x-export-name` headers.
 #[tauri::command]
-pub async fn export_binary_file(
-    app: AppHandle,
-    state: State<'_, AppState>,
-    suggested_name: String,
-    data_base64: String,
-    kind: String,
-) -> AppResult<Option<String>> {
-    use base64::Engine;
-    let (filter, ext): (&str, &str) = match kind.as_str() {
+pub async fn export_binary_file(app: AppHandle, state: State<'_, AppState>, request: tauri::ipc::Request<'_>) -> AppResult<Option<String>> {
+    let tauri::ipc::InvokeBody::Raw(body) = request.body() else {
+        return Err(AppError::InvalidPath("Invalid export data".into()));
+    };
+    let header = |name: &str| request.headers().get(name).and_then(|v| v.to_str().ok());
+    let kind = header("x-export-kind").unwrap_or_default();
+    let suggested_name = header("x-export-name")
+        .and_then(percent_decode)
+        .ok_or_else(|| AppError::InvalidPath("Invalid export file name".into()))?;
+    let (filter, ext): (&str, &str) = match kind {
         "docx" => ("Word document", "docx"),
         "pdf" => ("PDF document", "pdf"),
         "zip" => ("ZIP archive", "zip"),
         _ => return Err(AppError::InvalidPath("Unsupported export type".into())),
     };
     scope::validate_file_name(&suggested_name)?;
-    let bytes = base64::engine::general_purpose::STANDARD
-        .decode(data_base64.as_bytes())
-        .map_err(|_| AppError::InvalidPath("Invalid export data".into()))?;
+    let bytes = body.clone();
     let picked = file_dialog(&app)
         .set_title("Export")
         .add_filter(filter, &[ext])
@@ -246,7 +268,24 @@ pub async fn export_binary_file(
         path.set_extension(ext);
     }
     scope::validate_syntax(&path)?;
-    state.track("export.write", fs_ops::write_bytes_atomic(&path, &bytes))?;
-    state.logger.log("info", "export", &kind);
+    let target = path.clone();
+    state.track("export.write", blocking(move || fs_ops::write_bytes_atomic(&target, &bytes)).await)?;
+    state.logger.log("info", "export", kind);
     Ok(Some(fs_ops::path_string(&path)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::percent_decode;
+
+    #[test]
+    fn decodes_file_names_sent_in_headers() {
+        assert_eq!(percent_decode("plan.docx").as_deref(), Some("plan.docx"));
+        assert_eq!(percent_decode("Quarterly%20Report%20%C3%A9t%C3%A9.pdf").as_deref(), Some("Quarterly Report été.pdf"));
+        assert_eq!(percent_decode("%E6%97%A5%E6%9C%AC.zip").as_deref(), Some("日本.zip"));
+        // Broken escapes and invalid UTF-8 are refused.
+        assert_eq!(percent_decode("bad%2"), None);
+        assert_eq!(percent_decode("bad%zz.pdf"), None);
+        assert_eq!(percent_decode("%FF.pdf"), None);
+    }
 }
