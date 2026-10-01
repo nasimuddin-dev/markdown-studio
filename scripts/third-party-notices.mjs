@@ -37,7 +37,9 @@ function npmPackages() {
   for (const dir of dirs) {
     const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
     const key = `${pkg.name}@${pkg.version}`;
-    if (seen.has(key)) continue;
+    // Native binaries for one OS or CPU (an optional part of a Node package such as
+    // @napi-rs/canvas) can't run in the app's web view, aren't shipped, and differ per machine.
+    if (seen.has(key) || pkg.os || pkg.cpu) continue;
     const license = typeof pkg.license === "string" ? pkg.license : (pkg.license?.type ?? pkg.licenses?.map((l) => l.type).join(" OR ") ?? "");
     seen.set(key, { name: pkg.name, version: pkg.version, license, texts: licenseTexts(dir) });
   }

@@ -141,7 +141,7 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 ```
 
-## JavaScript packages (383)
+## JavaScript packages (382)
 
 | Package | Version | License |
 | --- | --- | --- |
@@ -205,7 +205,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 | @mermaid-js/parser | 2.0.0 | MIT |
 | @mixmark-io/domino | 2.2.0 | BSD-2-Clause |
 | @napi-rs/canvas | 1.0.9 | MIT |
-| @napi-rs/canvas-win32-x64-msvc | 1.0.9 | MIT |
 | @noble/ciphers | 1.3.0 | MIT |
 | @noble/hashes | 1.8.0 | MIT |
 | @swc/helpers | 0.5.23 | Apache-2.0 |
