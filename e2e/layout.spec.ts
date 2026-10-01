@@ -17,7 +17,7 @@ const SIZES = [
 ];
 
 /** The window's controls, where clipped or overlapping labels are bugs (not the document). */
-const CHROME = ".menubar, .toolbar, .format-toolbar, .tabbar, .breadcrumbs, .statusbar, .sidebar-tabs, .modal, [role=menu], .toasts";
+const CHROME = ".menubar, .toolbar, .format-toolbar, .tabbar, .breadcrumbs, .statusbar, .sidebar, .cm-panels, .modal, [role=menu], .toasts";
 
 async function layoutProblems(page: Page, where: string): Promise<string[]> {
   const problems = await page.evaluate((chrome) => {
@@ -89,6 +89,13 @@ async function layoutProblems(page: Page, where: string): Promise<string[]> {
           const a = shownRect(controls[i]);
           const b = shownRect(controls[j]);
           if (controls[i].contains(controls[j]) || controls[j].contains(controls[i])) continue;
+          // Buttons placed inside a text box's reserved padding (search options) are by design.
+          const [input, other] = controls[i].tagName === "INPUT" ? [controls[i], controls[j]] : controls[j].tagName === "INPUT" ? [controls[j], controls[i]] : [null, null];
+          if (input && other) {
+            const ir = input.getBoundingClientRect();
+            const textEnd = ir.right - parseFloat(getComputedStyle(input).paddingRight);
+            if (other.getBoundingClientRect().left >= textEnd - 1) continue;
+          }
           const overlapX = Math.min(a.right, b.right) - Math.max(a.left, b.left);
           const overlapY = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
           if (overlapX > 2 && overlapY > 2) out.push(`overlap: ${name(controls[i])} and ${name(controls[j])}`);
@@ -154,6 +161,88 @@ for (const theme of ["light", "dark"] as const) {
       await chooseMenu(page, "Help", "Keyboard Shortcuts");
       await expect(page.getByRole("dialog", { name: "Keyboard Shortcuts" })).toBeVisible();
       problems.push(...(await layoutProblems(page, "Keyboard Shortcuts")));
+
+      expect(problems, problems.join("\n")).toEqual([]);
+    });
+  }
+}
+
+for (const theme of ["light", "dark"] as const) {
+  for (const size of SIZES) {
+    test(`panels and dialogs at ${size.width}×${size.height} (${theme})`, async ({ page }) => {
+      test.setTimeout(120_000);
+      await page.setViewportSize(size);
+      await page.emulateMedia({ colorScheme: theme });
+      await start(page);
+      const problems: string[] = [];
+      const palette = async (command: string) => {
+        await page.keyboard.press(`${mod}+Shift+P`);
+        await page.keyboard.type(command);
+        await page.keyboard.press("Enter");
+      };
+      await page.getByRole("button", { name: "Open Folder" }).first().click();
+      await page.locator(".tree-row", { hasText: /^README\.md$/ }).click();
+      await expect(page.locator(".markdown-body h1")).toBeVisible();
+
+      await page.keyboard.press(`${mod}+Shift+F`);
+      await page.getByRole("textbox", { name: "Search in files" }).fill("markdown");
+      await expect(page.locator(".search-match").first()).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Search")));
+
+      await palette("check links in folder");
+      await expect(page.getByRole("tab", { name: "Links", selected: true })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Links")));
+      await page.getByRole("tab", { name: "Tags" }).click();
+      await expect(page.getByRole("region", { name: "Tags" }).getByRole("status")).not.toHaveText("Finding tags…");
+      problems.push(...(await layoutProblems(page, "Tags")));
+      await page.getByRole("tab", { name: "Explorer" }).click();
+
+      await page.locator(".cm-line").first().click();
+      await page.keyboard.press(`${mod}+End`);
+      await page.keyboard.type("\n\n# Welcome to Markpion\n");
+      await page.keyboard.press(`${mod}+H`);
+      await expect(page.locator(".cm-search")).toBeVisible();
+      problems.push(...(await layoutProblems(page, "find and replace")));
+      await page.keyboard.press("Escape");
+      await page.getByRole("button", { name: /Show problems/ }).click();
+      await expect(page.locator(".cm-panel-lint")).toBeVisible();
+      problems.push(...(await layoutProblems(page, "problems panel")));
+
+      await page.locator(".tree-row", { hasText: /^assets$/ }).click();
+      await page.locator(".tree-row", { hasText: /^logo\.svg$/ }).click();
+      await expect(page.getByRole("dialog", { name: "logo.svg" }).locator("img")).toBeVisible();
+      problems.push(...(await layoutProblems(page, "picture preview")));
+      await page.keyboard.press("Escape");
+
+      await palette("close tab");
+      await expect(page.getByRole("alertdialog").or(page.getByRole("dialog"))).toBeVisible();
+      problems.push(...(await layoutProblems(page, "unsaved changes")));
+      await page.keyboard.press("Escape");
+
+      await palette("new from template");
+      await expect(page.getByRole("dialog")).toBeVisible();
+      problems.push(...(await layoutProblems(page, "templates")));
+      await page.keyboard.press("Escape");
+
+      await palette("about markpion");
+      await expect(page.getByRole("dialog", { name: "About Markpion" })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "About")));
+      await page.keyboard.press("Escape");
+
+      await page.keyboard.press(`${mod}+S`);
+      await palette("file history");
+      await expect(page.getByRole("dialog")).toBeVisible();
+      problems.push(...(await layoutProblems(page, "File History")));
+      await page.keyboard.press("Escape");
+
+      await palette("compare with file");
+      const picker = page.getByRole("dialog", { name: "Compare with file" });
+      await expect(picker).toBeVisible();
+      await page.keyboard.type("guide");
+      await expect(picker.getByRole("option").first()).toContainText(/guide/i);
+      await page.keyboard.press("Enter");
+      await expect(page.getByRole("dialog", { name: /^Compare — / })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Compare")));
 
       expect(problems, problems.join("\n")).toEqual([]);
     });
