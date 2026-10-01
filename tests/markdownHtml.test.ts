@@ -12,6 +12,8 @@ type HtmlFactory = typeof html;
 /** Types `text` at `pos` the way the editor's input handlers see it. */
 function type(view: EditorView, pos: number, text: string) {
   view.dispatch({ selection: { anchor: pos } });
+  // Auto-close reads the syntax tree; parse it all first (parsing is time-sliced, so a busy machine may not have yet).
+  ensureSyntaxTree(view.state, view.state.doc.length, 30_000);
   const insert = () => view.state.update({ changes: { from: pos, insert: text }, selection: { anchor: pos + text.length }, userEvent: "input.type" });
   const handled = view.state.facet(EditorView.inputHandler).some((h) => h(view, pos, pos, text, insert));
   if (!handled) view.dispatch(insert());

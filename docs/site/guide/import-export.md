@@ -82,7 +82,7 @@ The document's front matter isn't exported; its `title` becomes the exported doc
 
 ### A whole folder as one document
 
-- **File → Export → Export Folder as One PDF…**, **Export Folder as One Word Document…** and **Export Folder as One E-book (EPUB)…** combine every Markdown file in the open folder into one document and export it in one step. For an e-book, each document becomes a section of the table of contents under the folder's name.
+- **File → Export → Export Folder as One PDF…**, **Export Folder as One Word Document…**, **Export Folder as One E-book (EPUB)…** and **Export Folder as One LaTeX Document…** combine every Markdown file in the open folder into one document and export it in one step. For an e-book, each document becomes a section of the table of contents under the folder's name.
 - **File → Export → Combine Folder into One Document…** writes the combined Markdown to `<Folder> (combined).md` and opens it, so you can review or edit it before exporting.
 
 Either way, files are combined in folder order (a `README` or `index` first, then natural order, folder by folder), with a table of contents. Headings move down a level under the folder's title, links between the files become links within the document, and image paths are adjusted. Unsaved changes in open tabs are included.

@@ -47,20 +47,6 @@ export async function exportActiveAsHtml() {
   }
 }
 
-/** Exports the active document as a LaTeX (.tex) file. */
-export async function exportActiveAsLatex() {
-  const doc = activeDoc();
-  if (!doc) return;
-  try {
-    const { markdownToLatex } = await import("../services/convert/toLatex");
-    const tex = markdownToLatex(doc.content, { name: doc.name, math: features().math });
-    const saved = await backend().exportFile(exportFileName(doc.name, "tex"), tex, "tex");
-    if (saved) notify("success", `Exported to ${saved}`);
-  } catch (e) {
-    notify("error", describeError(e, "export to LaTeX"));
-  }
-}
-
 /** Markdown to export: a document, or a folder combined in memory. */
 interface ExportSource {
   content: string;
@@ -71,6 +57,23 @@ interface ExportSource {
 }
 
 const fromDoc = (doc: { content: string; name: string; path: string | null }): ExportSource => ({ content: doc.content, name: doc.name, path: doc.path });
+
+async function exportAsLatex(src: ExportSource) {
+  try {
+    const { markdownToLatex } = await import("../services/convert/toLatex");
+    const tex = markdownToLatex(src.content, { name: src.name, math: features().math });
+    const saved = await backend().exportFile(exportFileName(src.name, "tex"), tex, "tex");
+    if (saved) notify("success", `Exported to ${saved}`);
+  } catch (e) {
+    notify("error", describeError(e, "export to LaTeX"));
+  }
+}
+
+/** Exports the active document as a LaTeX (.tex) file. */
+export async function exportActiveAsLatex() {
+  const doc = activeDoc();
+  if (doc) await exportAsLatex(fromDoc(doc));
+}
 
 async function exportAsEpub(src: ExportSource) {
   try {
@@ -172,7 +175,7 @@ export async function exportActiveAsPdf() {
  * (combined in memory in folder order, with a table of contents), without
  * writing a combined .md file.
  */
-export async function exportFolder(format: "pdf" | "docx" | "epub") {
+export async function exportFolder(format: "pdf" | "docx" | "epub" | "tex") {
   const { readCombinableFolder, combineFolderText, combinedPathFor } = await import("./combine");
   const folder = await readCombinableFolder();
   if (!folder) return;
@@ -180,7 +183,8 @@ export async function exportFolder(format: "pdf" | "docx" | "epub") {
   if (unreadable.length) notify("warning", `Skipped ${unreadable.length} of ${count + unreadable.length} files that could not be read (${unreadable.slice(0, 3).join(", ")}).`);
   // Image paths were re-based onto the folder, as if the text lived in its combined file.
   const src: ExportSource = { content: markdown, name: basename(folder.root), path: combinedPathFor(folder.root) };
-  await (format === "pdf" ? exportAsPdf(src) : format === "epub" ? exportAsEpub(src) : exportAsDocx(src));
+  const exporters = { pdf: exportAsPdf, docx: exportAsDocx, epub: exportAsEpub, tex: exportAsLatex };
+  await exporters[format](src);
 }
 
 /**

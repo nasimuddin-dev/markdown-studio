@@ -174,6 +174,12 @@ export const documentCommands: Record<string, Command> = {
     run: async () => (await exporting()).exportFolder("docx"),
     enabled: () => !!useWorkspace.getState().root,
   },
+  exportFolderLatex: {
+    id: "exportFolderLatex",
+    label: "Export Folder as One LaTeX Document…",
+    run: async () => (await exporting()).exportFolder("tex"),
+    enabled: () => !!useWorkspace.getState().root,
+  },
   exportFolderEpub: {
     id: "exportFolderEpub",
     label: "Export Folder as One E-book (EPUB)…",

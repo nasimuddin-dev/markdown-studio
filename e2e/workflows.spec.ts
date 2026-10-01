@@ -1441,6 +1441,19 @@ test("File > Export > LaTeX makes a .tex document", async ({ page }) => {
   expect(tex).toContain("It costs 50\\% of $x^2$.");
 });
 
+test("Export Folder as One LaTeX Document titles it after the folder", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  const download = page.waitForEvent("download");
+  await chooseMenu(page, "File", "Export", "Export Folder as One LaTeX Document…");
+  const file = await download;
+  expect(file.suggestedFilename()).toBe("demo.tex");
+  const tex = Buffer.concat(await (await file.createReadStream()).toArray()).toString("utf8");
+  expect(tex).toContain("\\title{demo}");
+  // Each document's own top heading is a section of the combined document.
+  expect((tex.match(/\\section\{/g) ?? []).length).toBeGreaterThan(1);
+});
+
 test("Export Folder as One E-book puts every document in the book", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);
