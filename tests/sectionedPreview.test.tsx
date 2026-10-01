@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render } from "@testing-library/react";
 import { MarkdownView } from "../src/components/Preview";
+import { previewBlockLine } from "../src/components/PreviewChunks";
 import { DEFAULT_SETTINGS, useSettings } from "../src/stores/settingsStore";
 import { setupBackend } from "./helpers";
 
@@ -44,7 +45,7 @@ function snapshot(root: HTMLElement) {
   return {
     headings: q<HTMLElement>("h1, h2, h3, h4, h5, h6").map((h) => `${h.tagName} #${h.id} ${h.textContent}`),
     links: q<HTMLAnchorElement>("a").map((a) => `${a.getAttribute("href")} ${a.textContent}`),
-    lines: q<HTMLElement>("[data-line]:not(.pending)").map((e) => `${e.tagName}:${e.dataset.line}`),
+    lines: q<HTMLElement>("[data-line]:not(.pending)").map((e) => `${e.tagName}:${previewBlockLine(e)}`),
     tasks: q<HTMLInputElement>('input[type="checkbox"]').map((c) => c.defaultChecked),
     code: q<HTMLElement>("pre").map((p) => p.textContent),
     tables: q("table").length,
@@ -84,5 +85,38 @@ describe("sectioned preview of long documents", () => {
     const doc = longDoc() + "\nA note.[^1]\n\n[^1]: The footnote.\n";
     const view = render(<MarkdownView text={doc} docPath={null} sectionAt={1000} />).container;
     expect(view.querySelectorAll("section[data-footnotes]").length).toBe(1);
+  });
+});
+
+describe("editing a long document", () => {
+  it("re-parses only the section that changed, and later sections still report the right lines", async () => {
+    vi.resetModules();
+    let parses = 0;
+    vi.doMock("../src/services/sourceLines", async (importOriginal) => {
+      const actual = await importOriginal<typeof import("../src/services/sourceLines")>();
+      return {
+        ...actual,
+        rehypeSourceLines: (options?: { offset?: number }) => {
+          parses++;
+          return actual.rehypeSourceLines(options);
+        },
+      };
+    });
+    const { MarkdownView: View } = await import("../src/components/Preview");
+    const { previewBlockLine: lineOf } = await import("../src/components/PreviewChunks");
+    setupBackend();
+    const doc = longDoc();
+    const { container, rerender } = render(<View text={doc} docPath={null} sectionAt={1000} />);
+    const sections = container.querySelectorAll(".preview-chunk").length;
+    expect(parses).toBe(sections);
+    const lastHeading = () => [...container.querySelectorAll<HTMLElement>("h1")].at(-1)!;
+    const before = lineOf(lastHeading());
+
+    // A line added at the top: only the first section is parsed again.
+    parses = 0;
+    rerender(<View text={"An added first line.\n" + doc} docPath={null} sectionAt={1000} />);
+    expect(parses).toBe(1);
+    expect(lineOf(lastHeading())).toBe(before + 1);
+    vi.doUnmock("../src/services/sourceLines");
   });
 });

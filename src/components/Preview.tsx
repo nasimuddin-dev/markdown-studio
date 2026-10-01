@@ -19,7 +19,7 @@ import { extractHeadings, headingSlugs } from "../features/outline";
 import { taskCounts } from "../features/taskCount";
 import rehypeSlug from "rehype-slug";
 import { toggleTaskInDocument } from "../features/tasks";
-import { estimateHeight, mountAllChunks, PreviewChunk, rehypeChunks } from "./PreviewChunks";
+import { estimateHeight, mountAllChunks, PreviewChunk, previewBlockLine, rehypeChunks } from "./PreviewChunks";
 import { PreviewFind } from "./PreviewFind";
 import { useUi } from "../stores/uiStore";
 import { useWorkspace } from "../stores/workspaceStore";
@@ -276,8 +276,9 @@ export const MarkdownView = memo(function MarkdownView({ text, docPath, sectionA
 /**
  * A long document, section by section (markdownSections.ts): each section is
  * a placeholder until it nears the visible area, and only then parsed. A
- * section's result is kept (memo) until its own text, position or heading ids
- * change, so an edit re-parses only the sections it affects.
+ * section's result is kept (memo) until its own text or heading ids change,
+ * so an edit re-parses only the sections it affects. Its blocks' source lines
+ * count from the section's start; the wrapper carries the offset.
  */
 function SectionedMarkdown({ text, docPath }: { text: string; docPath: string | null }) {
   const sections = useMemo(() => {
@@ -304,18 +305,17 @@ function SectionedMarkdown({ text, docPath }: { text: string; docPath: string | 
   return (
     <>
       {sections.map((s, i) => (
-        <PreviewChunk key={i} index={String(i)} height={String(s.height)} tasksBefore={String(s.tasksBefore)} line={String(s.startLine)}>
-          <SectionMarkdown source={s.source} definitions={s.definitions} offset={s.startLine - 1} ids={s.ids} docPath={docPath} />
+        <PreviewChunk key={i} index={String(i)} height={String(s.height)} tasksBefore={String(s.tasksBefore)} line={String(s.startLine)} lineOffset={s.startLine - 1}>
+          <SectionMarkdown source={s.source} definitions={s.definitions} ids={s.ids} docPath={docPath} />
         </PreviewChunk>
       ))}
     </>
   );
 }
 
-const SectionMarkdown = memo(function SectionMarkdown({ source, definitions, offset, ids, docPath }: {
+const SectionMarkdown = memo(function SectionMarkdown({ source, definitions, ids, docPath }: {
   source: string;
   definitions: string;
-  offset: number;
   /** The section's heading ids, joined with NUL (a string, so the memo can compare it). */
   ids: string;
   docPath: string | null;
@@ -328,8 +328,8 @@ const SectionMarkdown = memo(function SectionMarkdown({ source, definitions, off
     const rehype = base.rehypePlugins.flatMap((p) =>
       p === rehypeSlug ? [[rehypeHeadingIds, { ids: ids ? ids.split("\u0000") : [] }], rehypeSlug] : [p],
     ) as typeof base.rehypePlugins;
-    return { ...base, rehypePlugins: [...rehype, [rehypeSourceLines, { offset }]] as typeof base.rehypePlugins };
-  }, [renderMath, ids, offset]);
+    return { ...base, rehypePlugins: [...rehype, rehypeSourceLines] as typeof base.rehypePlugins };
+  }, [renderMath, ids]);
   // Reference-style links can point at definitions anywhere in the document.
   const text = definitions ? `${source}\n\n${definitions}\n` : source;
   return (
@@ -391,7 +391,7 @@ function previewBlocks(el: HTMLElement) {
   const end = { line: Number(article.dataset.lines) + 1, top: el.scrollHeight };
   return {
     count: blocks.length + 1,
-    anchor: (i: number) => (i < blocks.length ? { line: Number(blocks[i].dataset.line), top: blocks[i].getBoundingClientRect().top - base } : end),
+    anchor: (i: number) => (i < blocks.length ? { line: previewBlockLine(blocks[i]), top: blocks[i].getBoundingClientRect().top - base } : end),
   };
 }
 
@@ -484,7 +484,7 @@ export function Preview() {
     const top = block.getBoundingClientRect().top - ref.current.getBoundingClientRect().top;
     // The preview stays where it is while the editor scrolls to the line.
     scrollSync.hold("preview");
-    revealLineAt(Number(block.dataset.line), Math.min(top, ref.current.clientHeight - 40));
+    revealLineAt(previewBlockLine(block), Math.min(top, ref.current.clientHeight - 40));
   };
 
   const finding = useUi((s) => s.previewFind);

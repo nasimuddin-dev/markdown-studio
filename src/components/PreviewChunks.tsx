@@ -87,8 +87,25 @@ export function mountAllChunks() {
   });
 }
 
+/**
+ * The document line a preview block starts on: its `data-line`, plus the
+ * offset of the section it's in when that section was parsed on its own.
+ */
+export function previewBlockLine(block: HTMLElement): number {
+  const wrapper = block.closest<HTMLElement>(".preview-chunk:not(.pending)");
+  return Number(block.dataset.line) + Number(wrapper?.dataset.lineOffset ?? 0);
+}
+
 /** One chunk: a sized placeholder until it nears the visible area. */
-export function PreviewChunk({ index, height, tasksBefore, line, children }: { index: string; height: string; tasksBefore: string; line?: string; children: ReactNode }) {
+export function PreviewChunk({ index, height, tasksBefore, line, lineOffset, children }: {
+  index: string;
+  height: string;
+  tasksBefore: string;
+  line?: string;
+  /** For a section of a long document parsed on its own: the lines before it (its blocks' `data-line` count from its start). */
+  lineOffset?: number;
+  children: ReactNode;
+}) {
   // The first chunk is at the top, where the preview opens.
   const [mounted, setMounted] = useState(index === "0");
   const ref = useRef<HTMLDivElement>(null);
@@ -109,7 +126,7 @@ export function PreviewChunk({ index, height, tasksBefore, line, children }: { i
     };
   }, [mounted]);
   return mounted ? (
-    <div className="preview-chunk" data-tasks-before={tasksBefore}>
+    <div className="preview-chunk" data-tasks-before={tasksBefore} data-line-offset={lineOffset || undefined}>
       {children}
     </div>
   ) : (

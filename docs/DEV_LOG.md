@@ -722,8 +722,9 @@ The user asked to keep the development loop going until midnight.
 
 **Unverified:** the sectioned preview on macOS (WebKit) and Linux; the speed-up was measured in the development build on Windows.
 
+**After the release:** sections below an edit no longer re-parse when their line numbers shift: each is parsed with its own line numbers and its wrapper carries the offset (`data-line-offset`, read by `previewBlockLine` for scroll sync and double-click). A test counts parses: an edit at the top re-parses one section. Ships in the next release.
+
 **Next up:**
 
-1. Sections below an edit re-parse when their line numbers shift; carrying the offset outside the parse would avoid that.
-2. A smaller startup bundle.
-3. The Linux watcher on a real Linux desktop.
+1. A smaller startup bundle.
+2. The Linux watcher on a real Linux desktop.
