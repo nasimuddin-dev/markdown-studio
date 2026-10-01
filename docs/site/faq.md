@@ -25,6 +25,8 @@ ARM64 builds for Windows and Linux aren't available yet. See [Installation](/get
 
 Yes. Markpion is free to download and use, and there's no paid edition. The source code is public on [GitHub](https://github.com/nasimuddin-dev/markpion); a license for reusing the code hasn't been published yet.
 
+Markpion is built with open-source software and fonts made by others. **Help → Third-Party Notices** lists them with their licenses; the same list ([THIRD_PARTY_NOTICES.md](https://github.com/nasimuddin-dev/markpion/blob/main/THIRD_PARTY_NOTICES.md)) is installed beside the app.
+
 ## Does it work offline?
 
 Yes. Everything works without an internet connection. The only connections are the optional update check, downloading an update if you choose to, and web images or links in your documents. See [Privacy](/privacy#network-access).

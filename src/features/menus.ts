@@ -112,7 +112,7 @@ export const MENUS: MenuDef[] = [
     label: "AI",
     items: [c("aiImprove"), c("aiFixGrammar"), c("aiShorter"), sep, c("aiSummarize"), c("aiContinue"), c("aiTranslate"), sep, c("aiWrite"), c("aiAsk")],
   },
-  { label: "Help", items: [c("shortcuts"), c("commandPalette"), sep, c("exportLogs"), c("checkUpdates"), c("about")] },
+  { label: "Help", items: [c("shortcuts"), c("commandPalette"), sep, c("exportLogs"), c("checkUpdates"), sep, c("thirdPartyNotices"), c("about")] },
 ];
 
 /**

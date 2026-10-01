@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { compareVersions, fetchLatestRelease, RELEASES_PAGE } from "../src/services/updates";
+import { compareVersions, fetchLatestRelease, noticesPage, RELEASES_PAGE } from "../src/services/updates";
 import { checkForUpdates } from "../src/features/updates";
 import { useUi } from "../src/stores/uiStore";
 import { autoAnswer, setupBackend } from "./helpers";
@@ -144,5 +144,11 @@ describe("in-app update (desktop)", () => {
     expect(useUi.getState().progress).toBeNull();
     expect(useUi.getState().toasts.at(-1)).toMatchObject({ kind: "error" });
     expect(useUi.getState().toasts.at(-1)?.message).toMatch(/current version is unchanged.*signature mismatch/);
+  });
+});
+
+describe("third-party notices", () => {
+  it("links to the notices of the running version", () => {
+    expect(noticesPage("0.25.0")).toBe("https://github.com/nasimuddin-dev/markpion/blob/v0.25.0/THIRD_PARTY_NOTICES.md");
   });
 });

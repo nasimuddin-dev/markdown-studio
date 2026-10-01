@@ -418,7 +418,7 @@ The product website shall provide OS-specific download options. The site may det
 |---|---|
 | Which minimum Windows, macOS, and Linux versions will be officially supported? | **Answered in practice:** Windows 10 1803+ and 11; macOS 10.15+; Linux x86_64 distributions from 2022 (Ubuntu 22.04+, Debian 12+, Fedora 36+). See [INSTALL.md](INSTALL.md). |
 | Will the first release support x64 only or x64 + ARM64? | **Partly answered:** Windows and Linux x64; macOS both Intel and Apple Silicon. Windows/Linux ARM64 are open. |
-| Should the product use a permissive open-source license, a proprietary license, or a dual-license model? | Open: needs a decision by the product owner. |
+| Should the product use a permissive open-source license, a proprietary license, or a dual-license model? | Open: needs a decision by the product owner. The licenses of the fonts and packages Markpion includes are listed in `THIRD_PARTY_NOTICES.md` (added 2026-10-01 at the owner's request; installed with the app and shown from Help → Third-Party Notices). |
 | Will AI functionality be part of v1.0 or a later release? | Open. |
 | Should AI features support local models, cloud providers, or both? | **Answered (2026-09-30):** both. Claude (cloud, with the user's key and consent) or a local model through Ollama on the same computer; the user chooses in Settings. |
 | Should Markdown HTML be fully supported, partially supported, or sanitized to a strict subset? | **Answered:** raw HTML is parsed, then sanitized to GitHub's allow-list (FR-034, SEC-004). |

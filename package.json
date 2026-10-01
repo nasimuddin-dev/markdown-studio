@@ -27,6 +27,7 @@
     "docs:screenshots": "playwright test --config playwright.screenshots.config.ts",
     "check:unused": "npx --yes knip@5",
     "check:startup": "node scripts/check-startup-size.mjs",
+    "notices": "node scripts/third-party-notices.mjs",
     "test:fixtures": "node scripts/make-fixtures.mjs",
     "test:native": "node scripts/test-native.mjs"
   },

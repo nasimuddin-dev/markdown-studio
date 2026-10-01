@@ -21,6 +21,8 @@ jobs:
       - run: npx vite build
       # Start-up JavaScript stays within its budget (scripts/check-startup-size.mjs).
       - run: npm run check:startup
+      # THIRD_PARTY_NOTICES.md matches the dependencies (regenerate with npm run notices).
+      - run: npm run notices -- --check
 
   e2e:
     name: End-to-end (Playwright)

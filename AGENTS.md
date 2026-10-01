@@ -26,6 +26,7 @@ To support a new host (for example a cloud version), implement `Backend` and cho
 | Native e2e (Windows, real app) | `npm run test:native` (needs `cargo install tauri-driver --locked`; close Markpion first) |
 | Rust tests | `cargo test --manifest-path src-tauri/Cargo.toml` |
 | Unused files, exports and dependencies | `npm run check:unused` |
+| Third-party notices (after changing dependencies) | `npm run notices` regenerates `THIRD_PARTY_NOTICES.md`; CI runs `npm run notices -- --check` |
 | Start-up JavaScript budget (after `npx vite build`) | `npm run check:startup` (`-- --list` shows the largest files); CI runs it |
 | Known vulnerabilities in dependencies | `npm audit --omit=dev`, `cargo audit --file src-tauri/Cargo.lock` (needs `cargo install cargo-audit --locked`); CI runs both |
 | Run the app | `npm run tauri:dev` (browser only: `npm run dev`) |

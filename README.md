@@ -170,6 +170,7 @@ That runs the desktop app with hot reload. Other scripts:
 | `npm run build` | Type check and production build of the frontend (`dist/`) |
 | `npm run check:unused` | Finds unused files, exports and dependencies ([knip](https://knip.dev), configured in `knip.json`) |
 | `npm run check:startup` | After `npx vite build`: checks the JavaScript loaded at start-up against its budget (`-- --list` shows the largest files) |
+| `npm run notices` | Regenerates [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) (the fonts, npm packages and Rust crates the app ships, with their license texts) after a dependency change; CI fails when it's out of date (`-- --check`) |
 | `npm audit --omit=dev`, `cargo audit --file src-tauri/Cargo.lock` | Known vulnerabilities in the dependencies that ship (CI runs both; the second needs `cargo install cargo-audit --locked`) |
 | `npm run test:fixtures` | Regenerates the sample files the import tests use |
 | `npm run tauri:build` | Builds installers for the current OS |
@@ -249,7 +250,7 @@ npm run release:installer -- --offline
 npm run release:github
 ```
 
-1. `version:set` updates the version in `package.json`, `tauri.conf.json` and `Cargo.toml`.
+1. `version:set` updates the version in `package.json` (and `package-lock.json`), `tauri.conf.json` and `Cargo.toml`.
 2. `release:installer -- --offline` builds two Windows installers:
    - the **standard** installer (~7 MB) replaces the one in [`downloads/`](downloads/), where only the latest version is kept;
    - the **offline** installer (~210 MB, with the WebView2 runtime) goes to `release-assets/`. It's too large for git, so it's ignored.

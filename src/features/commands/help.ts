@@ -10,6 +10,18 @@ export const helpCommands: Record<string, Command> = {
     run: async () => void (await (await import("../updates")).checkForUpdates({ manual: true })),
   },
   about: { id: "about", label: "About Markpion", run: () => useUi.getState().setAboutOpen(true) },
+  thirdPartyNotices: {
+    id: "thirdPartyNotices",
+    label: "Third-Party Notices",
+    run: async () => {
+      try {
+        const [{ version }, { noticesPage }] = await Promise.all([backend().appInfo(), import("../../services/updates")]);
+        await backend().openExternal(noticesPage(version));
+      } catch (e) {
+        notify("error", `Couldn't open the notices: ${(e as Error).message}`);
+      }
+    },
+  },
   exportLogs: {
     id: "exportLogs",
     label: "Export Diagnostic Logs…",

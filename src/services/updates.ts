@@ -1,5 +1,7 @@
 const RELEASES_API = "https://api.github.com/repos/nasimuddin-dev/markpion/releases/latest";
 export const RELEASES_PAGE = "https://github.com/nasimuddin-dev/markpion/releases/latest";
+/** The licenses of the fonts and packages a version includes (also installed beside the app). */
+export const noticesPage = (version: string) => `https://github.com/nasimuddin-dev/markpion/blob/v${version}/THIRD_PARTY_NOTICES.md`;
 
 export interface LatestRelease {
   version: string;
