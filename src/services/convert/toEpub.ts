@@ -88,10 +88,38 @@ interface NavEntry {
   level: number;
   id: string;
   text: string;
+  /** The chapter file the heading is in. */
+  file?: string;
+}
+
+/**
+ * The document split into chapters at its top-level headings: the first
+ * level-1 heading level used more than once at the top (h1, else h2). Content
+ * before the first one stays with it; a document without repeated top-level
+ * headings is one chapter.
+ */
+function splitChapters(page: Document, body: HTMLElement): HTMLElement[] {
+  const top = [...body.children];
+  const level = ["H1", "H2"].find((tag) => top.filter((el) => el.tagName === tag).length >= 2);
+  if (!level) return [body];
+  const parts: HTMLElement[] = [];
+  const start = () => {
+    const part = page.createElement("div");
+    part.className = "markdown-body";
+    parts.push(part);
+    return part;
+  };
+  let current = start();
+  for (const node of [...body.childNodes]) {
+    // A new chapter at each top-level heading after the first (what comes before the first joins it).
+    if (node instanceof Element && node.tagName === level && [...current.children].some((el) => el.tagName === level)) current = start();
+    current.appendChild(node);
+  }
+  return parts;
 }
 
 /** Nested <ol> lists for the headings (levels 1 to 3), as EPUB navigation requires. */
-function navList(entries: NavEntry[], file: string): string {
+function navList(entries: NavEntry[]): string {
   if (!entries.length) return "";
   const top = Math.min(...entries.map((e) => e.level));
   let out = "<ol>";
@@ -111,7 +139,7 @@ function navList(entries: NavEntry[], file: string): string {
         }
       }
     }
-    out += `<li><a href="${file}#${escapeXml(e.id)}">${escapeXml(e.text)}</a>`;
+    out += `<li><a href="${e.file ?? "content.xhtml"}#${escapeXml(e.id)}">${escapeXml(e.text)}</a>`;
   });
   out += "</li>";
   while (depth > top) {
@@ -182,9 +210,33 @@ export async function markdownToEpub(markdown: string, opts: EpubOptions): Promi
     if (text) nav.push({ level: Number(h.tagName[1]), id: h.id, text });
   });
 
-  const content = xmlSafe(new XMLSerializer().serializeToString(body));
-  const hasMath = !!body.querySelector("math");
-  const hasSvg = !!body.querySelector("svg");
+  // One file per chapter, so e-readers load and paginate a part at a time. Links
+  // (footnotes included) then point at the file that has their target.
+  const parts = splitChapters(page, body);
+  const files = parts.length === 1 ? ["content.xhtml"] : parts.map((_, i) => `chapter-${String(i + 1).padStart(2, "0")}.xhtml`);
+  const fileOf = new Map<string, string>();
+  parts.forEach((part, i) => part.querySelectorAll("[id]").forEach((el) => fileOf.set(el.id, files[i])));
+  parts.forEach((part, i) => {
+    for (const a of part.querySelectorAll('a[href^="#"]')) {
+      const fragment = a.getAttribute("href")!.slice(1);
+      let target = fragment;
+      try {
+        target = decodeURIComponent(fragment);
+      } catch {
+        /* compare as written */
+      }
+      const file = fileOf.get(target);
+      if (file && file !== files[i]) a.setAttribute("href", `${file}#${fragment}`);
+    }
+  });
+  for (const entry of nav) entry.file = fileOf.get(entry.id) ?? files[0];
+  const chapters = parts.map((part, i) => ({
+    file: files[i],
+    id: files.length === 1 ? "content" : `chapter-${i + 1}`,
+    title: (part.querySelector("h1, h2, h3")?.textContent ?? "").replace(/\s+/g, " ").trim() || title,
+    content: xmlSafe(new XMLSerializer().serializeToString(part)),
+    properties: [part.querySelector("math") && "mathml", part.querySelector("svg") && "svg"].filter(Boolean).join(" "),
+  }));
 
   const xhtml = (heading: string, inner: string, extra = "") => `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
@@ -202,7 +254,6 @@ ${inner}
 
   const id = opts.id ?? `urn:uuid:${crypto.randomUUID()}`;
   const modified = (opts.now ?? new Date()).toISOString().replace(/\.\d{3}Z$/, "Z");
-  const contentProps = [hasMath && "mathml", hasSvg && "svg"].filter(Boolean).join(" ");
   const cover = await coverImage(markdown, opts);
   const opf = `<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id" xml:lang="${escapeXml(lang)}">
@@ -215,11 +266,10 @@ ${meta.author ? `<dc:creator>${escapeXml(xmlSafe(meta.author))}</dc:creator>\n` 
 ${cover ? `<meta name="cover" content="cover-image" />\n` : ""}</metadata>
 <manifest>
 <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav" />
-${cover ? `<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" />\n<item id="cover-image" href="${cover.file}" media-type="${cover.type}" properties="cover-image" />\n` : ""}<item id="content" href="content.xhtml" media-type="application/xhtml+xml"${contentProps ? ` properties="${contentProps}"` : ""} />
-<item id="style" href="style.css" media-type="text/css" />
+${cover ? `<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" />\n<item id="cover-image" href="${cover.file}" media-type="${cover.type}" properties="cover-image" />\n` : ""}${chapters.map((c) => `<item id="${c.id}" href="${c.file}" media-type="application/xhtml+xml"${c.properties ? ` properties="${c.properties}"` : ""} />\n`).join("")}<item id="style" href="style.css" media-type="text/css" />
 ${images.map((img, i) => `<item id="image${i + 1}" href="${img.file}" media-type="${img.type}" />\n`).join("")}</manifest>
 <spine>
-${cover ? `<itemref idref="cover" />\n` : ""}<itemref idref="content" />
+${cover ? `<itemref idref="cover" />\n` : ""}${chapters.map((c) => `<itemref idref="${c.id}" />`).join("\n")}
 </spine>
 </package>
 `;
@@ -227,7 +277,7 @@ ${cover ? `<itemref idref="cover" />\n` : ""}<itemref idref="content" />
     "Contents",
     `<nav epub:type="toc" id="toc">
 <h1>Contents</h1>
-${navList(nav, "content.xhtml") || `<ol><li><a href="content.xhtml">${escapeXml(xmlSafe(title))}</a></li></ol>`}
+${navList(nav) || `<ol><li><a href="${files[0]}">${escapeXml(xmlSafe(title))}</a></li></ol>`}
 </nav>`,
   );
 
@@ -246,7 +296,7 @@ ${navList(nav, "content.xhtml") || `<ol><li><a href="content.xhtml">${escapeXml(
   );
   zip.file("OEBPS/content.opf", opf);
   zip.file("OEBPS/nav.xhtml", navDoc);
-  zip.file("OEBPS/content.xhtml", xhtml(title, content));
+  for (const c of chapters) zip.file(`OEBPS/${c.file}`, xhtml(c.title, c.content));
   zip.file("OEBPS/style.css", `${EPUB_CSS}\n${markdownCss}${opts.css ? `\n/* Custom CSS */\n${opts.css}` : ""}`);
   for (const img of images) zip.file(`OEBPS/${img.file}`, img.bytes);
   if (cover) {

@@ -1459,13 +1459,15 @@ test("File > Export > EPUB makes an e-book with its pictures, math and diagrams"
   expect(zip.file("OEBPS/images/image1.svg")).not.toBeNull();
   const opf = await zip.file("OEBPS/content.opf")!.async("string");
   expect(opf).toContain('properties="mathml svg"');
-  // Every document in the book is well-formed XML (as e-readers require).
-  for (const name of ["OEBPS/content.xhtml", "OEBPS/nav.xhtml", "OEBPS/content.opf", "META-INF/container.xml"]) {
+  // The README's sections are chapters; every document in the book is well-formed XML (as e-readers require).
+  const chapters = Object.keys(zip.files).filter((f) => /^OEBPS\/chapter-\d+\.xhtml$/.test(f));
+  expect(chapters.length).toBeGreaterThan(1);
+  for (const name of [...chapters, "OEBPS/nav.xhtml", "OEBPS/content.opf", "META-INF/container.xml"]) {
     const text = await zip.file(name)!.async("string");
     const errors = await page.evaluate((s) => new DOMParser().parseFromString(s, "application/xml").getElementsByTagName("parsererror").length, text);
     expect(errors, name).toBe(0);
   }
-  const content = await zip.file("OEBPS/content.xhtml")!.async("string");
+  const content = (await Promise.all(chapters.map((c) => zip.file(c)!.async("string")))).join("\n");
   expect(content).toContain("<svg");
   expect(content).toContain("<math");
 });
@@ -1510,8 +1512,10 @@ test("Export Folder as One E-book puts every document in the book", async ({ pag
   const nav = await zip.file("OEBPS/nav.xhtml")!.async("string");
   // The folder's title, with a chapter (a level-2 entry) for each top-level document.
   expect((nav.match(/<li>/g) ?? []).length).toBeGreaterThanOrEqual(files);
-  const content = await zip.file("OEBPS/content.xhtml")!.async("string");
-  expect(content).toContain("<h1");
+  // One chapter per document.
+  const chapters = Object.keys(zip.files).filter((f) => /^OEBPS\/chapter-\d+\.xhtml$/.test(f));
+  expect(chapters.length).toBeGreaterThanOrEqual(2);
+  expect(await zip.file(chapters[0])!.async("string")).toContain("<h1");
 });
 
 test("Move Selection to New File creates the file and links to it", async ({ page }) => {

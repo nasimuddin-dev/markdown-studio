@@ -57,15 +57,46 @@ describe("EPUB export", () => {
   it("builds a nested table of contents from the headings", async () => {
     const { text } = await book("# One\n\n## One A\n\n### Deep\n\n## One B\n\n# Two\n");
     const nav = xml(await text("OEBPS/nav.xhtml"));
-    const content = xml(await text("OEBPS/content.xhtml"));
     const top = nav.querySelector("nav > ol")!;
     expect([...top.children].map((li) => li.querySelector("a")!.textContent)).toEqual(["One", "Two"]);
     expect([...top.children[0].querySelector("ol")!.children].map((li) => li.querySelector("a")!.textContent)).toEqual(["One A", "One B"]);
-    // Every link points at a heading that exists.
+    // Every link points at a heading that exists, in the file it names.
     for (const a of nav.querySelectorAll("a")) {
-      const id = a.getAttribute("href")!.split("#")[1];
-      expect(content.getElementById(id)?.textContent).toBe(a.textContent);
+      const [file, id] = a.getAttribute("href")!.split("#");
+      expect(xml(await text(`OEBPS/${file}`)).getElementById(id)?.textContent).toBe(a.textContent);
     }
+  });
+
+  it("puts each top-level section in its own chapter file, in reading order", async () => {
+    const { text, zip } = await book("Intro text.\n\n# One\n\nFirst.\n\n# Two\n\nSecond.\n\n# Three\n\nThird.\n");
+    expect(zip.file("OEBPS/content.xhtml")).toBeNull();
+    const opf = await text("OEBPS/content.opf");
+    expect([...opf.matchAll(/<itemref idref="([^"]+)"/g)].map((m) => m[1])).toEqual(["chapter-1", "chapter-2", "chapter-3"]);
+    // Text before the first heading stays with the first chapter.
+    const first = xml(await text("OEBPS/chapter-01.xhtml"));
+    expect(first.body.textContent).toContain("Intro text.");
+    expect(first.querySelector("h1")!.textContent).toBe("One");
+    expect(first.querySelector("title")!.textContent).toBe("One");
+    expect(xml(await text("OEBPS/chapter-03.xhtml")).body.textContent).toContain("Third.");
+  });
+
+  it("splits a folder book (one title, documents as level-2 sections) at the documents", async () => {
+    const { zip } = await book("# Folder\n\n## Doc A\n\nA.\n\n## Doc B\n\nB.\n");
+    expect(Object.keys(zip.files).filter((f) => /chapter-\d+\.xhtml$/.test(f))).toHaveLength(2);
+  });
+
+  it("links footnotes and headings across chapters to the right file", async () => {
+    const { text } = await book("# One\n\nA claim[^1], see [two](#two).\n\n# Two\n\nBack to [one](#one).\n\n[^1]: The source.\n");
+    const one = xml(await text("OEBPS/chapter-01.xhtml"));
+    const two = xml(await text("OEBPS/chapter-02.xhtml"));
+    const hrefs = (doc: Document) => [...doc.querySelectorAll("a[href]")].map((a) => a.getAttribute("href")!);
+    // The footnote list is at the end (chapter 2); the reference in chapter 1 points there, and back.
+    const ref = hrefs(one).find((h) => h.includes("fn-1"))!;
+    expect(ref).toMatch(/^chapter-02\.xhtml#/);
+    expect(two.getElementById(decodeURIComponent(ref.split("#")[1]))).not.toBeNull();
+    expect(hrefs(two).find((h) => h.includes("fnref-1"))).toMatch(/^chapter-01\.xhtml#/);
+    expect(hrefs(one)).toContain("chapter-02.xhtml#two");
+    expect(hrefs(two)).toContain("chapter-01.xhtml#one");
   });
 
   it("packs local pictures once, and turns web pictures into links", async () => {
