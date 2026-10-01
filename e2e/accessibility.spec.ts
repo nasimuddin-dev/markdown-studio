@@ -192,7 +192,11 @@ for (const theme of ["light", "dark"] as const) {
       await page.keyboard.press("Escape");
 
       await palette("compare with file");
+      // The file list loads after the picker opens; choose only once the file is listed.
+      const picker = page.getByRole("dialog", { name: "Compare with file" });
+      await expect(picker).toBeVisible();
       await page.keyboard.type("guide");
+      await expect(picker.getByRole("option").first()).toContainText(/guide/i);
       await page.keyboard.press("Enter");
       await expect(page.getByRole("dialog", { name: /^Compare — / })).toBeVisible();
       await audit(page, "compare");
