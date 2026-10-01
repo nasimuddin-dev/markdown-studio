@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Sets the app version everywhere it is declared: package.json,
+// Sets the app version everywhere it is declared: package.json (and its lockfile),
 // src-tauri/tauri.conf.json and src-tauri/Cargo.toml.
 //   npm run version:set 0.3.0
 import { readFileSync, writeFileSync } from "node:fs";
@@ -19,6 +19,8 @@ const update = (file, fn) => {
 };
 
 update("package.json", (s) => s.replace(/("version":\s*")[^"]+(")/, `$1${version}$2`));
+// The lockfile repeats the project's version at the top and in its root package entry.
+update("package-lock.json", (s) => s.replace(/^(\s{2}"version":\s*")[^"]+(")/m, `$1${version}$2`).replace(/(""\s*:\s*\{\s*"name":\s*"[^"]+",\s*"version":\s*")[^"]+(")/, `$1${version}$2`));
 update("src-tauri/tauri.conf.json", (s) => s.replace(/("version":\s*")[^"]+(")/, `$1${version}$2`));
 update("src-tauri/Cargo.toml", (s) => s.replace(/^(version\s*=\s*")[^"]+(")/m, `$1${version}$2`));
 update("src/services/memoryBackend.ts", (s) => s.replace(/(version: ")[^"]+(", os: "browser")/, `$1${version}$2`));

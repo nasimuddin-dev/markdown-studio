@@ -7,6 +7,28 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.25.0
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.0)
+
+### Added
+
+- **Export as EPUB (e-book)** (File → Export → EPUB): an e-book with a table of contents from your headings, your pictures inside, math and Mermaid diagrams included. The title, author, description and language come from the front matter, and a `cover` picture named there becomes the book's cover. **Export Folder as One E-book** turns a folder of chapters into one book.
+- **Import E-book (.epub)** (File → Import): an e-book's chapters in reading order as one Markdown document, with its title, author and language as front matter and its pictures saved to `assets/`. Convert Folder to Markdown includes e-books too. Books protected with DRM can't be read, and Markpion says so.
+- **Export as LaTeX (.tex)** (File → Export → LaTeX): a complete LaTeX document with sections and cross-references, your math exactly as written, tables, code, footnotes, task lists and figures. **Export Folder as One LaTeX Document** does the same for a whole folder.
+- **Reflow Paragraph** (Edit → Lines, **Alt+Q**) re-breaks the paragraph at the cursor, or the selected paragraphs, at the **Line length** setting (80 characters when it's off), keeping list markers, quotes and hard line breaks. **Unwrap Paragraph** joins a paragraph back into one line.
+
+### Changed
+
+- **PDF export draws more inline formulas:** arrows (`\to`, `\Rightarrow`), set symbols (`\in`, `\subseteq`, `\cup`), logic symbols and blackboard capitals (`\mathbb{R}`) are now set in the same fonts the preview uses, instead of keeping their LaTeX source.
+- Markpion has less to load when it starts: 343 KB of compressed code instead of 402 KB. The editor's support for HTML inside Markdown is lighter, and Settings, About and the Links panel load when first used.
+
+### Fixed
+
+- Footnote links and links to HTML anchors didn't lead anywhere in exported HTML files (and Copy as HTML); they now jump to the footnote or anchor.
+- Keyboard shortcuts of Edit menu commands that change the text, including shortcuts you assign to commands such as Sort Lines, did nothing while typing in the editor.
+- After closing Settings or the slide show the first time they were opened from a menu, nothing had keyboard focus; focus now goes back to the editor.
+
 ## v0.24.1
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.24.1)

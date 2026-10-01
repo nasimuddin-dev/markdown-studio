@@ -171,6 +171,32 @@ describe("the desktop app", () => {
       assert.equal(saved.ok, true, `export failed: ${saved.message}`);
       assert.equal(saved.r.toLowerCase(), target.toLowerCase());
       assert.deepEqual([...readFileSync(target)], payload);
+
+      // E-books and LaTeX documents have their own kinds (and Save dialog filters).
+      const answerSave = (path) => {
+        const p = spawn("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", join(import.meta.dirname, "save-dialog.ps1"), "-Path", path], { stdio: "pipe" });
+        return new Promise((resolve) => p.on("exit", resolve));
+      };
+      const book = join(dir, "book.epub");
+      const bookAnswered = answerSave(book);
+      const savedBook = await exportWith([80, 75, 3, 4], { "x-export-name": "book.epub", "x-export-kind": "epub" });
+      assert.equal(await bookAnswered, 0, "the Save dialog should be answered");
+      assert.equal(savedBook.ok, true, `EPUB export failed: ${savedBook.message}`);
+      assert.deepEqual([...readFileSync(book)], [80, 75, 3, 4]);
+
+      const paper = join(dir, "paper.tex");
+      const paperAnswered = answerSave(paper);
+      await s.exec(
+        `window.__native = undefined;
+         window.__TAURI_INTERNALS__.invoke("export_file", { suggestedName: "paper.tex", content: arguments[0], kind: "tex" }).then(
+           (r) => { window.__native = { ok: true, r }; },
+           (e) => { window.__native = { ok: false, kind: e && e.kind, message: e && e.message }; });`,
+        "\\documentclass{article}\n\\begin{document}\nÉté\n\\end{document}\n",
+      );
+      const savedPaper = await s.waitFor(() => s.exec("return window.__native"), "the LaTeX export answer");
+      assert.equal(await paperAnswered, 0, "the Save dialog should be answered");
+      assert.equal(savedPaper.ok, true, `LaTeX export failed: ${savedPaper.message}`);
+      assert.equal(readFileSync(paper, "utf8"), "\\documentclass{article}\n\\begin{document}\nÉté\n\\end{document}\n");
     } finally {
       await s.quit();
     }

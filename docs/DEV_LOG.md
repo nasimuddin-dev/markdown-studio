@@ -728,3 +728,38 @@ The user asked to keep the development loop going until midnight.
 
 1. A smaller startup bundle.
 2. The Linux watcher on a real Linux desktop.
+
+## 2026-10-01 (7:14 AM – noon): development loop, 0.25.0
+
+The user asked to keep the development loop going until 12 PM.
+
+| Item | Commit |
+| --- | --- |
+| Start-up bundle 120 KB smaller: a light HTML language for the Markdown editor (`services/markdownHtml.ts`, swapped in by `vite.config.ts`), checked against `@codemirror/lang-html`; CI start-up budget (`npm run check:startup`, 370 KB gzipped) | ccc2f18 |
+| Settings, About and the Links panel load on first use; the demo backend only loads in the browser (`loadBackend`). Start-up now 1,042 KB (343 KB gzipped), from 1,203 KB (402 KB) | f8e847f |
+| Dialogs that load on first use give focus back to the editor (`rememberFocus`) | 4b7f0ac |
+| Browser demo: downloads aren't cancelled on a busy machine; the pickers work without `prompt()` | a9801e9, de7096e |
+| Reflow Paragraph (Alt+Q) and Unwrap Paragraph; the editor keymap now includes Edit menu commands (their shortcuts did nothing while typing) | 649fb1b |
+| Export as EPUB, Export Folder as One E-book, and a front matter cover picture; CI validates sample books with EPUBCheck | ac75195, 34c2eda, 10aefac, 9a1cc6a |
+| Footnote and anchor links work in exported HTML and EPUB (they pointed at ids without the sanitizer's `user-content-` prefix) | 9a1cc6a |
+| PDF inline formulas with arrows, set symbols and `\mathbb` capitals, set in KaTeX's fonts (OFL, from the `katex` package) | 2390937, 513b7e4 |
+| Import E-book (.epub), also in Convert Folder to Markdown | cf4868f |
+| Export as LaTeX and Export Folder as One LaTeX Document; CI compiles sample documents with pdflatex | fa86e7b, 06b2b84 |
+| `npm run version:set` updates `package-lock.json` too | release commit |
+| Test reliability: the slides test no longer opens example.com in a popup (it stalled the browser under load); print tests wait for the app; the compare step of the accessibility audit waits for the file list; light-HTML tests parse fully before checking | fa86e7b, 4b7f0ac, 9a1ca52, 06b2b84 |
+
+**Version:** 0.25.0. **Tests:** Vitest 656 (119 files), Playwright 110, Rust 50 (+1 ignored), native 5 (now also exporting an EPUB and a LaTeX file through the real Save dialog; the start-up handover test timed out once right after the release build on the busy machine and passed on the rerun), website check. CI also runs EPUBCheck and pdflatex on sample output.
+
+**Unverified:** EPUB files in e-reader apps (only EPUBCheck and XML checks); LaTeX output with XeLaTeX/LuaLaTeX and on real documents beyond the CI samples; the KaTeX font fallback in PDFs opened outside pdf.js (the text extraction test reads the symbols back).
+
+**Notes:** full local e2e runs were slowed by other processes on this machine (CPU at about 60% between runs); single failures under that load passed when rerun, and CI passed throughout. The project has no third-party notices file; the KaTeX fonts embedded in PDFs are OFL-licensed, which a notices file should list once the license question (SRS §21) is settled.
+
+**Next up:**
+
+1. Open exported EPUBs in e-reader apps (Apple Books, Calibre, Thorium) and record the results.
+2. The Linux watcher on a real Linux desktop.
+3. Nested scripts (`e^{x^2}`) in PDF inline formulas.
+
+**Questions for the user:**
+
+- Should Markpion ship a third-party notices file (it bundles Roboto, KaTeX fonts and many npm packages)? This depends on the license decision in SRS §21.
