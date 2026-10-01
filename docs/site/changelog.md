@@ -7,6 +7,21 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.25.1
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.1)
+
+### Added
+
+- **Help → Send Feedback… and Report a Problem…**: send a suggestion, report a problem, or tell us what you think of the design or workflow. Your text, and optionally your version, system and recent error messages (which you can edit), opens as a new issue on GitHub in your browser or as an email in your mail app; you review it and send it from there. Markpion sends nothing by itself.
+- Error messages, and any part of the window that fails to load, have a **Report…** button that starts a problem report with the error filled in.
+- **Copy as LaTeX** (File → Copy As): the selection or the document as LaTeX, for pasting into a paper or an Overleaf project.
+- **Help → Third-Party Notices** lists the fonts and open-source software Markpion includes, with their licenses. The list is also installed beside the app.
+
+### Changed
+
+- PDF export: a script inside a script made of digits and signs, such as `e^{-x^2}`, is now set as text instead of keeping its LaTeX.
+
 ## v0.25.0
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.0)

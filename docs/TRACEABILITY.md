@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-Status of each [SRS](SRS.md) requirement as of version 0.25.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
+Status of each [SRS](SRS.md) requirement as of version 0.25.1. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
 
 ## Functional requirements
 
@@ -159,10 +159,10 @@ Status of each [SRS](SRS.md) requirement as of version 0.25.0. **Done** means im
 
 ## Test coverage
 
-| Level | Where | Count (0.25.0) |
+| Level | Where | Count (0.25.1) |
 | --- | --- | --- |
-| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 656 tests in 119 files |
-| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 110 tests |
+| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 669 tests in 120 files |
+| End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 114 tests |
 | Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 50 tests (plus 1 ignored live API test) |
 | Native end-to-end (Windows) | `e2e-native/` (tauri-driver, `npm run test:native`), not in CI | 5 tests |
 | Visual regression (local) | `e2e-shots/visual.spec.ts` (Playwright, pixel-exact against a local baseline; not in CI because the pixels depend on the OS fonts) | 28 screens in 6 tests |
