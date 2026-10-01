@@ -789,3 +789,15 @@ The user asked for a third-party notices file, for error reporting and feedback 
 1. Check the installed 0.25.1: Help → Send Feedback, Help → Third-Party Notices, and the notices file in the install folder.
 2. Open exported EPUBs in e-reader apps.
 3. The Linux watcher on a real Linux desktop.
+
+## 2026-10-01 (late afternoon): development loop, 0.25.2
+
+| Item | Commit |
+| --- | --- |
+| Visual check: File → Export baseline updated for the new items (reviewed); the Send Feedback dialog added (30 screens) | 3878d9a |
+| EPUB: a chapter file per top-level section, links and footnotes rewritten across chapters; EPUBCheck in CI caught `aria-describedby` pointing into another chapter, fixed | d70988a, 9c50f70 |
+| The user reported that none of the Send Feedback buttons worked: they were disabled until a summary was typed, and disabled buttons looked enabled (no `:disabled` style anywhere). The buttons now explain the missing summary; disabled buttons are faded. A native test clicks the dialog's buttons in the real app | 4d6d4be |
+
+**Mistake:** a first version of the native feedback test tried to stub `open_external` in the page; the stub didn't take effect in the real web view, and one GitHub "new issue" page opened in the user's browser (nothing was submitted). The test no longer clicks Open on GitHub or Send by Email.
+
+**Version:** 0.25.2. **Tests:** Vitest 673 (120 files), Playwright 114, Rust 50 (+1 ignored), native 6, visual 30 screens (local).

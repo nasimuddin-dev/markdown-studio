@@ -7,6 +7,19 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.25.2
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.2)
+
+### Changed
+
+- **EPUB export makes a chapter for each top-level section** (each `#` heading, or each `##` heading under a single title, as in folder books), so e-readers open long books faster and show progress by chapter. Footnotes and links between sections still work.
+
+### Fixed
+
+- In **Send Feedback**, the buttons seemed to do nothing until a summary was typed. They now say "Write a short summary first" and put the cursor in the summary box.
+- Disabled buttons looked the same as ones you can click; they're now faded.
+
 ## v0.25.1
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.1)
