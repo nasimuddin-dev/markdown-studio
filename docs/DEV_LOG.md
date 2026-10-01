@@ -722,7 +722,7 @@ The user asked to keep the development loop going until midnight.
 
 **Unverified:** the sectioned preview on macOS (WebKit) and Linux; the speed-up was measured in the development build on Windows.
 
-**After the release:** sections below an edit no longer re-parse when their line numbers shift: each is parsed with its own line numbers and its wrapper carries the offset (`data-line-offset`, read by `previewBlockLine` for scroll sync and double-click). A test counts parses: an edit at the top re-parses one section. Ships in the next release.
+**After the release:** sections below an edit no longer re-parse when their line numbers shift: each is parsed with its own line numbers and its wrapper carries the offset (`data-line-offset`, read by `previewBlockLine` for scroll sync and double-click). A test counts parses: an edit at the top re-parses one section (86583c2). **Released as 0.24.1.** Tests: Vitest 607 (112 files), Playwright 103 (the slide show and the dark-theme audit failed once each under full-suite load and passed alone), Rust 50 (+1 ignored).
 
 **Next up:**
 

@@ -1,6 +1,6 @@
 [package]
 name = "markpion"
-version = "0.24.0"
+version = "0.24.1"
 description = "Cross-platform, local-first desktop Markdown editor"
 authors = ["Markpion contributors"]
 edition = "2021"

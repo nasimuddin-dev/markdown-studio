@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-Status of each [SRS](SRS.md) requirement as of version 0.24.0. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
+Status of each [SRS](SRS.md) requirement as of version 0.24.1. **Done** means implemented and tested (automated or manual). **Partial** means some of it is implemented and the gap is noted. **Planned** means it's scheduled for the release named in the SRS.
 
 ## Functional requirements
 
@@ -151,9 +151,9 @@ Status of each [SRS](SRS.md) requirement as of version 0.24.0. **Done** means im
 
 ## Test coverage
 
-| Level | Where | Count (0.24.0) |
+| Level | Where | Count (0.24.1) |
 | --- | --- | --- |
-| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 606 tests in 112 files |
+| Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 607 tests in 112 files |
 | End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 103 tests |
 | Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 50 tests (plus 1 ignored live API test) |
 | Native end-to-end (Windows) | `e2e-native/` (tauri-driver, `npm run test:native`), not in CI | 5 tests |
