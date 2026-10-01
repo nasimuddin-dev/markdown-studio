@@ -26,6 +26,7 @@ To support a new host (for example a cloud version), implement `Backend` and cho
 | Native e2e (Windows, real app) | `npm run test:native` (needs `cargo install tauri-driver --locked`; close Markpion first) |
 | Rust tests | `cargo test --manifest-path src-tauri/Cargo.toml` |
 | Unused files, exports and dependencies | `npm run check:unused` |
+| Start-up JavaScript budget (after `npx vite build`) | `npm run check:startup` (`-- --list` shows the largest files); CI runs it |
 | Known vulnerabilities in dependencies | `npm audit --omit=dev`, `cargo audit --file src-tauri/Cargo.lock` (needs `cargo install cargo-audit --locked`); CI runs both |
 | Run the app | `npm run tauri:dev` (browser only: `npm run dev`) |
 | Documentation site | `npm run docs:check`, `npm run docs:test` |
@@ -64,7 +65,7 @@ Document only what the code actually does, and check the source when unsure. No 
 - Layering: `services/` ← `stores/` ← `features/` ← `components/`. Host-specific code (Tauri, window, file system) goes only in `services/`.
 - Native file access goes only through Rust commands with `Scope` checks; never grant the frontend fs, dialog or shell permissions.
 - In Rust commands, check the scope first, then run file reads and writes inside `blocking(...)` (`commands/mod.rs`), so slow disks and large files don't stall the async runtime. Send large binary data to the UI as `tauri::ipc::Response` (raw bytes), not base64 in JSON.
-- Load heavy, rarely used code (exporters, Mermaid, KaTeX, dialogs) with dynamic `import()` so startup stays small.
+- Load heavy, rarely used code (exporters, Mermaid, KaTeX, dialogs) with dynamic `import()` so startup stays small; `npm run check:startup` enforces a budget. The Markdown editor gets a light HTML language (`services/markdownHtml.ts`, swapped in by `vite.config.ts`) so the CSS and JavaScript parsers stay out of start-up.
 - Tests: Vitest for logic, Playwright e2e for user flows (it includes WCAG audits), and Rust unit tests for Rust changes.
 - Styles: put UI CSS in the area file under `src/styles/app/` (add a new file to `app.css` for a new area). Use the tokens in `app/tokens.css` for colours (with a dark-theme value), font sizes, spacing (`--space-1`…`--space-10`), radii, shadows and z-index layers, and extend a rule instead of repeating its selector; `tests/styles.test.ts` enforces this. Menus come from `src/features/menus.ts`.
 - UI changes: `npx playwright test -c e2e-shots/playwright.config.ts visual` compares 28 screens (both themes) pixel for pixel against a local baseline; record one with `--update-snapshots` before a CSS refactor.

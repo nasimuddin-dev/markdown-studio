@@ -33,11 +33,31 @@ function pdfjsAssets(): Plugin {
   };
 }
 
+/**
+ * Gives `@codemirror/lang-markdown` a light HTML language (src/services/markdownHtml.ts)
+ * instead of `@codemirror/lang-html`, which would bring the CSS and JavaScript
+ * parsers into the start-up bundle. Only imports made by lang-markdown are
+ * redirected; everything else (fenced ```html blocks) gets the full package.
+ * Applies to builds; the dev server pre-bundles dependencies without it, which
+ * only affects size.
+ */
+function lightHtmlForMarkdown(): Plugin {
+  const light = resolve("src/services/markdownHtml.ts");
+  return {
+    name: "light-html-for-markdown",
+    enforce: "pre",
+    resolveId(source, importer) {
+      if (source === "@codemirror/lang-html" && importer && /[\\/]@codemirror[\\/]lang-markdown[\\/]/.test(importer)) return light;
+      return null;
+    },
+  };
+}
+
 const host = process.env.TAURI_DEV_HOST;
 
 // https://v2.tauri.app/start/frontend/vite/
 export default defineConfig({
-  plugins: [react(), pdfjsAssets()],
+  plugins: [react(), pdfjsAssets(), lightHtmlForMarkdown()],
   clearScreen: false,
   server: {
     port: 1420,

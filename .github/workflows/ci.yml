@@ -19,6 +19,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npx vite build
+      # Start-up JavaScript stays within its budget (scripts/check-startup-size.mjs).
+      - run: npm run check:startup
 
   e2e:
     name: End-to-end (Playwright)

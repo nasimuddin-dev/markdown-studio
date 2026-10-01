@@ -167,6 +167,7 @@ That runs the desktop app with hot reload. Other scripts:
 | `cargo test --manifest-path src-tauri/Cargo.toml` | Rust tests (scope, safe save, encoding, settings, history, search, watcher) |
 | `npm run build` | Type check and production build of the frontend (`dist/`) |
 | `npm run check:unused` | Finds unused files, exports and dependencies ([knip](https://knip.dev), configured in `knip.json`) |
+| `npm run check:startup` | After `npx vite build`: checks the JavaScript loaded at start-up against its budget (`-- --list` shows the largest files) |
 | `npm audit --omit=dev`, `cargo audit --file src-tauri/Cargo.lock` | Known vulnerabilities in the dependencies that ship (CI runs both; the second needs `cargo install cargo-audit --locked`) |
 | `npm run test:fixtures` | Regenerates the sample files the import tests use |
 | `npm run tauri:build` | Builds installers for the current OS |
