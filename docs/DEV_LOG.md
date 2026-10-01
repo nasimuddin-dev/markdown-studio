@@ -695,3 +695,11 @@ The user asked for every issue found to be fixed.
 - **Found by the new native test:** a file handed to the app while it was still starting was dropped (the UI wasn't listening for the event yet), for example the second of two files opened together. Paths now wait with the launch paths until the UI asks for them. The native suite (5 tests) covers this, the raw-byte reads and the picture rule in the real app.
 
 **Tests:** Vitest 593 (109 files), Playwright 101, Rust 49 (+1 ignored), native 5.
+
+**Released as 0.23.1** (the review's fixes: d67168a, a95b294). Not installed locally; the in-app updater delivers it.
+
+**Next up:**
+
+1. Run the Linux watcher on a real Linux desktop.
+2. Send exports to the native side as raw bytes too.
+3. The File History e2e test that is timing-dependent under load.

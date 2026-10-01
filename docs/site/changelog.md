@@ -7,6 +7,33 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.23.1
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.23.1)
+
+### Added
+
+- **Settings → Preview → Show pictures from the web in the preview.** Turn it off and a document's `https://` pictures are shown as placeholders, so previewing a document sends no request anywhere. IT can preset or lock it.
+
+### Changed
+
+- Large documents (over 1 MB of text): the status bar's word and task counts settle a moment after you stop typing instead of recounting on every keystroke, and the Markdown checks don't run, so typing stays smooth.
+- Importing large Word and PDF files uses much less memory.
+- Saving and opening large files no longer makes the rest of the app wait.
+- Linux: opening a folder with very many subfolders (for example one containing `node_modules`) no longer uses up the system's file-watch limit.
+
+### Fixed
+
+- Opening several files at once (or a second file right after the first) could drop the ones that arrived while Markpion was still starting.
+- Pictures embedded in a document as `data:image/…` (for example an import opened without saving) didn't show in the preview.
+- The preview kept every local picture it had shown in memory for the whole session; it now keeps the most recently used ones.
+
+### Security
+
+- A document opened on its own can show pictures from its folder and the folders inside it, but no longer from hidden folders, and only from beside it when it sits directly in your home folder or at the top of a drive.
+- A vulnerable library pulled in by the math export was updated (it wasn't part of the shipped app). Dependencies are now audited automatically on every change.
+- Log entries written by the interface are limited in size and kept to one line.
+
 ## v0.23.0
 
 Released: 2026-09-30 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.23.0)
