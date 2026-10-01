@@ -1130,9 +1130,14 @@ test("File History marks the words that changed within a line", async ({ page })
   await start(page);
   await openDemoFolder(page);
   await openFile(page, "README.md");
-  await page.locator(".cm-line", { hasText: "Markpion is a" }).click();
-  await page.keyboard.press("End");
+  // The line wraps onto two rows, and End goes to the end of a row, not the line: clicking its
+  // middle (between the rows) made the text land mid-line on some runs. Click past the end of
+  // its last row instead, which always puts the cursor at the end of the line.
+  const line = page.locator(".cm-line", { hasText: "Markpion is a" });
+  const box = (await line.boundingBox())!;
+  await line.click({ position: { x: box.width - 40, y: box.height - 4 } }); // clear of the pane divider
   await page.keyboard.type(" Really.");
+  await expect(line).toHaveText(/live preview\. Really\.$/);
   await page.keyboard.press(`${mod}+Shift+P`);
   await page.keyboard.type("file history");
   await page.keyboard.press("Enter");
