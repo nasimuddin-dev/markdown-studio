@@ -50,7 +50,15 @@ Distributions older than 2022 (for example, Ubuntu 20.04) don't have WebKitGTK 4
 
 ## ARM64 (Raspberry Pi and similar)
 
-Linux builds are available for x86_64 only at the moment.
+From version 0.23.0 there are ARM64 builds beside the x86_64 ones: `…-linux-arm64.deb`, `…-linux-aarch64.rpm` and `…-linux-aarch64.AppImage` on the [download page](/download). They are built automatically and haven't been tried on ARM hardware yet, so please report what you find.
+
+## Changes made by other programs don't show up in a very large folder
+
+**Problem:** you opened a folder with thousands of subfolders, and a file changed by another program deep inside it isn't updated in the Explorer.
+
+**Cause:** Linux limits how many folders one user can watch. Markpion watches up to 4,096 folders of the open folder, nearest first, and skips hidden folders and `node_modules`, `target`, `dist` and `build`.
+
+**Solution:** switch to another window and back: the Explorer and open documents refresh when Markpion regains focus. Or open a smaller folder (for example just `docs/`).
 
 ## Report an issue
 

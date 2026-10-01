@@ -40,6 +40,22 @@ jobs:
           name: playwright-traces
           path: test-results/
 
+  audit:
+    name: Dependency audit (npm, cargo)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Known vulnerabilities in what ships (dev tools aren't part of the app).
+      - run: npm audit --omit=dev --audit-level=high
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+      # Fails on vulnerabilities; "unmaintained" notices for crates Tauri's Linux stack pulls in are printed, not fatal.
+      - run: cargo audit --file src-tauri/Cargo.lock
+
   rust:
     name: Rust tests (${{ matrix.os }})
     strategy:

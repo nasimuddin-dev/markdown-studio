@@ -25,6 +25,20 @@ impl OpenPaths {
     pub fn is_empty(&self) -> bool {
         self.files.is_empty() && self.folders.is_empty()
     }
+
+    /// Adds `other`'s paths after these, skipping ones already listed.
+    pub fn append(&mut self, other: OpenPaths) {
+        for file in other.files {
+            if !self.files.contains(&file) {
+                self.files.push(file);
+            }
+        }
+        for folder in other.folders {
+            if !self.folders.contains(&folder) {
+                self.folders.push(folder);
+            }
+        }
+    }
 }
 
 /// Turns launch arguments into candidate paths (flags are ignored). Relative
@@ -72,11 +86,25 @@ pub fn accept(state: &AppState, paths: impl IntoIterator<Item = PathBuf>) -> Ope
 }
 
 /// Approves the paths and tells the UI to open them, bringing the window forward.
+///
+/// While the UI is still starting it isn't listening for the event yet (a
+/// second file double-clicked right after the first, or several files opened
+/// at once, arrive in that window). Those paths wait with the launch paths
+/// and are handed over when the UI asks for them, so none is dropped.
 pub fn open_in_ui(app: &AppHandle, paths: impl IntoIterator<Item = PathBuf>) {
+    use std::sync::atomic::Ordering;
     let state = app.state::<AppState>();
     let accepted = accept(&state, paths);
     if accepted.is_empty() {
         return;
+    }
+    {
+        // Checked under the same lock `take_pending_opens` holds while it marks the UI ready.
+        let mut pending = state.pending_open.lock().unwrap();
+        if !state.ui_ready.load(Ordering::SeqCst) {
+            pending.append(accepted);
+            return;
+        }
     }
     let _ = app.emit(OPEN_PATHS_EVENT, accepted);
     if let Some(window) = app.get_webview_window("main") {
@@ -88,6 +116,14 @@ pub fn open_in_ui(app: &AppHandle, paths: impl IntoIterator<Item = PathBuf>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn queued_paths_keep_their_order_without_duplicates() {
+        let mut pending = OpenPaths { files: vec!["a.md".into()], folders: vec![] };
+        pending.append(OpenPaths { files: vec!["b.md".into(), "a.md".into()], folders: vec!["docs".into()] });
+        pending.append(OpenPaths { files: vec![], folders: vec!["docs".into()] });
+        assert_eq!(pending, OpenPaths { files: vec!["a.md".into(), "b.md".into()], folders: vec!["docs".into()] });
+    }
 
     #[test]
     fn parses_launch_arguments() {

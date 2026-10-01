@@ -2,7 +2,7 @@ import { backend } from "../services";
 import { basename, dirname } from "../services/paths";
 import { useWorkspace } from "../stores/workspaceStore";
 import { ask, notify } from "../stores/uiStore";
-import { base64ToArrayBuffer, convertSource, kindForPath, writeConverted } from "./importing";
+import { convertSource, kindForPath, writeConverted } from "./importing";
 import { refreshDir } from "./workspace";
 
 export interface BatchResult {
@@ -64,7 +64,7 @@ export async function convertWorkspaceDocuments(): Promise<BatchResult | null> {
     const name = basename(path);
     try {
       const kind = kindForPath(path)!;
-      const converted = await convertSource(kind, base64ToArrayBuffer(await b.readBinaryFile(path)), name);
+      const converted = await convertSource(kind, await b.readBinaryFile(path), name);
       if (!converted.markdown.trim()) throw new Error(converted.warnings[0] ?? "No text found");
       const dest = mdPathFor(path);
       await writeConverted(dest, converted);

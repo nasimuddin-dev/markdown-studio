@@ -27,13 +27,6 @@ interface Source {
   dir: string | null;
 }
 
-function base64ToBuffer(b64: string): ArrayBuffer {
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return bytes.buffer;
-}
-
 /** Browser file picker; resolves `null` when cancelled. */
 function pickBrowserFile(accept: string): Promise<File | null> {
   return new Promise((resolve) => {
@@ -51,7 +44,7 @@ async function chooseSource(kind: ImportKind): Promise<Source | null> {
   if (b.capabilities.nativeImport) {
     const path = await b.pickImportFile(kind);
     if (!path) return null;
-    return { name: basename(path), data: base64ToBuffer(await b.readBinaryFile(path)), dir: dirname(path) };
+    return { name: basename(path), data: await b.readBinaryFile(path), dir: dirname(path) };
   }
   const file = await pickBrowserFile(ACCEPT[kind]);
   return file ? { name: file.name, data: await file.arrayBuffer(), dir: null } : null;
@@ -103,10 +96,6 @@ export async function writeConverted(dest: string, result: ConversionResult) {
     expectedMtime: null,
     force: true,
   });
-}
-
-export function base64ToArrayBuffer(b64: string) {
-  return base64ToBuffer(b64);
 }
 
 /** Inlines extracted images as data: URIs (for an import that wasn't saved yet). */

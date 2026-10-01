@@ -14,7 +14,7 @@ pub async fn list_dir(state: State<'_, AppState>, path: String, images: Option<b
 #[tauri::command]
 pub async fn read_text_file(state: State<'_, AppState>, path: String) -> AppResult<FileContent> {
     let file = state.track("fs.read", state.scope.check(Path::new(&path)))?;
-    let mut content = state.track("fs.read", fs_ops::read_text(&file))?;
+    let mut content = state.track("fs.read", blocking(move || fs_ops::read_text(&file)).await)?;
     content.path = path;
     Ok(content)
 }
@@ -30,11 +30,18 @@ pub async fn write_text_file(
     force: bool,
 ) -> AppResult<u64> {
     let file = state.track("fs.write", state.scope.check(Path::new(&path)))?;
-    // Keep the version being replaced in local history (never blocks the save).
-    if let Err(e) = crate::history::snapshot(&state.history_root(), &file) {
-        state.logger.log("warn", "history.snapshot", &e.to_string());
+    let history_root = state.history_root();
+    // The copy for local history and the write itself can take a while for a
+    // large file or a slow disk; they run off the async runtime's threads.
+    let (snapshot_error, result) = blocking(move || {
+        // Keep the version being replaced in local history (never blocks the save).
+        let snapshot_error = crate::history::snapshot(&history_root, &file).err().map(|e| e.to_string());
+        Ok((snapshot_error, fs_ops::write_text_atomic(&file, &content, line_ending, bom, expected_mtime, force)))
+    })
+    .await?;
+    if let Some(e) = snapshot_error {
+        state.logger.log("warn", "history.snapshot", &e);
     }
-    let result = fs_ops::write_text_atomic(&file, &content, line_ending, bom, expected_mtime, force);
     if result.is_ok() {
         state.logger.log("info", "fs.write", "saved document");
     }
@@ -149,24 +156,27 @@ pub async fn save_image_asset(
     Ok(fs_ops::path_string(&saved))
 }
 
-/// Reads an approved file as base64 (used for importing .docx / .pdf).
+/// Reads an approved file's bytes (used for importing .docx / .pdf). They go
+/// to the UI as raw bytes (an `ArrayBuffer`), not as base64 inside JSON, so a
+/// large import isn't held in memory several times over.
 #[tauri::command]
-pub async fn read_binary_file(state: State<'_, AppState>, path: String) -> AppResult<String> {
-    use base64::Engine;
+pub async fn read_binary_file(state: State<'_, AppState>, path: String) -> AppResult<tauri::ipc::Response> {
     const MAX: u64 = 100 * 1024 * 1024;
     let file = state.scope.check(Path::new(&path))?;
-    let meta = std::fs::metadata(&file)?;
-    if meta.len() > MAX {
-        return Err(AppError::TooLarge("Files larger than 100 MB can't be imported".into()));
-    }
-    let bytes = state.track("fs.readBinary", std::fs::read(&file).map_err(AppError::from))?;
-    Ok(base64::engine::general_purpose::STANDARD.encode(bytes))
+    let read = blocking(move || {
+        if std::fs::metadata(&file)?.len() > MAX {
+            return Err(AppError::TooLarge("Files larger than 100 MB can't be imported".into()));
+        }
+        Ok(std::fs::read(&file)?)
+    })
+    .await;
+    Ok(tauri::ipc::Response::new(state.track("fs.readBinary", read)?))
 }
 
 #[tauri::command]
 pub async fn read_image(state: State<'_, AppState>, path: String) -> AppResult<String> {
     let file = state.scope.check_asset(Path::new(&path))?;
-    fs_ops::read_image_data_url(&file)
+    blocking(move || fs_ops::read_image_data_url(&file)).await
 }
 
 /// Exports rendered content (e.g. HTML) to a location the user picks in a

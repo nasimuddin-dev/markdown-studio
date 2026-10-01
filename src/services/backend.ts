@@ -81,8 +81,8 @@ export interface FilesApi {
   movePath(path: string, directory: string): Promise<string>;
   renamePath(path: string, newName: string): Promise<string>;
   deletePath(path: string): Promise<void>;
-  /** Reads an approved file as base64 (desktop only; used by import). */
-  readBinaryFile(path: string): Promise<string>;
+  /** Reads an approved file's bytes (desktop only; used by import). */
+  readBinaryFile(path: string): Promise<ArrayBuffer>;
   /** Returns a data: URL for a local image referenced by a document. */
   readImage(path: string): Promise<string>;
   /**

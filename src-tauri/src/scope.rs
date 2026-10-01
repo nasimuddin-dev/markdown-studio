@@ -16,6 +16,26 @@ pub struct Scope {
     roots: Mutex<HashSet<PathBuf>>,
     /// Individually approved files (opened or chosen in a Save dialog).
     files: Mutex<HashSet<PathBuf>>,
+    /// Folders too broad to treat as one document's own folder (the home folder).
+    broad: Mutex<Vec<PathBuf>>,
+}
+
+/// Whether a document opened on its own in `dir` may show the picture `asset`
+/// in its preview. Pictures beside the document always; pictures in its
+/// subfolders (`images/…`) too, unless `dir` is a broad folder (the home
+/// folder, a drive's root), where "everything below" would be the user's whole
+/// profile or disk. Hidden files and folders (`.ssh`, `.config`) never.
+fn asset_in_reach(dir: &Path, asset: &Path, broad: &[PathBuf]) -> bool {
+    let Ok(rel) = asset.strip_prefix(dir) else { return false };
+    let mut depth = 0;
+    for part in rel.components() {
+        match part {
+            Component::Normal(name) if !name.to_string_lossy().starts_with('.') => depth += 1,
+            _ => return false,
+        }
+    }
+    let is_broad = dir.parent().is_none() || broad.iter().any(|b| b == dir);
+    depth == 1 || (depth > 1 && !is_broad)
 }
 
 /// Rejects relative paths and any path containing `..` before it is resolved,
@@ -106,19 +126,27 @@ impl Scope {
         }
     }
 
+    /// Marks folders (the home folder) as too broad for [`Scope::check_asset`]
+    /// to open their whole tree for one document.
+    pub fn set_broad_dirs(&self, dirs: impl IntoIterator<Item = PathBuf>) {
+        *self.broad.lock().unwrap() = dirs.into_iter().filter_map(|d| dunce::canonicalize(d).ok()).collect();
+    }
+
     /// Read-only access for preview assets (images). In addition to the normal
-    /// scope, allows files in the same folder tree as an approved document so that
-    /// a single opened README can show its relative images.
+    /// scope, a document opened on its own can show pictures beside it and in
+    /// its subfolders (so a single opened README finds its `images/`), within
+    /// the limits of [`asset_in_reach`].
     pub fn check_asset(&self, path: &Path) -> AppResult<PathBuf> {
         if let Ok(p) = self.check(path) {
             return Ok(p);
         }
         let resolved = resolve(path)?;
         let files = self.files.lock().unwrap();
+        let broad = self.broad.lock().unwrap();
         let allowed = files
             .iter()
             .filter_map(|f| f.parent())
-            .any(|dir| resolved.starts_with(dir));
+            .any(|dir| asset_in_reach(dir, &resolved, &broad));
         if allowed {
             Ok(resolved)
         } else {
@@ -215,6 +243,47 @@ mod tests {
         scope.rename_file(&a, &dir.join("renamed.md"));
         assert!(scope.check(&dir.join("renamed.md")).is_ok());
         assert!(scope.check(&a).is_err());
+    }
+
+    #[test]
+    fn a_lone_document_reaches_its_own_pictures_only() {
+        let tmp = tempfile::tempdir().unwrap();
+        let home = tmp.path().join("home");
+        let project = home.join("project");
+        for dir in [project.join("images").join("deep"), home.join("Pictures"), home.join(".ssh"), project.join(".git")] {
+            fs::create_dir_all(&dir).unwrap();
+        }
+        for file in [
+            project.join("README.md"),
+            project.join("logo.png"),
+            project.join("images").join("deep").join("a.png"),
+            project.join(".git").join("x.png"),
+            home.join("notes.md"),
+            home.join("beside.png"),
+            home.join("Pictures").join("private.png"),
+            home.join(".ssh").join("key.png"),
+        ] {
+            fs::write(&file, "x").unwrap();
+        }
+        let scope = Scope::default();
+        scope.set_broad_dirs([home.clone()]);
+
+        // A document in an ordinary folder: pictures beside it and in its subfolders, not hidden ones, not above it.
+        scope.allow_file(&project.join("README.md")).unwrap();
+        assert!(scope.check_asset(&project.join("logo.png")).is_ok());
+        assert!(scope.check_asset(&project.join("images").join("deep").join("a.png")).is_ok());
+        assert!(scope.check_asset(&project.join(".git").join("x.png")).is_err());
+        assert!(scope.check_asset(&home.join("beside.png")).is_err());
+
+        // A document directly in the home folder: only pictures beside it.
+        scope.allow_file(&home.join("notes.md")).unwrap();
+        assert!(scope.check_asset(&home.join("beside.png")).is_ok());
+        assert!(scope.check_asset(&home.join("Pictures").join("private.png")).is_err());
+        assert!(scope.check_asset(&home.join(".ssh").join("key.png")).is_err());
+
+        // An opened folder is unaffected: everything in it stays reachable.
+        scope.allow_dir(&home.join("Pictures")).unwrap();
+        assert!(scope.check_asset(&home.join("Pictures").join("private.png")).is_ok());
     }
 
     #[test]

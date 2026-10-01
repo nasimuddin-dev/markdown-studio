@@ -45,8 +45,10 @@ export async function openDroppedFiles(files: File[]) {
 
 export async function installOsOpenHandlers() {
   const b = backend();
-  await handleOpenPaths(await b.takePendingOpens().catch(() => ({ files: [], folders: [] })));
+  // Listen first, then collect what arrived before: the native side queues
+  // paths until this call, so a file opened while the app starts isn't lost.
   await b.onOpenPaths((p) => void handleOpenPaths(p));
+  await handleOpenPaths(await b.takePendingOpens().catch(() => ({ files: [], folders: [] })));
 
   if (!b.capabilities.desktop) {
     window.addEventListener("dragover", (e) => {

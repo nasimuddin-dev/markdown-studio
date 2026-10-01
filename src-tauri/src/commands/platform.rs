@@ -3,10 +3,14 @@
 #[allow(unused_imports)]
 use super::*;
 
-/// Returns (once) the files and folders the app was launched with.
+/// Returns (once) the files and folders the app was launched with, and any
+/// handed over while the UI was starting. The UI calls this after it starts
+/// listening for `open-paths`; from here on, new paths are sent as events.
 #[tauri::command]
 pub fn take_pending_opens(state: State<'_, AppState>) -> crate::open_paths::OpenPaths {
-    std::mem::take(&mut *state.pending_open.lock().unwrap())
+    let mut pending = state.pending_open.lock().unwrap();
+    state.ui_ready.store(true, std::sync::atomic::Ordering::SeqCst);
+    std::mem::take(&mut *pending)
 }
 
 /// Installs the native menu bar from the UI's menus (macOS only). Returns

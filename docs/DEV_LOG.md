@@ -677,3 +677,21 @@ The user asked for a review of the code for security, scalability and performanc
 **Open (documented in TRACEABILITY Known gaps):** preview assets under a lone document's folder tree (absolute paths); base64 IPC for imports. Recommended next: raw-bytes IPC, blocking file I/O off the async runtime, splitting `commands.ts`, and `cargo audit` in CI.
 
 **Tests:** Vitest 593 (109 files), Playwright 101, Rust 46 (+1 ignored). Not released yet.
+
+### Later the same day: the open items from the review
+
+The user asked for every issue found to be fixed.
+
+- **Pictures near a lone document:** on a closer look, "relative paths only" wouldn't narrow anything (the same files are reachable by relative path). The fix is in the rule itself (`scope.rs` `asset_in_reach`): never hidden folders, and only pictures beside the document when it sits directly in the home folder or a drive's root.
+- **Imports as raw bytes:** `read_binary_file` returns `tauri::ipc::Response`; the UI gets an `ArrayBuffer`. No base64 round trip.
+- **Blocking I/O:** `read_text_file`, `write_text_file` (with its history snapshot), `read_binary_file` and `read_image` run in `blocking(...)`.
+- **Linux watching:** folders are watched one by one (up to 4,096, skipping hidden, dependency and build folders), and new folders are added as they appear; Windows and macOS keep the single recursive watch.
+- **Command list:** `commands.ts` (764 lines) is now a 139-line registry over `commands/` (core, format, document, edit, view, ai, help). The website's shortcut tables are read from those files; the built page is identical (86 rows) before and after.
+- **Dependency audit:** `cargo audit`: 0 vulnerabilities in 542 crates (8 unmaintained/unsound notices in crates that come with Tauri's Linux stack). CI now runs `npm audit` and `cargo audit`.
+- Also fixed: the Linux troubleshooting page still said there were no ARM64 builds.
+
+**Unverified:** the Linux watcher on a real Linux desktop (unit-tested here; CI builds and tests it on Ubuntu).
+
+- **Found by the new native test:** a file handed to the app while it was still starting was dropped (the UI wasn't listening for the event yet), for example the second of two files opened together. Paths now wait with the launch paths until the UI asks for them. The native suite (5 tests) covers this, the raw-byte reads and the picture rule in the real app.
+
+**Tests:** Vitest 593 (109 files), Playwright 101, Rust 49 (+1 ignored), native 5.

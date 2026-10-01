@@ -40,6 +40,8 @@ pub struct AppState {
     pub recents: Mutex<Vec<RecentEntry>>,
     /// Files/folders passed on the command line, waiting for the UI to start.
     pub pending_open: Mutex<crate::open_paths::OpenPaths>,
+    /// Whether the UI has started listening for paths to open (until then they wait in `pending_open`).
+    pub ui_ready: std::sync::atomic::AtomicBool,
     /// AI requests the user cancelled; their streams stop at the next chunk.
     pub ai_cancelled: Mutex<std::collections::HashSet<u64>>,
 }
@@ -132,6 +134,19 @@ mod tests {
         assert_eq!(paths, ["C:\\notes\\b.md", "C:\\notes\\ab.md", "C:\\guides\\x.md", "C:\\guides"]);
         assert!(!renamed_recents(&mut list, "C:\\other", "C:\\else"));
     }
+}
+
+/// Runs blocking file work on the blocking thread pool, so reading or writing
+/// a large file (or a slow disk) never stalls the async runtime that serves
+/// every other command and event.
+pub(crate) async fn blocking<T, F>(work: F) -> AppResult<T>
+where
+    T: Send + 'static,
+    F: FnOnce() -> AppResult<T> + Send + 'static,
+{
+    tauri::async_runtime::spawn_blocking(work)
+        .await
+        .map_err(|e| AppError::Io(e.to_string()))?
 }
 
 fn md_filter_name() -> &'static str {

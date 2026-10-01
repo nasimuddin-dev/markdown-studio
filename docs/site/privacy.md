@@ -46,7 +46,7 @@ Delete those folders to remove everything; uninstalling leaves them in place so 
 
 ## Limited file access
 
-The part of the app that displays the interface has no direct access to your files. Every file operation goes through native code that only allows the files and folders you've opened yourself (and their contents), rejects path tricks such as `..`, and resolves shortcuts and links before checking.
+The part of the app that displays the interface has no direct access to your files. Every file operation goes through native code that only allows the files and folders you've opened yourself (and their contents), rejects path tricks such as `..`, and resolves shortcuts and links before checking. A document you open on its own can show pictures from its own folder and the folders inside it (so a README finds its `images/`), but not from hidden folders, and only from beside it when it sits directly in your home folder or at the top of a drive.
 
 ## Safe documents
 

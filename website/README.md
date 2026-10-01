@@ -33,7 +33,7 @@ The pages live with the rest of the documentation in `docs/site/`; this folder h
 docs/site/                   the pages (srcDir); URLs follow the file paths
 ├── data/
 │   ├── release.data.ts      version, release date and installer links, from the app's package.json and git tags
-│   └── shortcuts.data.ts    keyboard shortcuts parsed from src/features/commands.ts
+│   └── shortcuts.data.ts    keyboard shortcuts parsed from src/features/commands/*.ts
 ├── images/                  app screenshots (bundled with hashed names)
 └── public/                  copied as-is: logo, robots.txt, the social preview image
 website/
@@ -48,7 +48,7 @@ Because the pages are outside `website/`, `config.ts` resolves their package imp
 ## Single sources of truth
 
 - **Version and downloads.** Nothing on the site hard-codes the version. `release.data.ts` reads it from the root `package.json`, and the installer names follow the convention of `scripts/release-installer.mjs` and `.github/workflows/release.yml`. The release commit's version bump redeploys the site.
-- **Keyboard shortcuts** are parsed from the app's command definitions at build time. If the structure of `src/features/commands.ts` changes so that fewer than 30 shortcuts are found, the build fails instead of publishing an incomplete table.
+- **Keyboard shortcuts** are parsed from the app's command definitions at build time. If the structure of the files in `src/features/commands/` changes so that fewer than 30 shortcuts are found, the build fails instead of publishing an incomplete table.
 - **Changelog.** `docs/site/changelog.md` is updated with each release, from the release's commits (see the dev log). Never add a release that isn't published.
 
 ## Writing pages

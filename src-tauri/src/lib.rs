@@ -91,9 +91,12 @@ pub fn run() {
                 data_dir,
                 recents: Mutex::new(Vec::new()),
                 pending_open: Mutex::new(open_paths::OpenPaths::default()),
+                ui_ready: Default::default(),
                 ai_cancelled: Mutex::new(Default::default()),
             };
             state.load_recents();
+            // A document opened on its own in the home folder doesn't open the whole profile to its preview.
+            state.scope.set_broad_dirs(paths.home_dir().ok());
             // The main window is created here rather than in tauri.conf.json so
             // its background matches the theme from the first frame: while the
             // web view starts (slow on a first run, when WebView2 creates its

@@ -151,7 +151,7 @@ export async function insertImageFromFile() {
     const local = isInside(path, dirname(doc.path)) ? relativeImageMarkdown(doc.path, path) : null;
     if (local) return insertImageLinks([local]);
     const name = assetFileName(new File([], basename(path)));
-    const saved = await b.saveImageAsset(doc.path, name, await b.readBinaryFile(path), imageFolder());
+    const saved = await b.saveImageAsset(doc.path, name, await toBase64(new Blob([await b.readBinaryFile(path)])), imageFolder());
     insertImageLinks([imageMarkdown(saved, imageFolder())]);
   } catch (e) {
     notify("error", describeError(e, "insert the image"));

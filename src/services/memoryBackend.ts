@@ -281,7 +281,7 @@ export class MemoryBackend implements Backend {
     const p = this.check(path);
     const f = this.files.get(p);
     if (!f) throw new AppError("notFound", "File not found");
-    return btoa(unescape(encodeURIComponent(f.content)));
+    return new TextEncoder().encode(f.content).slice().buffer;
   }
 
   async listRecent() {

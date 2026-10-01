@@ -1,6 +1,6 @@
 /**
  * Keyboard shortcuts, read at build time from the application's command
- * definitions (src/features/commands.ts) with the TypeScript parser, so the
+ * definitions (src/features/commands/*.ts) with the TypeScript parser, so the
  * reference always matches the app. "Mod" is Ctrl on Windows/Linux and Cmd on
  * macOS; a conditional such as `isMac ? "Mod+Alt+F" : "Mod+H"` gives the
  * macOS and Windows/Linux variants.
@@ -24,7 +24,9 @@ export interface Shortcut {
 declare const data: Shortcut[];
 export { data };
 
-const SOURCE = "../../../src/features/commands.ts";
+/** The command definitions, one file per area (formatting first, as in the tables). */
+const SOURCE_DIR = "../../../src/features/commands/";
+const SOURCES = ["format.ts", "document.ts", "edit.ts", "view.ts", "ai.ts", "help.ts"].map((f) => SOURCE_DIR + f);
 
 /** Human-readable keys: "Mod+Shift+P" -> "Ctrl+Shift+P" / "Cmd+Shift+P". */
 function display(shortcut: string, mac: boolean) {
@@ -52,17 +54,15 @@ function literal(node: TS.Expression | undefined): { win: string; mac: string } 
 }
 
 export default {
-  watch: [SOURCE],
+  watch: SOURCES,
   load(): Shortcut[] {
-    const path = fileURLToPath(new URL(SOURCE, import.meta.url));
-    const file = ts.createSourceFile(path, readFileSync(path, "utf8"), ts.ScriptTarget.Latest, true);
     const out: Shortcut[] = [];
     let group = "";
     const visit = (node: TS.Node) => {
-      // Which exported table a command belongs to: formatCommands (Format) or commands (App).
+      // Which exported table a command belongs to: formatCommands (Format) or another …Commands table (App).
       if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
         if (node.name.text === "formatCommands") group = "format";
-        else if (node.name.text === "commands") group = "app";
+        else if (/Commands$/.test(node.name.text)) group = "app";
       }
       // formatCommand("id", "Label", command, "Shortcut")
       if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "formatCommand") {
@@ -85,8 +85,12 @@ export default {
       }
       ts.forEachChild(node, visit);
     };
-    visit(file);
-    if (out.length < 30) throw new Error(`Only ${out.length} shortcuts were found in ${SOURCE}; has its structure changed?`);
+    for (const source of SOURCES) {
+      const path = fileURLToPath(new URL(source, import.meta.url));
+      group = "";
+      visit(ts.createSourceFile(path, readFileSync(path, "utf8"), ts.ScriptTarget.Latest, true));
+    }
+    if (out.length < 30) throw new Error(`Only ${out.length} shortcuts were found in ${SOURCE_DIR}; has its structure changed?`);
     return out;
   },
 };

@@ -9,7 +9,7 @@ This file is the single source of project rules; `CLAUDE.md` imports it.
 | --- | --- |
 | `src/services/` | Everything host-specific. `backend.ts` defines the `Backend` interface (dialogs, files, workspace, storage, platform, AI) and `capabilities`; `tauriBackend.ts` is the desktop implementation, `memoryBackend.ts` the in-browser one (tests, e2e, demo). `services/index.ts` picks one; nothing else checks for Tauri. Also Markdown rendering (`markdown.ts`) and export converters (`convert/`). |
 | `src/stores/` | Zustand state: documents, workspace, settings (+ IT `policy.ts`), UI, AI. No UI code. |
-| `src/features/` | Behaviour: commands and shortcuts (`commands.ts`), editor helpers, save/close lifecycle, export, AI actions (`ai.ts`). Calls `backend()`, never Tauri directly. |
+| `src/features/` | Behaviour: commands and shortcuts (`commands.ts` is the registry; the commands are in `commands/`, one file per area), editor helpers, save/close lifecycle, export, AI actions (`ai.ts`). Calls `backend()`, never Tauri directly. |
 | `src/components/` | React UI. Reads stores, calls features. |
 | `src-tauri/src/` | Rust. `commands/` holds the Tauri commands by domain; `scope.rs` limits file access to what the user opened; `ai.rs` calls the Claude API (the API key stays in Rust and the OS credential store). |
 | `tests/`, `e2e/`, `e2e-native/` | Vitest unit tests; Playwright flows with axe accessibility audits (run against `MemoryBackend`); a few tauri-driver tests against the real Windows app. |
@@ -26,6 +26,7 @@ To support a new host (for example a cloud version), implement `Backend` and cho
 | Native e2e (Windows, real app) | `npm run test:native` (needs `cargo install tauri-driver --locked`; close Markpion first) |
 | Rust tests | `cargo test --manifest-path src-tauri/Cargo.toml` |
 | Unused files, exports and dependencies | `npm run check:unused` |
+| Known vulnerabilities in dependencies | `npm audit --omit=dev`, `cargo audit --file src-tauri/Cargo.lock` (needs `cargo install cargo-audit --locked`); CI runs both |
 | Run the app | `npm run tauri:dev` (browser only: `npm run dev`) |
 | Documentation site | `npm run docs:check`, `npm run docs:test` |
 
@@ -39,7 +40,7 @@ A feature or change is not done until the documents describe it. Update them **i
 | --- | --- |
 | `README.md` | The Features list; the Project structure if a module or folder was added; Development if scripts changed |
 | `docs/TRACEABILITY.md` | The requirement row or the "Beyond the MVP" table (with source location); Known gaps |
-| `docs/site/` | The matching page: `features.md`, and the guide page (`guide/*.md`), Markdown page (`markdown/*.md`), troubleshooting or FAQ entry it affects. Keyboard shortcut tables are generated from `src/features/commands.ts`, so there's no manual edit for those |
+| `docs/site/` | The matching page: `features.md`, and the guide page (`guide/*.md`), Markdown page (`markdown/*.md`), troubleshooting or FAQ entry it affects. Keyboard shortcut tables are generated from `src/features/commands/*.ts`, so there's no manual edit for those |
 | `docs/DESIGN.md` | If the architecture, a layer's responsibilities or the `Backend` interface changed |
 | `docs/INSTALL.md`, `docs/site/installation/*` | If installing, updating or platform support changed |
 | `docs/SRS.md` | Only the *Status* notes, revision history and §21 answers. Never rewrite requirement text |
@@ -62,6 +63,7 @@ Document only what the code actually does, and check the source when unsure. No 
 
 - Layering: `services/` ← `stores/` ← `features/` ← `components/`. Host-specific code (Tauri, window, file system) goes only in `services/`.
 - Native file access goes only through Rust commands with `Scope` checks; never grant the frontend fs, dialog or shell permissions.
+- In Rust commands, check the scope first, then run file reads and writes inside `blocking(...)` (`commands/mod.rs`), so slow disks and large files don't stall the async runtime. Send large binary data to the UI as `tauri::ipc::Response` (raw bytes), not base64 in JSON.
 - Load heavy, rarely used code (exporters, Mermaid, KaTeX, dialogs) with dynamic `import()` so startup stays small.
 - Tests: Vitest for logic, Playwright e2e for user flows (it includes WCAG audits), and Rust unit tests for Rust changes.
 - Styles: put UI CSS in the area file under `src/styles/app/` (add a new file to `app.css` for a new area). Use the tokens in `app/tokens.css` for colours (with a dark-theme value), font sizes, radii, shadows and z-index layers, and extend a rule instead of repeating its selector; `tests/styles.test.ts` enforces this. Menus come from `src/features/menus.ts`.

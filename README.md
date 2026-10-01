@@ -165,6 +165,7 @@ That runs the desktop app with hot reload. Other scripts:
 | `cargo test --manifest-path src-tauri/Cargo.toml` | Rust tests (scope, safe save, encoding, settings, history, search, watcher) |
 | `npm run build` | Type check and production build of the frontend (`dist/`) |
 | `npm run check:unused` | Finds unused files, exports and dependencies ([knip](https://knip.dev), configured in `knip.json`) |
+| `npm audit --omit=dev`, `cargo audit --file src-tauri/Cargo.lock` | Known vulnerabilities in the dependencies that ship (CI runs both; the second needs `cargo install cargo-audit --locked`) |
 | `npm run test:fixtures` | Regenerates the sample files the import tests use |
 | `npm run tauri:build` | Builds installers for the current OS |
 | `npm run version:set <x.y.z>` / `release:installer` / `release:github` | Release pipeline (see [Releasing a new version](#releasing-a-new-version)) |
@@ -183,7 +184,8 @@ src/
   components/   UI: MenuBar, FileExplorer, TabBar, Editor, Preview, Outline, StatusBar,
                 CommandPalette, SearchPanel, LinkCheckPanel, TagsPanel, Settings/History/Shortcuts dialogs,
                 AI panel and settings, error boundaries
-  features/     Behaviour: documents, workspace, commands & shortcuts, formatting, tables, TOC,
+  features/     Behaviour: documents, workspace, commands & shortcuts (commands.ts joins the
+                per-area files in commands/), menus, formatting, tables, TOC,
                 tasks, templates, import/export, combine, site export, link check, lint, autosave,
                 updates, AI assistant
   services/     Backend interface split by domain, with capabilities (Tauri desktop, in-memory

@@ -11,6 +11,13 @@ async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> 
   }
 }
 
+/** A raw IPC response arrives as an ArrayBuffer; older transports give a typed array or a number array. */
+function toArrayBuffer(data: ArrayBuffer | ArrayBufferView | number[]): ArrayBuffer {
+  if (data instanceof ArrayBuffer) return data;
+  const bytes = ArrayBuffer.isView(data) ? new Uint8Array(data.buffer, data.byteOffset, data.byteLength) : Uint8Array.from(data);
+  return bytes.slice().buffer;
+}
+
 let nextAiRequestId = 1;
 
 const currentWindow = async () => (await import("@tauri-apps/api/window")).getCurrentWindow();
@@ -43,7 +50,7 @@ export const tauriBackend: Backend = {
   pickSavePath: (suggestedName, directory) => call("pick_save_path", { suggestedName, directory }),
 
   pickImportFile: (kind) => call("pick_import_file", { kind }),
-  readBinaryFile: (path) => call("read_binary_file", { path }),
+  readBinaryFile: async (path) => toArrayBuffer(await call<ArrayBuffer | ArrayBufferView | number[]>("read_binary_file", { path })),
   listRecent: () => call("list_recent"),
   openRecent: (path) => call("open_recent", { path }),
   removeRecent: (path) => call("remove_recent", { path }),
