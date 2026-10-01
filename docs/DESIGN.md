@@ -370,9 +370,9 @@ flowchart LR
 Design rules that keep this path open:
 
 - **Paths are opaque to the UI.** Features pass the strings the backend returns; path helpers only format them for display and resolve relative Markdown links.
-- **No feature talks to the OS or network directly**; it goes through `Backend`, and asks `capabilities` before offering host-specific actions. Only `services/` imports Tauri; `services/index.ts` is the one place that picks the host.
+- **No feature talks to the OS or network directly**; it goes through `Backend`, and asks `capabilities` before offering host-specific actions. Only `services/` imports Tauri; `services/index.ts` is the one place that picks the host. A host whose backend is heavy or asynchronous loads it in `loadBackend()`, which `main.tsx` awaits before the first render (the browser demo's `MemoryBackend` loads this way, so the desktop app never downloads it).
 - **Stores hold state, features hold workflows, services hold pure logic** (Markdown pipeline, converters, parsers). Pure logic is shared by every backend and runs in tests without a host.
-- **Heavy features load on demand** (converters, Mermaid, KaTeX, the AI module, and the History, Keyboard Shortcuts and AI review dialogs, which are fetched a few seconds after startup), so a web build keeps a small first download.
+- **Heavy features load on demand** (converters, Mermaid, KaTeX, the AI module, and the History, Keyboard Shortcuts, AI review, Settings and About dialogs and the Links panel, which are fetched a few seconds after startup), so a web build keeps a small first download.
 - **Per-feature state stays separate** (for example `aiStore`), so new features don't grow one global store.
 
 ## 14. Design principles

@@ -7,7 +7,7 @@ This file is the single source of project rules; `CLAUDE.md` imports it.
 
 | Folder | What lives there |
 | --- | --- |
-| `src/services/` | Everything host-specific. `backend.ts` defines the `Backend` interface (dialogs, files, workspace, storage, platform, AI) and `capabilities`; `tauriBackend.ts` is the desktop implementation, `memoryBackend.ts` the in-browser one (tests, e2e, demo). `services/index.ts` picks one; nothing else checks for Tauri. Also Markdown rendering (`markdown.ts`) and export converters (`convert/`). |
+| `src/services/` | Everything host-specific. `backend.ts` defines the `Backend` interface (dialogs, files, workspace, storage, platform, AI) and `capabilities`; `tauriBackend.ts` is the desktop implementation, `memoryBackend.ts` the in-browser one (tests, e2e, demo). `services/index.ts` picks one (the browser one loads in `loadBackend()`, awaited by `main.tsx`; tests set theirs in `tests/setup.ts`); nothing else checks for Tauri. Also Markdown rendering (`markdown.ts`) and export converters (`convert/`). |
 | `src/stores/` | Zustand state: documents, workspace, settings (+ IT `policy.ts`), UI, AI. No UI code. |
 | `src/features/` | Behaviour: commands and shortcuts (`commands.ts` is the registry; the commands are in `commands/`, one file per area), editor helpers, save/close lifecycle, export, AI actions (`ai.ts`). Calls `backend()`, never Tauri directly. |
 | `src/components/` | React UI. Reads stores, calls features. |

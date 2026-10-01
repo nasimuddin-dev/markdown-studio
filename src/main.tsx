@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { saveRecoveryNow, startApp } from "./features/lifecycle";
+import { loadBackend } from "./services";
 import "./styles/app.css";
 import "./styles/markdown.css";
 
@@ -22,12 +23,14 @@ function AppCrash({ error }: { error: Error }) {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ErrorBoundary area="window" fallback={(error) => <AppCrash error={error} />}>
-      <App />
-    </ErrorBoundary>
-  </StrictMode>,
-);
-
-void startApp();
+// The desktop app has its backend already; the browser demo loads its in-memory one first.
+void loadBackend().then(() => {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <ErrorBoundary area="window" fallback={(error) => <AppCrash error={error} />}>
+        <App />
+      </ErrorBoundary>
+    </StrictMode>,
+  );
+  void startApp();
+});

@@ -1,5 +1,10 @@
 import "@testing-library/jest-dom/vitest";
 import { configure } from "@testing-library/react";
+import { setBackend } from "../src/services";
+import { createDemoBackend } from "../src/services/memoryBackend";
+
+// The app loads the browser backend in main.tsx; tests start with a fresh demo backend.
+setBackend(createDemoBackend());
 
 // Some dialogs load on first use (a dynamic import), which can take over a second when the test run is busy.
 configure({ asyncUtilTimeout: 5000 });

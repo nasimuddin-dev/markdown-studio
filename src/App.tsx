@@ -3,7 +3,6 @@ import { MenuBar } from "./components/MenuBar";
 import { FileExplorer } from "./components/FileExplorer";
 import { Outline } from "./components/Outline";
 import { SearchPanel } from "./components/SearchPanel";
-import { LinkCheckPanel } from "./components/LinkCheckPanel";
 import { TagsPanel } from "./components/TagsPanel";
 import { Icon } from "./components/Icon";
 import { useUi } from "./stores/uiStore";
@@ -22,13 +21,18 @@ const Preview = lazy(() => import("./components/Preview").then((m) => ({ default
 const loadHistory = () => import("./components/HistoryDialog");
 const loadShortcuts = () => import("./components/ShortcutsDialog");
 const loadAi = () => import("./components/AiPanel");
+const loadSettings = () => import("./components/SettingsDialog");
+const loadLinkCheck = () => import("./components/LinkCheckPanel");
 const ImagePreviewDialog = lazy(() => import("./components/ImagePreviewDialog").then((m) => ({ default: m.ImagePreviewDialog })));
 const CompareDialog = lazy(() => import("./components/CompareDialog").then((m) => ({ default: m.CompareDialog })));
 const HistoryDialog = lazy(() => loadHistory().then((m) => ({ default: m.HistoryDialog })));
 const ShortcutsDialog = lazy(() => loadShortcuts().then((m) => ({ default: m.ShortcutsDialog })));
 const AiPanel = lazy(() => loadAi().then((m) => ({ default: m.AiPanel })));
 const SlideShow = lazy(() => import("./components/SlideShow").then((m) => ({ default: m.SlideShow })));
-setTimeout(() => void Promise.all([loadHistory(), loadShortcuts(), loadAi()]).catch(() => {}), 3000);
+const SettingsDialog = lazy(() => loadSettings().then((m) => ({ default: m.SettingsDialog })));
+const AboutDialog = lazy(() => loadSettings().then((m) => ({ default: m.AboutDialog })));
+const LinkCheckPanel = lazy(() => loadLinkCheck().then((m) => ({ default: m.LinkCheckPanel })));
+setTimeout(() => void Promise.all([loadHistory(), loadShortcuts(), loadAi(), loadSettings(), loadLinkCheck()]).catch(() => {}), 3000);
 
 /** Mounts the lazily loaded dialogs only once they are first needed. */
 function OnDemandDialogs() {
@@ -38,6 +42,8 @@ function OnDemandDialogs() {
   const presenting = useUi((s) => s.presenting);
   const compare = useUi((s) => s.compare !== null);
   const imagePreview = useUi((s) => s.imagePreview !== null);
+  const settings = useUi((s) => s.settingsOpen);
+  const about = useUi((s) => s.aboutOpen);
   return (
     <Suspense fallback={null}>
       {history && <HistoryDialog />}
@@ -46,6 +52,8 @@ function OnDemandDialogs() {
       {presenting && <SlideShow />}
       {compare && <CompareDialog />}
       {imagePreview && <ImagePreviewDialog />}
+      {settings && <SettingsDialog />}
+      {about && <AboutDialog />}
     </Suspense>
   );
 }
@@ -80,7 +88,6 @@ function EditorPane() {
 import { StatusBar } from "./components/StatusBar";
 import { ChangeBanner } from "./components/ChangeBanner";
 import { DialogHost, Toasts } from "./components/Dialogs";
-import { AboutDialog, SettingsDialog } from "./components/SettingsDialog";
 import { Welcome } from "./components/Welcome";
 import { CommandPalette } from "./components/CommandPalette";
 import { useAi } from "./stores/aiStore";
@@ -179,7 +186,9 @@ function Sidebar() {
       ) : view === "search" ? (
         <SearchPanel />
       ) : view === "links" ? (
-        <LinkCheckPanel />
+        <Suspense fallback={null}>
+          <LinkCheckPanel />
+        </Suspense>
       ) : (
         <TagsPanel />
       )}
@@ -258,8 +267,6 @@ export default function App() {
           <StatusBar />
         </ErrorBoundary>
       )}
-      <SettingsDialog />
-      <AboutDialog />
       <CommandPalette />
       <OnDemandDialogs />
       <DialogHost />
