@@ -65,11 +65,11 @@ The installers aren't code-signed with a commercial certificate yet (Windows) or
 
 ## How do I report a bug?
 
-Open an issue on [GitHub](https://github.com/nasimuddin-dev/markpion/issues/new). Include your version (**Help → About Markpion**), your operating system, the steps to reproduce, and if relevant the log from **Help → Export Diagnostic Logs…** (it never contains your text). See [Troubleshooting](/troubleshooting/#report-an-issue).
+Choose **Help → Report a Problem…**, or **Report…** on an error message. Markpion fills in your version, your system and the error, opens the report as a new issue on GitHub in your browser, and you review and submit it there (with a free GitHub account). Nothing is sent without you. You can also open an issue on [GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) yourself. Include your version (**Help → About Markpion**), your operating system, the steps to reproduce, and if relevant the log from **Help → Export Diagnostic Logs…** (it never contains your text). See [Troubleshooting](/troubleshooting/#report-an-issue).
 
 ## How do I request a feature?
 
-Open an issue on [GitHub](https://github.com/nasimuddin-dev/markpion/issues/new) describing what you'd like to do and why. Check the [roadmap](/roadmap) first; it may already be planned.
+Choose **Help → Send Feedback…**: pick a suggestion, or an opinion on the design or workflow, describe what you'd like and why, and open it on GitHub (or copy the text to send another way). Check the [roadmap](/roadmap) first; it may already be planned.
 
 ## How do I uninstall Markpion?
 

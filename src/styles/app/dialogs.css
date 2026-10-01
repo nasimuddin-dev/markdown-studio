@@ -201,6 +201,22 @@
   text-align: right;
 }
 
+/* Help → Send Feedback / Report a Problem */
+.feedback-modal {
+  width: min(560px, 100%);
+}
+.feedback-modal label[for] {
+  display: block;
+  margin-top: var(--space-5);
+}
+.feedback-technical {
+  margin-top: var(--space-5);
+}
+.feedback-modal textarea:not(.code-input) {
+  font: inherit;
+  resize: vertical;
+}
+
 .about {
   display: flex;
   gap: var(--space-7);
@@ -246,6 +262,11 @@
 }
 .toast.success {
   border-left-color: var(--success);
+}
+.toast-action {
+  width: auto;
+  padding: 0 var(--space-2);
+  white-space: nowrap;
 }
 .toast-close {
   background: none;
@@ -469,6 +490,12 @@
 }
 .area-error p {
   margin: 0;
+}
+.area-error-buttons,
+.app-crash-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
 }
 .area-error code {
   max-width: 100%;

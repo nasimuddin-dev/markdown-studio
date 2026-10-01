@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { FeedbackKind, ReportedError } from "../services/feedback";
 
 export interface DialogButton<T extends string = string> {
   id: T;
@@ -66,6 +67,10 @@ interface UiState {
   /** The picture came from the Explorer, so the dialog offers to link it. */
   imagePreviewInsert: boolean;
   setImagePreview(path: string | null, insert?: boolean): void;
+  /** Send Feedback dialog: the kind to start with, and an error the report is about. */
+  feedback: { kind: FeedbackKind; error?: ReportedError } | null;
+  openFeedback(feedback: { kind: FeedbackKind; error?: ReportedError }): void;
+  closeFeedback(): void;
   setCompare(compare: { docId: string; path: string } | null): void;
   setProblems(p: UiState["problems"]): void;
   /** Incremented to move focus into the search box. */
@@ -122,6 +127,9 @@ export const useUi = create<UiState>((set, get) => ({
   imagePreview: null,
   imagePreviewInsert: true,
   setImagePreview: (imagePreview, insert = true) => set({ imagePreview, imagePreviewInsert: insert }),
+  feedback: null,
+  openFeedback: (feedback) => set({ feedback }),
+  closeFeedback: () => set({ feedback: null }),
   setCompare: (compare) => set({ compare }),
   setProblems: (problems) => set({ problems }),
   searchFocusToken: 0,

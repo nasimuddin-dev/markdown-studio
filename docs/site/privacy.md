@@ -18,6 +18,8 @@ Markpion is a local-first app. This page describes what it actually does with yo
 
 Markpion doesn't collect usage statistics, analytics or crash reports, and doesn't send any data about you or your documents.
 
+**Help → Send Feedback…** and **Report a Problem…** don't send anything either: they open a new GitHub issue in your browser, with the text you wrote and, if you choose, technical details (version, operating system and recent error messages, which you can edit). You review it there and decide whether to submit it. Recent errors are kept in memory only, and forgotten when Markpion closes.
+
 ## Network access
 
 Markpion works fully offline. It connects to the internet in only these cases:

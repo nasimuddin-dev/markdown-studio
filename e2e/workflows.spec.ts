@@ -607,6 +607,35 @@ test("code blocks in the preview have a Copy button", async ({ page }) => {
   expect(copied.replace(/\r\n/g, "\n")).toBe("const answer = 42;\nconsole.log(answer);");
 });
 
+test("Help > Send Feedback opens a filled-in GitHub issue in the browser, and nothing else is sent", async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as unknown as { opened: string[] }).opened = [];
+    window.open = (url?: string | URL) => {
+      (window as unknown as { opened: string[] }).opened.push(String(url));
+      return null;
+    };
+  });
+  const requests: string[] = [];
+  page.on("request", (r) => {
+    if (!r.url().startsWith("http://localhost")) requests.push(r.url());
+  });
+  await start(page);
+  await chooseMenu(page, "Help", "Send Feedback…");
+  const dialog = page.getByRole("dialog", { name: "Send Feedback" });
+  await dialog.getByLabel("Opinion on the design or workflow").check();
+  await dialog.getByLabel("Summary").fill("Export menu is long");
+  await dialog.getByLabel("Details", { exact: true }).fill("Group the folder exports.");
+  await dialog.getByRole("button", { name: "Open on GitHub" }).click();
+  await expect(dialog).toBeHidden();
+  const opened = await page.evaluate(() => (window as unknown as { opened: string[] }).opened);
+  expect(opened).toHaveLength(1);
+  const url = new URL(opened[0]);
+  expect(url.pathname).toBe("/nasimuddin-dev/markpion/issues/new");
+  expect(url.searchParams.get("title")).toBe("[Design] Export menu is long");
+  expect(url.searchParams.get("body")).toContain("Group the folder exports.");
+  expect(requests).toEqual([]);
+});
+
 test("Copy as LaTeX copies the selection as LaTeX", async ({ page }) => {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await start(page);

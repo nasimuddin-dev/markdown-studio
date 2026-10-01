@@ -139,6 +139,14 @@ export function Toasts() {
       {toasts.map((t) => (
         <div key={t.id} className={`toast ${t.kind}`} role={t.kind === "error" ? "alert" : "status"}>
           <span>{t.message}</span>
+          {t.kind === "error" && (
+            <button className="link-button toast-action" onClick={() => {
+              dismiss(t.id);
+              useUi.getState().openFeedback({ kind: "problem", error: { message: t.message } });
+            }}>
+              Report…
+            </button>
+          )}
           <button className="toast-close" onClick={() => dismiss(t.id)} aria-label="Dismiss notification">×</button>
         </div>
       ))}

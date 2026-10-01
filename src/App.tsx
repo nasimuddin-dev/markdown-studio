@@ -32,6 +32,7 @@ const SlideShow = lazy(() => import("./components/SlideShow").then((m) => ({ def
 const SettingsDialog = lazy(() => loadSettings().then((m) => ({ default: m.SettingsDialog })));
 const AboutDialog = lazy(() => loadSettings().then((m) => ({ default: m.AboutDialog })));
 const LinkCheckPanel = lazy(() => loadLinkCheck().then((m) => ({ default: m.LinkCheckPanel })));
+const FeedbackDialog = lazy(() => import("./components/FeedbackDialog").then((m) => ({ default: m.FeedbackDialog })));
 setTimeout(() => void Promise.all([loadHistory(), loadShortcuts(), loadAi(), loadSettings(), loadLinkCheck()]).catch(() => {}), 3000);
 
 /** Mounts the lazily loaded dialogs only once they are first needed. */
@@ -44,6 +45,7 @@ function OnDemandDialogs() {
   const imagePreview = useUi((s) => s.imagePreview !== null);
   const settings = useUi((s) => s.settingsOpen);
   const about = useUi((s) => s.aboutOpen);
+  const feedback = useUi((s) => s.feedback !== null);
   return (
     <Suspense fallback={null}>
       {history && <HistoryDialog />}
@@ -54,6 +56,7 @@ function OnDemandDialogs() {
       {imagePreview && <ImagePreviewDialog />}
       {settings && <SettingsDialog />}
       {about && <AboutDialog />}
+      {feedback && <FeedbackDialog />}
     </Suspense>
   );
 }

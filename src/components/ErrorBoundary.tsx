@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { backend } from "../services";
+import { recordError, reportProblem } from "../features/errorReports";
 
 interface Props {
   /** What this area is called in the message, e.g. "preview". */
@@ -29,6 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    recordError(error, this.props.area);
     const where = info.componentStack?.trim().split("\n")[0]?.trim() ?? "";
     try {
       backend().log("error", `ui.crash.${this.props.area}`, `${error.message}${where ? ` (${where})` : ""}`);
@@ -53,9 +55,14 @@ export class ErrorBoundary extends Component<Props, State> {
           The {this.props.area} couldn't be shown because of an unexpected error. Your documents are not affected.
         </p>
         <code>{error.message || String(error)}</code>
-        <button className="button" onClick={this.retry}>
-          Try Again
-        </button>
+        <div className="area-error-buttons">
+          <button className="button" onClick={this.retry}>
+            Try Again
+          </button>
+          <button className="button" onClick={() => reportProblem({ message: error.message || String(error), area: this.props.area, stack: error.stack })}>
+            Report Problem…
+          </button>
+        </div>
       </div>
     );
   }

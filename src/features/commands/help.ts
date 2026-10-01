@@ -10,6 +10,8 @@ export const helpCommands: Record<string, Command> = {
     run: async () => void (await (await import("../updates")).checkForUpdates({ manual: true })),
   },
   about: { id: "about", label: "About Markpion", run: () => useUi.getState().setAboutOpen(true) },
+  sendFeedback: { id: "sendFeedback", label: "Send Feedback…", run: () => useUi.getState().openFeedback({ kind: "suggestion" }) },
+  reportProblem: { id: "reportProblem", label: "Report a Problem…", run: () => useUi.getState().openFeedback({ kind: "problem" }) },
   thirdPartyNotices: {
     id: "thirdPartyNotices",
     label: "Third-Party Notices",

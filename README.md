@@ -133,6 +133,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Spell checking with the system dictionary (Settings)
 - Keyboard-first: every core action has a shortcut and an accessible menu, with visible focus states; shortcuts can be changed, removed or reset for any command in Help → Keyboard Shortcuts (conflicts are detected); works with Windows High Contrast (forced colours): selections, active tab, focus and unsaved markers are drawn with outlines in system colours
 - Help → Export Diagnostic Logs for support requests (logs never contain document text)
+- Help → Send Feedback / Report a Problem: a suggestion, problem or design opinion with optional, editable technical details (version, OS, recent errors), opened as a prefilled GitHub issue in the browser or copied; error messages and failed areas offer Report…; nothing is sent automatically
 - Runs on Windows, macOS and Linux, with a separate native installer for each (see [Download](#download))
 
 ## Security model

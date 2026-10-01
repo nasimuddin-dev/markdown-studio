@@ -212,6 +212,16 @@ for (const theme of ["light", "dark"] as const) {
       await expect(page.getByLabel("Files to include")).toBeVisible();
       await audit(page, "search");
     });
+
+    test("send feedback", async ({ page }) => {
+      await start(page, theme);
+      await page.getByRole("button", { name: "Help", exact: true }).click();
+      await page.getByRole("menuitem", { name: "Report a Problem…" }).click();
+      const dialog = page.getByRole("dialog", { name: "Report a Problem" });
+      await expect(dialog.getByRole("textbox", { name: "Technical details" })).toBeVisible();
+      await dialog.getByLabel("Summary").fill("Example");
+      await audit(page, "send feedback");
+    });
   });
 }
 
