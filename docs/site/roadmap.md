@@ -14,7 +14,7 @@ This roadmap comes from the project's [requirements specification](https://githu
 - **Rich Markdown:** GitHub Flavored Markdown, Mermaid diagrams, LaTeX math, front matter, alerts and footnotes.
 - **Productivity:** outline, command palette, Find in Files, formatting toolbar, tables, templates, table of contents, Markdown lint and link checking, presenting as slides.
 - **Git (read-only):** changed files in the Explorer, the branch in the status bar, change bars in the editor with revert, and the last commit in File History.
-- **Conversion:** import from Word, PDF, HTML and CSV; export to PDF, Word, HTML and EPUB, including whole folders (PDF and Word).
+- **Conversion:** import from Word, PDF, HTML and CSV; export to PDF, Word, HTML and EPUB, including whole folders.
 - **AI assistant (optional):** Claude improves, fixes, shortens, summarizes, translates or continues text, with your own API key and a review before any change.
 - **Distribution:** separate installers for Windows, macOS and Linux on every release, and signed automatic updates on Windows.
 

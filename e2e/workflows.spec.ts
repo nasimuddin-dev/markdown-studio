@@ -1417,6 +1417,22 @@ test("File > Export > EPUB makes an e-book with its pictures, math and diagrams"
   expect(content).toContain("<math");
 });
 
+test("Export Folder as One E-book puts every document in the book", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  const files = await page.getByRole("treeitem").filter({ hasText: /\.md$/ }).count();
+  const download = page.waitForEvent("download");
+  await chooseMenu(page, "File", "Export", "Export Folder as One E-book (EPUB)…");
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/\.epub$/);
+  const zip = await JSZip.loadAsync(Buffer.concat(await (await file.createReadStream()).toArray()));
+  const nav = await zip.file("OEBPS/nav.xhtml")!.async("string");
+  // The folder's title, with a chapter (a level-2 entry) for each top-level document.
+  expect((nav.match(/<li>/g) ?? []).length).toBeGreaterThanOrEqual(files);
+  const content = await zip.file("OEBPS/content.xhtml")!.async("string");
+  expect(content).toContain("<h1");
+});
+
 test("Move Selection to New File creates the file and links to it", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

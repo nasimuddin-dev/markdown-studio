@@ -47,20 +47,6 @@ export async function exportActiveAsHtml() {
   }
 }
 
-/** Exports the active document as an EPUB e-book. */
-export async function exportActiveAsEpub() {
-  const doc = activeDoc();
-  if (!doc) return;
-  try {
-    const { markdownToEpub } = await import("../services/convert/toEpub");
-    const bytes = await markdownToEpub(doc.content, { name: doc.name, docPath: doc.path, loadImage, features: features(), css: scopeCustomCss(useSettings.getState().settings.customCss) });
-    const saved = await backend().exportBinaryFile(exportFileName(doc.name, "epub"), bytes, "epub");
-    if (saved) notify("success", `Exported to ${saved}`);
-  } catch (e) {
-    notify("error", describeError(e, "export as an e-book"));
-  }
-}
-
 /** Markdown to export: a document, or a folder combined in memory. */
 interface ExportSource {
   content: string;
@@ -71,6 +57,23 @@ interface ExportSource {
 }
 
 const fromDoc = (doc: { content: string; name: string; path: string | null }): ExportSource => ({ content: doc.content, name: doc.name, path: doc.path });
+
+async function exportAsEpub(src: ExportSource) {
+  try {
+    const { markdownToEpub } = await import("../services/convert/toEpub");
+    const bytes = await markdownToEpub(src.content, { name: src.name, docPath: src.path, loadImage, features: features(), css: scopeCustomCss(useSettings.getState().settings.customCss) });
+    const saved = await backend().exportBinaryFile(exportFileName(src.name, "epub"), bytes, "epub");
+    if (saved) notify("success", `Exported to ${saved}`);
+  } catch (e) {
+    notify("error", describeError(e, "export as an e-book"));
+  }
+}
+
+/** Exports the active document as an EPUB e-book. */
+export async function exportActiveAsEpub() {
+  const doc = activeDoc();
+  if (doc) await exportAsEpub(fromDoc(doc));
+}
 
 async function exportAsDocx(src: ExportSource) {
   try {
@@ -155,7 +158,7 @@ export async function exportActiveAsPdf() {
  * (combined in memory in folder order, with a table of contents), without
  * writing a combined .md file.
  */
-export async function exportFolder(format: "pdf" | "docx") {
+export async function exportFolder(format: "pdf" | "docx" | "epub") {
   const { readCombinableFolder, combineFolderText, combinedPathFor } = await import("./combine");
   const folder = await readCombinableFolder();
   if (!folder) return;
@@ -163,7 +166,7 @@ export async function exportFolder(format: "pdf" | "docx") {
   if (unreadable.length) notify("warning", `Skipped ${unreadable.length} of ${count + unreadable.length} files that could not be read (${unreadable.slice(0, 3).join(", ")}).`);
   // Image paths were re-based onto the folder, as if the text lived in its combined file.
   const src: ExportSource = { content: markdown, name: basename(folder.root), path: combinedPathFor(folder.root) };
-  await (format === "pdf" ? exportAsPdf(src) : exportAsDocx(src));
+  await (format === "pdf" ? exportAsPdf(src) : format === "epub" ? exportAsEpub(src) : exportAsDocx(src));
 }
 
 /**
