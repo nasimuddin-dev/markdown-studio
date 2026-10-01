@@ -4,6 +4,7 @@ import { editorCommand } from "../editorBridge";
 import { fixAllProblemsCommand } from "../lintExtension";
 import { foldToLevel } from "../foldLevel";
 import { changeCase, joinLines, removeDuplicateLines, sortLines } from "../textTransforms";
+import { reflowParagraph, unwrapParagraph } from "../reflow";
 import { formatCommand, hasActive, isMac, type Command } from "./core";
 
 /** Find searches the preview when it's shown alone or has focus. */
@@ -24,6 +25,9 @@ export const editCommands: Record<string, Command> = {
   sortLinesDesc: formatCommand("sortLinesDesc", "Sort Lines (Z to A)", sortLines(true)),
   removeDuplicateLines: formatCommand("removeDuplicateLines", "Remove Duplicate Lines", removeDuplicateLines),
   joinLines: formatCommand("joinLines", "Join Lines", joinLines),
+  // Wraps at the Line length setting, or 80 columns when it's off.
+  reflowParagraph: formatCommand("reflowParagraph", "Reflow Paragraph", reflowParagraph(() => useSettings.getState().settings.editorLineLength || 80), "Alt+Q"),
+  unwrapParagraph: formatCommand("unwrapParagraph", "Unwrap Paragraph", unwrapParagraph),
   upperCase: formatCommand("upperCase", "Transform to Uppercase", changeCase("upper")),
   lowerCase: formatCommand("lowerCase", "Transform to Lowercase", changeCase("lower")),
   titleCase: formatCommand("titleCase", "Transform to Title Case", changeCase("title")),

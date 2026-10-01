@@ -112,7 +112,7 @@ For requirements, checksum verification, silent install, uninstalling and troubl
 - Typing `*`, `_`, `` ` ``, `~`, `"`, `(` or `[` with text selected wraps the selection (type `**` for bold)
 - Table menu: Fix Table repairs tables typed with mistakes (missing or wrong divider row, missing header, short or long rows, missing outer pipes, a pipe inside code), also from the toolbar's Table tools
 - Table → Convert Selection to Table (comma, tab, semicolon or pipe separated text); align and move columns
-- Edit menu line tools: Sort Lines (natural order), Remove Duplicate Lines, Join Lines, and Uppercase / Lowercase / Title Case
+- Edit menu line tools: Sort Lines (natural order), Remove Duplicate Lines, Join Lines, Reflow Paragraph (Alt+Q: hard-wraps at the line length, keeping list, quote and hard-break markup) and Unwrap Paragraph, and Uppercase / Lowercase / Title Case
 - Copy button on code blocks in the preview (on hover or keyboard focus)
 - Large documents: long previews are built in parts as you scroll to them; live preview pauses above 1 MB of text, with render-on-demand
 - Rename a file from its tab (Rename…) or, with no folder open, from the Explorer's Open Files list (F2), with recent files one click away; Open Folder starts in the file's folder

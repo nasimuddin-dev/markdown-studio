@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EditorSelection, EditorState, type StateCommand } from "@codemirror/state";
 import * as fmt from "../src/features/formatting";
-import { editorKeymap } from "../src/features/commands";
+import { applyKeybindings, editorKeymap } from "../src/features/commands";
 
 /** Builds a state from text where `|` marks the cursor and `[` `]` mark a selection. */
 function stateOf(marked: string) {
@@ -149,6 +149,16 @@ describe("editor keymap", () => {
   it("derives CodeMirror key names from menu shortcuts", () => {
     const keys = editorKeymap().map((k) => k.key).filter(Boolean);
     expect(keys).toEqual(expect.arrayContaining(["Mod-b", "Mod-i", "Mod-k", "Mod-Shift-x", "Mod-Alt-1", "Mod-Shift-8", "Mod-Alt-c", "Mod-Alt-=", "Mod-Alt--", "Mod-Enter", "Mod-Alt-r"]));
+  });
+
+  it("includes Edit menu commands that change the text, with the user's own shortcuts", () => {
+    expect(editorKeymap().map((k) => k.key)).toContain("Alt-q");
+    applyKeybindings({ sortLinesAsc: "Mod+Alt+S" });
+    try {
+      expect(editorKeymap().map((k) => k.key)).toContain("Mod-Alt-s");
+    } finally {
+      applyKeybindings({});
+    }
   });
 });
 

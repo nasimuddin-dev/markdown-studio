@@ -28,7 +28,8 @@ Object.assign(commands, formatCommands);
 /** CodeMirror keymap for editor commands, derived from the shortcuts above. */
 export function editorKeymap(): KeyBinding[] {
   const toKey = (shortcut: string) => shortcut.replace(/\+/g, "-").replace(/-([A-Z])$/, (_, k: string) => "-" + k.toLowerCase());
-  const format = Object.values(formatCommands)
+  // Every command that edits the text (Format and Edit menus, and shortcuts users assign to them).
+  const format = Object.values(commands)
     .filter((c) => c.shortcut && c.editor)
     .map((c) => ({ key: toKey(c.shortcut!), run: c.editor!, preventDefault: true }));
   // App shortcuts CodeMirror would otherwise capture: some keyboards/IMEs report

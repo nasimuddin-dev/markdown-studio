@@ -57,7 +57,7 @@ export const MENUS: MenuDef[] = [
       c("checkLinks"), c("fixAllProblems"), c("renameTag"), sep,
       sub("Git Changes", [c("gitNextChange", "Next Change"), c("gitPreviousChange", "Previous Change"), sep, c("gitShowChange"), c("gitRevertChange")]), sep,
       c("selectAll"), c("selectSection"),
-      sub("Lines", [c("sortLinesAsc"), c("sortLinesDesc"), c("removeDuplicateLines"), c("joinLines")]),
+      sub("Lines", [c("sortLinesAsc"), c("sortLinesDesc"), c("removeDuplicateLines"), c("joinLines"), sep, c("reflowParagraph"), c("unwrapParagraph")]),
       sub("Change Case", [c("upperCase", "UPPERCASE"), c("lowerCase", "lowercase"), c("titleCase", "Title Case")]),
     ],
   },

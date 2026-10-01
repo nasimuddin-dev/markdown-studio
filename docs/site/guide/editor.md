@@ -75,6 +75,8 @@ The **Edit** menu (and the command palette) also has the following. Longer menus
 - **Sort Lines (A to Z)** and **(Z to A)**: numbers sort naturally, so 2 comes before 10.
 - **Remove Duplicate Lines**: keeps the first of each repeated line; blank lines stay.
 - **Join Lines**: joins the selected lines, or the current line and the next one, with single spaces.
+- **Reflow Paragraph** (**Alt+Q**): re-breaks the paragraph at the cursor, or every paragraph the selection touches, so no line is longer than the **Line length** setting (80 characters when it's off). List items keep their marker with the following lines indented under the text, quotes keep their `>` on every line, and hard line breaks (two trailing spaces or a backslash) stay. Code blocks, math, HTML, tables, headings, link definitions and front matter are left alone, and a line never starts with a word that would turn it into a list item, heading or quote.
+- **Unwrap Paragraph**: the reverse, joining each paragraph into a single line.
 - **Transform to Uppercase**, **Lowercase** and **Title Case**: for each selection, or the word at the cursor.
 
 Sorting and removing duplicates work on the selected lines, or on the whole document when nothing is selected. Each is one edit that **Ctrl+Z** undoes.

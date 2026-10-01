@@ -765,6 +765,22 @@ test("a slow first-use dialog still gives focus back to the editor when it close
   await expect(editor).toBeFocused();
 });
 
+test("Reflow Paragraph wraps at the line length, and Unwrap Paragraph joins it again", async ({ page }) => {
+  await start(page);
+  await page.keyboard.press(`${mod}+N`);
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  const words = Array.from({ length: 30 }, (_, i) => `word${i}`).join(" ");
+  await page.keyboard.insertText(`- ${words}\n`);
+  await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("Alt+Q");
+  const lines = page.locator(".cm-line");
+  await expect(lines.nth(1)).toHaveText(/^ {2}word\d+/);
+  const texts = await lines.allTextContents();
+  expect(Math.max(...texts.map((t) => t.length))).toBeLessThanOrEqual(80);
+  await chooseMenu(page, "Edit", "Lines", "Unwrap Paragraph");
+  await expect(lines.first()).toHaveText(`- ${words}`);
+});
+
 test("resize the outline against the explorer, and close the folder from the explorer", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);
