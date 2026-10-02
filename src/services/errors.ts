@@ -13,7 +13,7 @@ export class AppError extends Error {
 
 const KINDS: ErrorKind[] = [
   "notFound", "permissionDenied", "outOfScope", "invalidPath", "encoding",
-  "conflict", "alreadyExists", "diskFull", "tooLarge", "io", "ai",
+  "conflict", "alreadyExists", "diskFull", "tooLarge", "io", "ai", "git",
 ];
 
 export function toAppError(e: unknown): AppError {
@@ -53,6 +53,9 @@ export function describeError(e: unknown, action: string): string {
       return `Couldn't ${action}: ${err.message}`;
     case "ai":
       return err.message;
+    case "git":
+      // Git's own words (nothing to commit, a hook's message…).
+      return `Couldn't ${action}: ${err.message}`;
     default:
       return `Couldn't ${action}: ${err.message}`;
   }

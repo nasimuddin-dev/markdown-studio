@@ -10,7 +10,7 @@
  * Steps: type check, unit tests, build + start-up budget, third-party notices,
  * Playwright end-to-end flows with accessibility audits (failures are rerun
  * once, alone, to tell machine-load flakes from real failures), the visual
- * comparison of 30 screens in both themes, the native tests against the real
+ * comparison of 32 screens in both themes, the native tests against the real
  * Windows app (skipped while Markpion is open), and the documentation check.
  *
  * Writes regression-report/report.md. When every step passes it also
@@ -81,7 +81,7 @@ if (!quick) {
   if (!hasBaseline) {
     step("Visual (recording a baseline)", "npx playwright test -c e2e-shots/playwright.config.ts visual --update-snapshots", { summary: () => "no baseline yet: recorded one, nothing compared" });
   } else {
-    const visual = step("Visual comparison (30 screens)", "npx playwright test -c e2e-shots/playwright.config.ts visual", { summary: playwrightSummary });
+    const visual = step("Visual comparison (32 screens)", "npx playwright test -c e2e-shots/playwright.config.ts visual", { summary: playwrightSummary });
     if (!visual.ok) {
       // List the screens that changed, with their diff images, for review.
       const diffs = [];

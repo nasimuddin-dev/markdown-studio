@@ -98,9 +98,19 @@ For a file that's committed to Git, the editor shows a thin bar next to the line
 
 The status bar sums up the file's changes (for example `+3 ~1 −2`: added, changed and deleted lines); click it to go to the next change. The bars update as you type and after you commit (when you come back to the window). Untracked files and documents over 1 MB have no bars. In Windows High Contrast, added lines get a solid bar and changed lines a dashed one.
 
+### Staging and committing
+
+The **Git** tab in the sidebar (the branch icon) is Source Control for the open folder:
+
+- **Changes** lists the files you've changed, added or deleted since the last commit, with their letter (**M**, **A**, **D**, **U** untracked). Click a file to open it. **+** stages a file; **+** in the heading stages them all.
+- **Staged Changes** lists what the next commit will contain. **−** unstages a file (its changes stay in it); **−** in the heading unstages them all.
+- Write a **commit message** and choose **Commit** (or press **Ctrl+Enter** in the message). Markpion commits with your own Git: your name and email, and the repository's hooks, apply as they do on the command line. If Git refuses, for example because a hook fails, its message is shown.
+
+After a commit the Explorer markers and the editor's change bars update. Only files inside the open folder are listed, even when the repository is bigger. Pulling, pushing and branches aren't in Markpion yet; use your usual Git tool for those.
+
 ### Requirements and privacy
 
-This needs Git installed. Markpion runs `git status` in the open folder (and `git show` for the file in the editor), read-only, when the folder opens, when files change, and when you come back to the window; it never commits, pulls or pushes. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
+This needs Git installed. Markpion runs `git status` in the open folder (and `git show` for the file in the editor) when the folder opens, when files change, and when you come back to the window. It changes the repository only when you stage, unstage or commit in the Git tab, and it never pulls or pushes. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
 
 ## Search, links and tags across the folder
 

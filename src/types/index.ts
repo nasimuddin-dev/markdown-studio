@@ -10,6 +10,16 @@ export interface GitStatus {
   files: Array<{ path: string; status: string }>;
 }
 
+/** A changed file in Source Control: what's staged (index against HEAD) and what isn't (working tree against index). */
+export interface GitChange {
+  path: string;
+  /** M modified, A added, D deleted, R renamed; null when nothing is staged. */
+  staged: string | null;
+  /** M modified, D deleted, U untracked; null when everything is staged. */
+  unstaged: string | null;
+  conflict: boolean;
+}
+
 export interface DirEntry {
   name: string;
   path: string;
@@ -58,7 +68,8 @@ export type ErrorKind =
   | "diskFull"
   | "tooLarge"
   | "io"
-  | "ai";
+  | "ai"
+  | "git";
 
 /** The AI assistant's setup, as reported by the backend. */
 export interface AiStatus {

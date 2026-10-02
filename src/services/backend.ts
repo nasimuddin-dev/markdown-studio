@@ -1,5 +1,5 @@
 import type {
-  AiStatus, AppInfo, AppUpdate, GitStatus, HistoryEntry, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
+  AiStatus, AppInfo, AppUpdate, GitChange, GitStatus, HistoryEntry, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
 } from "../types";
 
 /**
@@ -107,6 +107,14 @@ export interface WorkspaceApi {
   gitStatus(root: string): Promise<GitStatus | null>;
   /** An approved file's text as of the last Git commit (line endings normalized to LF); null when untracked or without Git. */
   gitHeadText(path: string): Promise<string | null>;
+  /** Source Control: the changed files inside `root`, with what's staged. Fails (kind "git") outside a repository. */
+  gitChanges(root: string): Promise<GitChange[]>;
+  /** Stages files inside `root` (new, changed or deleted). */
+  gitStage(root: string, paths: string[]): Promise<void>;
+  /** Unstages files inside `root`, keeping their changes. */
+  gitUnstage(root: string, paths: string[]): Promise<void>;
+  /** Commits what's staged (the user's Git identity and hooks apply); returns the short commit hash. */
+  gitCommit(root: string, message: string): Promise<string>;
   /** Word, PDF, HTML and CSV/TSV files under the workspace (batch conversion). */
   listConvertibleFiles(root: string): Promise<string[]>;
   /** Searches Markdown files under an approved folder. */

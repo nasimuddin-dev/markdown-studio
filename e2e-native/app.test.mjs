@@ -93,6 +93,45 @@ describe("the desktop app", () => {
     }
   });
 
+  it("Source Control stages and commits with the real Git", async () => {
+    const git = (...args) => {
+      const r = spawnSync("git", ["-C", repoDir, ...args], { encoding: "utf8" });
+      assert.equal(r.status, 0, `git ${args.join(" ")}: ${r.stderr}`);
+      return r.stdout;
+    };
+    const repoDir = join(dir, "repo");
+    mkdirSync(repoDir, { recursive: true });
+    git("init", "-q", "-b", "main");
+    // A local identity, so the test doesn't depend on (or change) the machine's Git settings.
+    git("config", "user.name", "Markpion Test");
+    git("config", "user.email", "test@example.com");
+    git("config", "commit.gpgsign", "false");
+    writeFileSync(join(repoDir, "notes.md"), "# Notes\n");
+    git("add", "notes.md");
+    git("commit", "-q", "-m", "First");
+    writeFileSync(join(repoDir, "notes.md"), "# Notes\n\nChanged.\n");
+
+    const s = await Session.start(APP);
+    try {
+      await s.find("h1");
+      // Handed over like "Open with" (tauri-driver doesn't pass launch arguments on).
+      openWithApp(repoDir);
+      await s.waitFor(() => s.exec("return !!document.querySelector('.tree-row')"), "the folder to open").catch(async (e) => {
+        throw new Error(`${e.message}. The window shows: ${(await s.exec("return document.body.innerText")).replace(/\s+/g, " ").slice(0, 400)}`);
+      });
+      await s.click(await s.findByText('[role="tab"]', "Git"));
+      await s.click(await s.find('button[aria-label="Stage notes.md"]'));
+      await s.find('[aria-labelledby="scm-staged"]');
+      await s.type(await s.find("#scm-message"), "Commit from the native test");
+      await s.click(await s.find(".scm-commit .button.primary"));
+      await s.waitFor(() => /Commit from the native test/.test(git("log", "-1", "--format=%s")), "the commit");
+      assert.equal(git("status", "--porcelain"), "");
+      await s.waitFor(() => s.exec("return document.querySelector('.source-control')?.textContent.includes('No changes')"), "the panel to show no changes");
+    } finally {
+      await s.quit();
+    }
+  });
+
   it("opens a file handed over by the OS, then saves an edit to disk", async () => {
     const file = join(dir, "note.md");
     writeFileSync(file, "# Note\n\nFirst line.\n");

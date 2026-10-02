@@ -32,8 +32,10 @@ const SlideShow = lazy(() => import("./components/SlideShow").then((m) => ({ def
 const SettingsDialog = lazy(() => loadSettings().then((m) => ({ default: m.SettingsDialog })));
 const AboutDialog = lazy(() => loadSettings().then((m) => ({ default: m.AboutDialog })));
 const LinkCheckPanel = lazy(() => loadLinkCheck().then((m) => ({ default: m.LinkCheckPanel })));
+const loadSourceControl = () => import("./components/SourceControlPanel");
+const SourceControlPanel = lazy(() => loadSourceControl().then((m) => ({ default: m.SourceControlPanel })));
 const FeedbackDialog = lazy(() => import("./components/FeedbackDialog").then((m) => ({ default: m.FeedbackDialog })));
-setTimeout(() => void Promise.all([loadHistory(), loadShortcuts(), loadAi(), loadSettings(), loadLinkCheck()]).catch(() => {}), 3000);
+setTimeout(() => void Promise.all([loadHistory(), loadShortcuts(), loadAi(), loadSettings(), loadLinkCheck(), loadSourceControl()]).catch(() => {}), 3000);
 
 /** Mounts the lazily loaded dialogs only once they are first needed. */
 function OnDemandDialogs() {
@@ -183,6 +185,15 @@ function Sidebar() {
         >
           <Icon name="tag" size={15} /> <span className="sidebar-tab-label">Tags</span>
         </button>
+        <button
+          role="tab"
+          aria-selected={view === "git"}
+          className={`sidebar-tab${view === "git" ? " active" : ""}`}
+          onClick={() => setView("git")}
+          title="Source Control (Git)"
+        >
+          <Icon name="branch" size={15} /> <span className="sidebar-tab-label">Git</span>
+        </button>
       </div>
       {view === "explorer" ? (
         <ExplorerAndOutline />
@@ -191,6 +202,10 @@ function Sidebar() {
       ) : view === "links" ? (
         <Suspense fallback={null}>
           <LinkCheckPanel />
+        </Suspense>
+      ) : view === "git" ? (
+        <Suspense fallback={null}>
+          <SourceControlPanel />
         </Suspense>
       ) : (
         <TagsPanel />

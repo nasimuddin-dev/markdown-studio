@@ -1,7 +1,7 @@
 import type { AiRequest, Backend, NativeMenu, WriteRequest } from "./backend";
 import { AppError } from "./errors";
 import { basename, dirname, isMarkdownPath, join } from "./paths";
-import type { AppUpdate, DirEntry, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
+import type { AppUpdate, DirEntry, GitChange, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
 import { buildSearchRegex, searchText } from "./search";
 import { pathFilter, relativeTo } from "./pathFilter";
 import { DEMO_FILES } from "./demoContent";
@@ -69,7 +69,9 @@ export class MemoryBackend implements Backend {
   private aiKey: string | null = null;
   private readonly policy: unknown;
   private readonly git: GitStatus | null;
-  private readonly gitHead: Record<string, string>;
+  /** Committed text per file (the demo's repository), and what's staged. */
+  private gitHead: Record<string, string>;
+  private gitIndex: Record<string, string> | null = null;
   private readonly readOnlyFiles: Set<string>;
   readonly logs: string[] = [];
 
@@ -481,6 +483,66 @@ export class MemoryBackend implements Backend {
   async gitHeadText(path: string): Promise<string | null> {
     return this.gitHead[this.check(path)] ?? null;
   }
+
+  /** The demo's repository: the committed files, a staging index and the working files. */
+  private repoIndex(): Record<string, string> {
+    this.gitIndex ??= { ...this.gitHead };
+    return this.gitIndex;
+  }
+
+  private requireRepo(root: string): string {
+    const dir = this.check(root);
+    if (!Object.keys(this.gitHead).some((p) => p.startsWith(dir + "/"))) throw new AppError("git", "fatal: not a git repository (or any of the parent directories): .git");
+    return dir;
+  }
+
+  async gitChanges(root: string): Promise<GitChange[]> {
+    const dir = this.requireRepo(root);
+    const index = this.repoIndex();
+    const paths = new Set([...Object.keys(this.gitHead), ...Object.keys(index), ...this.files.keys()].filter((p) => p.startsWith(dir + "/")));
+    const changes: GitChange[] = [];
+    for (const path of [...paths].sort()) {
+      const head = this.gitHead[path];
+      const staged = index[path];
+      const work = this.files.get(path)?.content;
+      const stagedChange = head === staged ? null : head === undefined ? "A" : staged === undefined ? "D" : "M";
+      const unstagedChange = staged === work ? null : staged === undefined ? "U" : work === undefined ? "D" : "M";
+      if (stagedChange || unstagedChange) changes.push({ path, staged: stagedChange, unstaged: unstagedChange, conflict: false });
+    }
+    return changes;
+  }
+
+  async gitStage(root: string, paths: string[]) {
+    this.requireRepo(root);
+    const index = this.repoIndex();
+    for (const p of paths) {
+      const work = this.files.get(p)?.content;
+      if (work === undefined) delete index[p];
+      else index[p] = work;
+    }
+  }
+
+  async gitUnstage(root: string, paths: string[]) {
+    this.requireRepo(root);
+    const index = this.repoIndex();
+    for (const p of paths) {
+      if (this.gitHead[p] === undefined) delete index[p];
+      else index[p] = this.gitHead[p];
+    }
+  }
+
+  async gitCommit(root: string, message: string) {
+    this.requireRepo(root);
+    if (!message.trim()) throw new AppError("git", "Write a commit message first.");
+    const index = this.repoIndex();
+    const same = Object.keys(index).length === Object.keys(this.gitHead).length && Object.entries(index).every(([p, t]) => this.gitHead[p] === t);
+    if (same) throw new AppError("git", "Nothing is staged. Stage the changes to commit first.");
+    this.gitHead = { ...index };
+    this.commits += 1;
+    return `demo${String(this.commits).padStart(3, "0")}`;
+  }
+
+  private commits = 0;
 
   async listWorkspaceFiles(root: string) {
     const dir = this.check(root);

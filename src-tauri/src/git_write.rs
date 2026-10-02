@@ -4,16 +4,17 @@
 //! for example when there's nothing to commit or a hook fails.
 //!
 //! Callers check that `root` is the open folder and that every path is inside
-//! it (see `commands::workspace`).
+//! it (see `commands::workspace`). Paths are absolute; git accepts them for
+//! files inside the work tree.
 
 use serde::Serialize;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 #[derive(Debug, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GitChange {
-    /// Path relative to the repository's top folder, with `/` separators.
+    /// Absolute path.
     pub path: String,
     /// The staged change (index against HEAD): M, A, D, R, or None.
     pub staged: Option<String>,
@@ -56,9 +57,17 @@ fn side(c: char) -> Option<String> {
     }
 }
 
-/// The repository's changed files, with what's staged and what isn't.
+/// The repository's top folder.
+fn top(root: &Path) -> Result<PathBuf, String> {
+    let top = run(root, &["rev-parse", "--show-toplevel"])?;
+    dunce::canonicalize(top.trim()).map_err(|e| e.to_string())
+}
+
+/// The changed files inside `root` (which may be a folder within the repository), with what's staged and what isn't.
 pub fn changes(root: &Path) -> Result<Vec<GitChange>, String> {
-    let out = run(root, &["status", "--porcelain=v1", "-z", "--untracked-files=all"])?;
+    let top = top(root)?;
+    let root = dunce::canonicalize(root).map_err(|e| e.to_string())?;
+    let out = run(&root, &["status", "--porcelain=v1", "-z", "--untracked-files=all"])?;
     let mut entries = out.split('\0').filter(|e| !e.is_empty());
     let mut list = Vec::new();
     while let Some(entry) = entries.next() {
@@ -66,19 +75,23 @@ pub fn changes(root: &Path) -> Result<Vec<GitChange>, String> {
             continue;
         }
         let xy: Vec<char> = entry[..2].chars().collect();
-        let path = entry[3..].to_string();
+        // Porcelain paths are relative to the top folder, with "/" separators.
+        let path = top.join(entry[3..].replace('/', std::path::MAIN_SEPARATOR_STR));
         // A rename's entry is followed by its old path.
         if xy[0] == 'R' || xy[0] == 'C' {
             entries.next();
         }
         let conflict = xy[0] == 'U' || xy[1] == 'U' || (xy[0] == 'A' && xy[1] == 'A') || (xy[0] == 'D' && xy[1] == 'D');
+        if !path.starts_with(&root) {
+            continue;
+        }
         let (staged, unstaged) = if xy == ['?', '?'] { (None, Some("U".into())) } else { (side(xy[0]), side(xy[1])) };
-        list.push(GitChange { path, staged, unstaged, conflict });
+        list.push(GitChange { path: path.to_string_lossy().into_owned(), staged, unstaged, conflict });
     }
     Ok(list)
 }
 
-/// Stages files (new, changed or deleted), given relative to the repository's top folder.
+/// Stages files (new, changed or deleted).
 pub fn stage(root: &Path, paths: &[String]) -> Result<(), String> {
     if paths.is_empty() {
         return Ok(());
@@ -119,6 +132,11 @@ mod tests {
     use super::*;
     use std::fs;
 
+    /// An absolute path in the test repository.
+    fn file(dir: &tempfile::TempDir, name: &str) -> String {
+        dunce::canonicalize(dir.path()).unwrap().join(name).to_string_lossy().into_owned()
+    }
+
     fn repo() -> tempfile::TempDir {
         let dir = tempfile::tempdir().unwrap();
         for args in [vec!["init", "-q", "-b", "main"], vec!["config", "user.name", "Test"], vec!["config", "user.email", "test@example.com"], vec!["config", "commit.gpgsign", "false"]] {
@@ -136,16 +154,27 @@ mod tests {
         let list = changes(dir.path()).unwrap();
         assert_eq!(list.len(), 2);
         assert!(list.iter().all(|c| c.staged.is_none() && c.unstaged.as_deref() == Some("U")));
-        assert!(list.iter().any(|c| c.path == "docs/b.md"));
+        assert!(list.iter().any(|c| c.path.replace('\\', "/").ends_with("/docs/b.md") && Path::new(&c.path).is_absolute()));
 
-        stage(dir.path(), &["a.md".into()]).unwrap();
-        let a = changes(dir.path()).unwrap().into_iter().find(|c| c.path == "a.md").unwrap();
+        stage(dir.path(), &[file(&dir, "a.md")]).unwrap();
+        let a = changes(dir.path()).unwrap().into_iter().find(|c| c.path.ends_with("a.md")).unwrap();
         assert_eq!((a.staged.as_deref(), a.unstaged.as_deref()), (Some("A"), None));
 
         // Changed again after staging: both sides.
         fs::write(dir.path().join("a.md"), "one\nmore\n").unwrap();
-        let a = changes(dir.path()).unwrap().into_iter().find(|c| c.path == "a.md").unwrap();
+        let a = changes(dir.path()).unwrap().into_iter().find(|c| c.path.ends_with("a.md")).unwrap();
         assert_eq!((a.staged.as_deref(), a.unstaged.as_deref()), (Some("A"), Some("M")));
+    }
+
+    #[test]
+    fn lists_only_changes_inside_the_open_folder() {
+        let dir = repo();
+        fs::create_dir(dir.path().join("docs")).unwrap();
+        fs::write(dir.path().join("docs/in.md"), "in\n").unwrap();
+        fs::write(dir.path().join("out.md"), "out\n").unwrap();
+        let list = changes(&dir.path().join("docs")).unwrap();
+        assert_eq!(list.len(), 1);
+        assert!(list[0].path.ends_with("in.md"));
     }
 
     #[test]
@@ -153,11 +182,11 @@ mod tests {
         let dir = repo();
         fs::write(dir.path().join("a.md"), "one\n").unwrap();
         assert_eq!(commit(dir.path(), "first").unwrap_err(), "Nothing is staged. Stage the changes to commit first.");
-        stage(dir.path(), &["a.md".into()]).unwrap();
+        stage(dir.path(), &[file(&dir, "a.md")]).unwrap();
         // Unstaging before the first commit (no HEAD yet) works too.
-        unstage(dir.path(), &["a.md".into()]).unwrap();
+        unstage(dir.path(), &[file(&dir, "a.md")]).unwrap();
         assert_eq!(changes(dir.path()).unwrap()[0].staged, None);
-        stage(dir.path(), &["a.md".into()]).unwrap();
+        stage(dir.path(), &[file(&dir, "a.md")]).unwrap();
         assert_eq!(commit(dir.path(), "   ").unwrap_err(), "Write a commit message first.");
         let hash = commit(dir.path(), "Add a.md\n\nWith a body.").unwrap();
         assert!(hash.len() >= 7);
@@ -167,9 +196,9 @@ mod tests {
 
         // A deletion is staged by staging the path.
         fs::remove_file(dir.path().join("a.md")).unwrap();
-        stage(dir.path(), &["a.md".into()]).unwrap();
+        stage(dir.path(), &[file(&dir, "a.md")]).unwrap();
         assert_eq!(changes(dir.path()).unwrap()[0].staged.as_deref(), Some("D"));
-        unstage(dir.path(), &["a.md".into()]).unwrap();
+        unstage(dir.path(), &[file(&dir, "a.md")]).unwrap();
         let a = &changes(dir.path()).unwrap()[0];
         assert_eq!((a.staged.as_deref(), a.unstaged.as_deref()), (None, Some("D")));
     }

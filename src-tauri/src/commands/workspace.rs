@@ -68,6 +68,57 @@ pub async fn git_head_text(state: State<'_, AppState>, path: String) -> AppResul
         .map_err(|e| AppError::Io(e.to_string()))
 }
 
+/// Each changed file in the open folder with what's staged (Source Control).
+#[tauri::command]
+pub async fn git_changes(state: State<'_, AppState>, root: String) -> AppResult<Vec<crate::git_write::GitChange>> {
+    let dir = state.scope.check(Path::new(&root))?;
+    super::blocking(move || crate::git_write::changes(&dir).map_err(AppError::Git)).await
+}
+
+/// Approved paths inside the open folder, for staging (deleted files can't be resolved, so they're
+/// checked by their folder).
+fn paths_in(state: &AppState, root: &str, paths: &[String]) -> AppResult<(std::path::PathBuf, Vec<String>)> {
+    let dir = state.scope.check(Path::new(root))?;
+    let mut out = Vec::new();
+    for p in paths {
+        let path = Path::new(p);
+        let checked = match state.scope.check(path) {
+            Ok(resolved) => resolved,
+            Err(_) => {
+                let parent = path.parent().ok_or_else(|| AppError::InvalidPath(p.clone()))?;
+                state.scope.check(parent)?.join(path.file_name().ok_or_else(|| AppError::InvalidPath(p.clone()))?)
+            }
+        };
+        if !checked.starts_with(&dir) {
+            return Err(AppError::OutOfScope(p.clone()));
+        }
+        out.push(checked.to_string_lossy().into_owned());
+    }
+    Ok((dir, out))
+}
+
+/// Stages files in the open folder.
+#[tauri::command]
+pub async fn git_stage(state: State<'_, AppState>, root: String, paths: Vec<String>) -> AppResult<()> {
+    let (dir, paths) = paths_in(&state, &root, &paths)?;
+    super::blocking(move || crate::git_write::stage(&dir, &paths).map_err(AppError::Git)).await
+}
+
+/// Unstages files in the open folder, keeping their changes.
+#[tauri::command]
+pub async fn git_unstage(state: State<'_, AppState>, root: String, paths: Vec<String>) -> AppResult<()> {
+    let (dir, paths) = paths_in(&state, &root, &paths)?;
+    super::blocking(move || crate::git_write::unstage(&dir, &paths).map_err(AppError::Git)).await
+}
+
+/// Commits what's staged in the open folder's repository; returns the short hash.
+#[tauri::command]
+pub async fn git_commit(state: State<'_, AppState>, root: String, message: String) -> AppResult<String> {
+    let dir = state.scope.check(Path::new(&root))?;
+    state.logger.log("info", "git", "commit");
+    super::blocking(move || crate::git_write::commit(&dir, &message).map_err(AppError::Git)).await
+}
+
 /// Git branch and changed files for an approved folder; `None` without Git or outside a repository.
 #[tauri::command]
 pub async fn git_status(state: State<'_, AppState>, root: String) -> AppResult<Option<crate::git::GitStatus>> {

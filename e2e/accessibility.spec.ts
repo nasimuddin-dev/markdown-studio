@@ -215,6 +215,23 @@ for (const theme of ["light", "dark"] as const) {
       await audit(page, "search");
     });
 
+    test("source control", async ({ page }) => {
+      await start(page, theme);
+      await page.getByRole("button", { name: "Open Folder" }).first().click();
+      await page.locator(".tree-row", { hasText: /^README\.md$/ }).click();
+      await page.locator(".cm-line").first().click();
+      await page.keyboard.press("End");
+      await page.keyboard.type(" (edited)");
+      await page.keyboard.press(`${mod}+S`);
+      await page.getByRole("tab", { name: /Git/ }).click();
+      const scm = page.getByRole("region", { name: "Source Control" });
+      await expect(scm.getByRole("list", { name: "Changes", exact: true })).toBeVisible();
+      await audit(page, "source control");
+      await scm.getByRole("button", { name: "Stage README.md" }).click();
+      await scm.getByLabel("Commit message").fill("A message");
+      await audit(page, "source control, staged");
+    });
+
     test("AI review", async ({ page }) => {
       await withStandInAi(page);
       await start(page, theme);

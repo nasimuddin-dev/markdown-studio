@@ -4,8 +4,6 @@ mod commands;
 mod error;
 mod fs_ops;
 mod git;
-// Used by the Source Control commands, which come next (see DEV_LOG).
-#[allow(dead_code)]
 mod git_write;
 mod history;
 mod menu;
@@ -161,6 +159,10 @@ pub fn run() {
             commands::workspace::list_workspace_files,
             commands::workspace::git_status,
             commands::workspace::git_head_text,
+            commands::workspace::git_changes,
+            commands::workspace::git_stage,
+            commands::workspace::git_unstage,
+            commands::workspace::git_commit,
             commands::workspace::list_convertible_files,
             commands::app_data::list_history,
             commands::workspace::watch_workspace,

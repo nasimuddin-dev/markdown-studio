@@ -30,6 +30,44 @@ async function openFile(page: Page, name: string) {
   await expect(page.getByRole("tab", { name: new RegExp(name.replace(".", "\\.")) })).toHaveAttribute("aria-selected", "true");
 }
 
+test("Source Control: stage a saved change, commit it, and the change bars clear", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.locator(".cm-line").first().click();
+  await page.keyboard.press("End");
+  await page.keyboard.type(" (committed)");
+  await page.keyboard.press(`${mod}+S`);
+  await expect(page.locator(".cm-git-modified")).toHaveCount(1);
+
+  await page.getByRole("tab", { name: /Git/ }).click();
+  const panel = page.getByRole("region", { name: "Source Control" });
+  const changes = panel.getByRole("list", { name: "Changes", exact: true });
+  await expect(changes.getByRole("listitem")).toHaveCount(1);
+  await expect(changes).toContainText("README.md");
+  const commitButton = panel.getByRole("button", { name: /^Commit/ });
+  await expect(commitButton).toBeDisabled();
+
+  await changes.getByRole("button", { name: "Stage README.md" }).click();
+  const staged = panel.getByRole("list", { name: "Staged Changes" });
+  await expect(staged.getByRole("listitem")).toHaveCount(1);
+  await expect(changes).toHaveCount(0);
+  // Unstage and stage again.
+  await staged.getByRole("button", { name: "Unstage README.md" }).click();
+  await expect(panel.getByRole("list", { name: "Changes", exact: true }).getByRole("listitem")).toHaveCount(1);
+  await panel.getByRole("button", { name: "Stage All" }).click();
+  await expect(staged.getByRole("listitem")).toHaveCount(1);
+
+  await panel.getByLabel("Commit message").fill("Mark the welcome heading");
+  await expect(commitButton).toHaveText(/Commit \(1\)/);
+  await panel.getByLabel("Commit message").press(`${mod}+Enter`);
+  await expect(page.getByText(/Committed \(demo001\): Mark the welcome heading/)).toBeVisible();
+  await expect(panel.getByText("No changes. Everything is committed.")).toBeVisible();
+  await expect(panel.getByLabel("Commit message")).toHaveValue("");
+  // The editor compares with the new commit now.
+  await expect(page.locator(".cm-git-modified")).toHaveCount(0);
+});
+
 test("create, edit, preview, save, close and reopen a document (§17.2)", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

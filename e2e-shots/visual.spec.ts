@@ -101,6 +101,17 @@ for (const theme of ["light", "dark"] as const) {
       await expect(page.getByRole("dialog", { name: "Send Feedback" })).toBeVisible();
       await snap(page, `${theme}-feedback`);
       await page.keyboard.press("Escape");
+      // Source Control with a saved change, one staged and a message.
+      await page.locator(".cm-line").first().click();
+      await page.keyboard.press("End");
+      await page.keyboard.type(" (edited)");
+      await page.keyboard.press(`${mod}+S`);
+      await page.getByRole("tab", { name: /Git/ }).click();
+      const scm = page.getByRole("region", { name: "Source Control" });
+      await scm.getByRole("button", { name: "Stage README.md" }).click();
+      await scm.getByLabel("Commit message").fill("Edit the welcome line");
+      await page.mouse.move(0, 0);
+      await snap(page, `${theme}-source-control`);
     });
   });
 }

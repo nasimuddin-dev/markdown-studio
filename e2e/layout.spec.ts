@@ -63,6 +63,18 @@ async function layoutProblems(page: Page, where: string): Promise<string[]> {
       if (r.left < -1 || r.top < -1 || r.right > vw + 1 || r.bottom > vh + 1) out.push(`off screen: ${name(el)} (${Math.round(r.left)},${Math.round(r.top)} to ${Math.round(r.right)},${Math.round(r.bottom)})`);
     }
 
+    // The sidebar's content fits it (focusing something wider would scroll the whole sidebar sideways).
+    for (const el of document.querySelectorAll(".sidebar, .sidebar-tabs")) {
+      if (visible(el) && el.scrollWidth > el.clientWidth + 1) out.push(`wider than the sidebar: ${name(el)} (${el.scrollWidth}px in ${el.clientWidth}px)`);
+    }
+
+    // Panels in the sidebar never scroll sideways (their content shrinks or wraps instead).
+    for (const panel of document.querySelectorAll(".sidebar *")) {
+      const s = getComputedStyle(panel);
+      if (!/(auto|scroll)/.test(s.overflowX) || !visible(panel)) continue;
+      if (panel.scrollWidth > panel.clientWidth + 1) out.push(`scrolls sideways: ${name(panel)} (${panel.scrollWidth}px of content in ${panel.clientWidth}px)`);
+    }
+
     // A dialog's buttons (Close, Done…) are on screen without scrolling the dialog.
     for (const buttons of document.querySelectorAll(".modal .modal-buttons")) {
       const dialog = buttons.closest(".modal")!;
@@ -209,6 +221,20 @@ for (const theme of ["light", "dark"] as const) {
       await page.getByRole("button", { name: /Show problems/ }).click();
       await expect(page.locator(".cm-panel-lint")).toBeVisible();
       problems.push(...(await layoutProblems(page, "problems panel")));
+
+      // Source Control, with the edit above saved: a change, then a staged one.
+      await page.keyboard.press(`${mod}+S`);
+      await page.getByRole("tab", { name: /Git/ }).click();
+      const scm = page.getByRole("region", { name: "Source Control" });
+      await expect(scm.getByRole("list", { name: "Changes", exact: true })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Source Control")));
+      await scm.getByRole("button", { name: "Stage README.md" }).click();
+      await expect(scm.getByRole("list", { name: "Staged Changes" })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "Source Control, staged")));
+      await page.getByRole("tab", { name: "Explorer" }).click();
+      // Unsaved again, for the unsaved-changes dialog below.
+      await page.locator(".cm-line").first().click();
+      await page.keyboard.type("!");
 
       await page.locator(".tree-row", { hasText: /^assets$/ }).click();
       await page.locator(".tree-row", { hasText: /^logo\.svg$/ }).click();

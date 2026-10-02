@@ -20,6 +20,8 @@ pub enum AppError {
     Io(String),
     /// The AI assistant couldn't complete a request; the message is for the user.
     Ai(String),
+    /// Git refused (nothing to commit, a hook failed…); the message is git's own.
+    Git(String),
 }
 
 impl AppError {
@@ -36,6 +38,7 @@ impl AppError {
             AppError::TooLarge(_) => "tooLarge",
             AppError::Io(_) => "io",
             AppError::Ai(_) => "ai",
+            AppError::Git(_) => "git",
         }
     }
 }
@@ -53,7 +56,8 @@ impl std::fmt::Display for AppError {
             | AppError::DiskFull(m)
             | AppError::TooLarge(m)
             | AppError::Io(m)
-            | AppError::Ai(m) => m,
+            | AppError::Ai(m)
+            | AppError::Git(m) => m,
         };
         write!(f, "{}: {}", self.category(), msg)
     }
