@@ -67,8 +67,11 @@ const e2e = step("End-to-end + accessibility", "npx playwright test", { summary:
 if (!e2e.ok) {
   const rerun = step("End-to-end: rerun of failures", "npx playwright test --last-failed", { summary: playwrightSummary });
   if (rerun.ok) {
-    results.find((r) => r.name === "End-to-end + accessibility").ok = true;
-    results.find((r) => r.name === "End-to-end + accessibility").detail += " (failures passed on rerun: flaky under load)";
+    const first = results.find((r) => r.name === "End-to-end + accessibility");
+    const flaky = [...e2e.log.matchAll(/^\s+\d+\) (\S+:\d+:\d+ › .+?) ─/gm)].map((m) => m[1]);
+    first.ok = true;
+    first.detail += ` (passed on rerun, flaky under load: ${flaky.join("; ") || "see log"})`;
+    console.log(`${"".padEnd(34)} → counted as a pass: the failures passed alone (machine load). A test that keeps doing this needs a look.`);
   }
 }
 
