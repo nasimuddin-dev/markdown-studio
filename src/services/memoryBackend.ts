@@ -1,7 +1,7 @@
 import type { AiRequest, Backend, NativeMenu, WriteRequest } from "./backend";
 import { AppError } from "./errors";
 import { basename, dirname, isMarkdownPath, join } from "./paths";
-import type { AppUpdate, DirEntry, GitChange, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
+import type { AppUpdate, DirEntry, GitBranches, GitChange, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
 import { buildSearchRegex, searchText } from "./search";
 import { pathFilter, relativeTo } from "./pathFilter";
 import { DEMO_FILES } from "./demoContent";
@@ -543,6 +543,38 @@ export class MemoryBackend implements Backend {
   }
 
   private commits = 0;
+  /** The demo's branches: names only (switching keeps the files), and no remote. */
+  private branch = "main";
+  private branchNames = ["main"];
+
+  async gitBranches(root: string): Promise<GitBranches> {
+    this.requireRepo(root);
+    return { current: this.branch, branches: [...this.branchNames].sort(), upstream: null, ahead: 0, behind: 0, hasRemote: false };
+  }
+
+  async gitSwitchBranch(root: string, name: string) {
+    this.requireRepo(root);
+    if (!this.branchNames.includes(name)) throw new AppError("git", `fatal: invalid reference: ${name}`);
+    this.branch = name;
+  }
+
+  async gitCreateBranch(root: string, name: string) {
+    this.requireRepo(root);
+    if (!/^[\w./-]+$/.test(name) || name.startsWith("-") || name.includes("..")) throw new AppError("git", `“${name}” isn't a valid branch name.`);
+    if (this.branchNames.includes(name)) throw new AppError("git", `fatal: a branch named '${name}' already exists`);
+    this.branchNames.push(name);
+    this.branch = name;
+  }
+
+  async gitPull(root: string): Promise<void> {
+    this.requireRepo(root);
+    throw new AppError("git", "This branch has no upstream to pull from. Push it first, or set one up with your Git tool.");
+  }
+
+  async gitPush(root: string): Promise<void> {
+    this.requireRepo(root);
+    throw new AppError("git", "This repository has no remote to push to. Add one with your Git tool first.");
+  }
 
   async listWorkspaceFiles(root: string) {
     const dir = this.check(root);

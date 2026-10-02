@@ -4,10 +4,11 @@ import { useDocuments } from "../stores/documentsStore";
 import { useGit } from "../stores/gitStore";
 import { useWorkspace } from "../stores/workspaceStore";
 import { basename, dirname, relativePath } from "../services/paths";
-import type { GitChange } from "../types";
+import type { GitBranches, GitChange } from "../types";
 import { openPath } from "../features/documents";
 import { openFolderDialog } from "../features/workspace";
-import { changeLabel, commit, loadChanges, stage, unstage, type ChangesResult } from "../features/sourceControl";
+import { changeLabel, commit, loadBranches, loadChanges, newBranch, pull, push, stage, switchBranch, unstage, type ChangesResult } from "../features/sourceControl";
+import { ContextMenu } from "./ContextMenu";
 import { Icon } from "./Icon";
 
 /** Sidebar → Source Control: staged and unstaged changes, staging and committing. */
@@ -16,6 +17,8 @@ export function SourceControlPanel() {
   const [result, setResult] = useState<ChangesResult | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [branches, setBranches] = useState<GitBranches | null>(null);
+  const [branchMenu, setBranchMenu] = useState<{ x: number; y: number } | null>(null);
   const run = useRef(0);
   // Refresh after saves (each document's saved text) and Git status updates (commits made elsewhere).
   const saved = useDocuments(useShallow((s) => s.docs.map((d) => `${d.path}:${d.savedContent.length}`).join("|")));
@@ -23,8 +26,10 @@ export function SourceControlPanel() {
 
   const load = useCallback(async () => {
     const id = ++run.current;
-    const r = await loadChanges();
-    if (id === run.current) setResult(r);
+    const [r, b] = await Promise.all([loadChanges(), loadBranches()]);
+    if (id !== run.current) return;
+    setResult(r);
+    setBranches(b);
   }, []);
 
   useEffect(() => {
@@ -103,6 +108,62 @@ export function SourceControlPanel() {
           <Icon name="refresh" size={14} />
         </button>
       </div>
+      {branches && (
+        <div className="scm-branch-bar">
+          <button
+            className="button small scm-branch"
+            aria-haspopup="menu"
+            aria-label={`Branch: ${branches.current ?? "detached HEAD"}. Switch or create a branch`}
+            title={`${branches.current ?? "Detached HEAD"}: switch or create a branch`}
+            disabled={busy}
+            onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              setBranchMenu({ x: r.left, y: r.bottom + 2 });
+            }}
+          >
+            <Icon name="branch" size={14} />
+            <span className="scm-branch-name">{branches.current ?? "detached HEAD"}</span>
+            <Icon name="chevronDown" size={12} />
+          </button>
+          <button
+            className="icon-button scm-sync"
+            disabled={busy || !branches.upstream}
+            title={branches.upstream ? `Pull from ${branches.upstream}` : "This branch has no upstream to pull from"}
+            aria-label={`Pull${branches.behind ? `, ${branches.behind} to pull` : ""}`}
+            onClick={() => void doAndReload(pull)}
+          >
+            <Icon name="arrowDown" size={14} />
+            {branches.behind > 0 && <span>{branches.behind}</span>}
+          </button>
+          <button
+            className="icon-button scm-sync"
+            disabled={busy || !branches.hasRemote}
+            title={branches.hasRemote ? (branches.upstream ? `Push to ${branches.upstream}` : "Push (and set the upstream)") : "This repository has no remote to push to"}
+            aria-label={`Push${branches.ahead ? `, ${branches.ahead} to push` : ""}`}
+            onClick={() => void doAndReload(push)}
+          >
+            <Icon name="arrowUp" size={14} />
+            {branches.ahead > 0 && <span>{branches.ahead}</span>}
+          </button>
+        </div>
+      )}
+      {branchMenu && branches && (
+        <ContextMenu
+          x={branchMenu.x}
+          y={branchMenu.y}
+          label="Branches"
+          onClose={() => setBranchMenu(null)}
+          items={[
+            ...branches.branches.map((name) => ({
+              label: name === branches.current ? `✓ ${name}` : name,
+              disabled: name === branches.current,
+              run: () => void doAndReload(() => switchBranch(name)),
+            })),
+            "separator" as const,
+            { label: "New Branch…", run: () => void doAndReload(newBranch) },
+          ]}
+        />
+      )}
       {result && "error" in result ? (
         <p className="sidebar-empty muted" role="status">{result.error}</p>
       ) : (

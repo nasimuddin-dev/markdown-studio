@@ -182,6 +182,12 @@
   color: var(--accent);
   box-shadow: 0 0 0 1px var(--border);
 }
+/* Like .button:disabled: a control that can't be used now looks it. */
+.icon-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 .icon-button.small {
   height: 24px;
   min-width: 24px;

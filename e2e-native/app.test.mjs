@@ -8,7 +8,7 @@
 import { afterEach, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Key, Session } from "./webdriver.mjs";
@@ -127,6 +127,33 @@ describe("the desktop app", () => {
       await s.waitFor(() => /Commit from the native test/.test(git("log", "-1", "--format=%s")), "the commit");
       assert.equal(git("status", "--porcelain"), "");
       await s.waitFor(() => s.exec("return document.querySelector('.source-control')?.textContent.includes('No changes')"), "the panel to show no changes");
+
+      // Push to a remote (a bare repository on disk: no network, same code path), then pull a commit made elsewhere.
+      const remote = join(dir, "remote.git");
+      spawnSync("git", ["init", "-q", "--bare", "-b", "main", remote]);
+      git("remote", "add", "origin", remote);
+      await s.click(await s.find(".source-control button[title='Refresh']"));
+      const pushButton = () => s.find("button[aria-label^='Push']");
+      await s.waitFor(async () => !(await s.exec("return document.querySelector(\"button[aria-label^='Push']\").disabled")), "Push to be enabled");
+      await s.click(await pushButton());
+      await s.waitFor(() => /Commit from the native test/.test(spawnSync("git", ["-C", remote, "log", "-1", "--format=%s"], { encoding: "utf8" }).stdout), "the push");
+      assert.equal(git("rev-parse", "--abbrev-ref", "@{u}").trim(), "origin/main");
+
+      const other = join(dir, "other");
+      spawnSync("git", ["clone", "-q", remote, other]);
+      const inOther = (...args) => spawnSync("git", ["-C", other, ...args], { encoding: "utf8" });
+      inOther("config", "user.name", "Other");
+      inOther("config", "user.email", "other@example.com");
+      inOther("config", "commit.gpgsign", "false");
+      writeFileSync(join(other, "from-elsewhere.md"), "# Elsewhere\n");
+      inOther("add", "from-elsewhere.md");
+      inOther("commit", "-q", "-m", "From another clone");
+      assert.equal(inOther("push", "-q").status, 0);
+      git("fetch", "-q");
+      await s.click(await s.find(".source-control button[title='Refresh']"));
+      await s.waitFor(async () => !(await s.exec("return document.querySelector(\"button[aria-label^='Pull']\").disabled")), "Pull to be enabled");
+      await s.click(await s.find("button[aria-label^='Pull']"));
+      await s.waitFor(() => existsSync(join(repoDir, "from-elsewhere.md")), "the pulled file");
     } finally {
       await s.quit();
     }

@@ -119,6 +119,43 @@ pub async fn git_commit(state: State<'_, AppState>, root: String, message: Strin
     super::blocking(move || crate::git_write::commit(&dir, &message).map_err(AppError::Git)).await
 }
 
+/// The open folder's branches, and how the current one stands against its upstream.
+#[tauri::command]
+pub async fn git_branches(state: State<'_, AppState>, root: String) -> AppResult<crate::git_write::GitBranches> {
+    let dir = state.scope.check(Path::new(&root))?;
+    super::blocking(move || crate::git_write::branches(&dir).map_err(AppError::Git)).await
+}
+
+/// Switches the open folder's repository to another branch.
+#[tauri::command]
+pub async fn git_switch_branch(state: State<'_, AppState>, root: String, name: String) -> AppResult<()> {
+    let dir = state.scope.check(Path::new(&root))?;
+    super::blocking(move || crate::git_write::switch_branch(&dir, &name).map_err(AppError::Git)).await
+}
+
+/// Creates a branch in the open folder's repository and switches to it.
+#[tauri::command]
+pub async fn git_create_branch(state: State<'_, AppState>, root: String, name: String) -> AppResult<()> {
+    let dir = state.scope.check(Path::new(&root))?;
+    super::blocking(move || crate::git_write::create_branch(&dir, &name).map_err(AppError::Git)).await
+}
+
+/// Pulls the upstream's commits (fast-forward only), with the user's Git credentials.
+#[tauri::command]
+pub async fn git_pull(state: State<'_, AppState>, root: String) -> AppResult<()> {
+    let dir = state.scope.check(Path::new(&root))?;
+    state.logger.log("info", "git", "pull");
+    super::blocking(move || crate::git_write::pull(&dir).map_err(AppError::Git)).await
+}
+
+/// Pushes the current branch (setting its upstream the first time), with the user's Git credentials.
+#[tauri::command]
+pub async fn git_push(state: State<'_, AppState>, root: String) -> AppResult<()> {
+    let dir = state.scope.check(Path::new(&root))?;
+    state.logger.log("info", "git", "push");
+    super::blocking(move || crate::git_write::push(&dir).map_err(AppError::Git)).await
+}
+
 /// Git branch and changed files for an approved folder; `None` without Git or outside a repository.
 #[tauri::command]
 pub async fn git_status(state: State<'_, AppState>, root: String) -> AppResult<Option<crate::git::GitStatus>> {

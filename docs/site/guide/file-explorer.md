@@ -106,11 +106,21 @@ The **Git** tab in the sidebar (the branch icon) is Source Control for the open 
 - **Staged Changes** lists what the next commit will contain. **−** unstages a file (its changes stay in it); **−** in the heading unstages them all.
 - Write a **commit message** and choose **Commit** (or press **Ctrl+Enter** in the message). Markpion commits with your own Git: your name and email, and the repository's hooks, apply as they do on the command line. If Git refuses, for example because a hook fails, its message is shown.
 
-After a commit the Explorer markers and the editor's change bars update. Only files inside the open folder are listed, even when the repository is bigger. Pulling, pushing and branches aren't in Markpion yet; use your usual Git tool for those.
+After a commit the Explorer markers and the editor's change bars update. Only files inside the open folder are listed, even when the repository is bigger.
+
+### Branches, pull and push
+
+Above the commit message:
+
+- **The branch button** shows the current branch. Choose it to switch to another branch, or **New Branch…** to create one from the current commit and switch to it. Git refuses to switch when your uncommitted changes would be overwritten, and says so.
+- **↓ Pull** brings in the commits on the branch's upstream (the number shows how many). It only pulls when no merge is needed; when both sides have new commits, Markpion says so and leaves merging or rebasing to your Git tool.
+- **↑ Push** sends your commits (the number shows how many). The first push of a new branch sets its upstream on the repository's remote.
+
+Pull and push use your Git credentials as on the command line (for example Git Credential Manager on Windows, which may show its own sign-in window). They stop after two minutes without an answer.
 
 ### Requirements and privacy
 
-This needs Git installed. Markpion runs `git status` in the open folder (and `git show` for the file in the editor) when the folder opens, when files change, and when you come back to the window. It changes the repository only when you stage, unstage or commit in the Git tab, and it never pulls or pushes. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
+This needs Git installed. Markpion runs `git status` in the open folder (and `git show` for the file in the editor) when the folder opens, when files change, and when you come back to the window. It changes the repository only when you stage, unstage, commit, switch or create a branch in the Git tab, and it contacts a remote only when you choose Pull or Push. As with any Git tool, opening a repository runs Git with that repository's configuration (Markpion turns off Git's file-system monitor hook). Turn it off with **Settings → Files → Show Git branch and changed files**.
 
 ## Search, links and tags across the folder
 

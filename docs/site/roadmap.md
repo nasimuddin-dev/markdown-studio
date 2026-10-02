@@ -13,7 +13,7 @@ This roadmap comes from the project's [requirements specification](https://githu
 - **Reliability:** safe atomic saves, external-change detection, crash recovery, recent files and local file history.
 - **Rich Markdown:** GitHub Flavored Markdown, Mermaid diagrams, LaTeX math, front matter, alerts and footnotes.
 - **Productivity:** outline, command palette, Find in Files, formatting toolbar, tables, templates, table of contents, Markdown lint and link checking, presenting as slides.
-- **Git:** staging, unstaging and committing in the Git tab; changed files in the Explorer, the branch in the status bar, change bars in the editor with revert, and the last commit in File History.
+- **Git:** staging, committing, branches, pull and push in the Git tab; changed files in the Explorer, the branch in the status bar, change bars in the editor with revert, and the last commit in File History.
 - **Conversion:** import from Word, PDF, HTML and CSV; export to PDF, Word, HTML, EPUB and LaTeX, including whole folders.
 - **AI assistant (optional):** Claude improves, fixes, shortens, summarizes, translates or continues text, with your own API key and a review before any change.
 - **Distribution:** separate installers for Windows, macOS and Linux on every release, and signed automatic updates on Windows.
@@ -22,7 +22,7 @@ See the [changelog](/changelog) for details per version.
 
 ## In progress
 
-- **Source control, part 2:** pull, push and branches (staging and committing are done). Next: publishing to static sites and documentation platforms, then a plugin system. Cloud sync and collaboration come after these.
+- **Publishing** to static sites and documentation platforms. Next: a plugin system. Cloud sync and collaboration come after these.
 
 ## Planned
 

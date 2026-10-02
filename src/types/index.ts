@@ -20,6 +20,19 @@ export interface GitChange {
   conflict: boolean;
 }
 
+/** Source Control: the branches and how the current one stands against its upstream. */
+export interface GitBranches {
+  /** The checked-out branch; null on a detached HEAD. */
+  current: string | null;
+  branches: string[];
+  /** The current branch's upstream, such as "origin/main". */
+  upstream: string | null;
+  /** Commits to push and to pull. */
+  ahead: number;
+  behind: number;
+  hasRemote: boolean;
+}
+
 export interface DirEntry {
   name: string;
   path: string;

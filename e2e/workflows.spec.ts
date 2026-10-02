@@ -66,6 +66,21 @@ test("Source Control: stage a saved change, commit it, and the change bars clear
   await expect(panel.getByLabel("Commit message")).toHaveValue("");
   // The editor compares with the new commit now.
   await expect(page.locator(".cm-git-modified")).toHaveCount(0);
+
+  // Branches: create one, then switch back. The demo has no remote, so Pull and Push are off.
+  await expect(panel.getByRole("button", { name: /^Pull/ })).toBeDisabled();
+  await expect(panel.getByRole("button", { name: /^Push/ })).toBeDisabled();
+  await panel.getByRole("button", { name: /^Branch: main/ }).click();
+  await page.getByRole("menuitem", { name: "New Branch…" }).click();
+  const dialog = page.getByRole("dialog", { name: "New Branch" });
+  await dialog.getByRole("textbox").fill("draft/ideas");
+  await dialog.getByRole("button", { name: "Create Branch" }).click();
+  await expect(page.getByText("Created draft/ideas and switched to it.")).toBeVisible();
+  await expect(panel.getByRole("button", { name: /^Branch: draft\/ideas/ })).toBeVisible();
+  await panel.getByRole("button", { name: /^Branch: draft\/ideas/ }).click();
+  await expect(page.getByRole("menuitem", { name: "✓ draft/ideas" })).toBeDisabled();
+  await page.getByRole("menuitem", { name: "main", exact: true }).click();
+  await expect(panel.getByRole("button", { name: /^Branch: main/ })).toBeVisible();
 });
 
 test("create, edit, preview, save, close and reopen a document (§17.2)", async ({ page }) => {

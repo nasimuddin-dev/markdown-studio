@@ -1,5 +1,5 @@
 import type {
-  AiStatus, AppInfo, AppUpdate, GitChange, GitStatus, HistoryEntry, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
+  AiStatus, AppInfo, AppUpdate, GitBranches, GitChange, GitStatus, HistoryEntry, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
 } from "../types";
 
 /**
@@ -115,6 +115,15 @@ export interface WorkspaceApi {
   gitUnstage(root: string, paths: string[]): Promise<void>;
   /** Commits what's staged (the user's Git identity and hooks apply); returns the short commit hash. */
   gitCommit(root: string, message: string): Promise<string>;
+  /** The branches, the current one and its upstream with commits to push and pull. */
+  gitBranches(root: string): Promise<GitBranches>;
+  gitSwitchBranch(root: string, name: string): Promise<void>;
+  /** Creates a branch from the current commit and switches to it. */
+  gitCreateBranch(root: string, name: string): Promise<void>;
+  /** Pulls the upstream's commits when that needs no merge (fast-forward), with the user's Git credentials. */
+  gitPull(root: string): Promise<void>;
+  /** Pushes the current branch, setting its upstream on the first push. */
+  gitPush(root: string): Promise<void>;
   /** Word, PDF, HTML and CSV/TSV files under the workspace (batch conversion). */
   listConvertibleFiles(root: string): Promise<string[]>;
   /** Searches Markdown files under an approved folder. */
