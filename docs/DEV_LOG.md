@@ -821,3 +821,29 @@ The user asked for an end-to-end UI regression suite run before every release, s
 1. A layout check of the AI panel (it shows only during an AI request, so it needs a stubbed response).
 2. Open exported EPUBs in Apple Books, Kobo or Calibre (epub.js renders them in an e2e test).
 3. The Linux build on a physical Linux desktop (the native tests run in CI under a virtual display).
+
+## 2026-10-01 (evening, until 8:30 PM): planned items and LaTeX with pictures, 0.26.0
+
+The user asked to complete the planned items, then to continue the loop until 8:30 PM.
+
+| Item | Commit |
+| --- | --- |
+| Layout checks for the slide show (with notes) and the table picker (the toolbar shows its button only in wide windows, so the check widens the window for it) | 470d799 |
+| The AI review in the layout checks and an axe audit, with a stand-in AI for the browser demo (`window.__markpionE2eAi`, test only); e2e first page loads get 20 s after four audits timed out waiting for a cold dev server | 7cec254 |
+| Exported e-books opened and rendered in epub.js (every chapter, pictures, contents links, a footnote and a link across chapters) | 7bd9f00 |
+| Native app tests on Linux in CI (WebKitWebDriver, xvfb, D-Bus): all 6 pass on Ubuntu 22.04, including the file watcher | a5772a0, 6bd6426 |
+| Export as LaTeX with Pictures (.zip): pictures (SVG to PNG) and Mermaid diagrams as PNG figures; CI compiles a sample with both | 1fc1d47 |
+
+**Version:** 0.26.0. **Tests:** Vitest 674 (120 files), Playwright 142 (24 layout checks, 1 epub.js test), Rust 50 (+1 ignored), native 6 (Windows locally, Linux in CI), visual 30 screens (local).
+
+**Unverified:** e-books in Apple Books, Kobo or Calibre (epub.js renders them); the Linux build on a physical desktop (the native tests run under a virtual display); LaTeX with Pictures compiled with real documents beyond the CI sample.
+
+**Next up:**
+
+1. macOS: there's no WebDriver for its web view, so native tests can't run there; a manual check list for a Mac.
+2. In-place updates for macOS and Linux, which need the updater key as a repository secret (the user's decision).
+3. Large documents (several MB) with every section open in the preview.
+
+**Questions for the user:**
+
+- Should the updater key be added as a GitHub repository secret, so macOS and Linux get in-place updates too? It's the same key that signs Windows updates; anyone with access to the repository's secrets could then sign updates.

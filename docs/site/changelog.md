@@ -7,6 +7,18 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.26.0
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.26.0)
+
+### Added
+
+- **Export as LaTeX with Pictures (.zip)** (File → Export): the LaTeX document together with an `images` folder holding its pictures and its Mermaid diagrams, so it compiles as it is. SVG pictures are converted to PNG, which pdfLaTeX can read.
+
+### Changed
+
+- More of Markpion is tested automatically before each release: exported e-books are opened in an e-reader engine (epub.js), the AI review is checked at small window sizes, and the desktop app's own tests now also run on Linux.
+
 ## v0.25.3
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.3)
