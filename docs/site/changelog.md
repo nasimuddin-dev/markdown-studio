@@ -19,6 +19,10 @@ Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpi
 
 - More of Markpion is tested automatically before each release: exported e-books are opened in an e-reader engine (epub.js), the AI review is checked at small window sizes, and the desktop app's own tests now also run on Linux.
 
+### Fixed
+
+- Opening a file (by double-clicking it or with "Open with") while Markpion was still starting could, now and then, leave a hidden copy of Markpion running that never opened the file. Files opened during start-up now always arrive.
+
 ## v0.25.3
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.3)

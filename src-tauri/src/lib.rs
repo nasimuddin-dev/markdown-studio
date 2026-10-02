@@ -117,7 +117,9 @@ pub fn run() {
             let _ = window.set_background_color(Some(window_background(theme.get("theme").and_then(|t| t.as_str()), os_dark)));
             // Files passed on the command line (file association, "Open with").
             let cwd = std::env::current_dir().unwrap_or_default();
-            let launch = open_paths::paths_from_args(std::env::args().skip(1), &cwd);
+            let mut launch = open_paths::paths_from_args(std::env::args().skip(1), &cwd);
+            // With any handed over by second launches while the window was being created.
+            launch.extend(open_paths::take_early());
             *state.pending_open.lock().unwrap() = open_paths::accept(&state, launch);
             app.manage(state);
             app.manage(watcher::WorkspaceWatcher::default());

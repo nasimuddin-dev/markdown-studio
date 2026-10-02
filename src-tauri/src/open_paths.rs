@@ -10,7 +10,19 @@ use crate::commands::{AppState, RecentKind};
 use crate::fs_ops;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, Manager};
+
+/// Paths handed over by a second launch before the app state exists: creating
+/// the main window runs a nested message loop on Windows, which can deliver a
+/// second launch's message in the middle of setup. Setup takes them with the
+/// launch paths. (Both run on the main thread, so none slips in between.)
+static EARLY: Mutex<Vec<PathBuf>> = Mutex::new(Vec::new());
+
+/// Paths that arrived before the app state existed, in order.
+pub fn take_early() -> Vec<PathBuf> {
+    std::mem::take(&mut *EARLY.lock().unwrap_or_else(|e| e.into_inner()))
+}
 
 pub const OPEN_PATHS_EVENT: &str = "open-paths";
 
@@ -93,7 +105,12 @@ pub fn accept(state: &AppState, paths: impl IntoIterator<Item = PathBuf>) -> Ope
 /// and are handed over when the UI asks for them, so none is dropped.
 pub fn open_in_ui(app: &AppHandle, paths: impl IntoIterator<Item = PathBuf>) {
     use std::sync::atomic::Ordering;
-    let state = app.state::<AppState>();
+    // Before setup has registered the state, keep the paths for it (app.state() would panic here,
+    // in the middle of the second launch's message, and that launch would wait forever).
+    let Some(state) = app.try_state::<AppState>() else {
+        EARLY.lock().unwrap_or_else(|e| e.into_inner()).extend(paths);
+        return;
+    };
     let accepted = accept(&state, paths);
     if accepted.is_empty() {
         return;
@@ -116,6 +133,13 @@ pub fn open_in_ui(app: &AppHandle, paths: impl IntoIterator<Item = PathBuf>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn early_paths_are_taken_once_in_order() {
+        EARLY.lock().unwrap().extend([PathBuf::from("one.md"), PathBuf::from("two.md")]);
+        assert_eq!(take_early(), vec![PathBuf::from("one.md"), PathBuf::from("two.md")]);
+        assert!(take_early().is_empty());
+    }
 
     #[test]
     fn queued_paths_keep_their_order_without_duplicates() {
