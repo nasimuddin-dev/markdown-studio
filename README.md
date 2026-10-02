@@ -9,21 +9,21 @@ The requirements are in [docs/SRS.md](docs/SRS.md), and implementation status pe
 ## Download
 
 <!-- download:start -->
-Markpion 0.27.0 was released on 2026-10-01 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.27.0 release page](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.27.0).
+Markpion 0.28.0 was released on 2026-10-01 and has a separate installer for each operating system. Each one is self-contained: nothing else needs to be installed. All files and checksums are on the [0.28.0 release page](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.28.0).
 
 | Operating system | Download |
 | --- | --- |
-| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/Markpion-0.27.0-windows-x64-setup.exe?raw=true) (7.8 MB) · [Offline installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-windows-x64-offline-setup.exe) (212.9 MB) · [ARM64 installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-windows-arm64-setup.exe) |
-| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-macos-x64.dmg) |
-| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
-| **Linux** ARM64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-linux-aarch64.AppImage) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-linux-arm64.deb) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-linux-aarch64.rpm) |
+| **Windows** 10 (1803+) and 11, x64 | [Standard installer](downloads/Markpion-0.28.0-windows-x64-setup.exe?raw=true) (7.8 MB) · [Offline installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-windows-x64-offline-setup.exe) (212.9 MB) · [ARM64 installer](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-windows-arm64-setup.exe) |
+| **macOS** 10.15+ | [Apple Silicon (M1 and later)](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-macos-arm64.dmg) · [Intel](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-macos-x64.dmg) |
+| **Linux** x86_64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-linux-x86_64.AppImage) (any distribution) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-linux-amd64.deb) (Ubuntu, Debian, Mint) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-linux-x86_64.rpm) (Fedora, RHEL, openSUSE) |
+| **Linux** ARM64 | [AppImage](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-linux-aarch64.AppImage) · [.deb](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-linux-arm64.deb) · [.rpm](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-linux-aarch64.rpm) |
 
 ### Windows
 
 | Installer | When to use it | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **Standard**: [Markpion-0.27.0-windows-x64-setup.exe](downloads/Markpion-0.27.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 7.8 MB | `a7b7724a00468b5efa6abea209b934b766b54c4ad2dd13dd4d860b079140f391` |
-| **Offline**: [Markpion-0.27.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 212.9 MB | `84a7c91d251412fd2c813cd274e2e90bd4128c93ad1a2be91d2db75d16afe608` |
+| **Standard**: [Markpion-0.28.0-windows-x64-setup.exe](downloads/Markpion-0.28.0-windows-x64-setup.exe?raw=true) | Recommended. WebView2 is already part of Windows 11 and updated Windows 10; if it's missing, the installer adds it automatically (needs internet) | 7.8 MB | `0b5d6639009193333e179dd765261374ca02ce9fb58b570fd8c806da0d8db3dc` |
+| **Offline**: [Markpion-0.28.0-windows-x64-offline-setup.exe](https://github.com/nasimuddin-dev/markpion/releases/download/v0.28.0/Markpion-0.28.0-windows-x64-offline-setup.exe) | Includes WebView2; no internet needed | 212.9 MB | `13599b1c7b10b8b6421184816276e34ba24147a819ae1f963b98f5ab98f037d5` |
 
 1. **Download** an installer above.
 2. **Run** it and choose **Anyone who uses this computer**, which needs administrator approval, or **Only for me**, which doesn't. The installer isn't code-signed yet, so if Windows SmartScreen says *"Windows protected your PC"*, choose **More info → Run anyway**.
@@ -40,8 +40,8 @@ The app appears in **Settings → Apps → Installed apps** and in **Control Pan
 ### Linux
 
 - **AppImage** (any distribution, no installation needed): download it, run `chmod +x Markpion-*.AppImage`, then start it.
-- **Debian, Ubuntu, Mint**: `sudo apt install ./Markpion-0.27.0-linux-amd64.deb` (apt installs the required system libraries automatically).
-- **Fedora, RHEL, openSUSE**: `sudo dnf install ./Markpion-0.27.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
+- **Debian, Ubuntu, Mint**: `sudo apt install ./Markpion-0.28.0-linux-amd64.deb` (apt installs the required system libraries automatically).
+- **Fedora, RHEL, openSUSE**: `sudo dnf install ./Markpion-0.28.0-linux-x86_64.rpm` (or `sudo zypper install` on openSUSE).
 
 On macOS and Linux, the app tells you when a new version is available and opens its download page.
 
