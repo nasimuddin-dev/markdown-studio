@@ -849,3 +849,14 @@ The user asked to complete the planned items, then to continue the loop until 8:
 **Questions for the user:**
 
 - Should the updater key be added as a GitHub repository secret, so macOS and Linux get in-place updates too? It's the same key that signs Windows updates; anyone with access to the repository's secrets could then sign updates.
+
+**After the release (until 8:30 PM):** 0.26.0 published and verified (the offline installer's upload failed four times with the connection aborted on this machine, then went through on a retry; its checksum matches). The user asked to build every remaining feature except cloud integration, then be reminded to start the cloud work. Started with source control: `git_write.rs` lists staged and unstaged changes and stages, unstages and commits through the user's git, with tests against temporary repositories (0b0cf82); not in the UI yet.
+
+**Next up (the user's plan: all non-cloud features first):**
+
+1. Source control in the UI: Tauri commands with scope checks (the open folder only), a Source Control sidebar tab (staged and unstaged files, stage/unstage, a commit message box and Commit), diffs against HEAD, tests at every level (Rust, unit, e2e with layout and axe checks, native).
+2. Pull and push with the system's Git credentials; branches.
+3. Publishing to static sites and documentation platforms.
+4. A plugin system: a design for the user's approval first (plugins must not reach the IPC or the API key).
+5. Large documents with every section open; the last inline-math cases in PDF.
+6. Then remind the user to start the cloud integration (sync, collaboration, the cloud backend).
