@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { CompletionContext } from "@codemirror/autocomplete";
-import { ensureSyntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree, forceParsing } from "@codemirror/language";
 import * as full from "@codemirror/lang-html";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { html, htmlCompletionSource } from "../src/services/markdownHtml";
@@ -12,8 +12,10 @@ type HtmlFactory = typeof html;
 /** Types `text` at `pos` the way the editor's input handlers see it. */
 function type(view: EditorView, pos: number, text: string) {
   view.dispatch({ selection: { anchor: pos } });
-  // Auto-close reads the syntax tree; parse it all first (parsing is time-sliced, so a busy machine may not have yet).
-  ensureSyntaxTree(view.state, view.state.doc.length, 30_000);
+  // Auto-close reads the view's syntax tree. Parsing is time-sliced, so on a busy machine it may not be
+  // done yet: forceParsing finishes it and updates the view's state (ensureSyntaxTree only parses; the
+  // state keeps the tree it was created with).
+  forceParsing(view, view.state.doc.length, 30_000);
   const insert = () => view.state.update({ changes: { from: pos, insert: text }, selection: { anchor: pos + text.length }, userEvent: "input.type" });
   const handled = view.state.facet(EditorView.inputHandler).some((h) => h(view, pos, pos, text, insert));
   if (!handled) view.dispatch(insert());

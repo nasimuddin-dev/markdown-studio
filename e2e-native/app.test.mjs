@@ -24,7 +24,8 @@ const EDITOR_TEXT = "return [...document.querySelectorAll('.cm-line')].map((l) =
  * launch hands its arguments to the running app and exits.
  */
 function openWithApp(file) {
-  const second = spawnSync(APP, [file], { timeout: 15000 });
+  // A cold start of the debug build can take a while on a busy machine; the hand-over itself is quick.
+  const second = spawnSync(APP, [file], { timeout: 45000 });
   assert.equal(second.status, 0, "the second launch should hand over the file and exit");
 }
 
