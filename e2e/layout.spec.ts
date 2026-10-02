@@ -17,7 +17,7 @@ const SIZES = [
 ];
 
 /** The window's controls, where clipped or overlapping labels are bugs (not the document). */
-const CHROME = ".menubar, .toolbar, .format-toolbar, .tabbar, .breadcrumbs, .statusbar, .sidebar, .cm-panels, .modal, [role=menu], .toasts";
+const CHROME = ".menubar, .toolbar, .format-toolbar, .tabbar, .breadcrumbs, .statusbar, .sidebar, .cm-panels, .modal, [role=menu], .toasts, .slideshow-bar, .table-picker";
 
 async function layoutProblems(page: Page, where: string): Promise<string[]> {
   const problems = await page.evaluate((chrome) => {
@@ -56,7 +56,7 @@ async function layoutProblems(page: Page, where: string): Promise<string[]> {
     const name = (el: Element) => `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).join(".") : ""} "${(el.textContent ?? "").trim().slice(0, 40)}"`;
 
     // Dialogs and menus are entirely on screen.
-    for (const el of document.querySelectorAll(".modal, [role=menu], .palette, [role=dialog]")) {
+    for (const el of document.querySelectorAll(".modal, [role=menu], .palette, [role=dialog], .table-picker")) {
       if (!visible(el)) continue;
       const r = el.getBoundingClientRect();
       if (r.left < -1 || r.top < -1 || r.right > vw + 1 || r.bottom > vh + 1) out.push(`off screen: ${name(el)} (${Math.round(r.left)},${Math.round(r.top)} to ${Math.round(r.right)},${Math.round(r.bottom)})`);
@@ -243,6 +243,40 @@ for (const theme of ["light", "dark"] as const) {
       await page.keyboard.press("Enter");
       await expect(page.getByRole("dialog", { name: /^Compare — / })).toBeVisible();
       problems.push(...(await layoutProblems(page, "Compare")));
+
+      expect(problems, problems.join("\n")).toEqual([]);
+    });
+  }
+}
+
+for (const theme of ["light", "dark"] as const) {
+  for (const size of SIZES) {
+    test(`slide show and table picker at ${size.width}×${size.height} (${theme})`, async ({ page }) => {
+      await page.setViewportSize(size);
+      await page.emulateMedia({ colorScheme: theme });
+      await start(page);
+      const problems: string[] = [];
+      await page.keyboard.press(`${mod}+N`);
+      await page.getByRole("textbox", { name: "Markdown editor" }).click();
+      await page.keyboard.insertText("# A slide with a fairly long title for a small window\n\n- one\n- two\n\nNote: speaker notes\n\n---\n\n# Second\n");
+
+      // The table picker opens from its toolbar button, which only wide windows show (narrower ones
+      // move it into the More menu, without the picker): widen the window for it, at this height.
+      await page.setViewportSize({ width: 1920, height: size.height });
+      await page.getByRole("toolbar", { name: "Formatting" }).getByRole("button", { name: "Insert Table" }).click();
+      await expect(page.getByRole("dialog", { name: "Insert table" })).toBeVisible();
+      problems.push(...(await layoutProblems(page, `table picker (1920×${size.height})`)));
+      await page.keyboard.press("Escape");
+      await page.setViewportSize(size);
+
+      await chooseMenu(page, "View", "Slides", "Present as Slides");
+      const show = page.getByRole("dialog", { name: "Slide show" });
+      await expect(show).toBeVisible();
+      problems.push(...(await layoutProblems(page, "slide show")));
+      await page.keyboard.press("n");
+      await expect(page.getByRole("complementary", { name: "Speaker notes" })).toBeVisible();
+      problems.push(...(await layoutProblems(page, "slide show with notes")));
+      await page.keyboard.press("Escape");
 
       expect(problems, problems.join("\n")).toEqual([]);
     });

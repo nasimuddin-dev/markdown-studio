@@ -818,6 +818,6 @@ The user asked for an end-to-end UI regression suite run before every release, s
 
 **Next up:**
 
-1. A layout check of the slide show, the AI panel and the table picker.
+1. A layout check of the AI panel (it shows only during an AI request, so it needs a stubbed response).
 2. Open exported EPUBs in e-reader apps.
 3. The Linux watcher on a real Linux desktop.
