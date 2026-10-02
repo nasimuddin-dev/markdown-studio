@@ -78,6 +78,28 @@ jobs:
           LATEX_OUT: latex-samples
       - run: cd latex-samples && for f in *.tex; do echo "== $f"; pdflatex -interaction=nonstopmode -halt-on-error "$f" > /dev/null || { tail -40 "${f%.tex}.log"; exit 1; }; done
 
+  native-linux:
+    name: Native app tests (Linux)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install Linux dependencies, WebKitWebDriver and a virtual display
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf webkit2gtk-driver xvfb dbus-x11
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - run: cargo install tauri-driver --locked
+      # The real app under a virtual display; the D-Bus session carries the single-instance hand-over.
+      - run: dbus-run-session -- xvfb-run -a npm run test:native
+
   audit:
     name: Dependency audit (npm, cargo)
     runs-on: ubuntu-latest

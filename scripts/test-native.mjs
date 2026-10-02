@@ -1,11 +1,13 @@
 /**
  * Runs the native end-to-end tests (e2e-native/) against a debug build of the
- * desktop app, through tauri-driver and Microsoft Edge WebDriver (Windows).
+ * desktop app, through tauri-driver: with Microsoft Edge WebDriver on Windows,
+ * and with WebKitWebDriver (package webkit2gtk-driver) on Linux, where CI runs
+ * them under xvfb-run and dbus-run-session.
  *
  *   npm run test:native            builds the app (debug, no installer), then tests
  *   npm run test:native -- --no-build   tests the existing debug build
  *
- * Needs `cargo install tauri-driver --locked`. The msedgedriver matching the
+ * Needs `cargo install tauri-driver --locked`. On Windows, the msedgedriver matching the
  * installed WebView2 runtime is downloaded from Microsoft on first use into
  * %LOCALAPPDATA%\markpion-dev\msedgedriver\<version>\. The debug app keeps
  * its settings, recent files, session and web storage in a temporary folder
@@ -17,17 +19,20 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync
 import { homedir, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-if (process.platform !== "win32") {
-  console.error("The native end-to-end tests run on Windows only (tauri-driver needs a WebDriver for the system web view).");
+const windows = process.platform === "win32";
+if (!windows && process.platform !== "linux") {
+  console.error("The native end-to-end tests run on Windows and Linux (tauri-driver needs a WebDriver for the system web view; macOS has none).");
   process.exit(1);
 }
 
 const root = resolve(import.meta.dirname, "..");
-const app = join(root, "src-tauri", "target", "debug", "markpion.exe");
+const app = join(root, "src-tauri", "target", "debug", windows ? "markpion.exe" : "markpion");
 
 // A running Markpion would receive the test app's launch (single instance) instead.
-const running = execFileSync("tasklist", ["/FI", "IMAGENAME eq markpion.exe", "/FO", "CSV", "/NH"], { encoding: "utf8" });
-if (/markpion\.exe/i.test(running)) {
+const running = windows
+  ? /markpion\.exe/i.test(execFileSync("tasklist", ["/FI", "IMAGENAME eq markpion.exe", "/FO", "CSV", "/NH"], { encoding: "utf8" }))
+  : spawnSync("pgrep", ["-x", "markpion"]).status === 0;
+if (running) {
   console.error("Markpion is running. Close it first: a second copy would hand its files to the running one.");
   process.exit(1);
 }
@@ -53,6 +58,8 @@ function webViewVersion() {
   throw new Error("WebView2 runtime not found.");
 }
 
+/** Windows: the Edge WebDriver matching the installed WebView2, downloaded on first use. */
+async function edgeDriver() {
 const version = webViewVersion();
 const driverDir = join(process.env.LOCALAPPDATA ?? homedir(), "markpion-dev", "msedgedriver", version);
 const driver = join(driverDir, "msedgedriver.exe");
@@ -66,8 +73,10 @@ if (!existsSync(driver)) {
   writeFileSync(zip, Buffer.from(await res.arrayBuffer()));
   execFileSync("powershell", ["-NoProfile", "-Command", `Expand-Archive -Force -Path '${zip}' -DestinationPath '${driverDir}'`]);
 }
+return driver;
+}
 
-const tauriDriver = join(homedir(), ".cargo", "bin", "tauri-driver.exe");
+const tauriDriver = join(homedir(), ".cargo", "bin", windows ? "tauri-driver.exe" : "tauri-driver");
 if (!existsSync(tauriDriver)) {
   console.error("tauri-driver isn't installed. Run: cargo install tauri-driver --locked");
   process.exit(1);
@@ -80,10 +89,13 @@ const env = { ...process.env, MARKPION_TEST_DATA_DIR: data };
 
 // A safety net: the real profile's files must not change during the run.
 const identifier = JSON.parse(readFileSync(join(root, "src-tauri", "tauri.conf.json"), "utf8")).identifier;
-const profile = ["settings.json", "recent.json"].map((f) => join(process.env.APPDATA ?? "", identifier, f));
+const configDir = windows ? (process.env.APPDATA ?? "") : (process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"));
+const profile = ["settings.json", "recent.json"].map((f) => join(configDir, identifier, f));
 const stamp = () => profile.map((f) => (existsSync(f) ? statSync(f).mtimeMs : 0)).join();
 const before = stamp();
-const driverProcess = spawn(tauriDriver, ["--native-driver", driver], { env, stdio: ["ignore", "inherit", "inherit"] });
+// On Linux, tauri-driver finds WebKitWebDriver on the PATH.
+const driverArgs = windows ? ["--native-driver", await edgeDriver()] : [];
+const driverProcess = spawn(tauriDriver, driverArgs, { env, stdio: ["ignore", "inherit", "inherit"] });
 
 // Wait for the driver to listen.
 for (let i = 0; ; i++) {

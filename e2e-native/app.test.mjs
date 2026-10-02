@@ -1,8 +1,9 @@
 /**
  * End-to-end tests against the real desktop app (Rust commands, scope checks,
  * file I/O, the file watcher, single-instance "Open with"), driven through
- * tauri-driver. Run them with `npm run test:native` (Windows), which builds
- * the app and starts the driver.
+ * tauri-driver. Run them with `npm run test:native` (Windows; Linux in CI), which
+ * builds the app and starts the driver. Steps that answer the native Save dialog
+ * (e2e-native/save-dialog.ps1) run on Windows only.
  */
 import { afterEach, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
@@ -30,8 +31,11 @@ function openWithApp(file) {
 /** Waits until no copy of the app is running, so the next launch isn't handed to it. */
 async function waitForExit() {
   for (let i = 0; i < 100; i++) {
-    const list = spawnSync("tasklist", ["/FI", "IMAGENAME eq markpion.exe", "/FO", "CSV", "/NH"], { encoding: "utf8" }).stdout ?? "";
-    if (!/markpion\.exe/i.test(list)) return;
+    const running =
+      process.platform === "win32"
+        ? /markpion\.exe/i.test(spawnSync("tasklist", ["/FI", "IMAGENAME eq markpion.exe", "/FO", "CSV", "/NH"], { encoding: "utf8" }).stdout ?? "")
+        : spawnSync("pgrep", ["-x", "markpion"]).status === 0;
+    if (!running) return;
     await new Promise((r) => setTimeout(r, 200));
   }
   throw new Error("The app didn't exit.");
@@ -193,6 +197,10 @@ describe("the desktop app", () => {
       assert.equal((await exportWith(pdf, { "x-export-name": encodeURIComponent("..\\up.pdf"), "x-export-kind": "pdf" })).kind, "invalidPath");
       // A JSON body (the old base64 form) isn't accepted.
       assert.deepEqual(await exportWith(null, { "x-export-name": "a.pdf", "x-export-kind": "pdf" }), { ok: false, kind: "invalidPath", message: "Invalid export data" });
+
+      // The exports below go through the native Save dialog, which only Windows can answer here
+      // (save-dialog.ps1 uses Windows APIs; WebDriver can't reach native dialogs).
+      if (process.platform !== "win32") return;
 
       // A real export: every byte value survives the trip to disk, through the native Save dialog.
       const target = join(dir, "exported résumé.zip");
