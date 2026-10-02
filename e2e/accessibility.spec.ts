@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { openAiReview, turnOnAi, withStandInAi } from "./ai";
 
 const mod = process.platform === "darwin" ? "Meta" : "Control";
 
@@ -13,7 +14,8 @@ async function start(page: Page, theme: "light" | "dark") {
     window.prompt = (_m?: string, d?: string) => d ?? null;
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
+  // The first load can be slow while the dev server compiles the app for a busy test run.
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible({ timeout: 20_000 });
 }
 
 /** WCAG 2.1 A/AA checks (SRS §15). CodeMirror's editable text is excluded (its internals are managed by the library); its gutters are checked. */
@@ -211,6 +213,14 @@ for (const theme of ["light", "dark"] as const) {
       await page.getByRole("button", { name: "File filters" }).click();
       await expect(page.getByLabel("Files to include")).toBeVisible();
       await audit(page, "search");
+    });
+
+    test("AI review", async ({ page }) => {
+      await withStandInAi(page);
+      await start(page, theme);
+      await turnOnAi(page);
+      await openAiReview(page);
+      await audit(page, "AI review");
     });
 
     test("send feedback", async ({ page }) => {

@@ -692,6 +692,9 @@ function downloadBlob(name: string, blob: Blob) {
 }
 
 export function createDemoBackend() {
+  // End-to-end tests can give the demo a stand-in AI (a page script defines it before the app
+  // loads), so the AI panel can be tested in the browser. The demo has no AI otherwise.
+  const testAi = typeof window !== "undefined" ? (window as { __markpionE2eAi?: (request: AiRequest) => Promise<string> }).__markpionE2eAi : undefined;
   // The sample files count as committed, so editing one shows the Git change bars.
-  return new MemoryBackend({ files: DEMO_FILES, storageKey: "demo-fs", gitHead: DEMO_FILES });
+  return new MemoryBackend({ files: DEMO_FILES, storageKey: "demo-fs", gitHead: DEMO_FILES, ...(typeof testAi === "function" ? { ai: testAi } : {}) });
 }

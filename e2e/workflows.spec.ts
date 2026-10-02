@@ -16,7 +16,8 @@ async function start(page: Page) {
     window.prompt = (_message?: string, defaultValue?: string) => defaultValue ?? null;
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
+  // The first load can be slow while the dev server compiles the app for a busy test run.
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible({ timeout: 20_000 });
 }
 
 async function openDemoFolder(page: Page) {

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { chooseMenu } from "./menu";
+import { openAiReview, turnOnAi, withStandInAi } from "./ai";
 
 /**
  * Layout checks at the window sizes people use, down to the app's minimum
@@ -116,7 +117,8 @@ async function start(page: Page) {
     window.prompt = (_m?: string, d?: string) => d ?? null;
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible();
+  // The first load can be slow while the dev server compiles the app for a busy test run.
+  await expect(page.getByRole("heading", { name: "Markpion" })).toBeVisible({ timeout: 20_000 });
 }
 
 for (const theme of ["light", "dark"] as const) {
@@ -278,6 +280,21 @@ for (const theme of ["light", "dark"] as const) {
       problems.push(...(await layoutProblems(page, "slide show with notes")));
       await page.keyboard.press("Escape");
 
+      expect(problems, problems.join("\n")).toEqual([]);
+    });
+  }
+}
+
+for (const theme of ["light", "dark"] as const) {
+  for (const size of SIZES) {
+    test(`AI review at ${size.width}×${size.height} (${theme})`, async ({ page }) => {
+      await withStandInAi(page);
+      await page.setViewportSize(size);
+      await page.emulateMedia({ colorScheme: theme });
+      await start(page);
+      await turnOnAi(page);
+      await openAiReview(page);
+      const problems = await layoutProblems(page, "AI review");
       expect(problems, problems.join("\n")).toEqual([]);
     });
   }
