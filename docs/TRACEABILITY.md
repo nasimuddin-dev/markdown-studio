@@ -164,7 +164,7 @@ Status of each [SRS](SRS.md) requirement as of version 0.26.0. **Done** means im
 | --- | --- | --- |
 | Unit and component | `tests/` (Vitest, Testing Library, jsdom) | 674 tests in 120 files |
 | End-to-end and accessibility | `e2e/` (Playwright; axe-core WCAG 2.1 AA audits in light and dark themes) | 142 tests (including 24 layout checks at three window sizes and an epub.js reading test) |
-| Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 50 tests (plus 1 ignored live API test) |
+| Rust | `#[cfg(test)]` modules in `src-tauri/src/` | 51 tests (plus 1 ignored live API test) |
 | Native end-to-end (Windows, Linux) | `e2e-native/` (tauri-driver, `npm run test:native`); Windows locally, Linux in CI (WebKitWebDriver under `xvfb-run`) | 6 tests |
 | Visual regression (local) | `e2e-shots/visual.spec.ts` (Playwright, pixel-exact against a local baseline; not in CI because the pixels depend on the OS fonts) | 30 screens in 6 tests |
 

@@ -834,9 +834,9 @@ The user asked to complete the planned items, then to continue the loop until 8:
 | Native app tests on Linux in CI (WebKitWebDriver, xvfb, D-Bus): all 6 pass on Ubuntu 22.04, including the file watcher | a5772a0, 6bd6426 |
 | Export as LaTeX with Pictures (.zip): pictures (SVG to PNG) and Mermaid diagrams as PNG figures; CI compiles a sample with both | 1fc1d47 |
 | Two tests that failed under load: the light-HTML auto-close test now uses forceParsing (ensureSyntaxTree doesn't update the view's state) | 744aa60 |
-| **Bug found by the native hand-over test** (it failed intermittently, and still with a 45 s timeout): a second launch's message could arrive while setup created the main window (WebView2 runs a nested message loop), before the app state was registered; `app.state()` then panicked mid-message and the second copy waited forever. Paths that arrive that early now wait in a queue that setup takes with the launch paths. Passed 3 native runs, 2 of them under load | this release |
+| **Bug found by the native hand-over test** (it failed intermittently, and still with a 45 s timeout): a second launch's message could arrive while setup created the main window (WebView2 runs a nested message loop), before the app state was registered; `app.state()` then panicked mid-message and the second copy waited forever. Paths that arrive that early now wait in a queue that setup takes with the launch paths. Passed 3 native runs, 2 of them under load | 68c67d3 |
 
-**Version:** 0.26.0. **Tests:** Vitest 674 (120 files), Playwright 142 (24 layout checks, 1 epub.js test), Rust 50 (+1 ignored), native 6 (Windows locally, Linux in CI), visual 30 screens (local).
+**Version:** 0.26.0. **Tests:** Vitest 674 (120 files), Playwright 142 (24 layout checks, 1 epub.js test), Rust 51 (+1 ignored), native 6 (Windows locally, Linux in CI), visual 30 screens (local). The full regression run passed for the release commit (68c67d3), with no flakes.
 
 **Unverified:** e-books in Apple Books, Kobo or Calibre (epub.js renders them); the Linux build on a physical desktop (the native tests run under a virtual display); LaTeX with Pictures compiled with real documents beyond the CI sample.
 
