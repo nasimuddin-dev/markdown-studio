@@ -7,6 +7,18 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.28.0
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.28.0)
+
+### Added
+
+- **Publish Folder to GitHub Pages** (File → Publish): builds the open folder as a website, the same pages as Export Folder as HTML Site, and publishes it to the repository's **gh-pages** branch with your own Git and credentials. Your files and your current branch aren't touched. Markpion then shows the site's address with an **Open Site** button. See [Import and export](/guide/import-export#publish-a-folder-to-github-pages).
+
+### Changed
+
+- **Inline math in PDF export** is set as text in more cases instead of keeping its LaTeX: negated symbols (`\notin`, `\not\subset`, `\nsubseteq`, `\nRightarrow`), a script inside a script (`e^{x^y}`), and inline matrices, written row by row: (1, 2; 3, 4). Formulas with accents such as `\hat{x}` still keep their LaTeX.
+
 ## v0.27.0
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.27.0)

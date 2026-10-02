@@ -881,3 +881,24 @@ The user asked to continue with the remaining non-cloud features (Git first).
 2. A plugin system (design for the user's approval first).
 3. Large documents with every section open; the last inline-math cases in PDF.
 4. Then remind the user to start the cloud integration.
+
+## 2026-10-01 (late night): publishing and the last PDF math cases, 0.28.0
+
+Continuing the user's plan (every non-cloud feature, then the cloud integration).
+
+| Item | Commit |
+| --- | --- |
+| Publish Folder to GitHub Pages: the HTML site's pages committed to gh-pages through a temporary index (work tree, index and current branch untouched), on top of the remote's gh-pages so the push fast-forwards; .nojekyll; the Pages address from a GitHub remote; site building shared with Export Folder as HTML Site (`buildSite`) | c9a8967 |
+| PDF inline math: \notin and \not before relations as the symbol with a slash (placed like KaTeX, scaled to heading, footnote and script sizes), AMS negated relations, nested letter scripts in the linear form, inline matrices row by row; the parser reads \not and matrix environments (Word keeps a matrix's LaTeX) | f777ac4 |
+
+**Version:** 0.28.0. **Tests:** Vitest 688 (122 files), Playwright 146, Rust 63 (+1 ignored), native 7 (the Source Control test now also publishes to gh-pages on a local bare remote; Linux in CI too), visual 32 screens (local; the File menu baseline was re-recorded for the new Publish row).
+
+**Unverified:** publishing to a real GitHub repository (the tests use a local bare remote, which runs the same git commands without the network); GitHub Pages must be turned on once in the repository's settings, which Markpion can't do without an account.
+
+**Left in PDF math:** accents (\hat, \vec, \overline: the bundled fonts lack the combining marks) and commands outside the subset (\binom, \mathcal) keep their LaTeX. Copying ∉ from a PDF gives "∈/".
+
+**Next up (the user's plan):**
+
+1. A plugin system: a design for the user's approval first (proposed in this session).
+2. Large documents (several MB) responsive with every section open.
+3. Then remind the user to start the cloud integration (sync, collaboration, cloud backend, and publishing to platforms that need an account such as Confluence).
