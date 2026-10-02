@@ -1,6 +1,6 @@
 import GithubSlugger from "github-slugger";
 import { collectFootnotes, type Footnotes } from "./footnotes";
-import { mathTextRuns } from "./mathText";
+import { mathTextRuns, SLASH_SPACING } from "./mathText";
 import { ALERT_KINDS, takeMdastAlert } from "../alerts";
 import { stripFrontMatter } from "../frontMatter";
 import { unified } from "unified";
@@ -92,12 +92,17 @@ class PdfBuilder {
   /** True while rendering a heading, whose `#words` aren't tags. */
   private inHeading = false;
 
-  private async headingInline(nodes: PhrasingContent[]): Promise<Inline[]> {
+  /** The font size of the text being built, in points (for placing the slash of ∉ and the like). */
+  private fontSize = BODY_SIZE;
+
+  private async headingInline(nodes: PhrasingContent[], depth: number): Promise<Inline[]> {
     this.inHeading = true;
+    this.fontSize = HEADING_SIZES[depth - 1] ?? BODY_SIZE;
     try {
       return await this.inline(nodes);
     } finally {
       this.inHeading = false;
+      this.fontSize = BODY_SIZE;
     }
   }
 
@@ -147,7 +152,13 @@ class PdfBuilder {
           const runs = mathTextRuns(n.value);
           if (runs) {
             out.push(
-              ...runs.map(({ font, ...r }) => ({ ...style, ...r, ...(style.italics && !font ? { italics: true } : {}), ...(font ? { font: MATH_FONTS[font] } : {}) })),
+              ...runs.map(({ font, slashed, ...r }) => {
+                const run = { ...style, ...r, ...(style.italics && !font ? { italics: true } : {}), ...(font ? { font: MATH_FONTS[font] } : {}) };
+                if (!slashed) return run;
+                // The symbol and a slash in one run; negative spacing moves the slash back over the symbol.
+                const size = this.fontSize * (r.sup || r.sub ? SCRIPT_SCALE : 1);
+                return { ...run, text: `${r.text}/`, characterSpacing: SLASH_SPACING * size };
+              }),
             );
           }
           else out.push({ text: `$${n.value}$`, ...style, style: "inlineCode" });
@@ -240,7 +251,7 @@ class PdfBuilder {
         this.headingIds.push({ depth: node.depth, id });
         return [
           {
-            text: await this.headingInline(node.children),
+            text: await this.headingInline(node.children, node.depth),
             style: `h${node.depth}`,
             id,
             outline: true,
@@ -338,9 +349,14 @@ class PdfBuilder {
     ];
     for (const { number, definition } of notes) {
       const body: Content[] = [];
-      for (const child of definition.children) body.push(...(await this.block(child)));
+      this.fontSize = FOOTNOTE_SIZE;
+      try {
+        for (const child of definition.children) body.push(...(await this.block(child)));
+      } finally {
+        this.fontSize = BODY_SIZE;
+      }
       out.push({
-        columns: [{ text: `${number}.`, width: 16, fontSize: 9.5, color: "#5C6575" }, { stack: body, width: "*", fontSize: 9.5 }],
+        columns: [{ text: `${number}.`, width: 16, fontSize: FOOTNOTE_SIZE, color: "#5C6575" }, { stack: body, width: "*", fontSize: FOOTNOTE_SIZE }],
         columnGap: 4,
         id: `fn-${number}`,
       } as Content);
@@ -350,7 +366,13 @@ class PdfBuilder {
 }
 
 /** pdfmake font families for formula symbols Roboto lacks (KaTeX's fonts, as in the preview). */
-const MATH_FONTS = { symbols: "KaTeXMain", doubleStruck: "KaTeXAMS" } as const;
+const MATH_FONTS = { symbols: "KaTeXMain", ams: "KaTeXAMS", doubleStruck: "KaTeXAMS" } as const;
+
+/** Font sizes in points: body text, headings 1–6, footnotes; pdfmake draws sub- and superscripts at 0.58 of the size. */
+const BODY_SIZE = 10.5;
+const HEADING_SIZES = [22, 17, 14, 12, 11, 10.5];
+const FOOTNOTE_SIZE = 9.5;
+const SCRIPT_SCALE = 0.58;
 
 let fontsReady: Promise<typeof import("pdfmake/build/pdfmake")> | null = null;
 
@@ -408,14 +430,14 @@ export async function markdownToPdf(markdown: string, opts: ExportOptions = {}):
     footer: (page, pages) => ({ text: `${page} / ${pages}`, alignment: "center", fontSize: 8, color: "#8A93A3", margin: [0, 20, 0, 0] }),
     // The title at the top of every page after the first (the first shows it as its heading), like printing.
     header: (page) => (page > 1 && opts.title ? { text: opts.title, alignment: "center", fontSize: 8, color: "#8A93A3", margin: [SIDE_MARGIN, 22, SIDE_MARGIN, 0] } : null),
-    defaultStyle: { font: "Roboto", fontSize: 10.5, lineHeight: 1.3, color: "#1D2330" },
+    defaultStyle: { font: "Roboto", fontSize: BODY_SIZE, lineHeight: 1.3, color: "#1D2330" },
     styles: {
-      h1: { fontSize: 22, bold: true, margin: [0, 6, 0, 8] },
-      h2: { fontSize: 17, bold: true, margin: [0, 10, 0, 6] },
-      h3: { fontSize: 14, bold: true, margin: [0, 8, 0, 4] },
-      h4: { fontSize: 12, bold: true, margin: [0, 6, 0, 4] },
-      h5: { fontSize: 11, bold: true, margin: [0, 6, 0, 4] },
-      h6: { fontSize: 10.5, bold: true, color: "#5C6575", margin: [0, 6, 0, 4] },
+      h1: { fontSize: HEADING_SIZES[0], bold: true, margin: [0, 6, 0, 8] },
+      h2: { fontSize: HEADING_SIZES[1], bold: true, margin: [0, 10, 0, 6] },
+      h3: { fontSize: HEADING_SIZES[2], bold: true, margin: [0, 8, 0, 4] },
+      h4: { fontSize: HEADING_SIZES[3], bold: true, margin: [0, 6, 0, 4] },
+      h5: { fontSize: HEADING_SIZES[4], bold: true, margin: [0, 6, 0, 4] },
+      h6: { fontSize: HEADING_SIZES[5], bold: true, color: "#5C6575", margin: [0, 6, 0, 4] },
       link: { color: "#2F5BEA", decoration: "underline" },
       inlineCode: { font: "Courier", fontSize: 9.5, background: "#F2F3F5" },
       code: { font: "Courier", fontSize: 9, lineHeight: 1.2, preserveLeadingSpaces: true },

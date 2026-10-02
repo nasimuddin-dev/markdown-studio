@@ -200,9 +200,10 @@ describe("math in PDF export", () => {
     const text = (await pdfToMarkdown(bytes.buffer as ArrayBuffer)).markdown;
     expect(text).toContain("π");
     expect(text).not.toContain("$e^{i\\pi}$");
-    // Symbols Roboto lacks are drawn in KaTeX's font; ∉ (an overlay in TeX) keeps its source.
+    // Symbols Roboto lacks are drawn in KaTeX's font; ∉ is ∈ with a slash drawn over it.
     expect(text).toContain("A ⊂ B");
-    expect(text).toContain("$x \\notin A$");
+    expect(text).toContain("x ∈/ A");
+    expect(text).not.toContain("\\notin");
     // A script inside a script uses Unicode superscript characters.
     expect(text).toContain("x²");
     expect(text).not.toContain("e^{-x^2}");

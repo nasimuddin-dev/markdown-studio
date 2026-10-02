@@ -13,8 +13,10 @@ export interface MathRun {
   italics?: boolean;
   sup?: boolean;
   sub?: boolean;
-  /** Drawn in KaTeX's main font (`symbols`) or as a plain capital in its AMS font (`doubleStruck`: ℝ is "R"). */
-  font?: "symbols" | "doubleStruck";
+  /** Drawn in KaTeX's main font (`symbols`), its AMS font (`ams`), or as a plain capital in the AMS font (`doubleStruck`: ℝ is "R"). */
+  font?: "symbols" | "ams" | "doubleStruck";
+  /** A single symbol with a slash drawn over it (∉ is ∈ with a slash), as KaTeX draws it. */
+  slashed?: boolean;
 }
 
 /** Symbols Roboto lacks, replaced by a glyph it has that looks the same. */
@@ -25,6 +27,21 @@ export const EXTRA_GLYPHS = "ϑϖ−′″∑∫∏√∞∂≤≥≠≈…ℓ�
 
 /** Symbols Roboto lacks that KaTeX_Main-Regular has (checked by a test). */
 export const SYMBOL_GLYPHS = "∓⋆∘≃≡≅∝≪≫→←↔⇒⇐⇔↦⟹⟺↑↓∈∋⊂⊆⊃⊇∪∩∖∅∀∃∧∨⊕⊗⊥∥∠△∇ℏℜℑℵ⋮⋱⟨⟩∣⌊⌋⌈⌉";
+
+/** Negated relations that KaTeX_AMS-Regular has (checked by a test). */
+export const AMS_GLYPHS = "⊈⊉≁∤∦⊬⊭⇏⇍⇎↛↚∄";
+
+/** Negated symbols no bundled font has: drawn as the symbol with a slash over it. */
+const SLASHED: Record<string, string> = { "∉": "∈", "∌": "∋", "⊄": "⊂", "⊅": "⊃", "≢": "≡" };
+
+/** The width of "/" in KaTeX_Main-Regular, in em (checked by a test). */
+export const SLASH_WIDTH = 0.5;
+
+/**
+ * The spacing, in em, that moves the slash back over the symbol: like KaTeX's
+ * \notin, the slash ends 1mu (1/18 em) before the symbol's end.
+ */
+export const SLASH_SPACING = -(SLASH_WIDTH + 1 / 18);
 
 /** Double-struck capitals (\mathbb), which KaTeX draws as plain capitals in its AMS font. */
 export const DOUBLE_STRUCK_LETTERS: Record<string, string> = { "ℝ": "R", "ℕ": "N", "ℤ": "Z", "ℚ": "Q", "ℂ": "C", "ℙ": "P", "ℍ": "H" };
@@ -43,6 +60,7 @@ const SUBSCRIPT_CHARS: Record<string, string> = {
 const SPACED = new Set([
   "=", "<", ">", "≤", "≥", "≠", "≈", "+", "−", "×", "÷", "±", "∓", "~", "≡", "≅", "≃", "∝", "≪", "≫",
   "→", "←", "↔", "⇒", "⇐", "⇔", "↦", "⟹", "⟺", "∈", "∋", "⊂", "⊆", "⊃", "⊇", "∪", "∩", "∖", "∧", "∨", "⊕", "⊗", "∘",
+  "∉", "∌", "⊄", "⊅", "≢", "⊈", "⊉", "≁", "∤", "∦", "⊬", "⊭", "⇏", "⇍", "⇎", "↛", "↚",
 ]);
 
 function hasGlyph(ch: string): boolean {
@@ -63,12 +81,17 @@ function runs(nodes: MathNode[], pos: "sup" | "sub" | undefined): MathRun[] {
   };
   const scripts = (sub?: MathNode[], sup?: MathNode[]) => {
     if (pos && (sub || sup)) {
-      // A script inside a script (e^{-x^2}): digits and signs as Unicode superscript or subscript characters.
-      for (const [body, chars] of [[sub, SUBSCRIPT_CHARS], [sup, SUPERSCRIPT_CHARS]] as const) {
+      // A script inside a script (e^{-x^2}): digits and signs as Unicode superscript or subscript
+      // characters; anything else (e^{x^a}) in the linear form x^a, as in plain-text math.
+      for (const [body, chars, mark] of [[sub, SUBSCRIPT_CHARS, "_"], [sup, SUPERSCRIPT_CHARS, "^"]] as const) {
         if (!body) continue;
         const text = runs(body, pos).map((r) => r.text).join("").replace(/\s+/g, "");
-        if (!text || ![...text].every((c) => c in chars)) throw new Unrenderable("Nested scripts");
-        push([...text].map((c) => chars[c]).join(""));
+        if (!text) throw new Unrenderable("Empty script");
+        if ([...text].every((c) => c in chars)) push([...text].map((c) => chars[c]).join(""));
+        else {
+          push(mark);
+          out.push(...wrapped(body));
+        }
       }
       return;
     }
@@ -126,6 +149,18 @@ function runs(nodes: MathNode[], pos: "sup" | "sub" | undefined): MathRun[] {
         out.push(...runs(n.body, pos));
         push(n.close);
         break;
+      case "matrix":
+        // In a line of text, a matrix is written row by row: (a, b; c, d).
+        push(n.open || "[");
+        n.rows.forEach((row, r) => {
+          if (r) push("; ");
+          row.forEach((cell, c) => {
+            if (c) push(", ");
+            out.push(...runs(cell, pos));
+          });
+        });
+        push(n.close || "]");
+        break;
     }
   }
   return out;
@@ -160,15 +195,21 @@ export function mathTextRuns(latex: string): MathRun[] | null {
   // Split runs where the font changes; a character no font has keeps the LaTeX.
   const split: MathRun[] = [];
   for (const r of result) {
+    const scripted = { ...(r.sup ? { sup: true } : {}), ...(r.sub ? { sub: true } : {}) };
     for (const ch of r.text) {
-      const font = hasGlyph(ch) ? undefined : SYMBOL_GLYPHS.includes(ch) ? "symbols" : DOUBLE_STRUCK_LETTERS[ch] ? "doubleStruck" : null;
+      if (SLASHED[ch]) {
+        // A run of its own: the PDF builder draws the slash over it.
+        split.push({ text: SLASHED[ch], ...scripted, font: "symbols", slashed: true });
+        continue;
+      }
+      const font = hasGlyph(ch) ? undefined : SYMBOL_GLYPHS.includes(ch) ? "symbols" : AMS_GLYPHS.includes(ch) ? "ams" : DOUBLE_STRUCK_LETTERS[ch] ? "doubleStruck" : null;
       if (font === null) return null;
       const text = font === "doubleStruck" ? DOUBLE_STRUCK_LETTERS[ch] : ch;
       // The symbol fonts are upright.
       const italics = !!r.italics && !font;
       const last = split[split.length - 1];
-      if (last && last.font === font && !!last.italics === italics && !!last.sup === !!r.sup && !!last.sub === !!r.sub) last.text += text;
-      else split.push({ text, ...(italics ? { italics } : {}), ...(r.sup ? { sup: true } : {}), ...(r.sub ? { sub: true } : {}), ...(font ? { font } : {}) });
+      if (last && !last.slashed && last.font === font && !!last.italics === italics && !!last.sup === !!r.sup && !!last.sub === !!r.sub) last.text += text;
+      else split.push({ text, ...(italics ? { italics } : {}), ...scripted, ...(font ? { font } : {}) });
     }
   }
   return split;

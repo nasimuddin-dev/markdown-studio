@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DOUBLE_STRUCK_LETTERS, EXTRA_GLYPHS, mathTextRuns, SYMBOL_GLYPHS } from "../src/services/convert/mathText";
+import { AMS_GLYPHS, DOUBLE_STRUCK_LETTERS, EXTRA_GLYPHS, mathTextRuns, SLASH_WIDTH, SYMBOL_GLYPHS } from "../src/services/convert/mathText";
 
 const text = (latex: string) => mathTextRuns(latex)?.map((r) => r.text).join("") ?? null;
 
@@ -35,11 +35,31 @@ describe("inline formulas as PDF text", () => {
     expect(text("\\epsilon \\cdot \\phi")).toBe("ε·φ");
   });
 
-  it("returns null for glyphs the font lacks, nested scripts and unsupported LaTeX", () => {
-    expect(mathTextRuns("x \\notin A")).toBeNull();
-    expect(mathTextRuns("e^{x^y}")).toBeNull();
-    expect(mathTextRuns("\\begin{matrix} a \\end{matrix}")).toBeNull();
+  it("returns null for glyphs no font has and unsupported LaTeX", () => {
     expect(mathTextRuns("\\unknown")).toBeNull();
+    expect(mathTextRuns("\\begin{align} a \\end{align}")).toBeNull();
+    expect(mathTextRuns("x \\in \\text{日本}")).toBeNull();
+  });
+
+  it("draws ∉ and similar symbols as the symbol with a slash, and negated relations in KaTeX's AMS font", () => {
+    expect(mathTextRuns("x \\notin A")).toEqual([{ text: "x", italics: true }, { text: " " }, { text: "∈", font: "symbols", slashed: true }, { text: " " }, { text: "A", italics: true }]);
+    expect(mathTextRuns("A \\not\\subset B")?.[2]).toEqual({ text: "⊂", font: "symbols", slashed: true });
+    expect(mathTextRuns("a \\not\\equiv b")?.[2]).toEqual({ text: "≡", font: "symbols", slashed: true });
+    expect(mathTextRuns("A \\nsubseteq B")?.[2]).toEqual({ text: "⊈", font: "ams" });
+    // In a script, the slashed symbol keeps the script's position.
+    expect(mathTextRuns("x_{i \\notin S}")?.[2]).toEqual({ text: "∈", sub: true, font: "symbols", slashed: true });
+  });
+
+  it("writes a script inside a script in the linear form when it isn't digits and signs", () => {
+    expect(mathTextRuns("e^{x^y}")).toEqual([{ text: "e", italics: true }, { text: "x", italics: true, sup: true }, { text: "^", sup: true }, { text: "y", italics: true, sup: true }]);
+    expect(mathTextRuns("x_{i_{jk}}")?.map((r) => r.text).join("")).toBe("xi_(jk)");
+    // Digits still become Unicode superscripts.
+    expect(mathTextRuns("e^{-x^2}")).toEqual([{ text: "e", italics: true }, { text: "−", sup: true }, { text: "x", italics: true, sup: true }, { text: "²", sup: true }]);
+  });
+
+  it("writes an inline matrix row by row", () => {
+    expect(mathTextRuns("A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}")?.map((r) => r.text).join("")).toBe("A = (1, 2; 3, 4)");
+    expect(mathTextRuns("\\begin{matrix} a & b \\end{matrix}")?.map((r) => r.text).join("")).toBe("[a, b]");
   });
 
   it("draws arrows, set notation and logic in KaTeX's font, and blackboard capitals in its AMS font", () => {
@@ -70,6 +90,10 @@ describe("inline formulas as PDF text", () => {
     expect([...SYMBOL_GLYPHS].filter((c) => !main.hasGlyphForCodePoint(c.codePointAt(0)!))).toEqual([]);
     const ams = font("KaTeX_AMS-Regular");
     expect(Object.values(DOUBLE_STRUCK_LETTERS).filter((c) => !ams.hasGlyphForCodePoint(c.codePointAt(0)!))).toEqual([]);
+    expect([...AMS_GLYPHS].filter((c) => !ams.hasGlyphForCodePoint(c.codePointAt(0)!))).toEqual([]);
+    // The slash over ∉ is placed with its width.
+    const metrics = main as unknown as { unitsPerEm: number; glyphForCodePoint(c: number): { advanceWidth: number } };
+    expect(metrics.glyphForCodePoint("/".codePointAt(0)!).advanceWidth / metrics.unitsPerEm).toBeCloseTo(SLASH_WIDTH, 3);
   });
 
   it("only allows characters the bundled Roboto font can draw", async () => {

@@ -2,8 +2,8 @@
  * A small LaTeX math parser for exporting formulas as native equations
  * (Word). It covers the common subset (fractions, roots, sub- and
  * superscripts, sums, integrals, limits, \left…\right brackets, text, Greek
- * letters, operators and function names) and throws `UnsupportedLatex` for
- * anything else (matrices, environments, alignment, unknown commands), so the
+ * letters, operators, function names, \not and matrix environments) and throws
+ * `UnsupportedLatex` for anything else (other environments, alignment, unknown commands), so the
  * caller can keep the formula's source instead of exporting it wrongly.
  */
 
@@ -15,7 +15,9 @@ export type MathNode =
   | { t: "sqrt"; body: MathNode[]; degree?: MathNode[] }
   | { t: "scripts"; base: MathNode[]; sub?: MathNode[]; sup?: MathNode[] }
   | { t: "bigop"; op: "sum" | "int" | "prod" | "lim"; sub?: MathNode[]; sup?: MathNode[]; body: MathNode[] }
-  | { t: "fence"; open: string; close: string; body: MathNode[] };
+  | { t: "fence"; open: string; close: string; body: MathNode[] }
+  /** A matrix: rows of cells, inside the environment's brackets. */
+  | { t: "matrix"; open: string; close: string; rows: MathNode[][][] };
 
 export class UnsupportedLatex extends Error {}
 
@@ -35,6 +37,8 @@ const SYMBOLS: Record<string, string> = {
   infty: "∞", partial: "∂", nabla: "∇", hbar: "ℏ", ell: "ℓ", Re: "ℜ", Im: "ℑ", aleph: "ℵ", prime: "′", degree: "°",
   ldots: "…", cdots: "⋯", dots: "…", vdots: "⋮", ddots: "⋱", langle: "⟨", rangle: "⟩", lvert: "|", rvert: "|",
   vert: "|", Vert: "‖", mid: "∣", lfloor: "⌊", rfloor: "⌋", lceil: "⌈", rceil: "⌉",
+  nsubseteq: "⊈", nsupseteq: "⊉", nsim: "≁", nmid: "∤", nparallel: "∦", nvdash: "⊬", nvDash: "⊭", nexists: "∄",
+  nrightarrow: "↛", nleftarrow: "↚", nRightarrow: "⇏", nLeftarrow: "⇍", nLeftrightarrow: "⇎",
   "{": "{", "}": "}", "%": "%", "&": "&", "_": "_", "#": "#", "$": "$", "|": "‖",
   ",": " ", ";": " ", ":": " ", " ": " ", quad: " ", qquad: "  ", "!": "",
 };
@@ -44,12 +48,23 @@ const FUNCTIONS = new Set([
   "log", "ln", "lg", "exp", "max", "min", "sup", "inf", "det", "dim", "ker", "gcd", "deg", "arg", "Pr",
 ]);
 
+/** \not before a symbol: the negated symbol. */
+const NEGATED: Record<string, string> = {
+  "=": "≠", "∈": "∉", "∋": "∌", "⊂": "⊄", "⊃": "⊅", "⊆": "⊈", "⊇": "⊉", "≡": "≢", "∼": "≁", "∣": "∤", "∥": "∦",
+  "∃": "∄", "→": "↛", "←": "↚", "⇒": "⇏", "⇐": "⇍", "⇔": "⇎",
+};
+
+/** Matrix environments and their brackets. */
+const MATRICES: Record<string, [string, string]> = {
+  matrix: ["", ""], smallmatrix: ["", ""], pmatrix: ["(", ")"], bmatrix: ["[", "]"], Bmatrix: ["{", "}"], vmatrix: ["|", "|"], Vmatrix: ["‖", "‖"],
+};
+
 const BIG_OPS: Record<string, "sum" | "int" | "prod" | "lim"> = { sum: "sum", int: "int", prod: "prod", lim: "lim" };
 
 const DOUBLE_STRUCK: Record<string, string> = { R: "ℝ", N: "ℕ", Z: "ℤ", Q: "ℚ", C: "ℂ", P: "ℙ", H: "ℍ" };
 
 /** Relations end the body of a sum or integral: `\sum_k a_k = S`. */
-const RELATIONS = new Set(["=", "<", ">", "≤", "≥", "≠", "≈", "≡", "∼", "≃", "≅", "∝", "→", "⇒", "⇔", "↦", ",", ";"]);
+const RELATIONS = new Set(["=", "<", ">", "≤", "≥", "≠", "≈", "≡", "≢", "∼", "≁", "≃", "≅", "∝", "→", "⇒", "⇔", "↦", ",", ";"]);
 
 function tokenize(src: string): string[] {
   const tokens: string[] = [];
@@ -78,6 +93,8 @@ function tokenize(src: string): string[] {
 
 class Parser {
   private i = 0;
+  /** Inside a matrix, "&" and "\\" end a cell and \end ends the matrix. */
+  private matrixDepth = 0;
   constructor(private tokens: string[]) {}
 
   parse(): MathNode[] {
@@ -98,6 +115,7 @@ class Parser {
     while (this.i < this.tokens.length && this.peek() !== stop) {
       const tok = this.peek();
       if (tok === "}" || tok === "\\right") break;
+      if (this.matrixDepth && (tok === "&" || tok === "\\\\" || tok === "\\end")) break;
       if (tok === "^" || tok === "_") {
         this.i++;
         const arg = this.argument();
@@ -225,6 +243,14 @@ class Parser {
         const letters = this.rawArgument();
         return { t: "text", v: [...letters].map((c) => DOUBLE_STRUCK[c] ?? c).join(""), upright: true };
       }
+      case "not": {
+        const next = this.atom();
+        const negated = next.t === "text" ? NEGATED[next.v] : undefined;
+        if (!negated) throw new UnsupportedLatex("\\not before this symbol");
+        return { t: "text", v: negated };
+      }
+      case "begin":
+        return this.matrix();
       case "big": case "Big": case "bigg": case "Bigg": case "displaystyle": case "textstyle": case "limits":
         return { t: "group", body: [] };
     }
@@ -233,11 +259,34 @@ class Parser {
     if (name in SYMBOLS) return { t: "text", v: SYMBOLS[name] };
     throw new UnsupportedLatex(`Unsupported command \\${name}`);
   }
+
+  /** A matrix environment, after \begin: cells split by "&", rows by "\\". */
+  private matrix(): MathNode {
+    const env = this.rawArgument();
+    const brackets = MATRICES[env];
+    if (!brackets) throw new UnsupportedLatex(`The ${env} environment isn't supported`);
+    this.matrixDepth++;
+    const rows: MathNode[][][] = [[]];
+    for (;;) {
+      rows[rows.length - 1].push(this.list(null));
+      const tok = this.peek();
+      this.i++;
+      if (tok === "&") continue;
+      if (tok === "\\\\") rows.push([]);
+      else if (tok === "\\end") break;
+      else throw new UnsupportedLatex(`Unclosed ${env}`);
+    }
+    if (this.rawArgument() !== env) throw new UnsupportedLatex(`Unclosed ${env}`);
+    this.matrixDepth--;
+    // A trailing "\\" leaves an empty last row.
+    const last = rows[rows.length - 1];
+    if (rows.length > 1 && last.length === 1 && !last[0].length) rows.pop();
+    return { t: "matrix", open: brackets[0], close: brackets[1], rows };
+  }
 }
 
 /** Parses a LaTeX formula; throws UnsupportedLatex for constructs outside the supported subset. */
 export function parseLatex(src: string): MathNode[] {
-  if (/\\begin\b|\\\\/.test(src)) throw new UnsupportedLatex("Environments and line breaks aren't supported");
   return new Parser(tokenize(src)).parse();
 }
 
@@ -258,6 +307,7 @@ export function mathToText(nodes: MathNode[]): string {
         case "scripts": return `${mathToText(n.base)}${n.sub ? `_${wrap(n.sub)}` : ""}${n.sup ? `^${wrap(n.sup)}` : ""}`;
         case "bigop": return `${{ sum: "∑", int: "∫", prod: "∏", lim: "lim" }[n.op]}${n.sub ? `_${wrap(n.sub)}` : ""}${n.sup ? `^${wrap(n.sup)}` : ""} ${mathToText(n.body)}`.trimEnd();
         case "fence": return `${n.open}${mathToText(n.body)}${n.close}`;
+        case "matrix": return `${n.open}${n.rows.map((row) => row.map(mathToText).join(", ")).join("; ")}${n.close}`;
       }
     })
     .join("");

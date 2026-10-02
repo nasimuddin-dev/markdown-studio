@@ -30,8 +30,21 @@ describe("LaTeX math parser", () => {
   });
 
   it("rejects constructs it can't convert faithfully", () => {
-    for (const src of ["\\begin{pmatrix} a & b \\end{pmatrix}", "a \\\\ b", "\\unknowncommand x", "x^", "\\frac{1}", "a & b"]) {
+    for (const src of [
+      "\\begin{align} a \\end{align}", "\\begin{pmatrix} a & b \\end{bmatrix}", "\\begin{pmatrix} a & b", "a \\\\ b", "\\unknowncommand x", "x^", "\\frac{1}", "a & b", "\\not x", "\\end{matrix}",
+    ]) {
       expect(() => parseLatex(src), src).toThrow(UnsupportedLatex);
     }
+  });
+
+  it("reads matrices row by row, with their brackets", () => {
+    expect(mathToText(parseLatex("\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}"))).toBe("(a, b; c, d)");
+    expect(mathToText(parseLatex("\\begin{bmatrix} x^2 & \\frac{1}{2} \\\\ \\end{bmatrix}"))).toBe("[x^2, 1/2]");
+    expect(parseLatex("\\begin{vmatrix} 1 \\end{vmatrix}")).toEqual([{ t: "matrix", open: "|", close: "|", rows: [[[{ t: "text", v: "1" }]]] }]);
+  });
+
+  it("negates relations with \\not and knows the AMS negated symbols", () => {
+    expect(mathToText(parseLatex("x \\not\\in A \\not= B \\not\\subset C"))).toBe("x∉A≠B⊄C");
+    expect(mathToText(parseLatex("A \\nsubseteq B \\nRightarrow \\nexists"))).toBe("A⊈B⇏∄");
   });
 });

@@ -41,7 +41,7 @@ description: Fix Markpion preview problems, including a paused preview, images t
 
 - Check **Settings → Preview → Render Mermaid diagrams** and **Render LaTeX math**.
 - The code block must start with exactly ` ```mermaid `.
-- In **PDF** exports, inline formulas are set as text (ones with nested scripts other than digits and signs, matrices or overlaid symbols such as `\notin` stay LaTeX), and display formulas are vector drawings (Word exports turn formulas into Word equations). Use **Print / Save as PDF** for a PDF with every formula rendered.
+- In **PDF** exports, inline formulas are set as text (ones with accents such as `\hat{x}` or less common commands such as `\binom` stay LaTeX), and display formulas are vector drawings (Word exports turn formulas into Word equations). Use **Print / Save as PDF** for a PDF with every formula rendered.
 
 ## Text with dollar signs turns into math
 

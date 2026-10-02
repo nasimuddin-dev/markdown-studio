@@ -3,7 +3,7 @@ import {
   MathRun, MathSquareBrackets, MathSubScript, MathSubSuperScript, MathSum, MathSuperScript, XmlComponent, BuilderElement,
   type MathComponent,
 } from "docx";
-import { parseLatex, type MathNode } from "./latex";
+import { parseLatex, UnsupportedLatex, type MathNode } from "./latex";
 
 /** Text for an `m:t` element. */
 class MathText extends XmlComponent {
@@ -98,6 +98,9 @@ function components(nodes: MathNode[]): MathComponent[] {
         }
         break;
       }
+      case "matrix":
+        // The docx library has no matrix element: Word keeps the formula's LaTeX.
+        throw new UnsupportedLatex("Matrices in Word equations");
     }
   }
   flush();
