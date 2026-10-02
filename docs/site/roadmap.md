@@ -22,7 +22,7 @@ See the [changelog](/changelog) for details per version.
 
 ## In progress
 
-Nothing is actively under development right now. The next items are chosen from the Planned list.
+- **Source control:** staging, unstaging and committing changes from Markpion (Git status, change bars and the last commit are already shown). Next: publishing to static sites and documentation platforms, then a plugin system. Cloud sync and collaboration come after these.
 
 ## Planned
 

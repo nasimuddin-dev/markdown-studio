@@ -4,6 +4,9 @@ mod commands;
 mod error;
 mod fs_ops;
 mod git;
+// Used by the Source Control commands, which come next (see DEV_LOG).
+#[allow(dead_code)]
+mod git_write;
 mod history;
 mod menu;
 mod open_paths;
