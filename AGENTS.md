@@ -24,7 +24,7 @@ To support a new host (for example a cloud version), implement `Backend` and cho
 | --- | --- |
 | Full regression (before every release, after UI changes) | `npm run test:regression`: type check, unit, build and start-up budget, notices, e2e + accessibility (failures rerun once), visual comparison, native tests, docs; report in `regression-report/report.md`. `-- --quick` skips visual and native |
 | Type check / unit tests / e2e | `npm run typecheck`, `npm test`, `npm run test:e2e` |
-| Native e2e (Windows, real app) | `npm run test:native` (needs `cargo install tauri-driver --locked`; close Markpion first) |
+| Native e2e (real app; Windows locally, Linux in CI) | `npm run test:native` (needs `cargo install tauri-driver --locked`; close Markpion first) |
 | Rust tests | `cargo test --manifest-path src-tauri/Cargo.toml` |
 | Unused files, exports and dependencies | `npm run check:unused` |
 | Third-party notices (after changing dependencies) | `npm run notices` regenerates `THIRD_PARTY_NOTICES.md`; CI runs `npm run notices -- --check` |

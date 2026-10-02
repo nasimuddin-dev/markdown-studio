@@ -167,7 +167,7 @@ That runs the desktop app with hot reload. Other scripts:
 | `npm run test:e2e` | End-to-end tests (Playwright) against the browser demo; uses the installed Microsoft Edge on Windows |
 | `npm run test:regression` | The full regression run before a release: type check, unit tests, build and start-up budget, notices, end-to-end flows with accessibility audits (failures rerun once), the visual comparison, native tests (close Markpion first) and the docs check; writes `regression-report/report.md`. `release:installer` requires a full pass for the commit being released |
 | `npm run test:visual` / `test:visual:update` | Compares 30 screens (both themes) with the local baseline in `e2e-shots/out/visual/` / records a new baseline after reviewing an intended change |
-| `npm run test:native` | End-to-end tests against the real desktop app (Windows): builds a debug app, then drives it through tauri-driver (`cargo install tauri-driver --locked`); the matching Edge WebDriver is downloaded on first use. The app keeps its data in a temporary folder, not your profile |
+| `npm run test:native` | End-to-end tests against the real desktop app (Windows and Linux; CI runs them on Linux): builds a debug app, then drives it through tauri-driver (`cargo install tauri-driver --locked`); on Windows the matching Edge WebDriver is downloaded on first use, on Linux it needs `webkit2gtk-driver` and a display. The app keeps its data in a temporary folder, not your profile |
 | `npm run typecheck` | TypeScript type check |
 | `cargo test --manifest-path src-tauri/Cargo.toml` | Rust tests (scope, safe save, encoding, settings, history, search, watcher) |
 | `npm run build` | Type check and production build of the frontend (`dist/`) |

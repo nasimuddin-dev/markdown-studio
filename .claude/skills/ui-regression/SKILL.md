@@ -27,7 +27,7 @@ It runs, in order, and writes `regression-report/report.md`:
 | Third-party notices | `THIRD_PARTY_NOTICES.md` matches the dependencies |
 | End-to-end + accessibility | Playwright user flows against the browser demo, with axe WCAG 2.1 AA audits in light and dark themes, and layout checks at 720×480, 1024×640 and 1366×768 (`e2e/layout.spec.ts`: no sideways scrolling, dialogs and their buttons on screen, no overlapping or clipped controls). Failures are rerun once alone: passing on the rerun means machine load, failing again means a real failure |
 | Visual comparison | 30 screens (both themes), pixel for pixel against the local baseline in `e2e-shots/out/visual/` |
-| Native (real app) | tauri-driver tests against the real Windows app (start-up, file handover, saving, raw-byte IPC, Save dialog exports, the feedback dialog) |
+| Native (real app) | tauri-driver tests against the real Windows app (CI also runs them on Linux) (start-up, file handover, saving, raw-byte IPC, Save dialog exports, the feedback dialog) |
 | Documentation | the website builds and its links resolve |
 
 Options: `--no-native` (skip the native tests), `--quick` (skip visual and native). Neither clears a release.

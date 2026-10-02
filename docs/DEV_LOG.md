@@ -787,8 +787,8 @@ The user asked for a third-party notices file, for error reporting and feedback 
 **Next up:**
 
 1. Check the installed 0.25.1: Help → Send Feedback, Help → Third-Party Notices, and the notices file in the install folder.
-2. Open exported EPUBs in e-reader apps.
-3. The Linux watcher on a real Linux desktop.
+2. Open exported EPUBs in Apple Books, Kobo or Calibre (epub.js renders them in an e2e test).
+3. The Linux build on a physical Linux desktop (the native tests run in CI under a virtual display).
 
 ## 2026-10-01 (late afternoon): development loop, 0.25.2
 
@@ -819,5 +819,5 @@ The user asked for an end-to-end UI regression suite run before every release, s
 **Next up:**
 
 1. A layout check of the AI panel (it shows only during an AI request, so it needs a stubbed response).
-2. Open exported EPUBs in e-reader apps.
-3. The Linux watcher on a real Linux desktop.
+2. Open exported EPUBs in Apple Books, Kobo or Calibre (epub.js renders them in an e2e test).
+3. The Linux build on a physical Linux desktop (the native tests run in CI under a virtual display).
