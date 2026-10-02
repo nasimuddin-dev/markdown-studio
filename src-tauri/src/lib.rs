@@ -168,6 +168,7 @@ pub fn run() {
             commands::workspace::git_create_branch,
             commands::workspace::git_pull,
             commands::workspace::git_push,
+            commands::workspace::git_publish_pages,
             commands::workspace::list_convertible_files,
             commands::app_data::list_history,
             commands::workspace::watch_workspace,

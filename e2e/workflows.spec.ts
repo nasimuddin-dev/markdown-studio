@@ -83,6 +83,20 @@ test("Source Control: stage a saved change, commit it, and the change bars clear
   await expect(panel.getByRole("button", { name: /^Branch: main/ })).toBeVisible();
 });
 
+test("Publish to GitHub Pages asks first, then explains why it can't (the demo has no remote)", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await chooseMenu(page, "File", "Publish", "Folder to GitHub Pages…");
+  const dialog = page.getByRole("dialog", { name: "Publish to GitHub Pages?" });
+  await expect(dialog).toContainText(/pages will be built from “.+”, committed to the gh-pages branch/);
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  await expect(dialog).toHaveCount(0);
+
+  await chooseMenu(page, "File", "Publish", "Folder to GitHub Pages…");
+  await dialog.getByRole("button", { name: "Publish" }).click();
+  await expect(page.getByText(/Couldn't publish the folder: This repository has no remote to publish to/)).toBeVisible();
+});
+
 test("create, edit, preview, save, close and reopen a document (§17.2)", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);

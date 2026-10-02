@@ -30,7 +30,7 @@ Markpion works fully offline. It connects to the internet in only these cases:
 | When you choose **Update Now** (Windows) | It downloads the new installer from GitHub Releases. | Don't choose Update Now |
 | When a document you preview contains an `https://` image | The image is loaded from its web server, as in a browser, which reveals your IP address to that server. | Yes: **Settings → Preview → Show pictures from the web in the preview** (off: a placeholder is shown instead) |
 | When you click a web link in the preview | The link opens in your browser. | |
-| When you choose **Pull** or **Push** in the Git tab | Your Git contacts the repository's remote, with your Git credentials, as on the command line. Nothing else is sent. | Don't choose Pull or Push |
+| When you choose **Pull** or **Push** in the Git tab, or **File → Publish → Folder to GitHub Pages** | Your Git contacts the repository's remote, with your Git credentials, as on the command line. Nothing else is sent. | Don't choose Pull or Push |
 | When you save an Anthropic API key, or run an AI command (only if the [AI assistant](/guide/ai-assistant) is turned on) | Saving the key checks it with `api.anthropic.com`. An AI command sends the selected text (or the paragraph at the cursor, or up to 6,000 characters before it) and the instruction to Anthropic's Claude API, under your key. Markpion asks before the first one. | Yes: it's off by default; **Settings → AI Assistant** |
 
 The app's Content Security Policy limits the interface's own network requests to `api.github.com`. AI requests are made by Markpion's native part, which alone can read the API key.

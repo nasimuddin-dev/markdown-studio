@@ -42,6 +42,7 @@ export const MENUS: MenuDef[] = [
         c("exportPdf", "PDF…"), c("exportDocx", "Word (.docx)…"), c("exportHtml", "HTML…"), c("exportEpub", "EPUB (E-book)…"), c("exportLatex", "LaTeX (.tex)…"), c("exportLatexZip", "LaTeX with Pictures (.zip)…"), c("exportZip", "Markdown with Images (.zip)…"), sep,
         c("combineFolder"), c("exportFolderPdf"), c("exportFolderDocx"), c("exportFolderEpub"), c("exportFolderLatex"), c("exportFolderHtml"),
       ]),
+      sub("Publish", [c("publishGitHubPages", "Folder to GitHub Pages…")]),
       sub("Copy As", [c("copyFormatted", "Formatted Text"), c("copyPlainText", "Plain Text"), c("copyHtml", "HTML"), c("copyLatex", "LaTeX")]),
       c("print"), sep,
       c("closeTab"), c("closeAllTabs"), c("reopenClosedTab"), c("closeFolder"), sep,

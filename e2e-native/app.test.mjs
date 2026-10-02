@@ -154,6 +154,17 @@ describe("the desktop app", () => {
       await s.waitFor(async () => !(await s.exec("return document.querySelector(\"button[aria-label^='Pull']\").disabled")), "Pull to be enabled");
       await s.click(await s.find("button[aria-label^='Pull']"));
       await s.waitFor(() => existsSync(join(repoDir, "from-elsewhere.md")), "the pulled file");
+
+      // Publish the folder as a site to gh-pages on the remote; the work tree and the branch stay as they are.
+      await s.click(await s.findByText(".menu-button", "File"));
+      await s.click(await s.findByText(".menu-item-label", "Publish"));
+      await s.click(await s.findByText(".menu-item-label", "Folder to GitHub Pages…"));
+      await s.click(await s.findByText(".modal-buttons button", "Publish"));
+      const published = () => spawnSync("git", ["-C", remote, "ls-tree", "-r", "--name-only", "gh-pages"], { encoding: "utf8" }).stdout;
+      await s.waitFor(() => /notes\.html/.test(published()), "the published pages");
+      assert.deepEqual(published().trim().split("\n"), [".nojekyll", "from-elsewhere.html", "index.html", "notes.html"]);
+      assert.equal(git("rev-parse", "--abbrev-ref", "HEAD").trim(), "main");
+      assert.equal(git("status", "--porcelain"), "");
     } finally {
       await s.quit();
     }

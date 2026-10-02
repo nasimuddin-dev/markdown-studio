@@ -156,6 +156,22 @@ pub async fn git_push(state: State<'_, AppState>, root: String) -> AppResult<()>
     super::blocking(move || crate::git_write::push(&dir).map_err(AppError::Git)).await
 }
 
+/// A page of a published site: its path inside the site ("guide/setup.html") and its HTML.
+#[derive(serde::Deserialize)]
+pub struct SiteFile {
+    path: String,
+    content: String,
+}
+
+/// Publishes a site built from the open folder to the gh-pages branch of its repository and pushes it.
+#[tauri::command]
+pub async fn git_publish_pages(state: State<'_, AppState>, root: String, files: Vec<SiteFile>, message: String) -> AppResult<crate::git_write::PublishResult> {
+    let dir = state.scope.check(Path::new(&root))?;
+    state.logger.log("info", "git", &format!("publish {} pages", files.len()));
+    let files: Vec<(String, String)> = files.into_iter().map(|f| (f.path, f.content)).collect();
+    super::blocking(move || crate::git_write::publish_pages(&dir, &files, &message).map_err(AppError::Git)).await
+}
+
 /// Git branch and changed files for an approved folder; `None` without Git or outside a repository.
 #[tauri::command]
 pub async fn git_status(state: State<'_, AppState>, root: String) -> AppResult<Option<crate::git::GitStatus>> {

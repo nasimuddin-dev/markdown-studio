@@ -68,7 +68,7 @@ This page lists what Markpion does today. Each feature links to its guide. Plann
 
 - **Import** Word (`.docx`), PDF, web pages (`.html`), EPUB e-books and CSV/TSV as Markdown, one file at a time or a whole folder. [Import & export](/guide/import-export)
 - **Export** to PDF (selectable text, links, bookmarks) and Word (`.docx`) on A4 or Letter paper with real headings, lists and tables, to standalone HTML, as an EPUB e-book (table of contents, pictures, math and diagrams included), as a LaTeX document (math kept as written; with its pictures and diagrams in a .zip that compiles as it is), as a `.zip` with the document and its pictures, or through Print → Save as PDF. You can also Copy as Formatted Text (paste into Word, email or Google Docs), Copy as Plain Text, Copy as HTML or Copy as LaTeX.
-- **Combine a folder** into one document with a table of contents, export a whole folder as one PDF or Word file, or as an **HTML site** with a page per document, working links and a contents page.
+- **Combine a folder** into one document with a table of contents, export a whole folder as one PDF or Word file, or as an **HTML site** with a page per document, working links and a contents page, and **publish** that site to GitHub Pages (File → Publish).
 
 ## App
 

@@ -21,6 +21,18 @@ export interface GitChange {
 }
 
 /** Source Control: the branches and how the current one stands against its upstream. */
+/** A site published to GitHub Pages (the gh-pages branch). */
+export interface PublishResult {
+  /** The commit on gh-pages (short hash). */
+  commit: string;
+  /** The remote it was pushed to. */
+  remote: string;
+  /** The site's address, when the remote is on GitHub. */
+  url: string | null;
+  /** The pages were the same as the last published ones. */
+  unchanged: boolean;
+}
+
 export interface GitBranches {
   /** The checked-out branch; null on a detached HEAD. */
   current: string | null;

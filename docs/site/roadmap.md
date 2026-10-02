@@ -15,6 +15,7 @@ This roadmap comes from the project's [requirements specification](https://githu
 - **Productivity:** outline, command palette, Find in Files, formatting toolbar, tables, templates, table of contents, Markdown lint and link checking, presenting as slides.
 - **Git:** staging, committing, branches, pull and push in the Git tab; changed files in the Explorer, the branch in the status bar, change bars in the editor with revert, and the last commit in File History.
 - **Conversion:** import from Word, PDF, HTML and CSV; export to PDF, Word, HTML, EPUB and LaTeX, including whole folders.
+- **Publishing:** a folder as a website on GitHub Pages, through your own Git.
 - **AI assistant (optional):** Claude improves, fixes, shortens, summarizes, translates or continues text, with your own API key and a review before any change.
 - **Distribution:** separate installers for Windows, macOS and Linux on every release, and signed automatic updates on Windows.
 
@@ -22,7 +23,7 @@ See the [changelog](/changelog) for details per version.
 
 ## In progress
 
-- **Publishing** to static sites and documentation platforms. Next: a plugin system. Cloud sync and collaboration come after these.
+- **A plugin system**, designed so plugins can't reach your files or the AI key without your permission. Cloud sync, collaboration and publishing to documentation platforms that need an account come after it.
 
 ## Planned
 
@@ -36,4 +37,4 @@ These depend on decisions or resources that aren't settled yet:
 
 - **Code signing:** Windows Authenticode and Apple notarization, so the first launch doesn't show warnings. This needs signing certificates.
 - **Automatic updates on macOS and Linux**, like on Windows.
-- **Future enhancements from the specification:** Git integration, plugins, cloud sync, collaboration and publishing workflows.
+- **Future enhancements from the specification:** plugins, cloud sync, collaboration, and publishing to hosted documentation platforms.

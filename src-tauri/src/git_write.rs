@@ -36,11 +36,17 @@ const NETWORK_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// Runs git, stopping it after `timeout` (None: no limit).
 fn run_for(dir: &Path, args: &[&str], timeout: Option<Duration>) -> Result<String, String> {
+    run_env(dir, args, &[], timeout)
+}
+
+/// Runs git with extra environment variables.
+fn run_env(dir: &Path, args: &[&str], env: &[(&str, &std::ffi::OsStr)], timeout: Option<Duration>) -> Result<String, String> {
     let mut cmd = Command::new("git");
     cmd.arg("-C")
         .arg(dir)
         .args(["-c", "core.quotepath=false"])
         .args(args)
+        .envs(env.iter().copied())
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -251,6 +257,133 @@ pub fn commit(root: &Path, message: &str) -> Result<String, String> {
     Ok(run(root, &["rev-parse", "--short", "HEAD"])?.trim().to_string())
 }
 
+/// The branch GitHub Pages serves a site from.
+const PAGES_BRANCH: &str = "gh-pages";
+
+#[derive(Debug, Serialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct PublishResult {
+    /// The new commit on gh-pages (short hash).
+    pub commit: String,
+    /// The remote it was pushed to (`origin`).
+    pub remote: String,
+    /// The site's address, when the remote is on GitHub.
+    pub url: Option<String>,
+    /// The pages were the same as the last published ones (nothing new was committed).
+    pub unchanged: bool,
+}
+
+/// The GitHub Pages address for a GitHub remote URL (https or ssh); None for other hosts.
+pub fn pages_url(remote_url: &str) -> Option<String> {
+    let url = remote_url.trim().trim_end_matches('/');
+    let rest = ["https://github.com/", "http://github.com/", "ssh://git@github.com/", "git@github.com:"].iter().find_map(|p| url.strip_prefix(p))?;
+    let rest = rest.strip_suffix(".git").unwrap_or(rest);
+    let (owner, repo) = rest.split_once('/')?;
+    if owner.is_empty() || repo.is_empty() || repo.contains('/') {
+        return None;
+    }
+    let owner = owner.to_lowercase();
+    // A repository named owner.github.io is served at the root.
+    if repo.to_lowercase() == format!("{owner}.github.io") {
+        Some(format!("https://{owner}.github.io/"))
+    } else {
+        Some(format!("https://{owner}.github.io/{repo}/"))
+    }
+}
+
+/// A site file's path ("guide/setup.html"): relative, "/" separators, no "." or ".." parts.
+fn site_path(rel: &str) -> Result<PathBuf, String> {
+    let ok = !rel.is_empty() && !rel.starts_with('/') && !rel.contains('\\') && !rel.contains(':') && rel.split('/').all(|part| !part.is_empty() && part != "." && part != "..");
+    if !ok {
+        return Err(format!("“{rel}” isn't a valid path for a page."));
+    }
+    Ok(rel.split('/').collect())
+}
+
+/// A temporary folder that's removed when dropped.
+struct TempFolder(PathBuf);
+impl TempFolder {
+    fn new(tag: &str) -> Result<Self, String> {
+        let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0);
+        let dir = std::env::temp_dir().join(format!("markpion-{tag}-{}-{nanos}", std::process::id()));
+        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        Ok(Self(dir))
+    }
+}
+impl Drop for TempFolder {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
+/// Publishes `files` (path inside the site, content) to the gh-pages branch of the
+/// repository that holds `root`, and pushes it to the first remote. The site
+/// replaces gh-pages' previous content as a new commit on top of it; the working
+/// tree, the index and the current branch aren't touched.
+pub fn publish_pages(root: &Path, files: &[(String, String)], message: &str) -> Result<PublishResult, String> {
+    if files.is_empty() {
+        return Err("There are no pages to publish.".into());
+    }
+    let remotes = run(root, &["remote"])?;
+    let Some(remote) = remotes.lines().map(str::trim).find(|r| !r.is_empty()).map(String::from) else {
+        return Err("This repository has no remote to publish to. Add one (for example on GitHub) with your Git tool first.".into());
+    };
+    let git_dir = PathBuf::from(run(root, &["rev-parse", "--absolute-git-dir"])?.trim());
+
+    // The site's files in a folder of their own; .nojekyll makes GitHub serve them as they are.
+    let site = TempFolder::new("site")?;
+    let scratch = TempFolder::new("index")?;
+    for (rel, content) in files {
+        let path = site.0.join(site_path(rel)?);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        std::fs::write(&path, content).map_err(|e| e.to_string())?;
+    }
+    std::fs::write(site.0.join(".nojekyll"), "").map_err(|e| e.to_string())?;
+
+    // Build on what's already published, so the push is a fast-forward.
+    let tracking = format!("refs/remotes/{remote}/{PAGES_BRANCH}");
+    if let Err(e) = run_for(root, &["fetch", "--quiet", &remote, &format!("+refs/heads/{PAGES_BRANCH}:{tracking}")], Some(NETWORK_TIMEOUT)) {
+        if !e.contains("couldn't find remote ref") {
+            return Err(e);
+        }
+    }
+    let local = format!("refs/heads/{PAGES_BRANCH}");
+    let resolve = |r: &str| run(root, &["rev-parse", "--verify", "--quiet", &format!("{r}^{{commit}}")]).ok().map(|s| s.trim().to_string());
+    let parent = resolve(&tracking).or_else(|| resolve(&local));
+
+    // A tree of the site's files, through a temporary index (the repository's own index stays as it is).
+    let index = scratch.0.join("index");
+    let env = [("GIT_INDEX_FILE", index.as_os_str()), ("GIT_DIR", git_dir.as_os_str()), ("GIT_WORK_TREE", site.0.as_os_str())];
+    run_env(&site.0, &["add", "--all", "--force", "."], &env, None)?;
+    let tree = run_env(&site.0, &["write-tree"], &env, None)?.trim().to_string();
+
+    let unchanged = match &parent {
+        Some(p) => run(root, &["rev-parse", &format!("{p}^{{tree}}")])?.trim() == tree,
+        None => false,
+    };
+    let commit = if unchanged {
+        parent.clone().unwrap_or_default()
+    } else {
+        let message = if message.trim().is_empty() { "Publish the site" } else { message.trim() };
+        let mut args = vec!["commit-tree", tree.as_str()];
+        if let Some(p) = &parent {
+            args.extend(["-p", p.as_str()]);
+        }
+        args.extend(["-m", message]);
+        run(root, &args)?.trim().to_string()
+    };
+    // Moves gh-pages only if it hasn't changed meanwhile ("" = it must not exist yet).
+    let old = resolve(&local).unwrap_or_default();
+    run(root, &["update-ref", "-m", "Markpion: publish", &local, &commit, &old])?;
+    run_for(root, &["push", "--quiet", &remote, &format!("{local}:{local}")], Some(NETWORK_TIMEOUT))?;
+
+    let url = run(root, &["remote", "get-url", &remote]).ok().and_then(|u| pages_url(&u));
+    let short = run(root, &["rev-parse", "--short", &commit])?.trim().to_string();
+    Ok(PublishResult { commit: short, remote, url, unchanged })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -409,6 +542,72 @@ mod tests {
         commit(dir.path(), "first").unwrap();
         assert!(push(dir.path()).unwrap_err().starts_with("This repository has no remote"));
         assert!(pull(dir.path()).unwrap_err().starts_with("This branch has no upstream"));
+    }
+
+    fn site(pages: &[(&str, &str)]) -> Vec<(String, String)> {
+        pages.iter().map(|(p, c)| (p.to_string(), c.to_string())).collect()
+    }
+
+    #[test]
+    fn publishes_pages_to_gh_pages_without_touching_the_work_tree() {
+        let (remote, dir) = cloned();
+        push(dir.path()).unwrap();
+        // An uncommitted change and a staged one stay as they are.
+        fs::write(dir.path().join("a.md"), "edited\n").unwrap();
+        fs::write(dir.path().join("new.md"), "new\n").unwrap();
+        stage(dir.path(), &[file(&dir, "new.md")]).unwrap();
+        let before = changes(dir.path()).unwrap();
+
+        let r = publish_pages(dir.path(), &site(&[("index.html", "<h1>Home</h1>"), ("guide/setup.html", "<p>Setup</p>")]), "Publish").unwrap();
+        assert_eq!((r.remote.as_str(), r.unchanged, r.url.clone()), ("origin", false, None));
+        assert_eq!(changes(dir.path()).unwrap(), before);
+        assert_eq!(branches(dir.path()).unwrap().current.as_deref(), Some("main"));
+        let files = run(remote.path(), &["ls-tree", "-r", "--name-only", "gh-pages"]).unwrap();
+        assert_eq!(files.lines().collect::<Vec<_>>(), vec![".nojekyll", "guide/setup.html", "index.html"]);
+        assert_eq!(run(remote.path(), &["show", "gh-pages:guide/setup.html"]).unwrap(), "<p>Setup</p>");
+
+        // Publishing again replaces the pages, on top of the last publish.
+        let again = publish_pages(dir.path(), &site(&[("index.html", "<h1>Home 2</h1>")]), "Again").unwrap();
+        assert!(!again.unchanged);
+        assert_eq!(run(remote.path(), &["ls-tree", "-r", "--name-only", "gh-pages"]).unwrap().lines().count(), 2);
+        assert_eq!(run(remote.path(), &["rev-list", "--count", "gh-pages"]).unwrap().trim(), "2");
+        // The same pages again: nothing new to commit.
+        assert!(publish_pages(dir.path(), &site(&[("index.html", "<h1>Home 2</h1>")]), "Same").unwrap().unchanged);
+    }
+
+    #[test]
+    fn publishing_builds_on_pages_another_clone_published() {
+        let (remote, dir) = cloned();
+        push(dir.path()).unwrap();
+        let other = tempfile::tempdir().unwrap();
+        run(other.path(), &["clone", "-q", &remote.path().to_string_lossy(), "."]).unwrap();
+        for args in [vec!["config", "user.name", "Other"], vec!["config", "user.email", "other@example.com"], vec!["config", "commit.gpgsign", "false"]] {
+            run(other.path(), &args).unwrap();
+        }
+        publish_pages(other.path(), &site(&[("index.html", "from the other clone")]), "Other").unwrap();
+        // This clone has no local gh-pages; it fetches the published one and builds on it.
+        publish_pages(dir.path(), &site(&[("index.html", "mine")]), "Mine").unwrap();
+        assert_eq!(run(remote.path(), &["rev-list", "--count", "gh-pages"]).unwrap().trim(), "2");
+    }
+
+    #[test]
+    fn refuses_unsafe_page_paths_and_a_repository_without_a_remote() {
+        let (_remote, dir) = cloned();
+        for bad in ["../x.html", "/x.html", "a//b.html", "a/./b.html", "c:/x.html", "a\\b.html", ""] {
+            assert!(publish_pages(dir.path(), &site(&[(bad, "x")]), "x").is_err(), "{bad}");
+        }
+        let alone = repo();
+        assert!(publish_pages(alone.path(), &site(&[("index.html", "x")]), "x").unwrap_err().starts_with("This repository has no remote"));
+    }
+
+    #[test]
+    fn works_out_the_github_pages_address() {
+        assert_eq!(pages_url("https://github.com/Owner/notes.git").as_deref(), Some("https://owner.github.io/notes/"));
+        assert_eq!(pages_url("git@github.com:owner/notes.git").as_deref(), Some("https://owner.github.io/notes/"));
+        assert_eq!(pages_url("ssh://git@github.com/owner/notes").as_deref(), Some("https://owner.github.io/notes/"));
+        assert_eq!(pages_url("https://github.com/owner/Owner.github.io").as_deref(), Some("https://owner.github.io/"));
+        assert_eq!(pages_url("https://gitlab.com/owner/notes.git"), None);
+        assert_eq!(pages_url("https://github.com/owner"), None);
     }
 
     #[test]

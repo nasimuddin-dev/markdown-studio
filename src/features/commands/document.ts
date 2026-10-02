@@ -162,6 +162,12 @@ export const documentCommands: Record<string, Command> = {
     run: async () => (await import("../siteExport")).exportFolderAsHtmlSite(),
     enabled: () => !!useWorkspace.getState().root,
   },
+  publishGitHubPages: {
+    id: "publishGitHubPages",
+    label: "Publish Folder to GitHub Pages…",
+    run: async () => (await import("../siteExport")).publishFolderToGitHubPages(),
+    enabled: () => !!useWorkspace.getState().root,
+  },
   exportFolderPdf: {
     id: "exportFolderPdf",
     label: "Export Folder as One PDF…",

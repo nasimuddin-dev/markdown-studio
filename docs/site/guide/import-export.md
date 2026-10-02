@@ -99,3 +99,17 @@ Either way, files are combined in folder order (a `README` or `index` first, the
 - If some of the HTML files already exist, Markpion asks before replacing them. Unsaved changes in open tabs are included.
 
 Open `index.html` in any browser to read the site.
+
+### Publish a folder to GitHub Pages
+
+**File → Publish → Folder to GitHub Pages…** builds the same site and puts it on the web with [GitHub Pages](https://pages.github.com/), when the open folder is in a Git repository with a remote on GitHub:
+
+1. Markpion asks first, then builds the pages (unsaved changes in open tabs included).
+2. It commits them to the repository's **gh-pages** branch, replacing the pages published before, and pushes that branch to the remote with your Git credentials, as **Push** in the Git tab does.
+3. It shows the site's address (`https://<owner>.github.io/<repository>/`) with an **Open Site** button.
+
+The first time, turn Pages on in the repository's settings on GitHub: **Settings → Pages → Deploy from a branch → gh-pages**. GitHub then rebuilds the site a minute or so after each publish.
+
+Your files, the staged changes and your current branch stay as they are; Markpion builds the gh-pages commit separately. Each publish is a new commit on gh-pages, so earlier versions stay in its history. If the folder is a subfolder of the repository, only that folder's documents are published. A GitHub Pages site is public on the internet, even when the repository is private (unless your organization uses GitHub Enterprise Cloud's access control), so publish only what anyone may read.
+
+A remote on another host (GitLab, your own server) works the same way: the pages go to its gh-pages branch, and that host's own settings decide how they're served. Publishing to documentation platforms that need an account (such as Confluence) isn't in Markpion yet.

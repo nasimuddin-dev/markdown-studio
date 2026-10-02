@@ -80,6 +80,7 @@ export const tauriBackend: Backend = {
   gitCreateBranch: (root, name) => call("git_create_branch", { root, name }),
   gitPull: (root) => call("git_pull", { root }),
   gitPush: (root) => call("git_push", { root }),
+  gitPublishPages: (root, files, message) => call("git_publish_pages", { root, files, message }),
   listConvertibleFiles: (root) => call("list_convertible_files", { root }),
   openExternal: (url) => call("open_external", { url }),
   revealInFolder: (path) => call("reveal_in_folder", { path }),

@@ -1,5 +1,5 @@
 import type {
-  AiStatus, AppInfo, AppUpdate, GitBranches, GitChange, GitStatus, HistoryEntry, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
+  AiStatus, AppInfo, AppUpdate, GitBranches, GitChange, GitStatus, HistoryEntry, PublishResult, OpenPaths, SearchOptions, SearchResult, DirEntry, FileContent, LineEnding, RecentEntry, RecoverySnapshot,
 } from "../types";
 
 /**
@@ -124,6 +124,8 @@ export interface WorkspaceApi {
   gitPull(root: string): Promise<void>;
   /** Pushes the current branch, setting its upstream on the first push. */
   gitPush(root: string): Promise<void>;
+  /** Publishes a site's pages (path inside the site → HTML) to the repository's gh-pages branch and pushes it; the work tree and current branch stay as they are. */
+  gitPublishPages(root: string, files: Array<{ path: string; content: string }>, message: string): Promise<PublishResult>;
   /** Word, PDF, HTML and CSV/TSV files under the workspace (batch conversion). */
   listConvertibleFiles(root: string): Promise<string[]>;
   /** Searches Markdown files under an approved folder. */

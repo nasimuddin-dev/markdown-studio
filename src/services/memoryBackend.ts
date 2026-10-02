@@ -1,7 +1,7 @@
 import type { AiRequest, Backend, NativeMenu, WriteRequest } from "./backend";
 import { AppError } from "./errors";
 import { basename, dirname, isMarkdownPath, join } from "./paths";
-import type { AppUpdate, DirEntry, GitBranches, GitChange, GitStatus, OpenPaths, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
+import type { AppUpdate, DirEntry, GitBranches, GitChange, GitStatus, OpenPaths, PublishResult, RecentEntry, RecoverySnapshot, SearchOptions, SearchResult } from "../types";
 import { buildSearchRegex, searchText } from "./search";
 import { pathFilter, relativeTo } from "./pathFilter";
 import { DEMO_FILES } from "./demoContent";
@@ -574,6 +574,11 @@ export class MemoryBackend implements Backend {
   async gitPush(root: string): Promise<void> {
     this.requireRepo(root);
     throw new AppError("git", "This repository has no remote to push to. Add one with your Git tool first.");
+  }
+
+  async gitPublishPages(root: string, _files: Array<{ path: string; content: string }>, _message: string): Promise<PublishResult> {
+    this.requireRepo(root);
+    throw new AppError("git", "This repository has no remote to publish to. Add one (for example on GitHub) with your Git tool first.");
   }
 
   async listWorkspaceFiles(root: string) {
