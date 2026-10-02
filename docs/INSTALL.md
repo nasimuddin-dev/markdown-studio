@@ -22,8 +22,8 @@ Choose one installer:
 
 | Installer | Use it when | Size |
 | --- | --- | --- |
-| **Standard**: <!-- installer-link -->[**Markpion-0.26.0-windows-x64-setup.exe**](../downloads/Markpion-0.26.0-windows-x64-setup.exe?raw=true)<!-- /installer-link --> | Recommended for almost everyone. If WebView2 is missing, it's downloaded automatically during setup (needs internet only in that case). | ~7 MB |
-| **Offline**: <!-- offline-link -->[**Markpion-0.26.0-windows-x64-offline-setup.exe**](https://github.com/nasimuddin-dev/markpion/releases/download/v0.26.0/Markpion-0.26.0-windows-x64-offline-setup.exe)<!-- /offline-link --> | The PC has **no internet access**, is locked down, or you're deploying to many machines. It includes the WebView2 runtime, so nothing is downloaded. | ~210 MB |
+| **Standard**: <!-- installer-link -->[**Markpion-0.27.0-windows-x64-setup.exe**](../downloads/Markpion-0.27.0-windows-x64-setup.exe?raw=true)<!-- /installer-link --> | Recommended for almost everyone. If WebView2 is missing, it's downloaded automatically during setup (needs internet only in that case). | ~7 MB |
+| **Offline**: <!-- offline-link -->[**Markpion-0.27.0-windows-x64-offline-setup.exe**](https://github.com/nasimuddin-dev/markpion/releases/download/v0.27.0/Markpion-0.27.0-windows-x64-offline-setup.exe)<!-- /offline-link --> | The PC has **no internet access**, is locked down, or you're deploying to many machines. It includes the WebView2 runtime, so nothing is downloaded. | ~210 MB |
 
 On GitHub you can also open the [`downloads`](../downloads/) folder, click the `.exe` file, and then click **Download raw file** (the ⬇ button). The offline installer is too large for the repository, so it's published on the project's [Releases page](https://github.com/nasimuddin-dev/markpion/releases/latest).
 
@@ -83,7 +83,7 @@ Open **Settings → Apps → Installed apps** (or **Control Panel → Programs a
 The installer supports unattended installation. Add `/AllUsers` (run elevated) or `/CurrentUser` to choose the scope:
 
 ```powershell
-.\Markpion-0.26.0-windows-x64-setup.exe /S /AllUsers
+.\Markpion-0.27.0-windows-x64-setup.exe /S /AllUsers
 ```
 
 To uninstall silently, run `uninstall.exe /S` from the installation folder.
