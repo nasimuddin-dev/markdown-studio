@@ -860,3 +860,24 @@ The user asked to complete the planned items, then to continue the loop until 8:
 4. A plugin system: a design for the user's approval first (plugins must not reach the IPC or the API key).
 5. Large documents with every section open; the last inline-math cases in PDF.
 6. Then remind the user to start the cloud integration (sync, collaboration, the cloud backend).
+
+## 2026-10-01 (night): Source Control, 0.27.0
+
+The user asked to continue with the remaining non-cloud features (Git first).
+
+| Item | Commit |
+| --- | --- |
+| Source Control tab: changed files staged and not, stage/unstage, commit through the user's git; demo repository model for the browser; scope checks on the root and every path | 1419071 |
+| The layout checks found a fifth sidebar tab didn't fit the narrowest window (the sidebar scrolled sideways when a button got focus); icon-only tabs now share the width, and the checks flag a sidebar wider than itself | 1419071 |
+| Branches (switch, create), pull (fast-forward only) and push (sets the upstream), with a two-minute limit for network commands; privacy page lists pull/push as user-started connections; disabled icon buttons are faded | 015f934 |
+
+**Version:** 0.27.0. **Tests:** Vitest 679 (121 files), Playwright 145, Rust 59 (+1 ignored), native 7 (Windows locally, Linux in CI: they commit, push and pull with real Git against a local bare remote), visual 32 screens (local).
+
+**Unverified:** pull and push against a hosted remote (GitHub) with a credential helper; the tests use a local bare repository, which runs the same git commands without the network.
+
+**Next up (the user's plan):**
+
+1. Publishing to static sites and documentation platforms.
+2. A plugin system (design for the user's approval first).
+3. Large documents with every section open; the last inline-math cases in PDF.
+4. Then remind the user to start the cloud integration.

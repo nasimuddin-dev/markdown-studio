@@ -7,6 +7,23 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.27.0
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.27.0)
+
+### Added
+
+- **Source Control** (the **Git** tab in the sidebar): see the files you've changed, stage or unstage them one by one or all at once, write a message and **Commit** (or press **Ctrl+Enter**). Markpion uses your own Git, so your name, email and the repository's hooks apply. If Git refuses, its message is shown.
+- **Branches, pull and push** in the same tab: switch to another branch or create one, **Pull** the latest commits (only when no merge is needed) and **Push** yours, with your Git sign-in as on the command line.
+
+### Changed
+
+- With five sidebar tabs, the tab icons share the sidebar's width, so they all fit even in the smallest window.
+
+### Fixed
+
+- Disabled icon buttons looked the same as ones you can click; they're now faded.
+
 ## v0.26.0
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.26.0)
