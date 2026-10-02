@@ -39,6 +39,17 @@ interface Context {
   labels: Set<string>;
   headingOffset: number;
   packages: Set<string>;
+  /** Picture file for a Mermaid diagram's code (null: keep the code). */
+  diagram?: (code: string) => string | null;
+  /** `.svg` pictures are included as `.png` (converted next to them; pdfLaTeX can't read SVG). */
+  svgAsPng?: boolean;
+}
+
+/** A centred figure for a picture file, with its description as the caption. */
+function figure(path: string, alt: string, ctx: Context): string {
+  const caption = alt ? `\n\\caption*{${escapeLatex(alt)}}` : "";
+  if (caption) ctx.packages.add("caption");
+  return `\\begin{figure}[htbp]\n\\centering\n${image(path, alt, ctx)}${caption}\n\\end{figure}`;
 }
 
 const plainText = (node: Nodes): string =>
@@ -114,6 +125,7 @@ function image(url: string, alt: string, ctx: Context): string {
   } catch {
     /* keep as written */
   }
+  if (ctx.svgAsPng) path = path.replace(/\.svg$/i, ".png");
   return `\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{${path.replace(/[\\%#{}]/g, "")}}`;
 }
 
@@ -152,11 +164,7 @@ function block(node: RootContent, ctx: Context, slugger = new GithubSlugger()): 
     case "paragraph": {
       // A picture on its own becomes a centred figure, with its description as the caption.
       const only = node.children.length === 1 ? node.children[0] : null;
-      if (only?.type === "image" && !/^[a-z][\w+.-]*:/i.test(only.url)) {
-        const caption = only.alt ? `\n\\caption*{${escapeLatex(only.alt)}}` : "";
-        if (caption) ctx.packages.add("caption");
-        return `\\begin{figure}[htbp]\n\\centering\n${image(only.url, only.alt ?? "", ctx)}${caption}\n\\end{figure}`;
-      }
+      if (only?.type === "image" && !/^[a-z][\w+.-]*:/i.test(only.url)) return figure(only.url, only.alt ?? "", ctx);
       return inline(node.children, ctx);
     }
     case "blockquote": {
@@ -167,8 +175,11 @@ function block(node: RootContent, ctx: Context, slugger = new GithubSlugger()): 
     }
     case "list":
       return list(node, ctx);
-    case "code":
+    case "code": {
+      const file = node.lang === "mermaid" ? ctx.diagram?.(node.value) : null;
+      if (file) return figure(file, "", ctx);
       return `\\begin{verbatim}\n${node.value.replace(/\\end\{verbatim\}/g, "\\end {verbatim}")}\n\\end{verbatim}`;
+    }
     case "math":
       return `\\[\n${node.value}\n\\]`;
     case "thematicBreak":
@@ -192,13 +203,16 @@ function block(node: RootContent, ctx: Context, slugger = new GithubSlugger()): 
  * `bodyOnly` returns just the converted text, for pasting into an existing
  * document: no preamble, and a top heading stays a section.
  */
-export function markdownToLatex(markdown: string, opts: { name?: string; math?: boolean; bodyOnly?: boolean } = {}): string {
+export function markdownToLatex(
+  markdown: string,
+  opts: { name?: string; math?: boolean; bodyOnly?: boolean; diagram?: (code: string) => string | null; svgAsPng?: boolean } = {},
+): string {
   const parser = unified().use(remarkParse).use(remarkGfm);
   if (opts.math !== false) parser.use(remarkMath, { singleDollarTextMath: true });
   const tree = parser.parse(stripFrontMatter(markdown)) as Root;
   remarkWikiLinks()(tree);
 
-  const ctx: Context = { definitions: new Map(), footnotes: new Map(), labels: new Set(), headingOffset: 0, packages: new Set() };
+  const ctx: Context = { definitions: new Map(), footnotes: new Map(), labels: new Set(), headingOffset: 0, packages: new Set(), diagram: opts.diagram, svgAsPng: opts.svgAsPng };
   const collect = (n: Nodes) => {
     if (n.type === "definition") ctx.definitions.set(n.identifier, n);
     if (n.type === "footnoteDefinition") ctx.footnotes.set(n.identifier, n);

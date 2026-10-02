@@ -39,7 +39,7 @@ export const MENUS: MenuDef[] = [
         c("convertFolder"),
       ]),
       sub("Export", [
-        c("exportPdf", "PDF…"), c("exportDocx", "Word (.docx)…"), c("exportHtml", "HTML…"), c("exportEpub", "EPUB (E-book)…"), c("exportLatex", "LaTeX (.tex)…"), c("exportZip", "Markdown with Images (.zip)…"), sep,
+        c("exportPdf", "PDF…"), c("exportDocx", "Word (.docx)…"), c("exportHtml", "HTML…"), c("exportEpub", "EPUB (E-book)…"), c("exportLatex", "LaTeX (.tex)…"), c("exportLatexZip", "LaTeX with Pictures (.zip)…"), c("exportZip", "Markdown with Images (.zip)…"), sep,
         c("combineFolder"), c("exportFolderPdf"), c("exportFolderDocx"), c("exportFolderEpub"), c("exportFolderLatex"), c("exportFolderHtml"),
       ]),
       sub("Copy As", [c("copyFormatted", "Formatted Text"), c("copyPlainText", "Plain Text"), c("copyHtml", "HTML"), c("copyLatex", "LaTeX")]),

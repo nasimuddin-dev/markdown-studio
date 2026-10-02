@@ -8,7 +8,7 @@ import { findAllLinks, localTargets } from "./lint";
 const IMAGE = /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i;
 
 /** Bytes of a `data:` URL (what the backend returns for images). */
-function dataUrlBytes(url: string): Uint8Array {
+export function dataUrlBytes(url: string): Uint8Array {
   const base64 = url.slice(url.indexOf(",") + 1);
   return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
 }

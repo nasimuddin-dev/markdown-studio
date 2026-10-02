@@ -80,6 +80,8 @@ describe("LaTeX export", () => {
   it("writes sample documents for compiling", async () => {
     const samples: Record<string, string> = {
       plain: "Just a paragraph with 50% & $x_1$.",
+      // As LaTeX with Pictures writes it: a diagram drawn to a PNG, and an SVG picture pointed at its PNG copy.
+      pictures: "# Pictures\n\n```mermaid\ngraph LR\n  A --> B\n```\n\n![Logo](pic.svg)\n",
       rich: [
         "---", "title: Sample Paper", "author: Markpion", "---", "",
         "# Introduction", "", "Text with **bold**, *italic*, ~~struck~~, `code_1`, a [link](https://example.com/?a=1&b=2#x), a footnote[^1] and [a reference](#methods).", "",
@@ -92,7 +94,7 @@ describe("LaTeX export", () => {
     };
     const out = process.env.LATEX_OUT;
     for (const [name, markdown] of Object.entries(samples)) {
-      const tex = markdownToLatex(markdown);
+      const tex = name === "pictures" ? markdownToLatex(markdown, { svgAsPng: true, diagram: () => "pic.png" }) : markdownToLatex(markdown);
       expect(tex).toContain("\\end{document}");
       if (out) {
         const { mkdirSync, writeFileSync } = await import("node:fs");
@@ -102,6 +104,19 @@ describe("LaTeX export", () => {
         writeFileSync(`${out}/pic.png`, Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64"));
       }
     }
+  });
+
+  it("draws Mermaid diagrams as figures when given a picture for them, and points SVG pictures at their PNG copies", () => {
+    const md = "```mermaid\ngraph LR\n  A --> B\n```\n\n```mermaid\nbroken\n```\n\n![Logo](images/logo.svg)\n";
+    const tex = markdownToLatex(md, { svgAsPng: true, diagram: (code) => (code.startsWith("graph") ? "images/diagram-1.png" : null) });
+    expect(tex).toContain("\\begin{figure}[htbp]\n\\centering\n\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{images/diagram-1.png}\n\\end{figure}");
+    // A diagram without a picture (it couldn't be drawn) stays as its code.
+    expect(tex).toContain("\\begin{verbatim}\nbroken\n\\end{verbatim}");
+    expect(tex).toContain("{images/logo.png}");
+    expect(tex).not.toContain("logo.svg");
+    // Without the options, nothing changes.
+    expect(markdownToLatex(md)).toContain("\\begin{verbatim}\ngraph LR");
+    expect(markdownToLatex(md)).toContain("{images/logo.svg}");
   });
 
   it("gives just the converted text for pasting (Copy as LaTeX)", () => {

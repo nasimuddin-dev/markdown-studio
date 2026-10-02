@@ -1488,6 +1488,29 @@ test("File > Export > LaTeX makes a .tex document", async ({ page }) => {
   expect(tex).toContain("It costs 50\\% of $x^2$.");
 });
 
+test("File > Export > LaTeX with Pictures makes a .zip that compiles as it is", async ({ page }) => {
+  await start(page);
+  await openDemoFolder(page);
+  await openFile(page, "README.md");
+  await page.getByRole("textbox", { name: "Markdown editor" }).click();
+  await page.keyboard.press(`${mod}+End`);
+  await page.keyboard.insertText("\n\n```mermaid\nflowchart LR\n  A --> B\n```\n");
+  const download = page.waitForEvent("download");
+  await chooseMenu(page, "File", "Export", "LaTeX with Pictures (.zip)…");
+  const file = await download;
+  expect(file.suggestedFilename()).toBe("README.zip");
+  const zip = await JSZip.loadAsync(Buffer.concat(await (await file.createReadStream()).toArray()));
+  const tex = await zip.file("README.tex")!.async("string");
+  // The SVG logo is converted to PNG (pdfLaTeX can't read SVG), and the diagram is drawn.
+  for (const name of ["images/logo.png", "images/diagram-1.png"]) {
+    const bytes = await zip.file(name)!.async("uint8array");
+    expect([...bytes.slice(1, 4)].map((b) => String.fromCharCode(b)).join(""), name).toBe("PNG");
+    expect(tex).toContain(`{${name}}`);
+  }
+  expect(zip.file("images/logo.svg")).toBeNull();
+  expect(tex).not.toContain("flowchart LR");
+});
+
 test("Export Folder as One LaTeX Document titles it after the folder", async ({ page }) => {
   await start(page);
   await openDemoFolder(page);
