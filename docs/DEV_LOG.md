@@ -801,3 +801,23 @@ The user asked for a third-party notices file, for error reporting and feedback 
 **Mistake:** a first version of the native feedback test tried to stub `open_external` in the page; the stub didn't take effect in the real web view, and one GitHub "new issue" page opened in the user's browser (nothing was submitted). The test no longer clicks Open on GitHub or Send by Email.
 
 **Version:** 0.25.2. **Tests:** Vitest 673 (120 files), Playwright 114, Rust 50 (+1 ignored), native 6, visual 30 screens (local).
+
+## 2026-10-01 (evening): regression suite, skills and a UI audit, 0.25.3
+
+The user asked for an end-to-end UI regression suite run before every release, saved as a skill, with all skills kept in the repository, and then to continue the loop with UI testing.
+
+| Item | Commit |
+| --- | --- |
+| `npm run test:regression` (`scripts/regression.mjs`): every check in order with a report; `release:installer` requires a full pass for the commit. Skills committed in `.claude/skills/`: `dev-loop`, `ui-regression`, `release` | ab377b1, 6923a49 |
+| Layout checks (`e2e/layout.spec.ts`) at 720×480, 1024×640 and 1366×768 in both themes, over 20 screens, dialogs and panels | 09a21da, 3069d5d |
+| Bugs they found: Keyboard Shortcuts' Close button and Report a Problem's buttons off screen in short windows (dialog buttons are now sticky); a narrow sidebar's search box with room for a few letters (options move under it below 240px); result file names cut mid-word, hiding the match count | 09a21da, 3069d5d |
+
+**Version:** 0.25.3. **Tests:** Vitest 673 (120 files), Playwright 126 (12 layout checks), Rust 50 (+1 ignored), native 6, visual 30 screens (local). The full regression run passed for the release commit's code.
+
+**Unverified:** the sticky dialog buttons and the narrow search box on macOS (WebKit) and Linux (WebKitGTK); both use widely supported CSS (`position: sticky`, `:has()`, container queries), but they were checked only in Chromium/WebView2.
+
+**Next up:**
+
+1. A layout check of the slide show, the AI panel and the table picker.
+2. Open exported EPUBs in e-reader apps.
+3. The Linux watcher on a real Linux desktop.

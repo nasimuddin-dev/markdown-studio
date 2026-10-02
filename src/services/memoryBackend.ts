@@ -186,7 +186,7 @@ export class MemoryBackend implements Backend {
   // ------------------------------------------------------------ Backend
 
   async appInfo() {
-    return { version: "0.25.2", os: "browser", arch: "web", logPath: "(in memory)" };
+    return { version: "0.25.3", os: "browser", arch: "web", logPath: "(in memory)" };
   }
 
   async pickOpenFile() {

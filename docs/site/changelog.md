@@ -7,6 +7,16 @@ description: Release notes for every Markpion version, listing what was added, c
 
 Every release of Markpion, newest first. Dates are the GitHub release dates (UTC). Installers for each version are on the [GitHub releases page](https://github.com/nasimuddin-dev/markpion/releases).
 
+## v0.25.3
+
+Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.3)
+
+### Fixed
+
+- In a small window, the buttons of tall dialogs (such as **Keyboard Shortcuts** and **Report a Problem**) were below the bottom of the window. They now stay at the bottom of the dialog while its content scrolls.
+- In a narrow sidebar, the **Search** box left room for only a few letters, because its options (Aa, ab, .*) sat inside it. They now move below the box when the sidebar is narrow.
+- Long file names in the Search and Links panels were cut off mid-word and hid the number of matches; they now end in "…" and the number stays visible.
+
 ## v0.25.2
 
 Released: 2026-10-01 · [Release files](https://github.com/nasimuddin-dev/markpion/releases/tag/v0.25.2)
